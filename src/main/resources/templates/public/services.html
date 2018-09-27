@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="">
+                <div class="page-title">
+                    <div class="title_left">
+                        <h3>Services</h3>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Services <small>For Investors &amp; Investment Management Firms</small></h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="col-xs-3">
+                            <!-- required for floating -->
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs tabs-left">
+                                <li class="active"><a href="#Retail" data-toggle="tab">Retail Investors</a>
+                                </li>
+                                <li><a href="#Institutional" data-toggle="tab">Professional/Institutional Investors</a>
+                                </li>
+                                <li><a href="#Advisers" data-toggle="tab">Investment Advisers/Asset Management Firms</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="col-xs-9">
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="Retail">
+                                    <p class="lead">Retail Investors</p>
+                                    <p />
+                                    <blockquote>
+                                        Long-term wealth creation is all about Asset Allocation Strategy.
+                                        <p />
+                                        <ul>
+                                            <li>Get your Investment Policy Statement (IPS) - Risk &amp; Return Profile, Advise for Strategic Asset Allocation, Future Investments, Insurance Need based on</li>
+                                            <ul>
+                                                <li>Family Background - Stage of life, Other Earning Members, Dependents, Source of Income</li>
+                                                <li>Income &amp; Lifestyle Spending Expenses - Ability of future Savings or Need for expenses</li>
+                                                <li>Current wealth level and Asset Allocation</li>
+                                                <li>Critical long-term Financial Goals &amp; Short-term Liquidity Events</li>
+                                                <li>Time Horizon &amp; Stages</li>
+                                                <li>Legal Restriction e.g. ESOP, Company Shares Company Shares cannot be sold and constitute one of the major portions of wealth</li>
+                                                <li>Tax Consideration</li>
+                                                <li>Unique Consideration</li>
+                                            </ul>
+                                            <li>Update, Monitor &amp; Rebalance to Strategic Asset Allocation </li>
+                                            <li>Get Performance Result of the portfolio in Globally Accepted Standardized Format</li>
+                                            <li>Assess Investment Strategy</li>
+                                        </ul>
+                                    </blockquote>
+                                </div>
+                                <div class="tab-pane" id="Institutional">
+                                    <p class="lead">Professional/Institutional Investors</p>
+                                    <p />
+                                    <blockquote>
+                                        Assess your Investment Performance accurately. (Note: <a href="http://www.twealthbook.com"><strong><u>Twealthbook.com</u></strong></a> is more suitable for you)
+                                        <p />
+                                        <ul>
+                                            <li>Develop your Investment Policy Statement (IPS) </li>
+                                            <li>Create portfolios</li>
+                                            <li>Track Cash flows</li>
+                                            <li>Update, Monitor &amp; Rebalance to Strategic Asset Allocation </li>
+                                            <li>Make sure Tactical Asset Allocation is within mandate defined in IPS</li>
+                                            <li>Compare performance with benchmark</li>
+                                            <li>Measure Investment Returns recommended by GIPS (TWRR, After Management Fees)</li>
+                                            <li>Asses Performance of your Investment Manager</li>
+                                            <li>Smooth transition from one Investment Manager to other</li>
+                                            <li>Asses your Investment Strategy</li>
+                                        </ul>
+                                    </blockquote>
+                                </div>
+                                <div class="tab-pane" id="Advisers">
+                                    <p class="lead">Investment Advisers/Asset Management Firms</p>
+                                    <p />
+                                    <blockquote>
+                                        Get a tech assistance to develop a competitive advantage by claiming your firm as a GIPS compliant. (Note: <a href="http://www.twealthbook.com"><strong><u>Twealthbook.com</u></strong></a> is more suitable for medium-large scale Asset Management Firm)
+                                        <p />
+                                        <ul>
+                                            <li>For Individuals: Increase your online Clients Base</li>
+                                            <li>For Firms</li>
+                                            <ul>
+                                                <li>Define a Composite </li>
+                                                <li>Put portfolios in a Composite</li>
+                                                <li>Keep Track of Cash flows of individual portfolios</li>
+                                                <li>Keep Track of Transactions</li>
+                                                <li>Measure Investment Performance of Portfolios based on daily market price</li>
+                                                <li>Get both Time-Weighted Rate of Returns (TWRR) and Money-Weighted Rate of Returns of Portfolios</li>
+                                                <li>Get Composite Performance as per GIPS standard</li>
+                                            </ul>
+                                        </ul>
+                                    </blockquote>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="clearfix"></div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>

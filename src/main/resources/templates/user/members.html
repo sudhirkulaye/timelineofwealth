@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="MemberManagement" ng-controller="MemberController">
+<!-- iCheck -->
+<link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
+<!-- bootstrap-wysiwyg -->
+<link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" th:href="@{/vendors/google-code-prettify/bin/prettify.min.css}"  rel="stylesheet" />
+<!-- Select2 -->
+<link href="../../static/vendors/select2/dist/css/select2.min.css" th:href="@{/vendors/select2/dist/css/select2.min.css}"  rel="stylesheet" />
+<!-- Switchery -->
+<link href="../../static/vendors/switchery/dist/switchery.min.css" th:href="@{/vendors/switchery/dist/switchery.min.css}" rel="stylesheet" />
+<!-- starrr -->
+<link href="../../static/vendors/starrr/dist/starrr.css" th:href="@{/vendors/starrr/dist/starrr.css}"  rel="stylesheet" />
+<!-- bootstrap-daterangepicker -->
+<link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}"  rel="stylesheet" />
+<!-- Animate.css -->
+<link href="../../static/vendors/animate.css/animate.min.css" th:href="@{/vendors/animate.css/animate.min.css}" rel="stylesheet" />
+<!-- jQuery custom content scroller -->
+<link href="../../static/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" th:href="@{/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css}" rel="stylesheet" />
+
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>-->
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/user/members.js" th:src="@{/custom/user/members.js}"></script>
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/usersidebarmenu :: common-usersidebarmenu" />
+
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/usertopnavigation :: common-usertopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="">
+                <div class="page-title">
+                    <div class="title_left">
+                        <h3>Family Background </h3>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <!--<div class="x_panel">-->
+                            <!--<div class="x_title">-->
+                                <!--<h2>Earning &amp; Dependent Members <small></small></h2>-->
+                                <!--<div class="clearfix"></div>-->
+                            <!--</div>-->
+                            <!--<div class="x_content">-->
+                                <br />
+                                <div class="x_panel">
+                                    <div class="x_title" ng-hide="hideTable">
+                                        <h2>Earning &amp; Dependent Members<small></small></h2>
+                                        <button type="button" ng-click="showClearForm()" class="btn btn-success  pull-right btn-xs">Add New</button>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="x_content" ng-hide="hideTable">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Relationship</th>
+                                                    <th>Age</th>
+                                                    <th>Earning Status</th>
+                                                    <th>Category</th>
+                                                    <th>Pension Security</th>
+                                                    <th></th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr ng-repeat="member in members">
+                                                    <td>{{member.firstName}} {{member.lastName}}</td>
+                                                    <td>{{member.relationship}}</td>
+                                                    <td>{{calculateAge(member.birthDate)}}</td>
+                                                    <td>{{member.earningStatus}}</td>
+                                                    <td>{{member.profession}}</td>
+                                                    <td>{{member.isSecuredByPension}}</td>
+                                                    <td><button type="button" ng-click="editMember(member)" class="btn btn-warning  pull-right btn-xs" > Edit </button></td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div  class="col-md-6 col-xs-12" ng-hide="hideForm">
+                                        <!--<span class="col-md-12 col-sm-12 col-xs-12 message" ng-show="memberHtmlForm.firstName.$error.reqired || memberHtmlForm.lastName.$error.reqired || isFormSubmit">First and Last Name Required!</span>-->
+                                        <span ng-show="relationshipError" class="col-md-12 col-sm-12 col-xs-12 alert alert-danger" >Only one member can have relationship as a Self</span>
+                                        <p />
+                                        <form name="memberHtmlForm" class="form-horizontal form-label-left input_mask" >
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+                                                <input type="text" name="firstName" class="form-control has-feedback-left" ng-model="memberForm.firstName" placeholder="Name*" required="required" ng-disabled="editMode" />
+                                                <span class="fa fa-user form-control-feedback left" aria-hidden="true"></span>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+                                                <input type="text" name="lastName"  class="form-control" ng-model="memberForm.lastName" placeholder="Surname*" required="required" ng-disabled="editMode"  />
+                                                <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+                                                <input type="email" class="form-control has-feedback-left" ng-model="memberForm.email" placeholder="Email" />
+                                                <span class="fa fa-envelope form-control-feedback left" aria-hidden="true"></span>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+                                                <input type="text" class="form-control" ng-model="memberForm.cellNo" pattern="[1-9]{1}[0-9]{9}" placeholder="10 Digit Cell No" />
+                                                <span class="fa fa-phone form-control-feedback right" aria-hidden="true"></span>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-6 col-sm-6 col-xs-6">Relationship <span class="required">*</span> </label>
+                                                <div class="col-md-6 col-sm-6 col-xs-6">
+                                                    <select class="form-control" ng-model="memberForm.relationship" required="required" ng-disabled="editMode" >
+                                                        <option>Self</option>
+                                                        <option>Wife</option>
+                                                        <option>Husband</option>
+                                                        <option>Father</option>
+                                                        <option>Mother</option>
+                                                        <option>Son</option>
+                                                        <option>Daughter</option>
+                                                        <option>Brother</option>
+                                                        <option>Sister</option>
+                                                        <option>In-Law</option>
+                                                        <option>Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-6 col-sm-6 col-xs-6">
+                                                    Date Of Birth <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-6 col-sm-6 col-xs-6">
+                                                    <!--input type="text" class="form-control" placeholder="YYYY-MM-DD"-->
+                                                    <input type="date" class="form-control" ng-model="memberForm.birthDate" placeholder="yyyy-MM-dd" required="required"  />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-6 col-sm-6 col-xs-12">Gender<span class="required">*</span></label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <select class="form-control" ng-model="memberForm.gender" required="required" >
+                                                        <option value="M">Male</option>
+                                                        <option value="F">Female</option>
+                                                        <option value="O">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-6 col-sm-6 col-xs-12">Earning Status<span class="required">*</span></label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <select class="form-control" ng-model="memberForm.earningStatus" required="required" >
+                                                        <option>Dependent</option>
+                                                        <option>Earning</option>
+                                                        <option>Not Earning</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-6 col-sm-6 col-xs-12">Marital Status</label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <select class="form-control" ng-model="memberForm.maritalStatus">
+                                                        <option>Single</option>
+                                                        <option>Married</option>
+                                                        <option>Widow</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-6 col-sm-6 col-xs-12">Secured by Pension</label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <select class="form-control" ng-model="memberForm.isSecuredByPension">
+                                                        <option value="Y">Yes</option>
+                                                        <option value="N">No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-6 col-sm-6 col-xs-12">Profession Category</label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <select class="form-control" ng-model="memberForm.profession">
+                                                        <option>Secured Govt. Job</option>
+                                                        <option>Stable Pvt. Sector Job</option>
+                                                        <option>Unstable Pvt. Sector Job</option>
+                                                        <option>Large Size Business</option>
+                                                        <option>Medium Size Business</option>
+                                                        <option>Small Size Business</option>
+                                                        <option>Professional/Self Employed</option>
+                                                        <option>Athlete/Actor/Model</option>
+                                                        <option>Pensioner</option>
+                                                        <option>Retired No Pension</option>
+                                                        <option>Housewife</option>
+                                                        <option>Student</option>
+                                                        <option>HNI</option>
+                                                        <option>Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-6 col-sm-6 col-xs-12">Industry</label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <select class="form-control" ng-model="memberForm.industry">
+                                                        <optgroup label="Discretionary">
+                                                            <option>Auto Components</option>
+                                                            <option>Automobiles</option>
+                                                            <option>Cons. Durables Leisure Products</option>
+                                                            <option>Diversified Consumer Services</option>
+                                                            <option>Hotels, Restaurants &amp; Leisure</option>
+                                                            <option>Household Durables</option>
+                                                            <option>Media</option>
+                                                            <option>Retailing - Distributors</option>
+                                                            <option>Retailing - Internet &amp; Catalog Retail</option>
+                                                            <option>Retailing - Multiline Retail</option>
+                                                            <option>Retailing - Specialty Retail</option>
+                                                            <option>Textiles, Apparel, Luxury Goods</option>
+                                                        </optgroup>
+                                                        <optgroup label="Energy">
+                                                            <option>Equipment &amp; Services</option>
+                                                            <option>Oil, Gas &amp; Coal</option>
+                                                        </optgroup>
+                                                        <optgroup label="Financials">
+                                                            <option>Banks</option>
+                                                            <option>Consumer Finance</option>
+                                                            <option>Diversified Financial Services</option>
+                                                            <option>Financials Capital Markets</option>
+                                                            <option>Insurance</option>
+                                                            <option>Mortgage Finance</option>
+                                                            <option>Real Estate Invest Trust-REIT</option>
+                                                            <option>Real Estate Mgmt &amp; Devpt</option>
+                                                        </optgroup>
+                                                        <optgroup label="Health Care">
+                                                            <option>Biotechnology</option>
+                                                            <option>Health Care Equipt &amp; Supplies</option>
+                                                            <option>Health Care Service Providers</option>
+                                                            <option>Health Care Technology</option>
+                                                            <option>Life Sciences Tools &amp; Services</option>
+                                                            <option>Pharmaceuticals</option>
+                                                        </optgroup>
+                                                        <optgroup label="Industrials">
+                                                            <option>Cap Goods - Aerospace &amp; Defense</option>
+                                                            <option>Cap Goods - Building Products</option>
+                                                            <option>Cap Goods - Conglomerates</option>
+                                                            <option>Cap Goods - Construction &amp; Eng.</option>
+                                                            <option>Cap Goods - Electrical Equipment</option>
+                                                            <option>Cap Goods - Machinery</option>
+                                                            <option>Cap Goods - Trading, Distributors</option>
+                                                            <option>Commercial Services &amp; Supplies</option>
+                                                            <option>Professional Services</option>
+                                                            <option>Transportation - Airlines</option>
+                                                            <option>Transportation - Infra</option>
+                                                            <option>Transportation - Logistics</option>
+                                                            <option>Transportation - Marine</option>
+                                                            <option>Transportation - Road &amp; Rail</option>
+                                                        </optgroup>
+                                                        <optgroup label="Materials">
+                                                            <option>Chemicals</option>
+                                                            <option>Construction Materials</option>
+                                                            <option>Containers &amp; Packaging</option>
+                                                            <option>Metals &amp; Mining</option>
+                                                            <option>Paper &amp; Forest Products</option>
+                                                        </optgroup>
+                                                        <optgroup label="Staples">
+                                                            <option>Beverages</option>
+                                                            <option>Food &amp; Staples Retailing</option>
+                                                            <option>Food Products</option>
+                                                            <option>Household Products</option>
+                                                            <option>Personal Products</option>
+                                                            <option>Tobacco</option>
+                                                        </optgroup>
+                                                        <optgroup label="Technology">
+                                                            <option>Communications Equipment</option>
+                                                            <option>Electronic Equipt, Instru, Comp</option>
+                                                            <option>Hardware, Storage &amp; Peripherals</option>
+                                                            <option>Internet Software &amp; Services</option>
+                                                            <option>IT Services</option>
+                                                            <option>Semiconductor Equipment</option>
+                                                            <option>Software</option>
+                                                        </optgroup>
+                                                        <optgroup label="Telecom">
+                                                            <option>Diversified Telecom Services</option>
+                                                            <option>Wireless Telecom Services</option>
+                                                        </optgroup>
+                                                        <optgroup label="Utilities">
+                                                            <option>Electric Utilities</option>
+                                                            <option>Gas Utilities</option>
+                                                            <option>Independent Power Renewable</option>
+                                                            <option>Multi-Utilities</option>
+                                                            <option>Water Utilities</option>
+                                                        </optgroup>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-6 col-sm-6 col-xs-12">Education </label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <select class="form-control" ng-model="memberForm.education">
+                                                        <option>Professional</option>
+                                                        <option>Master</option>
+                                                        <option>Graduate</option>
+                                                        <option>Under Graduate</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-6 col-sm-6 col-xs-12">Is Finance Professional</label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <select class="form-control" ng-model="memberForm.isFinanceProfessional">
+                                                        <option value="Y">Yes</option>
+                                                        <option value="N">No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-6 col-sm-6 col-xs-12">
+                                                    Exp. Retirement Date
+                                                </label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <input type="date" class="form-control" ng-model="memberForm.expectedRetirementDate" placeholder="yyyy-MM-dd" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-6 col-sm-6 col-xs-12">
+                                                    Date Last Update
+                                                </label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <input type="date" class="form-control" ng-model="memberForm.dateLastUpdate" placeholder="yyyy-MM-dd" ng-disabled="true" />
+                                                </div>
+                                            </div>
+                                            <div class="ln_solid"></div>
+                                            <div class="form-group">
+
+                                                <div class="col-md-4 col-sm-4 col-xs-12  col-md-offset-8">
+                                                    <button type="submit" class="btn btn-success" ng-click="processMember()">Save</button>
+                                                    <button class="btn btn-success" ng-click="showTable()">Cancel</button>
+                                                    <br /> <br />
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            <!--</div>-->
+                        <!--</div>-->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+
+
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- bootstrap-progressbar -->
+<script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js" th:src="@{/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js}"></script>
+<!-- iCheck -->
+<script src="../../static/vendors/iCheck/icheck.min.js" th:src="@{/vendors/iCheck/icheck.min.js}"></script>
+<!-- jquery.inputmask -->
+<script src="../../static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js" th:src="@{/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js}"></script>
+<!-- bootstrap-daterangepicker -->
+<script src="../../static/vendors/moment/min/moment.min.js" th:src="@{/vendors/moment/min/moment.min.js}"></script>
+<script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js" th:src="@{/vendors/bootstrap-daterangepicker/daterangepicker.js}"></script>
+<!-- bootstrap-wysiwyg -->
+<script src="../../static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js" th:src="@{/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js}"></script>
+<script src="../../static/vendors/jquery.hotkeys/jquery.hotkeys.js" th:src="@{/vendors/jquery.hotkeys/jquery.hotkeys.js}"></script>
+<script src="../../static/vendors/google-code-prettify/src/prettify.js" th:src="@{/vendors/google-code-prettify/src/prettify.js}"></script>
+<!-- jQuery Tags Input -->
+<script src="../../static/vendors/jquery.tagsinput/src/jquery.tagsinput.js" th:src="@{/vendors/jquery.tagsinput/src/jquery.tagsinput.js}"></script>
+<!-- Switchery -->
+<script src="../../static/vendors/switchery/dist/switchery.min.js" th:src="@{/vendors/switchery/dist/switchery.min.js}"></script>
+<!-- Select2 -->
+<script src="../../static/vendors/select2/dist/js/select2.full.min.js" th:src="@{/vendors/select2/dist/js/select2.full.min.js}"></script>
+<!-- Parsley -->
+<script src="../../static/vendors/parsleyjs/dist/parsley.min.js" th:src="@{/vendors/parsleyjs/dist/parsley.min.js}"></script>
+<!-- Autosize -->
+<script src="../../static/vendors/autosize/dist/autosize.min.js" th:src="@{/vendors/autosize/dist/autosize.min.js}"></script>
+<!-- jQuery autocomplete -->
+<script src="../../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js" th:src="@{/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js}"></script>
+<!-- starrr -->
+<script src="../../static/vendors/starrr/dist/starrr.js" th:src="@{/vendors/starrr/dist/starrr.js}"></script>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="">
+                <div class="page-title">
+                    <div class="title_left">
+                        <h3>Home</h3>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="x_panel">
+                            <div class="x_title">
+                                <h2>Welcome!</h2>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                <br />
+
+                                <!--<h3>Identify and Quantify your Finantial Goals</h3>-->
+                                <!--Goal Oriented or Liability Deriven Approach:-->
+                                <!--Retirment after 15 Years-->
+                                <!--Kids Higher Education after 10 Years-->
+                                <!--<br />-->
+                                <!--<h3>Assess Risk Return Objective</h3>-->
+                                <!--Is your future income secured?-->
+                                <!--Are you able to save after lifestyle spending?-->
+                                <!--What is your current wealth level?-->
+                                <!--What is your personality? Are you more risk averse or less risk averse?-->
+                                <!--<br />-->
+                                <!--<h3>Get Unbised Advise about your current wealth distribution and future savings [SIPs]</h3>-->
+                                <!--Be aware of agent/broker who is seeking brokerage/commission from selling investment/insurance products Vs unbaised independent advise from professionals-->
+                                <!--Select your Adviser and get advise related to your current distribution and on future savings (SIPs)-->
+                                <!--<h3>Monitor &amp; Audit your wealth, new income, Investments, Major Cash outflows</h3>-->
+                                <!--Stragic allocation decision deviates due to change in valuaiton levels, new income, major expenses etc.-->
+                                <!--Keep regular track and stay on the course.-->
+                                <!--<br />-->
+                                <!--<h3>Tactical Asset Allocaiton based on expectations from Economy and Asset Classes </h3>-->
+                                <!--Deviaiton to strategic Asset Allocaiton if suitable-->
+                                <!--<br />-->
+                                <!--<h3>Rebalancing</h3>-->
+                                <!--Rebalancing wealth to strategic Asset Allocation-->
+                                <!--<br />-->
+                                <!--<h3>Reassessing Insurance Need</h3>-->
+                                <!--Do you need life insurance in first place?-->
+                                <!--Is your covered amount enough?-->
+                                <!--<br />-->
+                                <!--<h3>Retirement Solution: Provision for Annuity</h3>-->
+                                <!--Money you may required to accumulate for retirement.-->
+                                <!--<br />-->
+                                <!--<h3>Wealth Transformation</h3>-->
+                                <!--Transfer your wealth to next genration with efficient way-->
+                                <!--<br />-->
+
+                                <blockquote>
+                                    <p>If you are a genuine individual retail investor, looking for unbiased and independent advice from professional you are welcome! Also, if you are individual investment professional or a wealth management firm looking for a technical solution to manage your clients efficiently, improve your decision making related to clients' investments you are also most welcome!!&nbsp;&nbsp;</p>
+                                    <p><strong>Retail Investors&rsquo; ultimate goal is to accumulate wealth to become financially independent or if one is already financially independent, then maximise or maintain the wealth level after spending for a given risk tolerance, short and long-term liquidity need, tax concerns, time horizon, and legal-regulatory considerations</strong>.</p>
+                                    <p>Considering this ultimate goal in mind, the kind of major investment advice (<strong>Independent&nbsp;and unbiased</strong>) to retail investor is <strong>how one should distribute the current wealth</strong> among the different asset classes (e.g. Real Estate, Equity, Fixed Income, Cash and Alternate Investment) <strong>known as</strong> <strong>Asset Allocation</strong> and <strong>how one should distribute the ongoing and future investments (e.g. SIPs)</strong> among the asset classes (<strong>rational is to stick to Strategic Asset Allocation at any point in time</strong>).</p>
+                                    <p>Now, there are <strong>two aspects of Investment Advice</strong>/<strong>Guidance</strong> related to wealth distribution - Part of an advice is <strong>based on investment theory</strong> which has evolved so far over the last few decades. With regard to this part, you will observe a high degree of consensus opinion among professionals. To some extent, Strategic Asset Allocation is somewhat related to this part. And the other part is <strong>based on the judgement of the adviser or fund/investment/wealth manager</strong>, especially related to a forecast of the future performances of asset classes or securities or a specific investment. There is a high probability of dispersion in advice among professionals e.g. one professional may believe that a particular asset-class is overvalued and exposure to that asset class needs to be reduced to a lower range (range is specified as part of the Strategic Asset Allocation). But at the same time, other professional may believe the other way. Usually, this is called <strong>Tactical Asset Allocation</strong>.</p>
+                                    <p>To give an unbiased independent advice, a professional needs to know certain information. Giving an unbiased independent advice consumes a very small amount of time compared to gathering relevant factual and situational information.</p>
+                                    <p>Types of information that needs to be captured:</p>
+                                    <ul>
+                                        <li><strong>Relatively Static Information</strong> that will usually not change over a short period of time (1 year) e.g. family background (earning and dependent members), income source, the stability of income source (e.g. job security), behavioural biases and willingness to accept the risk, short and long-term liquidity need (financial goals)</li>
+                                        <li><strong>Information that is required to be updated regularly</strong> either by an investor or by someone on behalf of the investor e.g. transactions on new investment or liquidating existing investment</li>
+                                        <li><strong>Information that automatically gets updated</strong> based on the latest valuation (market price data) of investments. Valuation of wealth and liability, etc.</li>
+                                    </ul>
+                                    <p>This web application will capture relevant information and provide basic advice related to current asset allocation and ongoing investments (SIPs), paid advice from external professionals (expert in tax, property etc.) or any specific advice from anyone among a list of professionals.</p>
+                                    <p>There are existing web applications (portfolio management) like MoneyControl, ET Portfolios but certainly, they lack some features. My earlier web application - <a href="http://www.twealthbook.com"><strong><u>twealthbook.com</u></strong></a> - was not so useful to the retail investors. (It is more suitable for professional PMS services). I am planning to develop that further but for Institutional Investors/Asset Management Firms - <strong><u>timelineofwealth.com</u> </strong>- is my new web application considering Retail Investors in mind.</p>
+                                    <p>The philosophy behind this web application is:</p>
+                                    <ul>
+                                        <li>Retail and Institutional Investors can get meaningful up-to-date information (<strong>a big picture</strong>)</li>
+                                        <li>Investment Manager (or Investors in case they are managing their own fund) can <strong>make better and informed decisions with efficiency</strong> (decisions related to current wealth distribution based on the outlook of economy/asset classes, e.g. should you overweight or underweight Equity Class compared to Fixed Income? Should you reduce the SIP amount in Mid-Small Cap Equity and deviate to Fixed Income SIP, etc.)</li>
+                                        <li><strong>Guidance to your current wealth distribution</strong> which must be suitable to your risk tolerance i.e. ability to take a risk and your willingness to take the risk (based on your behavioural biases)</li>
+                                        <li>How you should distribute the ongoing savings in different asset classes (<strong>guidance to SIP distribution</strong> among asset classes)</li>
+                                        <li>Estimating adequate <strong>insurance cover</strong></li>
+                                        <li><strong>Probable size of your retirement fund</strong> and <strong>annuity need</strong> (monthly pension amount) post-retirement</li>
+                                        <li><strong>Easy to update information and monitor regularly</strong> to remain meaningful</li>
+                                    </ul>
+                                    <p>Thanking you all.</p>
+                                    <p>Sudhir Kulaye</p>
+                                    <footer><cite title="Source Title">
+                                        <p>(<em>About me: After graduating in BE Computer Engineer, Mumbai University, I worked as a software engineer for 8 years. Over the last 7 years, I have been working as an investment professional, managing the wealth of my clients. I cleared all three levels of US CFA- Chartered Financial Analysts</em>)</p>
+                                    </cite></footer>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>
