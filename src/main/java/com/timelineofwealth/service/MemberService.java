@@ -34,7 +34,7 @@ public class MemberService {
     }
 
     public static List<Member> getUserMembers(String email){
-        logger.debug(String.format("In MemberService.getUserMembers: Email", email));
+        logger.debug(String.format("In MemberService.getUserMembers: Email %s", email));
 
         List<Member> members = new ArrayList<>();
         List<UserMembers> userMembers = userMembersRepository.findAllByEmail(email);
@@ -46,20 +46,20 @@ public class MemberService {
 
     @Transactional
     public static void addMember(User user, Member newMember){
-        logger.debug(String.format("In MemberService.addMember: Before Add %s", newMember.getMemberid()));
+        logger.debug(String.format("In MemberService.addMember: Before Add %d", newMember.getMemberid()));
         MemberService.memberRepository.save(newMember);
-        logger.debug(String.format("In MemberService.addMember: After Add %s", newMember.getMemberid()));
+        logger.debug(String.format("In MemberService.addMember: After Add %d", newMember.getMemberid()));
         UserMembers userMembers = new UserMembers();
         userMembers.setEmail(user.getEmail());
         Member newMemberWithmemberid = MemberService.memberRepository.findTopByFirstNameAndLastNameOrderByMemberidDesc(newMember.getFirstName(),newMember.getLastName());
-        logger.debug(String.format("In MemberService.addMember: New Member id  %s", newMemberWithmemberid.getMemberid()));
+        logger.debug(String.format("In MemberService.addMember: New Member id  %d", newMemberWithmemberid.getMemberid()));
         userMembers.setMemberId(newMemberWithmemberid.getMemberid());
         userMembers.setRelationship(newMember.getRelationship());
         MemberService.userMembersRepository.save(userMembers);
     }
 
     public static void updateMember(Member editedMember){
-        logger.debug(String.format("In MemberService.updateMember: EditedMember ", editedMember.getMemberid()));
+        logger.debug(String.format("In MemberService.updateMember: EditedMember %d", editedMember.getMemberid()));
         MemberService.memberRepository.save(editedMember);
     }
 

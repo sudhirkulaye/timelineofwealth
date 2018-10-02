@@ -2186,15 +2186,15 @@ if (typeof NProgress != 'undefined') {
 			  var mybarChart = new Chart(ctx, {
 				type: 'bar',
 				data: {
-				  labels: ["January", "February", "March", "April", "May", "June", "July"],
+				  labels: ["2011", "2012", "2013", "2014", "2015", "2016", "2017"],
 				  datasets: [{
-					label: '# of Votes',
+					label: 'Net Income',
 					backgroundColor: "#26B99A",
-					data: [51, 30, 40, 28, 92, 50, 45]
+					data: [10, 12, 15, 16, 17, 20, 25]
 				  }, {
-					label: '# of Votes',
+					label: 'Gross Expenses',
 					backgroundColor: "#03586A",
-					data: [41, 56, 25, 48, 72, 34, 12]
+					data: [5, 7, 10, 11, 12, 14, 15]
 				  }]
 				},
 

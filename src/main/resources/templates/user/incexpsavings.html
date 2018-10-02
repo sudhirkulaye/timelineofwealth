@@ -18,9 +18,14 @@
 <link href="../../static/vendors/animate.css/animate.min.css" th:href="@{/vendors/animate.css/animate.min.css}" rel="stylesheet" />
 <!-- jQuery custom content scroller -->
 <link href="../../static/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" th:href="@{/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css}" rel="stylesheet" />
-
 <!--Angular JS-->
 <script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!--Angular custom filter (for group by) JS-->
+<script src="../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
+<!-- Chart.js -->
+<script src="../../static/vendors/Chart.js/dist/Chart.min.js" th:src="@{/vendors/Chart.js/dist/Chart.min.js}"></script>
+<!-- angular.chartjs -->
+<script src="../../static/vendors/angular.chartjs/angular-chart.min.js" th:src="@{/vendors/angular.chartjs/angular-chart.min.js}"></script>
 <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>-->
 <!-- custom angular script -->
 <script type="text/javascript" src="../../static/custom/user/incexpsavings.js" th:src="@{/custom/user/incexpsavings.js}"></script>
@@ -49,19 +54,51 @@
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <br />
                         <div class="x_panel">
-                            <div class="x_title" ng-hide="hideTable">
+                            <div class="x_title" ng-hide="!hideForm">
                                 <h2>Annual Income, Expenses &amp; Savings<small></small></h2>
                                 <button type="button" ng-click="showClearForm()" class="btn btn-success  pull-right btn-xs">Add New</button>
                                 <div class="clearfix"></div>
                             </div>
-                            <div class="x_content" ng-hide="hideTable">
+                            <div class="col-md-6 col-sm-6 col-xs-12" ng-hide="!hideForm">
+                                <div class="x_panel">
+                                    <div class="x_title">
+                                        <h2>Income - Expenses <small>Annual Consolidated Income &amp; Expenses of all memebers</small></h2>
+                                        <ul class="nav navbar-right panel_toolbox">
+                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                            </li>
+                                            <li class="dropdown">
+                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                <ul class="dropdown-menu" role="menu">
+                                                    <li><a href="#">Settings 1</a>
+                                                    </li>
+                                                    <li><a href="#">Settings 2</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                            </li>
+                                        </ul>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="x_content">
+                                        <canvas id="incExpChart"  class="chart chart-bar" chart-colors="newColors"
+                                                chart-data="consolidatedIncExp" chart-labels="labelsYears"  chart-series="chartSeriesIncExp"></canvas>
+                                        <!--<canvas class="chart chart-bar" chart-type="type" chart-data="data" chart-labels="labels"-->
+                                                <!--chart-series="series" chart-options="options" chart-colors="colors"-->
+                                                <!--chart-dataset-override="datasetOverride">-->
+                                        <!--</canvas>-->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="x_content" ng-hide="!hideForm">
+                                <br />
                                 <div class="table-responsive">
                                     <table class="table table-hover">
                                         <thead>
                                         <tr>
                                             <th>Fin Year</th>
                                             <th>Name</th>
-                                            <th>Net Inc</th>
+                                            <th>Net Income</th>
                                             <th>Gross Expenses</th>
                                             <th>Regular Expenses</th>
                                             <th>Net Savings</th>
@@ -70,8 +107,8 @@
                                         </thead>
                                         <tbody>
                                         <tr ng-repeat="incExpSavingsRecord in incExpSavingsRecords">
-                                            <td>{{incExpSavingsRecord.finyear}} {{incExpSavingsRecord.lastName}}</td>
-                                            <td>{{incExpSavingsRecord.memberid}}</td>
+                                            <td>{{incExpSavingsRecord.key.finyear}}</td>
+                                            <td>{{ (members | filter : { 'memberid' : incExpSavingsRecord.key.memberid })[0].firstName }}</td>
                                             <td>{{incExpSavingsRecord.netIncome}}</td>
                                             <td>{{incExpSavingsRecord.grossTotalExpenses}}</td>
                                             <td>{{incExpSavingsRecord.normalizedRegularExpenses}}</td>
@@ -83,12 +120,14 @@
                                 </div>
                             </div>
                             <div  class="col-md-6 col-xs-12" ng-hide="hideForm">
+                                <span ng-show="nonZeroAdjustment" class="col-md-12 col-sm-12 col-xs-12 alert alert-danger" >Adjust Expenses or Investments so that Adjustment becomes zero</span>
+                                <span ng-show="recordAlreadyExist" class="col-md-12 col-sm-12 col-xs-12 alert alert-danger" >Record Already Exists</span>
                                 <p />
                                 <form name="IncExpSavingsRecordHtmlForm" class="form-horizontal form-label-left input_mask" >
                                     <div class="form-group">
                                         <label class="control-label col-md-6 col-sm-6 col-xs-6">Fin Year <span class="required">*</span> </label>
                                         <div class="col-md-6 col-sm-6 col-xs-6">
-                                            <select class="form-control" ng-model="incExpSavingsRecordFormForm.finyear" required="required" ng-disabled="editMode" >
+                                            <select class="form-control" ng-model="incExpSavingsRecordForm.key.finyear" ng-change="deesRecordexist()" required="required" ng-disabled="editMode">
                                                 <option>2010</option>
                                                 <option>2011</option>
                                                 <option>2012</option>
@@ -103,196 +142,191 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-6 col-sm-6 col-xs-12">Member<span class="required">*</span></label>
                                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="incExpSavingsRecordFormForm.memberid" required="required" >
+                                            <select class="form-control" ng-model="incExpSavingsRecordForm.key.memberid" ng-change="deesRecordexist()" required="required" ng-disabled="editMode">
                                                 <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Earning Status<span class="required">*</span></label>
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Regular Income<span class="required">*</span></label>
                                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="memberForm.earningStatus" required="required" >
-                                                <option>Dependent</option>
-                                                <option>Earning</option>
-                                                <option>Not Earning</option>
+                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/" ng-model="incExpSavingsRecordForm.regularIncome" />
+                                        </div>
+                                    </div>
+                                    <!--<div class="form-group">-->
+                                        <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Interest/Dividend Income<span class="required">*</span></label>-->
+                                        <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.interestDividendIncome" />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <!--<div class="form-group">-->
+                                        <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Rent Income<span class="required">*</span></label>-->
+                                        <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.rentIncome" />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Other Income<small>(Rent/Dividend/Interest)</small><span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.otherIncome" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Gross Total Income<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.grossTotalIncome" ng-disabled="true" />-->
+                                            <label> <p />
+                                                {{incExpSavingsRecordForm.regularIncome
+                                                + incExpSavingsRecordForm.interestDividendIncome
+                                                + incExpSavingsRecordForm.rentIncome
+                                                + incExpSavingsRecordForm.otherIncome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Income Tax Paid<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.incomeTax" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Net Income <small>(A)</small><span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.netIncome" ng-disabled="true" />-->
+                                            <label> <p />
+                                                {{incExpSavingsRecordForm.regularIncome
+                                                + incExpSavingsRecordForm.interestDividendIncome
+                                                + incExpSavingsRecordForm.rentIncome
+                                                + incExpSavingsRecordForm.otherIncome
+                                                - incExpSavingsRecordForm.incomeTax}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Tax Bracket<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.taxRate" />-->
+                                            <select class="form-control" required="required"  ng-model="incExpSavingsRecordForm.taxRate">
+                                                <option>0</option>
+                                                <!--<option>5</option>-->
+                                                <option>10</option>
+                                                <!--<option>15</option>-->
+                                                <option>20</option>
+                                                <!--<option>25</option>-->
+                                                <option>30</option>
+                                                <option>35</option>
+                                                <!--<option>40</option>-->
                                             </select>
                                         </div>
                                     </div>
+                                    <!--<div class="form-group">-->
+                                        <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Increase in Bankbalance<span class="required">*</span></label>-->
+                                        <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.investmentIncreaseInBankbalance"  />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
                                     <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Marital Status</label>
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Investments in Tax Saving<span class="required">*</span></label>
                                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="memberForm.maritalStatus">
-                                                <option>Single</option>
-                                                <option>Married</option>
-                                                <option>Widow</option>
-                                            </select>
+                                            <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.investmentTaxSavings"  />
+                                        </div>
+                                    </div>
+                                    <!--<div class="form-group">-->
+                                        <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Investment in Equity (MF/Stocks)<span class="required">*</span></label>-->
+                                        <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.investmentInEquity"  />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <!--<div class="form-group">-->
+                                        <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Investment in Fixed Inc. (FDs/Bonds)<span class="required">*</span></label>-->
+                                        <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.investmentInFixedIncome"  />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Other Investments <small>(MF/Stocks/Bonds/Bank)</small><span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.investmentInOther"  />
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Secured by Pension</label>
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Total Investments<small> (B)</small><span class="required">*</span></label>
                                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="memberForm.isSecuredByPension">
-                                                <option value="Y">Yes</option>
-                                                <option value="N">No</option>
-                                            </select>
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.investmentTotal" ng-disabled="true" />-->
+                                            <label> <p />
+                                                {{incExpSavingsRecordForm.investmentIncreaseInBankbalance
+                                                + incExpSavingsRecordForm.investmentTaxSavings
+                                                + incExpSavingsRecordForm.investmentInEquity
+                                                + incExpSavingsRecordForm.investmentInFixedIncome
+                                                + incExpSavingsRecordForm.investmentInOther }}
+                                            </label>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Profession Category</label>
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Regular Expenses <span class="required">*</span></label>
                                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="memberForm.profession">
-                                                <option>Secured Govt. Job</option>
-                                                <option>Stable Pvt. Sector Job</option>
-                                                <option>Unstable Pvt. Sector Job</option>
-                                                <option>Large Size Business</option>
-                                                <option>Medium Size Business</option>
-                                                <option>Small Size Business</option>
-                                                <option>Professional/Self Employed</option>
-                                                <option>Athlete/Actor/Model</option>
-                                                <option>Pensioner</option>
-                                                <option>Retired No Pension</option>
-                                                <option>Housewife</option>
-                                                <option>Student</option>
-                                                <option>HNI</option>
-                                                <option>Other</option>
-                                            </select>
+                                            <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.normalizedRegularExpenses"  />
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Industry</label>
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Infrequent Expenses <small>(Medical/Renovation)</small><span class="required">*</span></label>
                                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="memberForm.industry">
-                                                <optgroup label="Discretionary">
-                                                    <option>Auto Components</option>
-                                                    <option>Automobiles</option>
-                                                    <option>Cons. Durables Leisure Products</option>
-                                                    <option>Diversified Consumer Services</option>
-                                                    <option>Hotels, Restaurants &amp; Leisure</option>
-                                                    <option>Household Durables</option>
-                                                    <option>Media</option>
-                                                    <option>Retailing - Distributors</option>
-                                                    <option>Retailing - Internet &amp; Catalog Retail</option>
-                                                    <option>Retailing - Multiline Retail</option>
-                                                    <option>Retailing - Specialty Retail</option>
-                                                    <option>Textiles, Apparel, Luxury Goods</option>
-                                                </optgroup>
-                                                <optgroup label="Energy">
-                                                    <option>Equipment &amp; Services</option>
-                                                    <option>Oil, Gas &amp; Coal</option>
-                                                </optgroup>
-                                                <optgroup label="Financials">
-                                                    <option>Banks</option>
-                                                    <option>Consumer Finance</option>
-                                                    <option>Diversified Financial Services</option>
-                                                    <option>Financials Capital Markets</option>
-                                                    <option>Insurance</option>
-                                                    <option>Mortgage Finance</option>
-                                                    <option>Real Estate Invest Trust-REIT</option>
-                                                    <option>Real Estate Mgmt &amp; Devpt</option>
-                                                </optgroup>
-                                                <optgroup label="Health Care">
-                                                    <option>Biotechnology</option>
-                                                    <option>Health Care Equipt &amp; Supplies</option>
-                                                    <option>Health Care Service Providers</option>
-                                                    <option>Health Care Technology</option>
-                                                    <option>Life Sciences Tools &amp; Services</option>
-                                                    <option>Pharmaceuticals</option>
-                                                </optgroup>
-                                                <optgroup label="Industrials">
-                                                    <option>Cap Goods - Aerospace &amp; Defense</option>
-                                                    <option>Cap Goods - Building Products</option>
-                                                    <option>Cap Goods - Conglomerates</option>
-                                                    <option>Cap Goods - Construction &amp; Eng.</option>
-                                                    <option>Cap Goods - Electrical Equipment</option>
-                                                    <option>Cap Goods - Machinery</option>
-                                                    <option>Cap Goods - Trading, Distributors</option>
-                                                    <option>Commercial Services &amp; Supplies</option>
-                                                    <option>Professional Services</option>
-                                                    <option>Transportation - Airlines</option>
-                                                    <option>Transportation - Infra</option>
-                                                    <option>Transportation - Logistics</option>
-                                                    <option>Transportation - Marine</option>
-                                                    <option>Transportation - Road &amp; Rail</option>
-                                                </optgroup>
-                                                <optgroup label="Materials">
-                                                    <option>Chemicals</option>
-                                                    <option>Construction Materials</option>
-                                                    <option>Containers &amp; Packaging</option>
-                                                    <option>Metals &amp; Mining</option>
-                                                    <option>Paper &amp; Forest Products</option>
-                                                </optgroup>
-                                                <optgroup label="Staples">
-                                                    <option>Beverages</option>
-                                                    <option>Food &amp; Staples Retailing</option>
-                                                    <option>Food Products</option>
-                                                    <option>Household Products</option>
-                                                    <option>Personal Products</option>
-                                                    <option>Tobacco</option>
-                                                </optgroup>
-                                                <optgroup label="Technology">
-                                                    <option>Communications Equipment</option>
-                                                    <option>Electronic Equipt, Instru, Comp</option>
-                                                    <option>Hardware, Storage &amp; Peripherals</option>
-                                                    <option>Internet Software &amp; Services</option>
-                                                    <option>IT Services</option>
-                                                    <option>Semiconductor Equipment</option>
-                                                    <option>Software</option>
-                                                </optgroup>
-                                                <optgroup label="Telecom">
-                                                    <option>Diversified Telecom Services</option>
-                                                    <option>Wireless Telecom Services</option>
-                                                </optgroup>
-                                                <optgroup label="Utilities">
-                                                    <option>Electric Utilities</option>
-                                                    <option>Gas Utilities</option>
-                                                    <option>Independent Power Renewable</option>
-                                                    <option>Multi-Utilities</option>
-                                                    <option>Water Utilities</option>
-                                                </optgroup>
-                                            </select>
+                                            <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.infrequentTotalExpenses"  />
+                                        </div>
+                                    </div>
+                                    <!--<div class="form-group">-->
+                                        <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Infreqent Medical Expenses <span class="required">*</span></label>-->
+                                        <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.infrequentMedicalExpenses"  />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <!--<div class="form-group">-->
+                                        <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Infreqent Renovation Expenses <span class="required">*</span></label>-->
+                                        <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.infrequentRenovationExpenses"  />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <!--<div class="form-group">-->
+                                        <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Infreqent Other Expenses <small>(Net Inc less Total Investment)</small><span class="required">*</span></label>-->
+                                        <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.infrequentOtherExpenses"  />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Total Expenses<span> (C)</span> <span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.grossTotalExpenses" ng-disabled="true"  />-->
+                                            <label> <p />
+                                                {{incExpSavingsRecordForm.normalizedRegularExpenses
+                                                + incExpSavingsRecordForm.infrequentTotalExpenses}}
+                                            </label>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Education </label>
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Adjustment <small>[Must be zero:(A)-(B)-(C)]</small></label>
                                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="memberForm.education">
-                                                <option>Professional</option>
-                                                <option>Master</option>
-                                                <option>Graduate</option>
-                                                <option>Under Graduate</option>
-                                            </select>
+                                            <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.adjustment" ng-disabled="true"  />-->
+                                            <label> <p />
+                                                {{incExpSavingsRecordForm.regularIncome
+                                                + incExpSavingsRecordForm.interestDividendIncome
+                                                + incExpSavingsRecordForm.rentIncome
+                                                + incExpSavingsRecordForm.otherIncome
+                                                - incExpSavingsRecordForm.incomeTax
+                                                - (
+                                                + incExpSavingsRecordForm.investmentIncreaseInBankbalance
+                                                + incExpSavingsRecordForm.investmentTaxSavings
+                                                + incExpSavingsRecordForm.investmentInEquity
+                                                + incExpSavingsRecordForm.investmentInFixedIncome
+                                                + incExpSavingsRecordForm.investmentInOther
+                                                ) - (
+                                                incExpSavingsRecordForm.normalizedRegularExpenses
+                                                + incExpSavingsRecordForm.infrequentTotalExpenses)}}
+                                            </label>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Is Finance Professional</label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="memberForm.isFinanceProfessional">
-                                                <option value="Y">Yes</option>
-                                                <option value="N">No</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">
-                                            Exp. Retirement Date
-                                        </label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <input type="date" class="form-control" ng-model="memberForm.expectedRetirementDate" placeholder="yyyy-MM-dd" />
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">
-                                            Date Last Update
-                                        </label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <input type="date" class="form-control" ng-model="memberForm.dateLastUpdate" placeholder="yyyy-MM-dd" ng-disabled="true" />
-                                        </div>
-                                    </div>
-                                    <div class="ln_solid"></div>
-                                    <div class="form-group">
-
                                         <div class="col-md-4 col-sm-4 col-xs-12  col-md-offset-8">
-                                            <button type="submit" class="btn btn-success" ng-click="processMember()">Save</button>
+                                            <button type="submit" class="btn btn-success" ng-click="processIncExpSavingsRecord()">Save</button>
                                             <button class="btn btn-success" ng-click="showTable()">Cancel</button>
                                             <br /> <br />
                                         </div>
@@ -349,6 +383,7 @@
 <script src="../../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js" th:src="@{/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js}"></script>
 <!-- starrr -->
 <script src="../../static/vendors/starrr/dist/starrr.js" th:src="@{/vendors/starrr/dist/starrr.js}"></script>
+
 <!-- Custom Theme Scripts -->
 <script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
 </body>
