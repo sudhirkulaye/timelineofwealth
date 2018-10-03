@@ -32,6 +32,7 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
     $scope.labelsYears = [];
     $scope.chartSeriesIncExp = [];
     $scope.newColors = ['#26B99A', '#03586A', '#DCDCDC', '#46BFBD', '#FDB45C', '#949FB1', '#4D5360'];
+    $scope.chartOptions = { scales: { yAxes: [{ ticks: { min:0 } }] } };
     $http.defaults.headers.post["Content-Type"] = "application/json";
     $scope.hideForm = true;
     $scope.editMode = false;
@@ -99,7 +100,7 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
         $scope.consolidatedIncExp = [];
         $scope.consolidatedIncExp.push(consInc);
         $scope.consolidatedIncExp.push(consExp);
-        $scope.chartSeriesIncExp = ['Net Inc','Net Exp']
+        $scope.chartSeriesIncExp = ['Net Inc','Gross Exp']
 
 //        $scope.consolidatedIncExp = [[10, 12, 15, 16, 17, 20, 25], [5, 7, 10, 11, 12, 14, 15]];
 //        $scope.labelsYears = ["2011", "2012", "2013", "2014", "2015", "2016", "2017"];
@@ -143,7 +144,6 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
     $scope.showClearForm = function showClearForm() {
         $scope.hideForm = false;
         $scope.editMode = false;
-        $scope.selfEditMode = false;
         $scope.nonZeroAdjustment = false;
         $scope.recordAlreadyExist = false;
         $scope.incExpSavingsRecordForm.key.memberid = "";
@@ -224,9 +224,9 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
             $scope.nonZeroAdjustment = true;
         }
 
-        var index = $filter('filter')($scope.incExpSavingsRecords, {"key":{"memberid":$scope.incExpSavingsRecordForm.key.memberid,"finyear":$scope.incExpSavingsRecordForm.key.finyear}}).length;
-        if (index > 0 && $scope.editMode == false) {
-            //console.log('Record Already Exist/Key fields -FinYear and Member- must be unique');
+        var index = $filter('filter')($scope.incExpSavingsRecords, {"key.memberid":$scope.incExpSavingsRecordForm.key.memberid,"key.finyear":$scope.incExpSavingsRecordForm.key.finyear}).length;
+        if (index > 0 && $scope.editMode != true) {
+            console.log('Add mode Record Exists');
             $scope.recordAlreadyExist = true;
         }
 
@@ -235,7 +235,7 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
         if($scope.IncExpSavingsRecordHtmlForm.$valid && !$scope.nonZeroAdjustment && !$scope.recordAlreadyExist)
         {
               //Submit your form
-              if ($scope.editMode == false) {
+              if ($scope.editMode != true) {
                   method = "POST";
                   url = "/addincexpsavingsrecords";
               } else {
