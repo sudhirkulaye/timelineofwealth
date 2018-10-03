@@ -27,7 +27,7 @@ public class UserViewController {
     }
 
     @RequestMapping(value = "/user/incexpsavings", method = RequestMethod.GET)
-    public String income(Model model, @AuthenticationPrincipal UserDetails userDetails){
+    public String incomeExpenseAndSavings(Model model, @AuthenticationPrincipal UserDetails userDetails){
         Date dateToday = new Date();
         model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
         model.addAttribute("title", "TimelineOfWealth-Income Expense");
@@ -35,5 +35,31 @@ public class UserViewController {
         return "user/incexpsavings";
     }
 
+    @RequestMapping(value = "/user/liabilites", method = RequestMethod.GET)
+    public String liabilites(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        Date dateToday = new Date();
+        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        model.addAttribute("title", "TimelineOfWealth-Liabilites");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/liabilites";
+    }
+
+    @RequestMapping(value = "/user/insurances", method = RequestMethod.GET)
+    public String insurances(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        Date dateToday = new Date();
+        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        model.addAttribute("title", "TimelineOfWealth-Insurances");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/insurances";
+    }
+
+    @RequestMapping(value = "/user/liquidityneed", method = RequestMethod.GET)
+    public String liquidityneed(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        Date dateToday = new Date();
+        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        model.addAttribute("title", "TimelineOfWealth- Liquidity Need");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/liquidityneed";
+    }
 
 }
