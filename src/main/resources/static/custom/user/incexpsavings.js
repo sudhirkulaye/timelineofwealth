@@ -29,9 +29,10 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
         "adjustment":0
     };
     $scope.consolidatedIncExp = [];
+    $scope.consolidatedIncExp1 = [];
     $scope.labelsYears = [];
-    $scope.chartSeriesIncExp = [];
-    $scope.newColors = ['#26B99A', '#03586A', '#DCDCDC', '#46BFBD', '#FDB45C', '#949FB1', '#4D5360'];
+    $scope.chartSeriesIncExp = ['Net Inc','Gross Exp'];
+    $scope.newColors = ['#26B99A', '#03586A', '#1E947B', '#1a3c33', '#DCDCDC', '#46BFBD', '#FDB45C'];
     $scope.chartOptions = { scales: { yAxes: [{ ticks: { min:0 } }] } };
     $http.defaults.headers.post["Content-Type"] = "application/json";
     $scope.hideForm = true;
@@ -100,12 +101,6 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
         $scope.consolidatedIncExp = [];
         $scope.consolidatedIncExp.push(consInc);
         $scope.consolidatedIncExp.push(consExp);
-        $scope.chartSeriesIncExp = ['Net Inc','Gross Exp']
-
-//        $scope.consolidatedIncExp = [[10, 12, 15, 16, 17, 20, 25], [5, 7, 10, 11, 12, 14, 15]];
-//        $scope.labelsYears = ["2011", "2012", "2013", "2014", "2015", "2016", "2017"];
-//        $scope.chartSeriesIncExp = ['Net Inc','Net Exp'];
-
 
     }
 

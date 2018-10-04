@@ -35,13 +35,13 @@ public class UserViewController {
         return "user/incexpsavings";
     }
 
-    @RequestMapping(value = "/user/liabilites", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/liabilities", method = RequestMethod.GET)
     public String liabilites(Model model, @AuthenticationPrincipal UserDetails userDetails){
         Date dateToday = new Date();
         model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
-        model.addAttribute("title", "TimelineOfWealth-Liabilites");
+        model.addAttribute("title", "TimelineOfWealth-Liabilities");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
-        return "user/liabilites";
+        return "user/liabilities";
     }
 
     @RequestMapping(value = "/user/insurances", method = RequestMethod.GET)
