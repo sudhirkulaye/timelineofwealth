@@ -9,5 +9,5 @@ import java.util.List;
 @RepositoryRestResource
 public interface UserMembersRepository extends JpaRepository<UserMembers, Long> {
     public List<UserMembers> findAllByEmail(String email);
-    public UserMembers findByMemberId(Long memberId);
+    public UserMembers findByMemberid(Long memberid);
 }

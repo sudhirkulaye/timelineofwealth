@@ -1,6 +1,7 @@
 package com.timelineofwealth.service;
 
 import com.timelineofwealth.entities.IncomeExpenseSavings;
+import com.timelineofwealth.entities.Member;
 import com.timelineofwealth.entities.User;
 import com.timelineofwealth.entities.UserMembers;
 import com.timelineofwealth.repositories.IncomeExpenseSavingsRepository;
@@ -28,23 +29,16 @@ public class IncomeExpenseSavingsService {
         IncomeExpenseSavingsService.incomeExpenseSavingsRepository = incomeExpenseSavingsRepository;
     }
 
-    @Autowired
-    private static UserMembersRepository userMembersRepository;
-    @Autowired
-    public  void setUserMembersRepository(UserMembersRepository userMembersRepository){
-        IncomeExpenseSavingsService.userMembersRepository = userMembersRepository;
-    }
-
     public static List<IncomeExpenseSavings> getIncomeExpenseSavingsRecords(String email){
         logger.debug(String.format("In IncomeExpenseSavingsService.getIncomeExpenseSavingsRecords: Email %s", email));
 
         List<IncomeExpenseSavings> incomeExpenseSavingsRecords;
-        List<UserMembers> userMembers = userMembersRepository.findAllByEmail(email);
-        List<Long> members = new ArrayList<>();
-        for (UserMembers userMember : userMembers ){
-            members.add(new Long(userMember.getMemberId()));
+        List<Member> members = MemberService.getUserMembers(email);
+        List<Long> membersIds = new ArrayList<>();
+        for (Member member : members ){
+            membersIds.add(new Long(member.getMemberid()));
         }
-        incomeExpenseSavingsRecords = incomeExpenseSavingsRepository.findByKeyMemberidInOrderByKeyFinyearDescKeyMemberidAsc(members);
+        incomeExpenseSavingsRecords = incomeExpenseSavingsRepository.findByKeyMemberidInOrderByKeyFinyearDescKeyMemberidAsc(membersIds);
 
         return incomeExpenseSavingsRecords;
     }

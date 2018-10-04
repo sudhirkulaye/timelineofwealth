@@ -39,7 +39,7 @@ public class MemberService {
         List<Member> members = new ArrayList<>();
         List<UserMembers> userMembers = userMembersRepository.findAllByEmail(email);
         for (UserMembers userMember : userMembers ){
-            members.add(memberRepository.findByMemberid(userMember.getMemberId()));
+            members.add(memberRepository.findByMemberid(userMember.getMemberid()));
         }
         return members;
     }
@@ -53,7 +53,7 @@ public class MemberService {
         userMembers.setEmail(user.getEmail());
         Member newMemberWithmemberid = MemberService.memberRepository.findTopByFirstNameAndLastNameOrderByMemberidDesc(newMember.getFirstName(),newMember.getLastName());
         logger.debug(String.format("In MemberService.addMember: New Member id  %d", newMemberWithmemberid.getMemberid()));
-        userMembers.setMemberId(newMemberWithmemberid.getMemberid());
+        userMembers.setMemberid(newMemberWithmemberid.getMemberid());
         userMembers.setRelationship(newMember.getRelationship());
         MemberService.userMembersRepository.save(userMembers);
     }
@@ -64,7 +64,7 @@ public class MemberService {
     }
 
     public static boolean isAuthorised(String signInUserEmail, Long memeberId){
-        UserMembers userMembers = MemberService.userMembersRepository.findByMemberId(memeberId);
+        UserMembers userMembers = MemberService.userMembersRepository.findByMemberid(memeberId);
         logger.debug(String.format("In MemberService.isAuthorised: userMembers.getEmail() %s", userMembers.getEmail()));
         logger.debug(String.format("In MemberService.isAuthorised: signInUserEmail %s", signInUserEmail));
         if (userMembers.getEmail().equals(signInUserEmail)){

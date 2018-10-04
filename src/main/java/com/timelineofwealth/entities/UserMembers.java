@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Table(name = "user_members")
 public class UserMembers implements Serializable {
     private String email;
-    private long memberId;
+    private long memberid;
     private String relationship;
 
 
@@ -24,11 +24,11 @@ public class UserMembers implements Serializable {
 
     @Id
     @Column(name = "memberid")
-    public long getMemberId() {
-        return memberId;
+    public long getMemberid() {
+        return memberid;
     }
-    public void setMemberId(long memberId) {
-        this.memberId = memberId;
+    public void setMemberid(long memberid) {
+        this.memberid = memberid;
     }
 
     @Column(name = "relationship")

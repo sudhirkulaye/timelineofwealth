@@ -55,14 +55,14 @@
                         <br />
                         <div class="x_panel">
                             <div class="x_title" ng-hide="!hideForm">
-                                <h2>Annual Income, Expenses &amp; Savings<small></small></h2>
+                                <h2>Annual Income, Expenses &amp; Savings<small>Top down approach to track annual expenses, both regular and non-frequent</small></h2>
                                 <button type="button" ng-click="showClearForm()" class="btn btn-success  pull-right btn-xs">Add New</button>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="col-md-6 col-sm-6 col-xs-12" ng-hide="!hideForm">
                                 <div class="x_panel">
                                     <div class="x_title">
-                                        <h2>Income - Expenses <small>Annual Consolidated Income &amp; Expenses of all memebers</small></h2>
+                                        <h2>Income - Expenses<small>Annual Consolidated Income &amp; Expenses of all members</small></h2>
                                         <ul class="nav navbar-right panel_toolbox">
                                             <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                             </li>
@@ -83,10 +83,6 @@
                                     <div class="x_content">
                                         <canvas id="incExpChart"  class="chart chart-bar" chart-colors="newColors" chart-options="chartOptions"
                                                 chart-data="consolidatedIncExp" chart-labels="labelsYears"  chart-series="chartSeriesIncExp"></canvas>
-                                        <!--<canvas class="chart chart-bar" chart-type="type" chart-data="data" chart-labels="labels"-->
-                                                <!--chart-series="series" chart-options="options" chart-colors="colors"-->
-                                                <!--chart-dataset-override="datasetOverride">-->
-                                        <!--</canvas>-->
                                     </div>
                                 </div>
                             </div>
@@ -269,7 +265,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Infrequent Expenses <small>(Medical/Renovation)</small><span class="required">*</span></label>
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Infrequent Expenses <small>(Medical/Renovation/LoanPrePay)</small><span class="required">*</span></label>
                                         <div class="col-md-6 col-sm-6 col-xs-12">
                                             <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.infrequentTotalExpenses"  />
                                         </div>
