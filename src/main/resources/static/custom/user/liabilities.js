@@ -110,6 +110,22 @@ incExpSavingsModule.controller('LiabilitiesController', function($scope, $http, 
         $scope.hideForm = true;
     }
 
+    $scope.deleteLiabilityRecord = function deleteLiabilityRecord(liabilityRecord) {
+        var result = confirm("Are you sure you want to delete this item?");
+        if (result) {
+            var method = "DELETE";
+            var url = "/deleteliability";
+            $http({
+                      method: method,
+                      url: urlBase + url,
+                      data: angular.toJson(liabilityRecord),
+                      headers: {
+                          'Content-Type': 'application/json'
+                      }
+                  }).then(_success, _error);
+        }
+    }
+
     $scope.processLiabilityRecord = function processLiabilityRecord(){
         var method = "";
         var url = "";

@@ -70,4 +70,17 @@ public class LiabilitiesService {
         }
     }
 
+    public static void deleteLiabilitiesRecord(Liabilities deletedRecord){
+        logger.debug(String.format("In LiabilitiesService.deleteLiabilitiesRecord: deletedRecord.key.memberid %d", deletedRecord.getKey().getMemberid()));
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        logger.debug(String.format("In LiabilitiesService.deleteLiabilitiesRecord: Email %s", user.getEmail()));
+        if(MemberService.isAuthorised(user.getEmail(), deletedRecord.getKey().getMemberid())){
+            LiabilitiesService.LiabilitiesRepository.delete(deletedRecord);
+        } else {
+            throw new InsufficientAuthenticationException("User is not authorized");
+        }
+    }
+
 }

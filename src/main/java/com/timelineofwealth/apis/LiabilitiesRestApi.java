@@ -22,7 +22,7 @@ public class LiabilitiesRestApi {
     private static final Logger logger = LoggerFactory.getLogger(LiabilitiesRestApi.class);
 
     @RequestMapping(value = "/getliabilities", method = RequestMethod.GET)
-    public List<Liabilities> getliabilitiesRecords() {
+    public List<Liabilities> getliabilities() {
         logger.debug(String.format("Call user/api/getliabilities/"));
 
         UserDetails userDetails =
@@ -32,18 +32,25 @@ public class LiabilitiesRestApi {
     }
 
     @RequestMapping(value = "/updateliability", method = RequestMethod.PUT)
-    public List<Liabilities> updateMember(@RequestBody Liabilities editedRecord) {
+    public List<Liabilities> updateliability(@RequestBody Liabilities editedRecord) {
         logger.debug("Call user/api/updateliability/ " + editedRecord.getKey().getMemberid());
         editedRecord.setPvOutstandingEmis(editedRecord.getPvOutstandingEmis().setScale(0, BigDecimal.ROUND_HALF_UP));
         LiabilitiesService.updateLiabilitiesRecord(editedRecord);
-        return getliabilitiesRecords();
+        return getliabilities();
     }
 
     @RequestMapping(value = "/addliability", method = RequestMethod.POST)
-    public List<Liabilities> addMember(@RequestBody Liabilities newRecord) {
+    public List<Liabilities> addliability(@RequestBody Liabilities newRecord) {
         logger.debug("Call user/api/addliability/ " + newRecord.getKey().getMemberid());
         newRecord.setPvOutstandingEmis(newRecord.getPvOutstandingEmis().setScale(0, BigDecimal.ROUND_HALF_UP));
         LiabilitiesService.addLiabilitiesRecord(newRecord);
-        return getliabilitiesRecords();
+        return getliabilities();
+    }
+
+    @RequestMapping(value = "/deleteliability", method = RequestMethod.DELETE)
+    public List<Liabilities> deleteliability(@RequestBody Liabilities deletedRecord) {
+        logger.debug("Call user/api/deleteliability/ " + deletedRecord.getKey().getMemberid());
+        LiabilitiesService.deleteLiabilitiesRecord(deletedRecord);
+        return getliabilities();
     }
 }
