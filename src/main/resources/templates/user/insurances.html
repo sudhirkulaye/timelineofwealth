@@ -1,10 +1,267 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="InsurancesManagement" ng-controller="InsurancesController">
+<!-- iCheck -->
+<link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
+<!-- bootstrap-wysiwyg -->
+<link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" th:href="@{/vendors/google-code-prettify/bin/prettify.min.css}"  rel="stylesheet" />
+<!-- Select2 -->
+<link href="../../static/vendors/select2/dist/css/select2.min.css" th:href="@{/vendors/select2/dist/css/select2.min.css}"  rel="stylesheet" />
+<!-- Switchery -->
+<link href="../../static/vendors/switchery/dist/switchery.min.css" th:href="@{/vendors/switchery/dist/switchery.min.css}" rel="stylesheet" />
+<!-- starrr -->
+<link href="../../static/vendors/starrr/dist/starrr.css" th:href="@{/vendors/starrr/dist/starrr.css}"  rel="stylesheet" />
+<!-- bootstrap-daterangepicker -->
+<link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}"  rel="stylesheet" />
+<!-- Animate.css -->
+<link href="../../static/vendors/animate.css/animate.min.css" th:href="@{/vendors/animate.css/animate.min.css}" rel="stylesheet" />
+<!-- jQuery custom content scroller -->
+<link href="../../static/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" th:href="@{/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css}" rel="stylesheet" />
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/user/insurances.js" th:src="@{/custom/user/insurances.js}"></script>
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/usersidebarmenu :: common-usersidebarmenu" />
 
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/usertopnavigation :: common-usertopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="">
+                <div class="page-title">
+                    <div class="title_left">
+                        <h3>Insurances </h3>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <br />
+                        <div class="x_panel">
+                            <div class="x_title" ng-hide="!hideForm">
+                                <h2>Insurances, ULIPs and Annuities <small>Tracking your insurances, ULIPS and annuity products</small></h2>
+                                <button type="button" ng-click="showClearForm()" class="btn btn-success  pull-right btn-xs">Add New</button>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content" ng-hide="!hideForm">
+                                <br />
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>Member</th>
+                                            <th>Insurance Name</th>
+                                            <th>Category</th>
+                                            <th>Cover Amt.</th>
+                                            <th>Premium Amt.</th>
+                                            <th>Expiry Date</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="insuranceRecord in insurances">
+                                            <td>{{ (members | filter : { 'memberid' : insuranceRecord.key.memberid })[0].firstName }}</td>
+                                            <td>{{insuranceRecord.productName}}</td>
+                                            <td>{{insuranceRecord.category}}</td>
+                                            <td>{{insuranceRecord.coverAmount}}</td>
+                                            <td>{{insuranceRecord.premiumAmount}}</td>
+                                            <td>{{insuranceRecord.expiryDate}}</td>
+                                            <td>
+                                                <button type="button" ng-click="deleteInsuranceRecord(insuranceRecord)" class="btn btn-danger  pull-right btn-xs" > Delete </button>
+                                                <button type="button" ng-click="editInsuranceRecord(insuranceRecord)" class="btn btn-warning  pull-right btn-xs" > Edit </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div  class="col-md-6 col-xs-12" ng-hide="hideForm">
+                                <form name="InsuranceRecordHtmlForm" class="form-horizontal form-label-left input_mask" >
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Member<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <select class="form-control" ng-model="insuranceForm.key.memberid" required="required" ng-disabled="editMode">
+                                                <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Insurance Product UIN<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <input type="text" class="form-control" required="required" ng-model="insuranceForm.productUIN" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Insurance Name<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <input type="text" class="form-control" required="required" ng-model="insuranceForm.productName" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Insurance Category <span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <select class="form-control" ng-model="insuranceForm.category" required="required" >
+                                                <option>Term Life Insurance</option>
+                                                <option>Whole Life Insurance</option>
+                                                <option>Endowment Policy</option>
+                                                <option>Money-back Policy</option>
+                                                <option>Child Plan</option>
+                                                <option>Pension Plans</option>
+                                                <option>Unit-linked Insurance Plans(ULIPs)</option>
+                                                <option>Health Insurance</option>
+                                                <option>Motor Insurance</option>
+                                                <option>Other Insurance</option>
+                                                <option>Annuity Scheme</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Cover Amount<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="insuranceForm.coverAmount" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Premium Amount</label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/" ng-model="insuranceForm.premiumAmount" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Frequency of Premium<small></small><span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <select class="form-control" required="required" ng-model="insuranceForm.premiumFrequencyInMonths" >
+                                                <option value="0">One Time</option>
+                                                <option value="1">Monthly</option>
+                                                <option value="3">Quarterly</option>
+                                                <option value="6">Semi Annually</option>
+                                                <option value="12">Annually</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Last Date when premium paid<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <input type="date" class="form-control" required="required" ng-model="insuranceForm.lastDatePremiumPaid" placeholder="yyyy-MM-dd" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Is Lifetime covered <span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <select class="form-control" ng-model="insuranceForm.lifeTimeCover" required="required" >
+                                                <option>Yes</option>
+                                                <option>No</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Expiry or Maturity Date<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <input type="date" class="form-control" required="required" ng-model="insuranceForm.expiryDate" placeholder="yyyy-MM-dd" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Maturity Amount<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="insuranceForm.maturityAmount" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Maturity Payment Frequency<small></small><span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <select class="form-control" required="required" ng-model="insuranceForm.maturityFrequency" >
+                                                <option value="0">One Time</option>
+                                                <option value="1">Monthly</option>
+                                                <option value="3">Quarterly</option>
+                                                <option value="6">Semi Annually</option>
+                                                <option value="12">Annually</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Expected Bonus Amount<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,3}$/" ng-model="insuranceForm.expectedBonusAmount" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">
+                                            Date Last Update
+                                        </label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <input type="date" class="form-control" ng-model="insuranceForm.dateLastUpdate" placeholder="yyyy-MM-dd"  ng-disabled="true" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-4 col-sm-4 col-xs-12  col-md-offset-8">
+                                            <button type="submit" class="btn btn-success" ng-click="processInsuranceRecord()">Save</button>
+                                            <button class="btn btn-success" ng-click="showTable()">Cancel</button>
+                                            <br /> <br />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+
+
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- bootstrap-progressbar -->
+<script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js" th:src="@{/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js}"></script>
+<!-- iCheck -->
+<script src="../../static/vendors/iCheck/icheck.min.js" th:src="@{/vendors/iCheck/icheck.min.js}"></script>
+<!-- jquery.inputmask -->
+<script src="../../static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js" th:src="@{/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js}"></script>
+<!-- bootstrap-daterangepicker -->
+<script src="../../static/vendors/moment/min/moment.min.js" th:src="@{/vendors/moment/min/moment.min.js}"></script>
+<script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js" th:src="@{/vendors/bootstrap-daterangepicker/daterangepicker.js}"></script>
+<!-- bootstrap-wysiwyg -->
+<script src="../../static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js" th:src="@{/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js}"></script>
+<script src="../../static/vendors/jquery.hotkeys/jquery.hotkeys.js" th:src="@{/vendors/jquery.hotkeys/jquery.hotkeys.js}"></script>
+<script src="../../static/vendors/google-code-prettify/src/prettify.js" th:src="@{/vendors/google-code-prettify/src/prettify.js}"></script>
+<!-- jQuery Tags Input -->
+<script src="../../static/vendors/jquery.tagsinput/src/jquery.tagsinput.js" th:src="@{/vendors/jquery.tagsinput/src/jquery.tagsinput.js}"></script>
+<!-- Switchery -->
+<script src="../../static/vendors/switchery/dist/switchery.min.js" th:src="@{/vendors/switchery/dist/switchery.min.js}"></script>
+<!-- Select2 -->
+<script src="../../static/vendors/select2/dist/js/select2.full.min.js" th:src="@{/vendors/select2/dist/js/select2.full.min.js}"></script>
+<!-- Parsley -->
+<script src="../../static/vendors/parsleyjs/dist/parsley.min.js" th:src="@{/vendors/parsleyjs/dist/parsley.min.js}"></script>
+<!-- Autosize -->
+<script src="../../static/vendors/autosize/dist/autosize.min.js" th:src="@{/vendors/autosize/dist/autosize.min.js}"></script>
+<!-- jQuery autocomplete -->
+<script src="../../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js" th:src="@{/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js}"></script>
+<!-- starrr -->
+<script src="../../static/vendors/starrr/dist/starrr.js" th:src="@{/vendors/starrr/dist/starrr.js}"></script>
+
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
 </body>
 </html>

@@ -6,10 +6,10 @@ import java.math.BigDecimal;
 import java.sql.Date;
 
 @Entity
-@Table(name = "liabilities")
-public class Liabilities implements Serializable {
+@Table(name = "liability")
+public class Liability implements Serializable {
     @Embeddable
-    public static class LiabilitiesKey implements Serializable {
+    public static class LiabilityKey implements Serializable {
         @Column(name = "memberid")
         private long memberid;
         @Column(name = "loanid")
@@ -31,7 +31,7 @@ public class Liabilities implements Serializable {
     }
 
     @EmbeddedId
-    private LiabilitiesKey key;
+    private LiabilityKey key;
 
     @Column(name = "loan_desc")
     private String loanDesc;
@@ -66,10 +66,10 @@ public class Liabilities implements Serializable {
     @Column(name = "date_last_update")
     private Date dateLastUpdate;
 
-    public LiabilitiesKey getKey() {
+    public LiabilityKey getKey() {
         return key;
     }
-    public void setKey(LiabilitiesKey key) {
+    public void setKey(LiabilityKey key) {
         this.key = key;
     }
 

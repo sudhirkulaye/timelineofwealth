@@ -39,7 +39,7 @@ public class UserViewController {
     public String liabilites(Model model, @AuthenticationPrincipal UserDetails userDetails){
         Date dateToday = new Date();
         model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
-        model.addAttribute("title", "TimelineOfWealth-Liabilities");
+        model.addAttribute("title", "TimelineOfWealth-Liability");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/liabilities";
     }
@@ -53,13 +53,40 @@ public class UserViewController {
         return "user/insurances";
     }
 
-    @RequestMapping(value = "/user/liquidityneed", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/liquidities", method = RequestMethod.GET)
     public String liquidityneed(Model model, @AuthenticationPrincipal UserDetails userDetails){
         Date dateToday = new Date();
         model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
-        model.addAttribute("title", "TimelineOfWealth- Liquidity Need");
+        model.addAttribute("title", "TimelineOfWealth- Liquidities");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
-        return "user/liquidityneed";
+        return "user/liquidities";
+    }
+
+    @RequestMapping(value = "/user/sip", method = RequestMethod.GET)
+    public String sip(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        Date dateToday = new Date();
+        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        model.addAttribute("title", "TimelineOfWealth- Regular Investments");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/sip";
+    }
+
+    @RequestMapping(value = "/user/buytxn", method = RequestMethod.GET)
+    public String buyTxn(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        Date dateToday = new Date();
+        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        model.addAttribute("title", "TimelineOfWealth- Buy Transaction");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/buytxn";
+    }
+
+    @RequestMapping(value = "/user/selltxn", method = RequestMethod.GET)
+    public String sellTxn(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        Date dateToday = new Date();
+        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        model.addAttribute("title", "TimelineOfWealth- Sell Transaction");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/selltxn";
     }
 
 }

@@ -1,15 +1,15 @@
-var incExpSavingsModule = angular.module('LiquditiesManagement', []);
+var incExpSavingsModule = angular.module('LiquiditiesManagement', []);
 
-incExpSavingsModule.controller('LiquditiesController', function($scope, $http, $filter) {
+incExpSavingsModule.controller('LiquiditiesController', function($scope, $http, $filter) {
     var urlBase="/user/api";
     $scope.members = [];
-    $scope.liqudities =[];
-    $scope.liqudityForm = {
-        "key":{"memberid":-1,"liqudityid":-1},
+    $scope.liquidities =[];
+    $scope.liquidityForm = {
+        "key":{"memberid":-1,"liquidityid":-1},
         "liquidityDesc":"",
         "priority":"",
-        "expectedBeginingDate":new Date("2010-01-01"),
-        "amountRequiredBeginingDate":0,
+        "expectedStartDate":new Date("2010-01-01"),
+        "amountRequiredStartDate":0,
         "frequency":"0",
         "expectedEndDate":new Date("2010-01-01"),
         "dateLastUpdate":new Date("2010-01-01")
@@ -22,7 +22,7 @@ incExpSavingsModule.controller('LiquditiesController', function($scope, $http, $
     showRecords();
 
     function showRecords(){
-        $scope.liqudities = new Array;
+        $scope.liquidities = new Array;
         $scope.hideForm = true;
 
         var url = "/getusermembers";
@@ -35,32 +35,32 @@ incExpSavingsModule.controller('LiquditiesController', function($scope, $http, $
                 }
             });
 
-        url = "/getliqudities";
+        url = "/getliquidities";
 
         $http.get(urlBase + url).
             then(function (response) {
                 if (response != undefined) {
-                    $scope.liqudities = response.data;
+                    $scope.liquidities = response.data;
                 } else {
-                    $scope.liqudities = [];
+                    $scope.liquidities = [];
                 }
             });
     }
 
 
-    $scope.editLiqudityRecord = function editLiqudityRecord(liqudityRecord){
+    $scope.editLiquidityRecord = function editLiquidityRecord(liquidityRecord){
         $scope.hideForm = false;
         $scope.editMode = true;
 
-        $scope.liqudityForm.key.memberid = ""+liqudityRecord.key.memberid;
-        $scope.liqudityForm.key.liqudityid = liqudityRecord.key.liqudityid;
-        $scope.liqudityForm.liquidityDesc = liqudityRecord.liquidityDesc;
-        $scope.liqudityForm.priority = ""+liqudityRecord.priority;
-        $scope.liqudityForm.expectedBeginingDate = new Date(liqudityRecord.expectedBeginingDate);
-        $scope.liqudityForm.amountRequiredBeginingDate = liqudityRecord.amountRequiredBeginingDate;
-        $scope.liqudityForm.frequency = ""+liqudityRecord.frequency;
-        $scope.liqudityForm.expectedEndDate = new Date(liqudityRecord.expectedEndDate);
-        $scope.liqudityForm.dateLastUpdate = new Date(liqudityRecord.dateLastUpdate);
+        $scope.liquidityForm.key.memberid = ""+liquidityRecord.key.memberid;
+        $scope.liquidityForm.key.liquidityid = liquidityRecord.key.liquidityid;
+        $scope.liquidityForm.liquidityDesc = liquidityRecord.liquidityDesc;
+        $scope.liquidityForm.priority = ""+liquidityRecord.priority;
+        $scope.liquidityForm.expectedStartDate = new Date(liquidityRecord.expectedStartDate);
+        $scope.liquidityForm.amountRequiredStartDate = liquidityRecord.amountRequiredStartDate;
+        $scope.liquidityForm.frequency = ""+liquidityRecord.frequency;
+        $scope.liquidityForm.expectedEndDate = new Date(liquidityRecord.expectedEndDate);
+        $scope.liquidityForm.dateLastUpdate = new Date(liquidityRecord.dateLastUpdate);
 
     }
 
@@ -68,30 +68,30 @@ incExpSavingsModule.controller('LiquditiesController', function($scope, $http, $
         $scope.hideForm = false;
         $scope.editMode = false;
 
-        $scope.liqudityForm.key.memberid = "-1";
-        $scope.liqudityForm.key.liqudityid = "-1";
-        $scope.liqudityForm.liquidityDesc = "";
-        $scope.liqudityForm.priority = "";
-        $scope.liqudityForm.expectedBeginingDate = new Date("2010-01-01");
-        $scope.liqudityForm.amountRequiredBeginingDate = 0;
-        $scope.liqudityForm.frequency = "0";
-        $scope.liqudityForm.expectedEndDate = new Date("2010-01-01");
-        $scope.liqudityForm.dateLastUpdate = new Date();
+        $scope.liquidityForm.key.memberid = "-1";
+        $scope.liquidityForm.key.liquidityid = "-1";
+        $scope.liquidityForm.liquidityDesc = "";
+        $scope.liquidityForm.priority = "";
+        $scope.liquidityForm.expectedStartDate = new Date("2010-01-01");
+        $scope.liquidityForm.amountRequiredStartDate = 0;
+        $scope.liquidityForm.frequency = "0";
+        $scope.liquidityForm.expectedEndDate = new Date("2010-01-01");
+        $scope.liquidityForm.dateLastUpdate = new Date();
     }
 
     $scope.showTable = function showTable() {
         $scope.hideForm = true;
     }
 
-    $scope.deleteLiqudityRecord = function deleteLiqudityRecord(liqudityRecord) {
+    $scope.deleteLiquidityRecord = function deleteLiquidityRecord(liquidityRecord) {
         var result = confirm("Are you sure you want to delete this item?");
         if (result) {
             var method = "DELETE";
-            var url = "/deleteliqudity";
+            var url = "/deleteliquidity";
             $http({
                       method: method,
                       url: urlBase + url,
-                      data: angular.toJson(liqudityRecord),
+                      data: angular.toJson(liquidityRecord),
                       headers: {
                           'Content-Type': 'application/json'
                       }
@@ -99,24 +99,24 @@ incExpSavingsModule.controller('LiquditiesController', function($scope, $http, $
         }
     }
 
-    $scope.processLiqudityRecord = function processLiqudityRecord(){
+    $scope.processLiquidityRecord = function processLiquidityRecord(){
         var method = "";
         var url = "";
-        if($scope.LiqudityRecordHtmlForm.$valid)
+        if($scope.LiquidityRecordHtmlForm.$valid)
         {
-               $scope.liqudityForm.dateLastUpdate = new Date();
+               $scope.liquidityForm.dateLastUpdate = new Date();
               //Submit your form
               if ($scope.editMode != true) {
                   method = "POST";
-                  url = "/addliqudity";
+                  url = "/addliquidity";
               } else {
                   method = "PUT";
-                  url = "/updateliqudity";
+                  url = "/updateliquidity";
               }
               $http({
                   method: method,
                   url: urlBase + url,
-                  data: angular.toJson($scope.liqudityForm),
+                  data: angular.toJson($scope.liquidityForm),
                   headers: {
                       'Content-Type': 'application/json'
                   }
@@ -126,9 +126,9 @@ incExpSavingsModule.controller('LiquditiesController', function($scope, $http, $
 
     function _success(res) {
         if (res != undefined) {
-            $scope.liqudities = res.data;
+            $scope.liquidities = res.data;
         } else {
-            $scope.liqudities = [];
+            $scope.liquidities = [];
         }
         $scope.showTable();
     }
@@ -143,3 +143,15 @@ incExpSavingsModule.controller('LiquditiesController', function($scope, $http, $
     }
 
 });
+
+incExpSavingsModule.filter("frequency", function () {
+    return function (frequency) {
+        switch (frequency) {
+            case 0: return "One Time";
+            case 1: return "Monthly";
+            case 3: return "Quarterly";
+            case 6: return "Semi Annually";
+            case 12: return "Annually";
+        }
+    }
+})
