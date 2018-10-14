@@ -71,10 +71,14 @@ public class IncomeExpenseSavings implements Serializable {
     private BigDecimal infrequentRenovationExpenses;
     @Column(name = "infrequent_other_expenses")
     private BigDecimal infrequentOtherExpenses;
+    @Column(name = "annual_liability")
+    private BigDecimal annualLiability;
     @Column(name = "normalized_regular_expenses")
     private BigDecimal normalizedRegularExpenses;
     @Column(name = "adjustment")
     private BigDecimal adjustment;
+    @Column(name = "note")
+    private String note;
 
     public IncomeExpenseSavingsKey getKey() {
         return key;
@@ -216,6 +220,13 @@ public class IncomeExpenseSavings implements Serializable {
         this.infrequentOtherExpenses = infrequentOtherExpenses;
     }
 
+    public BigDecimal getAnnualLiability() {
+        return annualLiability;
+    }
+    public void setAnnualLiability(BigDecimal annualLiability) {
+        this.annualLiability = annualLiability;
+    }
+
     public BigDecimal getNormalizedRegularExpenses() {
         return normalizedRegularExpenses;
     }
@@ -228,5 +239,12 @@ public class IncomeExpenseSavings implements Serializable {
     }
     public void setAdjustment(BigDecimal adjustment) {
         this.adjustment = adjustment;
+    }
+
+    public String getNote() {
+        return note;
+    }
+    public void setNote(String note) {
+        this.note = note;
     }
 }

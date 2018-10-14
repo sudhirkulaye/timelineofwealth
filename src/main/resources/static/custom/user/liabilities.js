@@ -137,6 +137,7 @@ incExpSavingsModule.controller('LiabilitiesController', function($scope, $http, 
         }
         if($scope.LiabilityRecordHtmlForm.$valid)
         {
+              $scope.liabilityForm.dateLastUpdate = new Date();
               //Submit your form
               if ($scope.editMode != true) {
                   method = "POST";

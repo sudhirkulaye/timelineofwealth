@@ -25,8 +25,10 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
         "infrequentMedicalExpenses":0,
         "infrequentRenovationExpenses":0,
         "infrequentOtherExpenses":0,
+        "annualLiability":0,
         "normalizedRegularExpenses":0,
-        "adjustment":0
+        "adjustment":0,
+        "note":""
     };
     $scope.consolidatedIncExp = [];
     $scope.consolidatedIncExp1 = [];
@@ -129,8 +131,10 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
         $scope.incExpSavingsRecordForm.infrequentMedicalExpenses = incExpSavingsRecord.infrequentMedicalExpenses;
         $scope.incExpSavingsRecordForm.infrequentRenovationExpenses = incExpSavingsRecord.infrequentRenovationExpenses;
         $scope.incExpSavingsRecordForm.infrequentOtherExpenses = incExpSavingsRecord.infrequentOtherExpenses;
+        $scope.incExpSavingsRecordForm.annualLiability = incExpSavingsRecord.annualLiability;
         $scope.incExpSavingsRecordForm.normalizedRegularExpenses = incExpSavingsRecord.normalizedRegularExpenses;
         $scope.incExpSavingsRecordForm.adjustment = incExpSavingsRecord.adjustment;
+        $scope.incExpSavingsRecordForm.note = incExpSavingsRecord.note;
 
         $scope.nonZeroAdjustment = false;
         $scope.recordAlreadyExist = false;
@@ -162,8 +166,10 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
         $scope.incExpSavingsRecordForm.infrequentMedicalExpenses = 0;
         $scope.incExpSavingsRecordForm.infrequentRenovationExpenses = 0;
         $scope.incExpSavingsRecordForm.infrequentOtherExpenses = 0;
+        $scope.incExpSavingsRecordForm.annualLiability = 0;
         $scope.incExpSavingsRecordForm.normalizedRegularExpenses = 0;
         $scope.incExpSavingsRecordForm.adjustment = 0;
+        $scope.incExpSavingsRecordForm.note = "";
     }
 
     $scope.deesRecordexist = function deesRecordexist(){
@@ -199,6 +205,7 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
                                                      + $scope.incExpSavingsRecordForm.investmentInFixedIncome
                                                      + $scope.incExpSavingsRecordForm.investmentInOther;
         $scope.incExpSavingsRecordForm.grossTotalExpenses = $scope.incExpSavingsRecordForm.normalizedRegularExpenses
+                                                        + $scope.incExpSavingsRecordForm.annualLiability
                                                         + $scope.incExpSavingsRecordForm.infrequentTotalExpenses;
         $scope.incExpSavingsRecordForm.adjustment = $scope.incExpSavingsRecordForm.regularIncome
                                                 + $scope.incExpSavingsRecordForm.interestDividendIncome
@@ -213,6 +220,7 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
                                                 + $scope.incExpSavingsRecordForm.investmentInOther
                                                 ) - (
                                                 $scope.incExpSavingsRecordForm.normalizedRegularExpenses
+                                                + $scope.incExpSavingsRecordForm.annualLiability
                                                 + $scope.incExpSavingsRecordForm.infrequentTotalExpenses);
 
         if($scope.incExpSavingsRecordForm.adjustment != 0){

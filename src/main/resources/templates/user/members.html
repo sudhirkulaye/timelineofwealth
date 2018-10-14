@@ -90,6 +90,7 @@
                                     </div>
                                     <div  class="col-md-6 col-xs-12" ng-hide="hideForm">
                                         <span ng-show="relationshipError" class="col-md-12 col-sm-12 col-xs-12 alert alert-danger" >Only one member can have relationship as a Self</span>
+                                        <!--<span ng-show="memberHtmlForm.cellNo.$error.pattern" class="col-md-12 col-sm-12 col-xs-12 alert alert-danger" >Only 10 Digits for a Phone Number</span>-->
                                         <p />
                                         <form name="memberHtmlForm" class="form-horizontal form-label-left input_mask" >
                                             <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
@@ -105,7 +106,7 @@
                                                 <span class="fa fa-envelope form-control-feedback left" aria-hidden="true"></span>
                                             </div>
                                             <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
-                                                <input type="text" class="form-control" ng-model="memberForm.cellNo" pattern="[1-9]{1}[0-9]{9}" placeholder="10 Digit Cell No" />
+                                                <input type="text" class="form-control" name="cellNo" ng-model="memberForm.cellNo" ng-pattern="/^[0-9]{10,10}$/" placeholder="10 Digit Cell No" />
                                                 <span class="fa fa-phone form-control-feedback right" aria-hidden="true"></span>
                                             </div>
                                             <div class="form-group">
