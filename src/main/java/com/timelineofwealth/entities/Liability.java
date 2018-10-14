@@ -7,7 +7,7 @@ import java.sql.Date;
 
 @Entity
 @Table(name = "liabilities")
-public class Liabilities {
+public class Liabilities implements Serializable {
     @Embeddable
     public static class LiabilitiesKey implements Serializable {
         @Column(name = "memberid")

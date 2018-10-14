@@ -1,6 +1,6 @@
 package com.timelineofwealth.service;
 
-import com.timelineofwealth.entities.Liabilities;
+import com.timelineofwealth.entities.Liability;
 import com.timelineofwealth.entities.Member;
 import com.timelineofwealth.entities.User;
 import com.timelineofwealth.repositories.LiabilitiesRepository;
@@ -27,21 +27,21 @@ public class LiabilitiesService {
         LiabilitiesService.LiabilitiesRepository = LiabilitiesRepository;
     }
 
-    public static List<Liabilities> getLiabilitiesRecords(String email){
+    public static List<Liability> getLiabilitiesRecords(String email){
         logger.debug(String.format("In LiabilitiesService.getLiabilitiesRecords: Email %s", email));
 
-        List<Liabilities> LiabilitiesRecords;
+        List<Liability> liabilityRecords;
         List<Member> members = MemberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
         }
-        LiabilitiesRecords = LiabilitiesRepository.findByKeyMemberidInOrderByKeyMemberidAscKeyLoanidAsc(membersIds);
+        liabilityRecords = LiabilitiesRepository.findByKeyMemberidInOrderByKeyMemberidAscKeyLoanidAsc(membersIds);
 
-        return LiabilitiesRecords;
+        return liabilityRecords;
     }
 
-    public static void updateLiabilitiesRecord(Liabilities editedRecord) {
+    public static void updateLiabilitiesRecord(Liability editedRecord) {
         logger.debug(String.format("In LiabilitiesService.updateLiabilitiesRecord: editedRecord.key.memberid %d", editedRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -54,7 +54,7 @@ public class LiabilitiesService {
         }
     }
 
-    public static void addLiabilitiesRecord(Liabilities newRecord) {
+    public static void addLiabilitiesRecord(Liability newRecord) {
         logger.debug(String.format("In LiabilitiesService.addLiabilitiesRecord: newRecord.key.memberid %d", newRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -70,7 +70,7 @@ public class LiabilitiesService {
         }
     }
 
-    public static void deleteLiabilitiesRecord(Liabilities deletedRecord){
+    public static void deleteLiabilitiesRecord(Liability deletedRecord){
         logger.debug(String.format("In LiabilitiesService.deleteLiabilitiesRecord: deletedRecord.key.memberid %d", deletedRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
