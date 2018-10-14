@@ -1,6 +1,6 @@
 package com.timelineofwealth.apis;
 
-import com.timelineofwealth.entities.Liabilities;
+import com.timelineofwealth.entities.Liability;
 import com.timelineofwealth.entities.User;
 import com.timelineofwealth.service.CommonService;
 import com.timelineofwealth.service.LiabilitiesService;
@@ -22,7 +22,7 @@ public class LiabilitiesRestApi {
     private static final Logger logger = LoggerFactory.getLogger(LiabilitiesRestApi.class);
 
     @RequestMapping(value = "/getliabilities", method = RequestMethod.GET)
-    public List<Liabilities> getliabilities() {
+    public List<Liability> getliabilities() {
         logger.debug(String.format("Call user/api/getliabilities/"));
 
         UserDetails userDetails =
@@ -32,7 +32,7 @@ public class LiabilitiesRestApi {
     }
 
     @RequestMapping(value = "/updateliability", method = RequestMethod.PUT)
-    public List<Liabilities> updateliability(@RequestBody Liabilities editedRecord) {
+    public List<Liability> updateliability(@RequestBody Liability editedRecord) {
         logger.debug("Call user/api/updateliability/ " + editedRecord.getKey().getMemberid());
         editedRecord.setPvOutstandingEmis(editedRecord.getPvOutstandingEmis().setScale(0, BigDecimal.ROUND_HALF_UP));
         LiabilitiesService.updateLiabilitiesRecord(editedRecord);
@@ -40,7 +40,7 @@ public class LiabilitiesRestApi {
     }
 
     @RequestMapping(value = "/addliability", method = RequestMethod.POST)
-    public List<Liabilities> addliability(@RequestBody Liabilities newRecord) {
+    public List<Liability> addliability(@RequestBody Liability newRecord) {
         logger.debug("Call user/api/addliability/ " + newRecord.getKey().getMemberid());
         newRecord.setPvOutstandingEmis(newRecord.getPvOutstandingEmis().setScale(0, BigDecimal.ROUND_HALF_UP));
         LiabilitiesService.addLiabilitiesRecord(newRecord);
@@ -48,7 +48,7 @@ public class LiabilitiesRestApi {
     }
 
     @RequestMapping(value = "/deleteliability", method = RequestMethod.DELETE)
-    public List<Liabilities> deleteliability(@RequestBody Liabilities deletedRecord) {
+    public List<Liability> deleteliability(@RequestBody Liability deletedRecord) {
         logger.debug("Call user/api/deleteliability/ " + deletedRecord.getKey().getMemberid());
         LiabilitiesService.deleteLiabilitiesRecord(deletedRecord);
         return getliabilities();
