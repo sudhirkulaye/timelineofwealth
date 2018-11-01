@@ -94,10 +94,10 @@ public class PublicViewController {
         return "public/assetclasses";
     }
 
-    @RequestMapping(value = "/public/economyandmarketwatch")
+    @RequestMapping(value = "/public/mftypes")
     public String economyAndMarketwatch(Model model){
         model.addAttribute("processingDate", "2018-08-15"/*CommonService.getProcessingDate()*/);
         model.addAttribute("title", "Timeline of Weatlh");
-        return "public/economyandmarketwatch";
+        return "public/mftypes";
     }
 }

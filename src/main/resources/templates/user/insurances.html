@@ -35,185 +35,178 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-            <div class="">
-                <div class="page-title">
-                    <div class="title_left">
-                        <h3>Insurances </h3>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
-
-                <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <br />
-                        <div class="x_panel">
-                            <div class="x_title" ng-hide="!hideForm">
-                                <h2>Insurances, ULIPs and Annuities <small>Tracking your insurances, ULIPS and annuity products</small></h2>
-                                <button type="button" ng-click="showClearForm()" class="btn btn-success  pull-right btn-xs">Add New</button>
-                                <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <br />
+                    <div class="x_panel">
+                        <div class="x_title" ng-hide="!hideForm">
+                            <h1>Insurances, ULIPs and Annuities </h1>
+                            <p />Tracking your insurances, ULIPS and annuity products
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" ng-hide="!hideForm">
+                            <button type="button" ng-click="showClearForm()" class="btn btn-success  pull-left btn-xs">Add New Insurance</button>
+                        </div>
+                        <div class="x_content" ng-hide="!hideForm">
+                            <br />
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Member</th>
+                                        <th>Insurance Name</th>
+                                        <th>Category</th>
+                                        <th>Cover Amt.</th>
+                                        <th>Premium Amt.</th>
+                                        <th>Expiry Date</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="insuranceRecord in insurances">
+                                        <td>{{ (members | filter : { 'memberid' : insuranceRecord.key.memberid })[0].firstName }}</td>
+                                        <td>{{insuranceRecord.productName}}</td>
+                                        <td>{{insuranceRecord.category}}</td>
+                                        <td>{{insuranceRecord.coverAmount}}</td>
+                                        <td>{{insuranceRecord.premiumAmount}}</td>
+                                        <td>{{insuranceRecord.expiryDate}}</td>
+                                        <td>
+                                            <button type="button" ng-click="deleteInsuranceRecord(insuranceRecord)" class="btn btn-danger  pull-right btn-xs" > Delete </button>
+                                            <button type="button" ng-click="editInsuranceRecord(insuranceRecord)" class="btn btn-warning  pull-right btn-xs" > Edit </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="x_content" ng-hide="!hideForm">
-                                <br />
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                        <tr>
-                                            <th>Member</th>
-                                            <th>Insurance Name</th>
-                                            <th>Category</th>
-                                            <th>Cover Amt.</th>
-                                            <th>Premium Amt.</th>
-                                            <th>Expiry Date</th>
-                                            <th></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr ng-repeat="insuranceRecord in insurances">
-                                            <td>{{ (members | filter : { 'memberid' : insuranceRecord.key.memberid })[0].firstName }}</td>
-                                            <td>{{insuranceRecord.productName}}</td>
-                                            <td>{{insuranceRecord.category}}</td>
-                                            <td>{{insuranceRecord.coverAmount}}</td>
-                                            <td>{{insuranceRecord.premiumAmount}}</td>
-                                            <td>{{insuranceRecord.expiryDate}}</td>
-                                            <td>
-                                                <button type="button" ng-click="deleteInsuranceRecord(insuranceRecord)" class="btn btn-danger  pull-right btn-xs" > Delete </button>
-                                                <button type="button" ng-click="editInsuranceRecord(insuranceRecord)" class="btn btn-warning  pull-right btn-xs" > Edit </button>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                        </div>
+                        <div  class="col-md-6 col-xs-12" ng-hide="hideForm">
+                            <form name="InsuranceRecordHtmlForm" class="form-horizontal form-label-left input_mask" >
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Member<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="insuranceForm.key.memberid" required="required" ng-disabled="editMode">
+                                            <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div  class="col-md-6 col-xs-12" ng-hide="hideForm">
-                                <form name="InsuranceRecordHtmlForm" class="form-horizontal form-label-left input_mask" >
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Member<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="insuranceForm.key.memberid" required="required" ng-disabled="editMode">
-                                                <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
-                                            </select>
-                                        </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Insurance Product UIN<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="text" class="form-control" required="required" ng-model="insuranceForm.productUIN" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Insurance Product UIN<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <input type="text" class="form-control" required="required" ng-model="insuranceForm.productUIN" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Insurance Name<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="text" class="form-control" required="required" ng-model="insuranceForm.productName" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Insurance Name<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <input type="text" class="form-control" required="required" ng-model="insuranceForm.productName" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Insurance Category <span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="insuranceForm.category" required="required" >
+                                            <option>Term Life Insurance</option>
+                                            <option>Whole Life Insurance</option>
+                                            <option>Endowment Policy</option>
+                                            <option>Money-back Policy</option>
+                                            <option>Child Plan</option>
+                                            <option>Pension Plans</option>
+                                            <option>Unit-linked Insurance Plans(ULIPs)</option>
+                                            <option>Health Insurance</option>
+                                            <option>Motor Insurance</option>
+                                            <option>Other Insurance</option>
+                                            <option>Annuity Scheme</option>
+                                        </select>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Insurance Category <span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="insuranceForm.category" required="required" >
-                                                <option>Term Life Insurance</option>
-                                                <option>Whole Life Insurance</option>
-                                                <option>Endowment Policy</option>
-                                                <option>Money-back Policy</option>
-                                                <option>Child Plan</option>
-                                                <option>Pension Plans</option>
-                                                <option>Unit-linked Insurance Plans(ULIPs)</option>
-                                                <option>Health Insurance</option>
-                                                <option>Motor Insurance</option>
-                                                <option>Other Insurance</option>
-                                                <option>Annuity Scheme</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Cover Amount<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="insuranceForm.coverAmount" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Cover Amount<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="insuranceForm.coverAmount" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Premium Amount</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/" ng-model="insuranceForm.premiumAmount" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Premium Amount</label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/" ng-model="insuranceForm.premiumAmount" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Frequency of Premium<small></small><span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <select class="form-control" required="required" ng-model="insuranceForm.premiumFrequencyInMonths" >
+                                            <option value="0">One Time</option>
+                                            <option value="1">Monthly</option>
+                                            <option value="3">Quarterly</option>
+                                            <option value="6">Semi Annually</option>
+                                            <option value="12">Annually</option>
+                                        </select>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Frequency of Premium<small></small><span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <select class="form-control" required="required" ng-model="insuranceForm.premiumFrequencyInMonths" >
-                                                <option value="0">One Time</option>
-                                                <option value="1">Monthly</option>
-                                                <option value="3">Quarterly</option>
-                                                <option value="6">Semi Annually</option>
-                                                <option value="12">Annually</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Last Date when premium paid<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="date" class="form-control" required="required" ng-model="insuranceForm.lastDatePremiumPaid" placeholder="yyyy-MM-dd" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Last Date when premium paid<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="date" class="form-control" required="required" ng-model="insuranceForm.lastDatePremiumPaid" placeholder="yyyy-MM-dd" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Is Lifetime covered <span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="insuranceForm.lifeTimeCover" required="required" >
+                                            <option>Yes</option>
+                                            <option>No</option>
+                                        </select>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Is Lifetime covered <span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="insuranceForm.lifeTimeCover" required="required" >
-                                                <option>Yes</option>
-                                                <option>No</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Expiry or Maturity Date<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="date" class="form-control" required="required" ng-model="insuranceForm.expiryDate" placeholder="yyyy-MM-dd" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Expiry or Maturity Date<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="date" class="form-control" required="required" ng-model="insuranceForm.expiryDate" placeholder="yyyy-MM-dd" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Maturity Amount<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="insuranceForm.maturityAmount" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Maturity Amount<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="insuranceForm.maturityAmount" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Maturity Payment Frequency<small></small><span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <select class="form-control" required="required" ng-model="insuranceForm.maturityFrequency" >
+                                            <option value="0">One Time</option>
+                                            <option value="1">Monthly</option>
+                                            <option value="3">Quarterly</option>
+                                            <option value="6">Semi Annually</option>
+                                            <option value="12">Annually</option>
+                                        </select>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Maturity Payment Frequency<small></small><span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <select class="form-control" required="required" ng-model="insuranceForm.maturityFrequency" >
-                                                <option value="0">One Time</option>
-                                                <option value="1">Monthly</option>
-                                                <option value="3">Quarterly</option>
-                                                <option value="6">Semi Annually</option>
-                                                <option value="12">Annually</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Expected Bonus Amount<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,3}$/" ng-model="insuranceForm.expectedBonusAmount" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Expected Bonus Amount<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,3}$/" ng-model="insuranceForm.expectedBonusAmount" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">
+                                        Date Last Update
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="date" class="form-control" ng-model="insuranceForm.dateLastUpdate" placeholder="yyyy-MM-dd"  ng-disabled="true" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">
-                                            Date Last Update
-                                        </label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <input type="date" class="form-control" ng-model="insuranceForm.dateLastUpdate" placeholder="yyyy-MM-dd"  ng-disabled="true" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-4 col-sm-4 col-xs-12  col-md-offset-8">
+                                        <button type="submit" class="btn btn-success" ng-click="processInsuranceRecord()">Save</button>
+                                        <button class="btn btn-success" ng-click="showTable()">Cancel</button>
+                                        <br /> <br />
                                     </div>
-                                    <div class="form-group">
-                                        <div class="col-md-4 col-sm-4 col-xs-12  col-md-offset-8">
-                                            <button type="submit" class="btn btn-success" ng-click="processInsuranceRecord()">Save</button>
-                                            <button class="btn btn-success" ng-click="showTable()">Cancel</button>
-                                            <br /> <br />
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
         <!-- /page content -->
