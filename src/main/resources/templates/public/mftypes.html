@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h1>Mutual Fund Types, Subtypes and Risk-Return Characteristics</h1>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> General Caveat: Prefer Direct MFs. You could accumulate substantial amount over longer period especially in case of Equity MFs </strong>  </h2>
+                            </p>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th width="15%"><h2><strong>MF Type</strong></h2></th>
+                                        <th width="15%"><h2><strong>Subtype</strong></h2></th>
+                                        <th width="70%"><h2><strong>Risk-Return Characteristics</strong></h2></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><h2><strong>Debt</strong></h2></td>
+                                        <td></td>
+                                        <td>
+                                            <p>
+                                                <h2><i class="fa fa-check-square-o"></i> Use Debt MF along with Bank FDs, PPF <strong>to diversify overall wealth</strong></h2>
+                                            </p>
+                                            <p>
+                                            <h2><i class="fa fa-check-square-o"></i> Usually <strong>protect capital</strong> and give returns around Bank FDs</h2>
+                                            </p>
+                                            <p>
+                                                <h2><i class="fa fa-check-square-o"></i> Increase exposure to Debt MF or Fixed Income Asset Class in general <p />(i.e. Bank FDs, Debt Mutual Funds etc.) when Equity Asset Class is over-valued <p />and expected to under-perform</h2>
+                                            </p>
+                                            <p>
+                                            <h2><i class="fa fa-check-square-o"></i> Main Exposures are <strong>Interest Rate Risk and Credit Risk:</strong> (Note: Check Debt MF style-box) </h2>
+                                            </p>
+                                            <ul>
+                                                <li><h2>Debt MF having short term debt securities are less sensitive to Interest Rate Risk</h2></li>
+                                                <li><h2>Debt mutual funds having long term debt securities are more sensitive to Interest Rate Risk </h2> </li>
+                                                <li><h2><strong>When interest rate goes down long term debt securities give much better returns than FD</strong> </h2></li>
+                                                <li><h2><strong>When interest rate goes up long term debt securities under-perform FD</strong> </h2></li>
+                                                <li><h2>When economy is going good usually low credit quality securities give better returns </h2></li>
+                                                <li><h2>During recession low credit quality securities usually under-perform </h2></li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Banking &amp; PSU</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Major debt securities are from Banking and PSU sectors</h2></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Corporate Bond</h2></td>
+                                        <td>
+                                            <h2><i class="fa fa-check-square-o"></i> Check Style Box for Credit Quality of underlying securities
+                                                <p /><i class="fa fa-check-square-o"></i> Increase exposure when economy is about to come out of recession
+                                            </h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Credit Risk</h2></td>
+                                        <td>
+                                            <h2><i class="fa fa-check-square-o"></i> Check Style Box for Credit Quality of underlying securities
+                                                <p /><i class="fa fa-check-square-o"></i> Increase exposure when economy is about to come out of recession
+                                            </h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Dynamic Bond</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Usually Interest Rate Risk sensitive</h2></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Floating Rate</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Prefer when inflation is expected to go up</h2></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Fixed Term Plan</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> There is a locking period, thus, low liquidity</h2></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Guilt </h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Long term Government Securities</h2></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Constant Maturity Gilt</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Long term Government Securities
+                                            <p /><i class="fa fa-check-square-o"></i> Usually Interest Rate Risk sensitive
+                                        </h2></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Duration</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Low Duration Funds (securities with short maturity) are less sensitive to interest rate risk
+                                            <p /><i class="fa fa-check-square-o"></i> High Duration Funds (securities with short maturity) are more sensitive to interest rate risk</h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Money Market/Liquid</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Short Duration Funds (securities with short maturity, usually in months) are least sensitive to interest rate risk
+                                            <p /><i class="fa fa-check-square-o"></i> Use to park money while switching between asset classes
+                                            <p /><i class="fa fa-check-square-o"></i> Highly liquid no exit load for short duration
+                                            <p /><i class="fa fa-check-square-o"></i> Low risk and usually behave like FDs
+                                        </h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><h2><strong>Equity</strong></h2></td>
+                                        <td></td>
+                                        <td>
+                                            <p>
+                                            <h2><i class="fa fa-check-square-o"></i> Use Equity MF (or Diversified Equity Asset Class) <strong>to hedge inflation risk</strong></h2>
+                                            </p>
+                                            <p>
+                                            <h2><i class="fa fa-check-square-o"></i> Usually use for <strong>capital appreciation over longer term (usually 10 Years)</strong> </h2>
+                                            </p>
+                                            <p>
+                                                <h2><i class="fa fa-check-square-o"></i> Increase exposure to Equity Asset Class in general when Equity Asset Class is under-valued
+                                                <p />and expected to out-perform. Especially when economy is bottoming out of recession.</h2>
+                                            </p>
+                                            <p>
+                                            <h2><i class="fa fa-check-square-o"></i> Main Risk is <strong>short term volatility:</strong> (Note: Check Equity MF style-box) </h2>
+                                            </p>
+                                            <ul>
+                                                <li><h2>Small Cap Equity MF returns are usually more volatile in short term than Large Cap Equity MF</h2></li>
+                                                <li><h2>Growth and Value are two main investment styles</h2> </li>
+                                                <li><h2><strong>Growth Style MFs invest in stocks showing higher revenue growth.
+                                                    <p />Usually stocks are expensive and returns depend on actual materialization of future growth </strong> </h2></li>
+                                                <li><h2><strong>Value Style MFs invest in stocks with stable business but not showing high revenue growth
+                                                    <p />Usually stocks are less expensive and returns depend on positive earning surprises </strong> </h2></li>
+                                                <li><h2>Use Sector exposed Equity MFs when that particular sector is about to outperform in coming quarters  </h2></li>
+                                                <li><h2>Use Thematic Equity MFs when that particular theme is expected to out-perform in coming quarters </h2></li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Large/Mid/Small</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Large Cap Equity MFs invest in stocks of stable large companies and relatively show lower volatility risk
+                                                <p /><i class="fa fa-check-square-o"></i> Mid-to-Small Cap Equity MFs invest in stocks of Mid to Small size companies and relatively show higher volatility risk
+                                            </h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Multi Cap</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Usually include stocks of large to small size companies
+                                            <p /><i class="fa fa-check-square-o"></i> Watch Equity style box for size exposure</h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Sector Exposure</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Exposure to stocks from either Pharma or IT or Infra or any other Sector
+                                            <p /><i class="fa fa-check-square-o"></i> Good when you anticipate sector might out perform broader market
+                                             <p />(<strong>IT and Pharma Sector MFs out performed in 2018, due to dollar appreciation and other factors </strong>)
+                                            <p /><i class="fa fa-check-square-o"></i> Risk of returns not inline with broader benchmarks i.e. SENSEX or NIFTY
+                                        </h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Thematic</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Useful when there is an anticipation of certain theme will outperform broader market
+                                            <p /><i class="fa fa-check-square-o"></i> Consumption Consumer Trend, Dividend Yield, Inflation-Interest Rate, Exchange Rate theme
+                                        </h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><h2><strong>Hybrid</strong></h2></td>
+                                        <td></td>
+                                        <td>
+                                            <h2><strong>Combination of Debt and Equity Mutual Fund</strong></h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Aggressive</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Higher percentage of allocation to Equity Class
+                                        </h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Conservative</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Higher percentage of allocation to Debt Class
+                                        </h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><h2>Balanced</h2></td>
+                                        <td><h2><i class="fa fa-check-square-o"></i> Usually equal weighing to both Debt and Equity
+                                        </h2>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>

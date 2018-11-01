@@ -35,135 +35,128 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-            <div class="">
-                <div class="page-title">
-                    <div class="title_left">
-                        <h3>Liquidities </h3>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
-
-                <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <br />
-                        <div class="x_panel">
-                            <div class="x_title" ng-hide="!hideForm">
-                                <h2>Liquidities, ULIPs and Annuities <small>Tracking your liquidities, ULIPS and annuity products</small></h2>
-                                <button type="button" ng-click="showClearForm()" class="btn btn-success  pull-right btn-xs">Add New</button>
-                                <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <br />
+                    <div class="x_panel">
+                        <div class="x_title" ng-hide="!hideForm">
+                            <h1>Future Liquidity Need (Financial Goals) </h1>
+                            <p />Tracking your Financial Goals and their priorities
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" ng-hide="!hideForm">
+                            <button type="button" ng-click="showClearForm()" class="btn btn-success  pull-left btn-xs">Add New Goal</button>
+                        </div>
+                        <div class="x_content" ng-hide="!hideForm">
+                            <br />
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Member</th>
+                                        <th>Liquidity/Goal</th>
+                                        <th>Priority</th>
+                                        <th>Exp. Start Date</th>
+                                        <th>Amt. Required</th>
+                                        <th>Frequency</th>
+                                        <th>Exp. End Date</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="liquidityRecord in liquidities">
+                                        <td>{{ (members | filter : { 'memberid' : liquidityRecord.key.memberid })[0].firstName }}</td>
+                                        <td>{{liquidityRecord.liquidityDesc}}</td>
+                                        <td>{{liquidityRecord.priority}}</td>
+                                        <td>{{liquidityRecord.expectedStartDate}}</td>
+                                        <td>{{liquidityRecord.amountRequiredStartDate}}</td>
+                                        <td>{{liquidityRecord.frequency | frequency}}</td>
+                                        <td>{{liquidityRecord.expectedEndDate}}</td>
+                                        <td>
+                                            <button type="button" ng-click="deleteLiquidityRecord(liquidityRecord)" class="btn btn-danger  pull-right btn-xs" > Delete </button>
+                                            <button type="button" ng-click="editLiquidityRecord(liquidityRecord)" class="btn btn-warning  pull-right btn-xs" > Edit </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="x_content" ng-hide="!hideForm">
-                                <br />
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                        <tr>
-                                            <th>Member</th>
-                                            <th>Liquidity/Goal</th>
-                                            <th>Priority</th>
-                                            <th>Exp. Start Date</th>
-                                            <th>Amt. Required</th>
-                                            <th>Frequency</th>
-                                            <th>Exp. End Date</th>
-                                            <th></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr ng-repeat="liquidityRecord in liquidities">
-                                            <td>{{ (members | filter : { 'memberid' : liquidityRecord.key.memberid })[0].firstName }}</td>
-                                            <td>{{liquidityRecord.liquidityDesc}}</td>
-                                            <td>{{liquidityRecord.priority}}</td>
-                                            <td>{{liquidityRecord.expectedStartDate}}</td>
-                                            <td>{{liquidityRecord.amountRequiredStartDate}}</td>
-                                            <td>{{liquidityRecord.frequency | frequency}}</td>
-                                            <td>{{liquidityRecord.expectedEndDate}}</td>
-                                            <td>
-                                                <button type="button" ng-click="deleteLiquidityRecord(liquidityRecord)" class="btn btn-danger  pull-right btn-xs" > Delete </button>
-                                                <button type="button" ng-click="editLiquidityRecord(liquidityRecord)" class="btn btn-warning  pull-right btn-xs" > Edit </button>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                        </div>
+                        <div  class="col-md-6 col-xs-12" ng-hide="hideForm">
+                            <form name="LiquidityRecordHtmlForm" class="form-horizontal form-label-left input_mask" >
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Member<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="liquidityForm.key.memberid" required="required" ng-disabled="editMode">
+                                            <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div  class="col-md-6 col-xs-12" ng-hide="hideForm">
-                                <form name="LiquidityRecordHtmlForm" class="form-horizontal form-label-left input_mask" >
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Member<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="liquidityForm.key.memberid" required="required" ng-disabled="editMode">
-                                                <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
-                                            </select>
-                                        </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Liquidity/Goal Description<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="text" class="form-control" required="required" ng-model="liquidityForm.liquidityDesc" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Liquidity/Goal Description<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <input type="text" class="form-control" required="required" ng-model="liquidityForm.liquidityDesc" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Priority <span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="liquidityForm.priority" required="required" >
+                                            <option>Critical</option>
+                                            <option>High</option>
+                                            <option>Medium</option>
+                                            <option>Low</option>
+                                        </select>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Priority <span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="liquidityForm.priority" required="required" >
-                                                <option>Critical</option>
-                                                <option>High</option>
-                                                <option>Medium</option>
-                                                <option>Low</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Expected Start Date<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="date" class="form-control" required="required" ng-model="liquidityForm.expectedStartDate" placeholder="yyyy-MM-dd" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Expected Start Date<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="date" class="form-control" required="required" ng-model="liquidityForm.expectedStartDate" placeholder="yyyy-MM-dd" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Expected Amount<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="liquidityForm.amountRequiredStartDate" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Expected Amount<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="liquidityForm.amountRequiredStartDate" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Frequency of Liquidity<small></small><span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <select class="form-control" required="required" ng-model="liquidityForm.frequency" >
+                                            <option value="0">One Time</option>
+                                            <option value="1">Monthly</option>
+                                            <option value="3">Quarterly</option>
+                                            <option value="6">Semi Annually</option>
+                                            <option value="12">Annually</option>
+                                        </select>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Frequency of Liquidity<small></small><span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <select class="form-control" required="required" ng-model="liquidityForm.frequency" >
-                                                <option value="0">One Time</option>
-                                                <option value="1">Monthly</option>
-                                                <option value="3">Quarterly</option>
-                                                <option value="6">Semi Annually</option>
-                                                <option value="12">Annually</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Expected Start Date<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="date" class="form-control" required="required" ng-model="liquidityForm.expectedEndDate" placeholder="yyyy-MM-dd" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Expected Start Date<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="date" class="form-control" required="required" ng-model="liquidityForm.expectedEndDate" placeholder="yyyy-MM-dd" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">
+                                        Date Last Update
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="date" class="form-control" ng-model="liquidityForm.dateLastUpdate" placeholder="yyyy-MM-dd"  ng-disabled="true" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">
-                                            Date Last Update
-                                        </label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <input type="date" class="form-control" ng-model="liquidityForm.dateLastUpdate" placeholder="yyyy-MM-dd"  ng-disabled="true" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-4 col-sm-4 col-xs-12  col-md-offset-8">
+                                        <button type="submit" class="btn btn-success" ng-click="processLiquidityRecord()">Save</button>
+                                        <button class="btn btn-success" ng-click="showTable()">Cancel</button>
+                                        <br /> <br />
                                     </div>
-                                    <div class="form-group">
-                                        <div class="col-md-4 col-sm-4 col-xs-12  col-md-offset-8">
-                                            <button type="submit" class="btn btn-success" ng-click="processLiquidityRecord()">Save</button>
-                                            <button class="btn btn-success" ng-click="showTable()">Cancel</button>
-                                            <br /> <br />
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
         <!-- /page content -->

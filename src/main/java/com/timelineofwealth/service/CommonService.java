@@ -1,19 +1,33 @@
 package com.timelineofwealth.service;
 
 import com.timelineofwealth.controllers.UserViewController;
+import com.timelineofwealth.dto.MutualFundDTO;
+import com.timelineofwealth.entities.AssetClassification;
+import com.timelineofwealth.entities.MutualFundUniverse;
+import com.timelineofwealth.entities.Subindustry;
 import com.timelineofwealth.entities.User;
+import com.timelineofwealth.repositories.AssetClassificationRepository;
+import com.timelineofwealth.repositories.MutualFundUniverseRepository;
+import com.timelineofwealth.repositories.SubindustryRepository;
 import com.timelineofwealth.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import org.springframework.cache.annotation.Cacheable;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
+@EnableCaching
 public class CommonService {
 
     public static final String ADMIN_ROLE = "ROLE_ADMIN";
@@ -22,11 +36,32 @@ public class CommonService {
 
     @Autowired
     private static UserRepository userRepository;
-
     @Autowired
     public  void setUserRepository(UserRepository userRepository){
         CommonService.userRepository = userRepository;
     }
+
+    @Autowired
+    private static AssetClassificationRepository assetClassificationRepository;
+    @Autowired
+    public void setAssetClassificationRepository(AssetClassificationRepository assetClassificationRepository){
+        CommonService.assetClassificationRepository = assetClassificationRepository;
+    }
+
+    @Autowired
+    private static SubindustryRepository subindustryRepository;
+    @Autowired
+    public void setSubindustryRepository(SubindustryRepository subindustryRepository){
+        CommonService.subindustryRepository = subindustryRepository;
+    }
+
+    @Autowired
+    private static MutualFundUniverseRepository mutualFundUniverseRepository;
+    @Autowired
+    public void setMutualFundUniverseRepository(MutualFundUniverseRepository mutualFundUniverseRepository){
+        CommonService.mutualFundUniverseRepository = mutualFundUniverseRepository;
+    }
+
 
     /**
      * Returns true if SignIn User is Admin
@@ -89,6 +124,98 @@ public class CommonService {
             welcomeMessage = signInUser.getPrefix()+ " "+ signInUser.getLastName();
         }
         return welcomeMessage;
+    }
+
+    /**
+     * Returns Asset Classifications
+     * @return
+     */
+    public static List<AssetClassification> getAssetClassfication() {
+        return  CommonService.assetClassificationRepository.findAll();
+    }
+
+    /**
+     * Return All Sub Industries
+     * @return
+     */
+    public static List<Subindustry> getSubindustries() {
+        return CommonService.subindustryRepository.findAll();
+    }
+
+    /**
+     * Returns all Fund Houses
+     * @return
+     */
+    @Cacheable("FundHouses")
+    public static List<String> getDistinctFundHouse() {
+        return CommonService.mutualFundUniverseRepository.findDistinctFundHouse();
+    }
+
+    /**
+     * Returns all Fund Houses by
+     * @param fundHouse
+     * @return
+     */
+    @Cacheable(value = "SchemeNamesByFundHouse")
+    public static List<MutualFundDTO> getSchemeNames(String fundHouse){
+        List<MutualFundUniverse> funds = CommonService.mutualFundUniverseRepository.findSchemeNamesByFundHouse(fundHouse,new Sort("schemeNamePart"));
+        List<MutualFundDTO> fundsDTO = new ArrayList<>();
+        setFundsDTO(funds, fundsDTO);
+        return  fundsDTO;
+    }
+
+    private static void setFundsDTO(List<MutualFundUniverse> funds, List<MutualFundDTO> fundsDTO) {
+        for (MutualFundUniverse fund: funds) {
+            MutualFundDTO fundDTO = new MutualFundDTO();
+            fundDTO.setSchemeCode(fund.getSchemeCode());
+            fundDTO.setIsinDivReinvestment(fund.getIsinDivReinvestment());
+            fundDTO.setSchemeCodeDirectGrowth(fund.getSchemeCodeDirectGrowth());
+            fundDTO.setSchemeCodeRegularGrowth(fund.getSchemeCodeRegularGrowth());
+            fundDTO.setFundHouse(fund.getFundHouse());
+            fundDTO.setDirectRegular(fund.getDirectRegular());
+            fundDTO.setDividendGrowth(fund.getDividendGrowth());
+            fundDTO.setDividendFreq(fund.getDividendFreq());
+            fundDTO.setSchemeNamePart(fund.getSchemeNamePart());
+            fundDTO.setSchemeNameFull(fund.getSchemeNameFull());
+            fundDTO.setAssetClassid(fund.getAssetClassid());
+            fundDTO.setCategory(fund.getCategory());
+            fundDTO.setEquityStyleBox(fund.getEquityStyleBox());
+            fundDTO.setDebtStyleBox(fund.getDebtStyleBox());
+            fundDTO.setLatestNav(fund.getLatestNav());
+            fundDTO.setDateLatestNav(fund.getDateLatestNav());
+            fundDTO.setBenchmarkTicker(fund.getBenchmarkTicker());
+
+            fundsDTO.add(fundDTO);
+        }
+    }
+
+    /**
+     * Returns all Fund Houses by
+     * @param fundHouse
+     * @param directRegular
+     * @return
+     */
+    @Cacheable(value = "SchemeNamesByFundHouseAndPlan")
+    public static List<MutualFundDTO> getSchemeNames(String fundHouse,String directRegular){
+        List<MutualFundUniverse> funds = CommonService.mutualFundUniverseRepository.findSchemeNamesByFundHouse(fundHouse,directRegular, new Sort("schemeNamePart"));
+        List<MutualFundDTO> fundsDTO = new ArrayList<>();
+        setFundsDTO(funds, fundsDTO);
+        return  fundsDTO;
+    }
+
+    /**
+     * Returns all Fund Houses by
+     * @param fundHouse
+     * @param directRegular
+     * @param dividendGrowth
+     * @return
+     */
+    @Cacheable(value = "SchemeNamesByFundHouseAndPlanAndOption")
+    public static List<MutualFundDTO> getSchemeNames(String fundHouse,String directRegular,String dividendGrowth){
+        List<MutualFundUniverse> funds = CommonService.mutualFundUniverseRepository.findSchemeNamesByFundHouse(fundHouse,directRegular, dividendGrowth, new Sort("schemeNamePart"));
+        List<MutualFundDTO> fundsDTO = new ArrayList<>();
+        setFundsDTO(funds, fundsDTO);
+        return  fundsDTO;
     }
 
 }

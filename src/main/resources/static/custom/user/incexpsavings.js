@@ -229,7 +229,7 @@ incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http
 
         var index = $filter('filter')($scope.incExpSavingsRecords, {"key.memberid":$scope.incExpSavingsRecordForm.key.memberid,"key.finyear":$scope.incExpSavingsRecordForm.key.finyear}).length;
         if (index > 0 && $scope.editMode != true) {
-            console.log('Add mode Record Exists');
+            //console.log('Add mode Record Exists');
             $scope.recordAlreadyExist = true;
         }
 

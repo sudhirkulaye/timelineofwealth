@@ -35,192 +35,185 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-            <div class="">
-                <div class="page-title">
-                    <div class="title_left">
-                        <h3>Loans and Liabilities </h3>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
-
-                <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <br />
-                        <div class="x_panel">
-                            <div class="x_title" ng-hide="!hideForm">
-                                <h2>Loans and Liabilities<small>Tracking your Loans</small></h2>
-                                <button type="button" ng-click="showClearForm()" class="btn btn-success  pull-right btn-xs">Add New</button>
-                                <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <br />
+                    <div class="x_panel">
+                        <div class="x_title" ng-hide="!hideForm">
+                            <h1>Loans and Liabilities</h1>
+                            <p />Tracking your Loans
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" ng-hide="!hideForm">
+                            <button type="button" ng-click="showClearForm()" class="btn btn-success  pull-left btn-xs">Add New Loan</button>
+                        </div>
+                        <div class="x_content" ng-hide="!hideForm">
+                            <br />
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Member</th>
+                                        <th>Loan Desc</th>
+                                        <th>Loan Type</th>
+                                        <th>EMI Amt.</th>
+                                        <th>#Pending EMIs</th>
+                                        <th>PV of EMIs</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="liabilityRecord in liabilities">
+                                        <td>{{ (members | filter : { 'memberid' : liabilityRecord.key.memberid })[0].firstName }}</td>
+                                        <td>{{liabilityRecord.loanDesc}}</td>
+                                        <td>{{liabilityRecord.loanType}}</td>
+                                        <td>{{liabilityRecord.currentEmiAmount}}</td>
+                                        <td>{{liabilityRecord.remainingEmis}}</td>
+                                        <td>{{liabilityRecord.pvOutstandingEmis}}</td>
+                                        <td>
+                                            <button type="button" ng-click="deleteLiabilityRecord(liabilityRecord)" class="btn btn-danger  pull-right btn-xs" > Delete </button>
+                                            <button type="button" ng-click="editLiabilityRecord(liabilityRecord)" class="btn btn-warning  pull-right btn-xs" > Edit </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="x_content" ng-hide="!hideForm">
-                                <br />
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                        <tr>
-                                            <th>Member</th>
-                                            <th>Loan Desc</th>
-                                            <th>Loan Type</th>
-                                            <th>EMI Amt.</th>
-                                            <th>#Pending EMIs</th>
-                                            <th>PV of EMIs</th>
-                                            <th></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr ng-repeat="liabilityRecord in liabilities">
-                                            <td>{{ (members | filter : { 'memberid' : liabilityRecord.key.memberid })[0].firstName }}</td>
-                                            <td>{{liabilityRecord.loanDesc}}</td>
-                                            <td>{{liabilityRecord.loanType}}</td>
-                                            <td>{{liabilityRecord.currentEmiAmount}}</td>
-                                            <td>{{liabilityRecord.remainingEmis}}</td>
-                                            <td>{{liabilityRecord.pvOutstandingEmis}}</td>
-                                            <td>
-                                                <button type="button" ng-click="deleteLiabilityRecord(liabilityRecord)" class="btn btn-danger  pull-right btn-xs" > Delete </button>
-                                                <button type="button" ng-click="editLiabilityRecord(liabilityRecord)" class="btn btn-warning  pull-right btn-xs" > Edit </button>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                        </div>
+                        <div  class="col-md-6 col-xs-12" ng-hide="hideForm">
+                            <form name="LiabilityRecordHtmlForm" class="form-horizontal form-label-left input_mask" >
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Member<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="liabilityForm.key.memberid" required="required" ng-disabled="editMode">
+                                            <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div  class="col-md-6 col-xs-12" ng-hide="hideForm">
-                                <form name="LiabilityRecordHtmlForm" class="form-horizontal form-label-left input_mask" >
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Member<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="liabilityForm.key.memberid" required="required" ng-disabled="editMode">
-                                                <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
-                                            </select>
-                                        </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Loan Description<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="text" class="form-control" required="required" ng-model="liabilityForm.loanDesc" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Loan Description<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <input type="text" class="form-control" required="required" ng-model="liabilityForm.loanDesc" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Loan Type<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="liabilityForm.loanType" required="required" >
+                                            <option>Home Loan</option>
+                                            <option>Car Loan</option>
+                                            <option>Education Loan</option>
+                                            <option>Personal Loan</option>
+                                            <option>Other Loan</option>
+                                        </select>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Loan Type<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <select class="form-control" ng-model="liabilityForm.loanType" required="required" >
-                                                <option>Home Loan</option>
-                                                <option>Car Loan</option>
-                                                <option>Education Loan</option>
-                                                <option>Personal Loan</option>
-                                                <option>Other Loan</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Disbursement Amount<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="liabilityForm.disbursementAmount" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Disbursement Amount<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="liabilityForm.disbursementAmount" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Disbursement Date<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="date" class="form-control" required="required" ng-model="liabilityForm.disbursementDate" placeholder="yyyy-MM-dd" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Disbursement Date<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="date" class="form-control" required="required" ng-model="liabilityForm.disbursementDate" placeholder="yyyy-MM-dd" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Initial Total Emis<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,3}$/" ng-model="liabilityForm.initialTotalEmis" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Initial Total Emis<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,3}$/" ng-model="liabilityForm.initialTotalEmis" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">First EMI Date<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="date" class="form-control" required="required" ng-model="liabilityForm.firstEmiDate" placeholder="yyyy-MM-dd" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">First EMI Date<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="date" class="form-control" required="required" ng-model="liabilityForm.firstEmiDate" placeholder="yyyy-MM-dd" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Initial EMI Amount<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="liabilityForm.initialEmiAmount" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Initial EMI Amount<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="liabilityForm.initialEmiAmount" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Current EMI Amount<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" ng-change="calculatePV()" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="liabilityForm.currentEmiAmount" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Current EMI Amount<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" ng-change="calculatePV()" required="required" ng-pattern="/^[0-9]{1,9}$/"  ng-model="liabilityForm.currentEmiAmount" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">EMI Day<small> (1 to 31)</small><span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" ng-change="calculateRemainingEmis()"  required="required" ng-pattern="/^[0-9]{1,2}$/" min="1" max="31" ng-model="liabilityForm.currentEmiDay" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">EMI Day<small> (1 to 31)</small><span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" ng-change="calculateRemainingEmis()"  required="required" ng-pattern="/^[0-9]{1,2}$/" min="1" max="31" ng-model="liabilityForm.currentEmiDay" />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Last month of EMI<small> (1 to 12)</small><span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <select class="form-control" ng-change="calculateRemainingEmis()"  ng-model="liabilityForm.lastEmiMonth" required="required" >
+                                            <option value="01">January</option>
+                                            <option value="02">February</option>
+                                            <option value="03">March</option>
+                                            <option value="04">April</option>
+                                            <option value="55">May</option>
+                                            <option value="06">Jun</option>
+                                            <option value="07">July</option>
+                                            <option value="08">August</option>
+                                            <option value="09">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
+                                        </select>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Last month of EMI<small> (1 to 12)</small><span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <select class="form-control" ng-change="calculateRemainingEmis()"  ng-model="liabilityForm.lastEmiMonth" required="required" >
-                                                <option value="01">January</option>
-                                                <option value="02">February</option>
-                                                <option value="03">March</option>
-                                                <option value="04">April</option>
-                                                <option value="55">May</option>
-                                                <option value="06">Jun</option>
-                                                <option value="07">July</option>
-                                                <option value="08">August</option>
-                                                <option value="09">September</option>
-                                                <option value="10">October</option>
-                                                <option value="11">November</option>
-                                                <option value="12">December</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Last Year of EMI<small> (2010 to 2050)</small><span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" ng-change="calculateRemainingEmis()" required="required" ng-pattern="/^[0-9]{1,4}$/" min="2010" max="2050" ng-model="liabilityForm.lastEmiYear" />
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Last Year of EMI<small> (2010 to 2050)</small><span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" ng-change="calculateRemainingEmis()" required="required" ng-pattern="/^[0-9]{1,4}$/" min="2010" max="2050" ng-model="liabilityForm.lastEmiYear" />
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Remaining Installments</label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <!--<input type="number" class="form-control" ng-model="liabilityForm.remainingEmis" ng-disabled="true" />-->
-                                            <label> <p />
-                                                {{liabilityForm.remainingEmis}}
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Loan Interest Rate<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" ng-change="calculatePV()"  required="required" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" min="0" max="50" ng-model="liabilityForm.interestRate" />
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Present Value of Remaining EMIs<small> (@Loan Int. Rate)</small><span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" required="required" ng-model="liabilityForm.pvOutstandingEmis" ng-disabled="true" />
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">
-                                            Date Last Update
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Remaining Installments</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <!--<input type="number" class="form-control" ng-model="liabilityForm.remainingEmis" ng-disabled="true" />-->
+                                        <label> <p />
+                                            {{liabilityForm.remainingEmis}}
                                         </label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <input type="date" class="form-control" ng-model="liabilityForm.dateLastUpdate" placeholder="yyyy-MM-dd"  ng-disabled="true" />
-                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <div class="col-md-4 col-sm-4 col-xs-12  col-md-offset-8">
-                                            <button type="submit" class="btn btn-success" ng-click="processLiabilityRecord()">Save</button>
-                                            <button class="btn btn-success" ng-click="showTable()">Cancel</button>
-                                            <br /> <br />
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Loan Interest Rate<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" ng-change="calculatePV()"  required="required" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" min="0" max="50" ng-model="liabilityForm.interestRate" />
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Present Value of Remaining EMIs<small> (@Loan Int. Rate)</small><span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                        <input type="number" class="form-control" required="required" ng-model="liabilityForm.pvOutstandingEmis" ng-disabled="true" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">
+                                        Date Last Update
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="date" class="form-control" ng-model="liabilityForm.dateLastUpdate" placeholder="yyyy-MM-dd"  ng-disabled="true" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-4 col-sm-4 col-xs-12  col-md-offset-8">
+                                        <button type="submit" class="btn btn-success" ng-click="processLiabilityRecord()">Save</button>
+                                        <button class="btn btn-success" ng-click="showTable()">Cancel</button>
+                                        <br /> <br />
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
         <!-- /page content -->
