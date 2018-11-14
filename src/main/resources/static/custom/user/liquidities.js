@@ -1,6 +1,6 @@
-var incExpSavingsModule = angular.module('LiquiditiesManagement', []);
+var module = angular.module('LiquiditiesManagement', []);
 
-incExpSavingsModule.controller('LiquiditiesController', function($scope, $http, $filter) {
+module.controller('LiquiditiesController', function($scope, $http, $filter) {
     var urlBase="/user/api";
     $scope.members = [];
     $scope.liquidities =[];
@@ -144,7 +144,7 @@ incExpSavingsModule.controller('LiquiditiesController', function($scope, $http, 
 
 });
 
-incExpSavingsModule.filter("frequency", function () {
+module.filter("frequency", function () {
     return function (frequency) {
         switch (frequency) {
             case 0: return "One Time";

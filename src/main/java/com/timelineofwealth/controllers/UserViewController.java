@@ -71,22 +71,40 @@ public class UserViewController {
         return "user/sip";
     }
 
-    @RequestMapping(value = "/user/buytxn", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/addassets", method = RequestMethod.GET)
     public String buyTxn(Model model, @AuthenticationPrincipal UserDetails userDetails){
         Date dateToday = new Date();
         model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
         model.addAttribute("title", "TimelineOfWealth- Buy Transaction");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
-        return "user/buytxn";
+        return "user/addassets";
     }
 
-    @RequestMapping(value = "/user/selltxn", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/sellassets", method = RequestMethod.GET)
     public String sellTxn(Model model, @AuthenticationPrincipal UserDetails userDetails){
         Date dateToday = new Date();
         model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
         model.addAttribute("title", "TimelineOfWealth- Sell Transaction");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
-        return "user/selltxn";
+        return "user/sellassets";
+    }
+
+    @RequestMapping(value = "/user/wealthdistribution", method = RequestMethod.GET)
+    public String wealthDistribution(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        Date dateToday = new Date();
+        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        model.addAttribute("title", "TimelineOfWealth- Sell Transaction");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/wealthdistribution";
+    }
+
+    @RequestMapping(value = "/user/wealthhistory", method = RequestMethod.GET)
+    public String wealthHistory(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        Date dateToday = new Date();
+        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        model.addAttribute("title", "TimelineOfWealth- Sell Transaction");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/wealthhistory";
     }
 
 }

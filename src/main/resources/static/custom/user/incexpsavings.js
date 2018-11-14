@@ -1,6 +1,6 @@
-var incExpSavingsModule = angular.module('IncExpSavingsManagement', ['angular.filter','chart.js']);
+var module = angular.module('IncExpSavingsManagement', ['angular.filter','chart.js']);
 
-incExpSavingsModule.controller('IncExpSavingsController', function($scope, $http, $filter) {
+module.controller('IncExpSavingsController', function($scope, $http, $filter) {
     var urlBase="/user/api";
     $scope.members = [];
     $scope.incExpSavingsRecords =[];

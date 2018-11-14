@@ -4,12 +4,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
 
 @Entity
 @Table(name = "mutual_fund_universe")
-public class MutualFundUniverse {
+public class MutualFundUniverse implements Serializable {
     @Id
     @Column(name = "scheme_code")
     private long schemeCode;
