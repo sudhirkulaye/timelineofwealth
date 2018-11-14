@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="WealthDetailsManagement" ng-controller="WealthDetailsController">
+<!-- iCheck -->
+<link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
+<!-- bootstrap-wysiwyg -->
+<link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" th:href="@{/vendors/google-code-prettify/bin/prettify.min.css}"  rel="stylesheet" />
+<!-- Select2 -->
+<link href="../../static/vendors/select2/dist/css/select2.min.css" th:href="@{/vendors/select2/dist/css/select2.min.css}"  rel="stylesheet" />
+<!-- Switchery -->
+<link href="../../static/vendors/switchery/dist/switchery.min.css" th:href="@{/vendors/switchery/dist/switchery.min.css}" rel="stylesheet" />
+<!-- starrr -->
+<link href="../../static/vendors/starrr/dist/starrr.css" th:href="@{/vendors/starrr/dist/starrr.css}"  rel="stylesheet" />
+<!-- bootstrap-daterangepicker -->
+<link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}"  rel="stylesheet" />
+<!-- Animate.css -->
+<link href="../../static/vendors/animate.css/animate.min.css" th:href="@{/vendors/animate.css/animate.min.css}" rel="stylesheet" />
+<!-- jQuery custom content scroller -->
+<link href="../../static/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" th:href="@{/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css}" rel="stylesheet" />
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- ui-bootstrap-tpls.js -->
+<script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/user/addassets.js" th:src="@{/custom/user/addassets.js}"></script>
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/usersidebarmenu :: common-usersidebarmenu" />
+
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/usertopnavigation :: common-usertopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <br />
+                    <div class="x_panel">
+                        <div class="x_title" ng-hide="!hideForm">
+                            <h1>Add Assets </h1>
+                            <p />Audit of Entire Existing Wealth
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" ng-hide="!hideForm">
+                            <button type="button" ng-click="showClearForm()" class="btn btn-success  pull-left btn-xs">Add New Asset</button>
+                            <font color="red"> Note: Delete Record only to rectify any error in data entry. Instead use "Sell Assets" to keep realized profit-loss history </font>
+                            <div class="clearfix"></div>
+                            <p />
+                            <label class="pull-left" >Filter By Member: &nbsp;&nbsp;&nbsp;</label>
+                            <select class="pull-left" ng-model="searchMember" >
+                                <option value = "0"></option>
+                                <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
+                            </select>
+                            <label class="pull-left" >&nbsp;&nbsp;&nbsp; Filter By Asset Type: &nbsp;&nbsp;&nbsp;</label>
+                            <select class="pull-left" ng-model="searchAssetClass" >
+                                <option value=""></option>
+                                <option>Cash - Cash/Bank Accounts</option>
+                                <option>Fixed Income - FDs/PPF</option>
+                                <option>Fixed Income - Endowment Insurance</option>
+                                <option>Fixed Income - Debt MFs</option>
+                                <option>Fixed Inc. &amp; Equity - ULIP/Pension Funds</option>
+                                <option>Fixed Inc. &amp; Equity - Hybrid MFs</option>
+                                <option>Diversified Equity - ETFs,MFs</option>
+                                <option>Individual Equity - Stocks</option>
+                                <option>Commodity</option>
+                                <option>Real Estate</option>
+                                <option>Alternative Investments</option>
+                            </select>
+                            <lebel class="pull-left" >&nbsp;&nbsp;&nbsp;</lebel>
+                            <input class="pull-left" type="text" placeholder="Search by Short Name" ng-model="searchText" />
+                        </div>
+                        <div class="x_content" ng-hide="!hideForm">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Member</th>
+                                        <th>Asset Class-SubClass</th>
+                                        <th>Short Name</th>
+                                        <th align="right">Market Value</th>
+                                        <th align="right">Net Profit</th>
+                                        <th align="right">Returns(Abs)</th>
+                                        <th align="right">Returns(Annualized)</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="wealthDetailsRecord in wealthDetailsRecords | filter:filterByMember | filter:filterByAssetClass | filter:searchTransaction ">
+                                        <td>{{ (members | filter : { 'memberid' : wealthDetailsRecord.key.memberid })[0].firstName }}</td>
+                                        <td>{{ (assetClasses | filter : { 'classid' : wealthDetailsRecord.assetClassid})[0].subclassName }}</td>
+                                        <td>{{wealthDetailsRecord.shortName}}</td>
+                                        <td align="right">{{wealthDetailsRecord.marketValue | currency:"&#8377;":0}}</td>
+                                        <td align="right">{{wealthDetailsRecord.netProfit | currency:"&#8377;":0 }}</td>
+                                        <td align="right">{{(wealthDetailsRecord.absoluteReturn)*100 | number:2}}%</td>
+                                        <td align="right">{{(wealthDetailsRecord.annualizedReturn)*100 | number:2}}%</td>
+                                        <td>
+                                            <button type="button" ng-click="deleteWealthDetailsRecord(wealthDetailsRecord)" class="btn btn-danger  pull-right btn-xs" > Delete </button>
+                                            <button type="button" ng-click="editWealthDetailsRecord(wealthDetailsRecord)" class="btn btn-warning  pull-right btn-xs" > Edit </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div  class="col-md-9 col-xs-12" ng-hide="hideForm">
+                            <form name="wealthDetailsRecordHtmlForm" class="form-horizontal form-label-left input_mask" >
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Member<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="wealthDetailsRecordForm.key.memberid" required="required" ng-disabled="editMode">
+                                            <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="!editMode">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Asset Type<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <Select class="form-control" ng-model="dummy.assetClassType" ng-change="onSelectionOfAssetType(dummy.assetClassType)" >
+                                            <option value=""></option>
+                                            <option>Cash/Bank/Broker Account</option>
+                                            <option>FDs/Notes/Bonds/Debentures/Commercial Paper</option>
+                                            <option>PPF/NSC/Post Office/Govt. Savings</option>
+                                            <option>Endowment Insurance</option>
+                                            <option>ULIP/Pension Funds</option>
+                                            <option>Mutual Funds</option>
+                                            <option>Stocks</option>
+                                            <option>Commodity other than MF</option>
+                                            <option>Real Estate other than REIT</option>
+                                            <option>Alternative Investments</option>
+                                        </Select>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="buyDateFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">{{labelBuyDate}}<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="date" class="form-control" required="required" ng-disabled="editMode" ng-model="wealthDetailsRecordForm.key.buyDate" placeholder="yyyy-MM-dd"  />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="mutualFundFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Fund House<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="text" ng-change="resetDirectRegularDividendGrowth()" ng-model="dummy.fundHouse" uib-typeahead="fundHouse for fundHouse in fundHouses | filter:$viewValue | limitTo:8" class="form-control"  ng-disabled="editMode"/>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="mutualFundFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Direct/Regular<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="dummy.directRegular" ng-change="getSchemeNames()"  >
+                                            <option>Direct</option>
+                                            <option>Regular</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="mutualFundFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Dividend/Growth<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="dummy.dividendGrowth" ng-change="getSchemeNames()"  >
+                                            <option>Dividend</option>
+                                            <option>Growth</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="mutualFundFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Search by Scheme Name<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="text" typeahead-on-select="setSchemeDetails($item)" ng-model="dummy.name" uib-typeahead="fundDTO.schemeNameFull for fundDTO in fundsDTO | filter:$viewValue | limitTo:8" class="form-control" ng-disabled="editMode" />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="realEstateFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Type of Real Estate<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="dummy.realEstateType"  >
+                                            <option value="601010">Direct - Residential Rental</option>
+                                            <option value="601020">Direct - Commercial Rental</option>
+                                            <option value="601030">Direct - Agricultural Land</option>
+                                            <option value="601040">Direct - Non Agricultural Land</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="alternativeInvestmentsFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Type of Alternative Investment<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="dummy.altInvstType" >
+                                            <option value="701010">Hedge Fund or PMS</option>
+                                            <option value="701020">Trading, Managed Futures</option>
+                                            <option value="701030">Private Equity</option>
+                                            <option value="701040">Venture Capital</option>
+                                            <option value="701050">Distressed Securities</option>
+                                            <option value="701060">Artifacts Or Coins</option>
+                                            <option value="701070">Any other Investment</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="tickerFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Ticker<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="text" ng-model="wealthDetailsRecordForm.key.ticker" class="form-control" ng-disabled="true" />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="stockFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Stock Search By Name<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="text" typeahead-on-select="setStockDetails($item)" ng-model="dummy.name" uib-typeahead="stock.name for stock in stocks | filter:$viewValue | limitTo:8" class="form-control" ng-disabled="editMode" />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="shortNameFlag" >
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">{{labelShortName}}<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="text" ng-model="wealthDetailsRecordForm.shortName" class="form-control" ng-disabled="editMode" />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="nameFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">{{labelFullName}}</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="text" ng-model="wealthDetailsRecordForm.name" class="form-control" ng-disabled="editMode"  />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="assetClassidFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Asset Class - Subclass</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="wealthDetailsRecordForm.assetClassid" ng-disabled="true">
+                                            <option ng-repeat="assetClass in assetClasses" value="{{assetClass.classid}}">{{assetClass.subclassName}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="subindustryidFlag" >
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Sector - Industry - Sub-Industry</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="wealthDetailsRecordForm.subindustryid" ng-disabled="true">
+                                            <option ng-repeat="industry in industries" value="{{industry.subindustryid}}">{{industry.sectorNameDisplay}}-{{industry.industryNameDisplay}}-{{industry.subIndustryNameDisplay}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="quantityFlag" >
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Quantity/Units</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.quantity" ng-disabled="editMode" />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="rateFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">{{labelRate}}</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="number" ng-change="setCMPForStocks()" class="form-control" ng-model="wealthDetailsRecordForm.rate" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01"  />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="brokerageFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Brokerage</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.brokerage" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="taxFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Tax</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.tax" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="totalCostFlag" >
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Total Cost</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12" >
+                                        <!--<input type="hidden" class="form-control" ng-model="wealthDetailsRecordForm.totalCost"-->
+                                               <!--ng-disabled="true" value="" /> --> <p />
+                                        {{(wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.rate)+wealthDetailsRecordForm.brokerage+wealthDetailsRecordForm.tax}}
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="netRateFlag"  vertical-align="middle">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Net Rate</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.netRate" ng-disabled="true" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
+                                        {{((wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.rate)+wealthDetailsRecordForm.brokerage+wealthDetailsRecordForm.tax)/wealthDetailsRecordForm.quantity}}
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="cmpFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">{{labelCMP}}</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.cmp" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="marketValueFlag" >
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Market Value</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <!--<input type="hidden" class="form-control" ng-model="wealthDetailsRecordForm.marketValue" ng-disabled="true" />--><p />
+                                        {{(wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.cmp)}}
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="holdingPeriodFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Holding Period</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.holdingPeriod" ng-disabled="true" />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="netProfitFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Net Profit</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.netProfit" ng-disabled="true" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
+                                        {{(wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.cmp) - ((wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.rate)+wealthDetailsRecordForm.brokerage+wealthDetailsRecordForm.tax)}}
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="absoluteReturnFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Absolute Returns (in decimal 7% as 0.07)</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.absoluteReturn"  ng-disabled="true" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="annualizedReturnFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Annualized Returns (in decimal 7% as 0.07)</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.annualizedReturn"  ng-disabled="!FDRecord" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="maturityValueFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Maturity Value<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.maturityValue"  />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="maturityDateFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Maturity Date</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="date" class="form-control" ng-model="wealthDetailsRecordForm.maturityDate" placeholder="yyyy-MM-dd"  />
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="lastValuationDateFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">{{labelLastValuationDate}}</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="date" class="form-control" ng-model="wealthDetailsRecordForm.lastValuationDate" placeholder="yyyy-MM-dd" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-4 col-sm-4 col-xs-12  col-md-offset-8">
+                                        <button type="submit" class="btn btn-success" ng-click="processWealthDetailsRecord()">Save</button>
+                                        <button class="btn btn-success" ng-click="showTable()">Cancel</button>
+                                        <br /> <br />
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+
+
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- bootstrap-progressbar -->
+<script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js" th:src="@{/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js}"></script>
+<!-- iCheck -->
+<script src="../../static/vendors/iCheck/icheck.min.js" th:src="@{/vendors/iCheck/icheck.min.js}"></script>
+<!-- jquery.inputmask -->
+<script src="../../static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js" th:src="@{/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js}"></script>
+<!-- bootstrap-daterangepicker -->
+<script src="../../static/vendors/moment/min/moment.min.js" th:src="@{/vendors/moment/min/moment.min.js}"></script>
+<script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js" th:src="@{/vendors/bootstrap-daterangepicker/daterangepicker.js}"></script>
+<!-- bootstrap-wysiwyg -->
+<script src="../../static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js" th:src="@{/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js}"></script>
+<script src="../../static/vendors/jquery.hotkeys/jquery.hotkeys.js" th:src="@{/vendors/jquery.hotkeys/jquery.hotkeys.js}"></script>
+<script src="../../static/vendors/google-code-prettify/src/prettify.js" th:src="@{/vendors/google-code-prettify/src/prettify.js}"></script>
+<!-- jQuery Tags Input -->
+<script src="../../static/vendors/jquery.tagsinput/src/jquery.tagsinput.js" th:src="@{/vendors/jquery.tagsinput/src/jquery.tagsinput.js}"></script>
+<!-- Switchery -->
+<script src="../../static/vendors/switchery/dist/switchery.min.js" th:src="@{/vendors/switchery/dist/switchery.min.js}"></script>
+<!-- Select2 -->
+<script src="../../static/vendors/select2/dist/js/select2.full.min.js" th:src="@{/vendors/select2/dist/js/select2.full.min.js}"></script>
+<!-- Parsley -->
+<script src="../../static/vendors/parsleyjs/dist/parsley.min.js" th:src="@{/vendors/parsleyjs/dist/parsley.min.js}"></script>
+<!-- Autosize -->
+<script src="../../static/vendors/autosize/dist/autosize.min.js" th:src="@{/vendors/autosize/dist/autosize.min.js}"></script>
+<!-- jQuery autocomplete -->
+<script src="../../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js" th:src="@{/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js}"></script>
+<!-- starrr -->
+<script src="../../static/vendors/starrr/dist/starrr.js" th:src="@{/vendors/starrr/dist/starrr.js}"></script>
+
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>

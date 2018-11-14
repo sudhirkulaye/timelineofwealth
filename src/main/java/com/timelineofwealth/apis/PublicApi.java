@@ -63,4 +63,11 @@ public class PublicApi {
         return CommonService.getSchemeNames(fundHouse,directRegular,dividendGrowth);
     }
 
+    @RequestMapping(value = "/getallstocks", method = RequestMethod.GET)
+    public List<StockUniverse> getAllStocks(){
+        logger.debug(String.format("Call public/api/getallstocks/"));
+
+        return CommonService.getAllStocks();
+    }
+
 }

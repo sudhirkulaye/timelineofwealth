@@ -1,6 +1,6 @@
-var membersModule = angular.module('MemberManagement', []);
+var module = angular.module('MemberManagement', []);
 
-membersModule.controller('MemberController', function($scope, $http, $filter) {
+module.controller('MemberController', function($scope, $http, $filter) {
     var urlBase="/user/api";
     $scope.members =[];
     $scope.memberForm = {

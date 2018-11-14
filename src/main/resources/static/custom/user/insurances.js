@@ -1,6 +1,6 @@
-var incExpSavingsModule = angular.module('InsurancesManagement', []);
+var module = angular.module('InsurancesManagement', []);
 
-incExpSavingsModule.controller('InsurancesController', function($scope, $http, $filter) {
+module.controller('InsurancesController', function($scope, $http, $filter) {
     var urlBase="/user/api";
     $scope.members = [];
     $scope.insurances =[];

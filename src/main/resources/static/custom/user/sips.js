@@ -1,6 +1,6 @@
-var incExpSavingsModule = angular.module('SipsManagement', ['ui.bootstrap']);
+var module = angular.module('SipsManagement', ['ui.bootstrap']);
 
-incExpSavingsModule.controller('SipsController', function($scope, $http, $filter) {
+module.controller('SipsController', function($scope, $http, $filter) {
     var urlBase="/user/api";
     $scope.members = [];
     $scope.fundHouses = [];
@@ -100,11 +100,6 @@ incExpSavingsModule.controller('SipsController', function($scope, $http, $filter
         $scope.sipForm.debtStyleBox = fundDTO.debtStyleBox;
     }
 
-    // on change of schemeCode in Add Mode
-    $scope.getMFDetails = function getMFDetails() {
-
-    }
-
     $scope.getSchemeNames = function getSchemeNames() {
         var publicapiurl = "/public/api/getschemenames";
         var params = "";
@@ -167,7 +162,7 @@ incExpSavingsModule.controller('SipsController', function($scope, $http, $filter
     $scope.showClearForm = function showClearForm() {
         $scope.hideForm = false;
         $scope.editMode = false;
-        $scope.searchBy = 'schemeCode';
+        //$scope.searchBy = 'schemeCode';
 
         $scope.sipForm.key.memberid = "-1";
         $scope.sipForm.key.sipid = "-1";
@@ -255,7 +250,7 @@ incExpSavingsModule.controller('SipsController', function($scope, $http, $filter
 
 });
 
-incExpSavingsModule.filter("frequency", function () {
+module.filter("frequency", function () {
     return function (frequency) {
         switch (frequency) {
             case 0: return "One Time";

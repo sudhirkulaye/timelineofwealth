@@ -2,14 +2,8 @@ package com.timelineofwealth.service;
 
 import com.timelineofwealth.controllers.UserViewController;
 import com.timelineofwealth.dto.MutualFundDTO;
-import com.timelineofwealth.entities.AssetClassification;
-import com.timelineofwealth.entities.MutualFundUniverse;
-import com.timelineofwealth.entities.Subindustry;
-import com.timelineofwealth.entities.User;
-import com.timelineofwealth.repositories.AssetClassificationRepository;
-import com.timelineofwealth.repositories.MutualFundUniverseRepository;
-import com.timelineofwealth.repositories.SubindustryRepository;
-import com.timelineofwealth.repositories.UserRepository;
+import com.timelineofwealth.entities.*;
+import com.timelineofwealth.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@Service("CommonService")
 @EnableCaching
 public class CommonService {
 
@@ -60,6 +54,13 @@ public class CommonService {
     @Autowired
     public void setMutualFundUniverseRepository(MutualFundUniverseRepository mutualFundUniverseRepository){
         CommonService.mutualFundUniverseRepository = mutualFundUniverseRepository;
+    }
+
+    @Autowired
+    private static StockUniverseRepository stockUniverseRepository;
+    @Autowired
+    public void setStockUniverseRepository(StockUniverseRepository stockUniverseRepository){
+        CommonService.stockUniverseRepository = stockUniverseRepository;
     }
 
 
@@ -218,4 +219,12 @@ public class CommonService {
         return  fundsDTO;
     }
 
+    /**
+     * Returns all stocks
+     * @return
+     */
+    @Cacheable(value = "StockUniverse")
+    public static List<StockUniverse> getAllStocks(){
+        return CommonService.stockUniverseRepository.findAll();
+    }
 }
