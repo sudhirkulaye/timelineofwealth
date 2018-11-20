@@ -36,6 +36,10 @@ public interface MutualFundUniverseRepository extends JpaRepository<MutualFundUn
     //@Cacheable(value = "SchemeNamesByFundHouseAndPlanAndOption")
     @Query(value = "select fund from MutualFundUniverse fund where fund.fundHouse= :fundHouse and fund.directRegular=:directRegular and fund.dividendGrowth=:dividendGrowth")
     public List<MutualFundUniverse> findSchemeNamesByFundHouse(@Param("fundHouse")String fundHouse, @Param("directRegular")String directRegular, @Param("dividendGrowth")String dividendGrowth, Sort sort);
+    @Query(value = "select fund from MutualFundUniverse fund where fund.fundHouse= :fundHouse and fund.category like :category% and fund.dividendGrowth='Growth'")
+    public List<MutualFundUniverse> findSchemeNamesByFundHouseAndCategory(@Param("fundHouse")String fundHouse, @Param("category")String cateogry, Sort sort);
+    public List<MutualFundUniverse> findAllByFundHouseAndCategory(String fundHouse, String cateogry);
+
 
     public List<MutualFundUniverse> findAllBySchemeNamePartIgnoreCaseContaining(String schemeNamePart);
 
