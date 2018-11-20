@@ -1,5 +1,6 @@
 package com.timelineofwealth.controllers;
 
+import com.timelineofwealth.apis.PublicApi;
 import com.timelineofwealth.service.CommonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +18,13 @@ public class UserViewController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserViewController.class);
 
+    private java.sql.Date dateToday; // = new PublicApi().getSetupDates().getDateToday();
+
     @RequestMapping(value = "/user/members", method = RequestMethod.GET)
     public String members(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        Date dateToday = new Date();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth-Members");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/members";
@@ -28,8 +32,9 @@ public class UserViewController {
 
     @RequestMapping(value = "/user/incexpsavings", method = RequestMethod.GET)
     public String incomeExpenseAndSavings(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        Date dateToday = new Date();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth-Income Expense");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/incexpsavings";
@@ -37,8 +42,9 @@ public class UserViewController {
 
     @RequestMapping(value = "/user/liabilities", method = RequestMethod.GET)
     public String liabilites(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        Date dateToday = new Date();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth-Liability");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/liabilities";
@@ -46,8 +52,9 @@ public class UserViewController {
 
     @RequestMapping(value = "/user/insurances", method = RequestMethod.GET)
     public String insurances(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        Date dateToday = new Date();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth-Insurances");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/insurances";
@@ -55,8 +62,9 @@ public class UserViewController {
 
     @RequestMapping(value = "/user/liquidities", method = RequestMethod.GET)
     public String liquidityneed(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        Date dateToday = new Date();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth- Liquidities");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/liquidities";
@@ -64,8 +72,9 @@ public class UserViewController {
 
     @RequestMapping(value = "/user/sip", method = RequestMethod.GET)
     public String sip(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        Date dateToday = new Date();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth- Regular Investments");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/sip";
@@ -73,8 +82,9 @@ public class UserViewController {
 
     @RequestMapping(value = "/user/addassets", method = RequestMethod.GET)
     public String buyTxn(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        Date dateToday = new Date();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth- Buy Transaction");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/addassets";
@@ -82,8 +92,9 @@ public class UserViewController {
 
     @RequestMapping(value = "/user/sellassets", method = RequestMethod.GET)
     public String sellTxn(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        Date dateToday = new Date();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth- Sell Transaction");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/sellassets";
@@ -91,8 +102,9 @@ public class UserViewController {
 
     @RequestMapping(value = "/user/wealthdistribution", method = RequestMethod.GET)
     public String wealthDistribution(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        Date dateToday = new Date();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth- Sell Transaction");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/wealthdistribution";
@@ -100,8 +112,9 @@ public class UserViewController {
 
     @RequestMapping(value = "/user/wealthhistory", method = RequestMethod.GET)
     public String wealthHistory(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        Date dateToday = new Date();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth- Sell Transaction");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/wealthhistory";

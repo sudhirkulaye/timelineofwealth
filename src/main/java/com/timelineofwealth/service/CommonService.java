@@ -63,6 +63,13 @@ public class CommonService {
         CommonService.stockUniverseRepository = stockUniverseRepository;
     }
 
+    @Autowired
+    private static SetupDatesRepository setupDatesRepository;
+    @Autowired
+    public void setSetupDatesRepository(SetupDatesRepository setupDatesRepository){
+        CommonService.setupDatesRepository = setupDatesRepository;
+    }
+
 
     /**
      * Returns true if SignIn User is Admin
@@ -128,10 +135,30 @@ public class CommonService {
     }
 
     /**
+     * Return Setup Dates
+     * @return
+     */
+    public static SetupDates getSetupDates() {
+        List<SetupDates> setupDatesList;
+        SetupDates setupDates = new SetupDates();
+        if (CommonService.setupDatesRepository != null) {
+            setupDatesList = CommonService.setupDatesRepository.findAll();
+            setupDates = setupDatesList.get(0);
+        }
+
+        return setupDates;
+    }
+
+    /**
      * Returns Asset Classifications
      * @return
      */
     public static List<AssetClassification> getAssetClassfication() {
+//        if (CommonService.assetClassificationRepository != null) {
+//            return  CommonService.assetClassificationRepository.findAll();
+//        } else {
+//            return new ArrayList<>();
+//        }
         return  CommonService.assetClassificationRepository.findAll();
     }
 
@@ -217,6 +244,16 @@ public class CommonService {
         List<MutualFundDTO> fundsDTO = new ArrayList<>();
         setFundsDTO(funds, fundsDTO);
         return  fundsDTO;
+    }
+
+    @Cacheable(value = "GetSchemeDetails")
+    public  static  List<MutualFundDTO> getSchemeDetails(String fundHouse, String category) {
+
+        List<MutualFundUniverse> funds = CommonService.mutualFundUniverseRepository.findSchemeNamesByFundHouseAndCategory(fundHouse, category, new Sort("schemeNamePart"));
+        //List<MutualFundUniverse> funds = CommonService.mutualFundUniverseRepository.findAllByFundHouseAndCategory(fundHouse, category);
+        List<MutualFundDTO> fundsDTO = new ArrayList<>();
+        setFundsDTO(funds, fundsDTO);
+        return fundsDTO;
     }
 
     /**

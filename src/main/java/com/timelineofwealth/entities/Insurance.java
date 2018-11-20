@@ -45,8 +45,8 @@ public class Insurance implements Serializable {
     private BigDecimal premiumAmount;
     @Column(name = "premium_frequency_in_months")
     private int premiumFrequencyInMonths;
-    @Column(name = "last_date_premium_paid")
-    private Date lastDatePremiumPaid;
+    @Column(name = "last_date_of_premium")
+    private Date lastDateOfPremium;
     @Column(name = "life_time_cover")
     private String lifeTimeCover;
     @Column(name = "expiry_date")
@@ -109,11 +109,11 @@ public class Insurance implements Serializable {
         this.premiumFrequencyInMonths = premiumFrequencyInMonths;
     }
 
-    public Date getLastDatePremiumPaid() {
-        return lastDatePremiumPaid;
+    public Date getLastDateOfPremium() {
+        return lastDateOfPremium;
     }
-    public void setLastDatePremiumPaid(Date lastDatePremiumPaid) {
-        this.lastDatePremiumPaid = lastDatePremiumPaid;
+    public void setLastDateOfPremium(Date lastDateOfPremium) {
+        this.lastDateOfPremium = lastDateOfPremium;
     }
 
     public String getLifeTimeCover() {

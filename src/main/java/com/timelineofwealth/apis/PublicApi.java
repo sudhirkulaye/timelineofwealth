@@ -21,6 +21,13 @@ import java.util.List;
 public class PublicApi {
     private static final Logger logger = LoggerFactory.getLogger(PublicApi.class);
 
+    @RequestMapping(value = "/getDates", method = RequestMethod.GET)
+    public SetupDates getSetupDates() {
+        logger.debug(String.format("Call public/api/getassetclassifications/"));
+
+        return CommonService.getSetupDates();
+    }
+
     @RequestMapping(value = "/getassetclassifications", method = RequestMethod.GET)
     public List<AssetClassification> getAssetClassfication() {
         logger.debug(String.format("Call public/api/getassetclassifications/"));
@@ -61,6 +68,13 @@ public class PublicApi {
         logger.debug(String.format("Call public/api/getschemenames/"+fundHouse+"/"+directRegular+"/"+dividendGrowth));
 
         return CommonService.getSchemeNames(fundHouse,directRegular,dividendGrowth);
+    }
+
+    @RequestMapping(value = "/getSchemeDetails/{fundHouse}/{category}", method = RequestMethod.GET)
+    public List<MutualFundDTO> getSchemeDetails(@PathVariable String fundHouse, @PathVariable String category) {
+        logger.debug(String.format("Call public/api/getschemenames/"+fundHouse+"/"+category));
+
+        return CommonService.getSchemeDetails(fundHouse,category);
     }
 
     @RequestMapping(value = "/getallstocks", method = RequestMethod.GET)
