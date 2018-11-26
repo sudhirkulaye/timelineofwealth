@@ -1,0 +1,86 @@
+<div class="col-md-3 left_col" th:fragment="common-adminsidebarmenu">
+    <div class="left_col scroll-view">
+        <div class="navbar nav_title" style="border: 0;">
+            <a href="/" class="site_title">
+                <img src="../../static/images/tow.png" th:src="@{/images/tow.png}" height="25" width="25" />
+                <span>Timeline of Wealth</span>
+            </a>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <!-- menu profile quick info -->
+        <div class="profile clearfix">
+            <div class="profile_pic">
+                <img src="../../static/images/profile.png" th:src="@{/images/profile.png}" alt="..." class="img-circle profile_img" />
+            </div>
+            <div class="profile_info">
+                <span><h2>Welcome,</h2></span>
+                <h2><span th:text="${welcomeMessage}"></span></h2>
+            </div>
+        </div>
+        <!-- /menu profile quick info -->
+
+        <br />
+
+        <!-- sidebar menu -->
+        <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+            <div class="menu_section">
+                <h3>Back office Management</h3>
+                <ul class="nav side-menu">
+                    <!--<li><a href="javascript:void(0)"><i class="fa fa-laptop"></i> Dashobard <span class="label label-success pull-right">Coming Soon</span></a></li>-->
+                    <li><a><i class="fa fa-upload"></i> EOD Price Data Upload <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="/admin/uploadnsedailypricedata">NSE </a></li>
+                            <li><a href="/admin/uploadbsedailypricedata">BSE </a></li>
+                            <li><a href="/admin/uploadmfnavdata">Mutual Funds </a></li>
+                            <li><a href="/admin/uploadindexdata">Index Data</a></li>
+                            <li><a href="/admin/uploaddailydatab">Daily Data B</a></li>
+                            <li><a href="/admin/uploaddailydatas">Daily Data S</a></li>
+                            <!--<li><a href="/admin/uploadnpsdata">NPS Schemes</a></li>-->
+                        </ul>
+                    </li>
+                    <li><a><i class="fa fa-pencil-square-o"></i> Stocks <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="/admin/stockuniverse">Add-Edit Stock</a></li>
+                            <li><a href="/admin/stocksplit">Stock Split/Bonus</a></li>
+                            <li><a href="/admin/stockdividend">Dividend</a></li>
+                        </ul>
+                    </li>
+                    <li><a><i class="fa fa-pencil-square-o"></i> Mutual Funds <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="/admin/mfuniverse">Add-Edit MF</a></li>
+                        </ul>
+                    </li>
+                    <li><a><i class="fa fa-pencil-square-o"></i> Index &amp; Economic Data <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="/admin/indexstatistics">Statistics</a></li>
+                            <!--<li><a href="/admin/gdp">GDP</a></li>-->
+                            <!--<li><a href="/admin/inflation">Inflation </a></li>-->
+                            <!--<li><a href="/admin/inflation">Interest Rate </a></li>-->
+                            <!--<li><a href="/admin/inflation">Bond Yield </a></li>-->
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- /sidebar menu -->
+
+        <!-- /menu footer buttons -->
+        <div class="sidebar-footer hidden-small">
+            <a data-toggle="tooltip" data-placement="top" title="Settings">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="Lock">
+                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+            </a>
+        </div>
+        <!-- /menu footer buttons -->
+    </div>
+</div>

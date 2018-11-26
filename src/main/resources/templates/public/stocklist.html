@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="StockListManagement" ng-controller="StockListController">
+<!-- iCheck -->
+<link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
+<!-- bootstrap-wysiwyg -->
+<link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" th:href="@{/vendors/google-code-prettify/bin/prettify.min.css}"  rel="stylesheet" />
+<!-- Select2 -->
+<link href="../../static/vendors/select2/dist/css/select2.min.css" th:href="@{/vendors/select2/dist/css/select2.min.css}"  rel="stylesheet" />
+<!-- Switchery -->
+<link href="../../static/vendors/switchery/dist/switchery.min.css" th:href="@{/vendors/switchery/dist/switchery.min.css}" rel="stylesheet" />
+<!-- starrr -->
+<link href="../../static/vendors/starrr/dist/starrr.css" th:href="@{/vendors/starrr/dist/starrr.css}"  rel="stylesheet" />
+<!-- bootstrap-daterangepicker -->
+<link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}"  rel="stylesheet" />
+<!-- Animate.css -->
+<link href="../../static/vendors/animate.css/animate.min.css" th:href="@{/vendors/animate.css/animate.min.css}" rel="stylesheet" />
+<!-- jQuery custom content scroller -->
+<link href="../../static/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" th:href="@{/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css}" rel="stylesheet" />
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- ui-bootstrap-tpls.js -->
+<script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/public/stocklist.js" th:src="@{/custom/public/stocklist.js}"></script>
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h1>Stocks Statistics</h1>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <font color="red"> <strong>Note: </strong> Keep watching this page which is going to evolve. We will make sure investors will get bigger picture while investing in individual security. Also, pPlease update us if you find any discrepancy to twealthbook@gmail.com. <p />We believe, Investing in individual security requires understanding company's core business and having unique insight where consensus might be wrong. <p /> Especially in three areas: better ability to forecast financial results, better ability to predict valuation levels and  better ability of judging sentiments.     </font> <p />
+                            <div class="clearfix"></div>
+                            <label class="pull-left" >Included in Index : &nbsp;&nbsp;&nbsp;</label>
+                            <select class="pull-left" ng-model="indexFilter" >
+                                <option></option>
+                                <option>SENSEX</option>
+                                <option>NIFTY50</option>
+                                <option>NIFTY Next 50</option>
+                                <option>NSE-BSE100</option>
+                                <option>NSE-BSE200</option>
+                                <option>NSE-BSE500</option>
+                            </select>
+                            <!--<label class="pull-left" >&nbsp;&nbsp;&nbsp;</label>-->
+                            <!--<label class="pull-left" >Sector : &nbsp;&nbsp;&nbsp;</label>-->
+                            <!--<select class="pull-left" ng-model="sectorFilter" >-->
+                                <!--<option value=""></option>-->
+                                <!--<option ng-repeat="stock in stocks | unique:'sectorNameDisplay'">{{stock.sectorNameDisplay}}</option>-->
+                            <!--</select>-->
+                            <label class="pull-left" >&nbsp;&nbsp;&nbsp;</label>
+                            <label class="pull-left" >Industry : &nbsp;&nbsp;&nbsp;</label>
+                            <select class="pull-left" ng-model="industryFilter" >
+                                <option value=""></option>
+                                <option ng-repeat="stock in stocks | unique:'industryNameDisplay'">{{stock.industryNameDisplay}}</option>
+                            </select>
+                            <lebel class="pull-left" >&nbsp;&nbsp;&nbsp;</lebel>
+                            <input class="pull-left" type="text" placeholder="Search by Short Name" ng-model="searchTextFilter" />
+                        </div>
+                        <div class="x_content">
+                            <p>
+                                <lable style="float: right;" th:text="${dateToday}"></lable>
+                                <lable style="float: right;">Last updated : </lable>
+                            </p>
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <!--<th>Asset Class</th>-->
+                                    <th>Included Index</th>
+                                    <th>Name</th>
+                                    <th>Sector</th>
+                                    <th>Industry</th>
+                                    <th>Sub-Industry</th>
+                                    <th>Market Cap</th>
+                                </tr>
+                                <tbody>
+                                <tr ng-repeat="stock in stocks  | filter:filterByIndex | filter:filterByIndustry | filter:searchStock">
+                                    <!--<td>{{ (assetClasses | filter : { 'classid' : stock.assetClassid})[0].subclassName }}</td>-->
+                                    <!--<td>{{stock.ticker}}</td>-->
+                                    <td>{{stock.includedIndexName}}</td>
+                                    <td>{{stock.shortName}}</td>
+                                    <!--<td>{{(industries | filter : { 'subindustryid' : stock.subindustryid})[0].sectorNameDisplay}}-{{(industries | filter : { 'subindustryid' : stock.subindustryid})[0].industryNameDisplay}}</td>-->
+                                    <td>{{stock.sectorNameDisplay}}</td>
+                                    <td>{{stock.industryNameDisplay}}</td>
+                                    <td>{{stock.subIndustryNameDisplay}}</td>
+                                    <td align="right">{{stock.marketcap | currency:"&#8377;":0}}</td>
+                                </tr>
+                                </tbody>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>

@@ -12,5 +12,6 @@ import java.util.List;
 public interface StockUniverseRepository  extends JpaRepository<StockUniverse, String> {
 
     public List<StockUniverse> findAll();
+    public List<StockUniverse> findAllByIsNse500OrIsBse500OrderByMarketcapDesc(int isNse500, int isBse500);
 
 }

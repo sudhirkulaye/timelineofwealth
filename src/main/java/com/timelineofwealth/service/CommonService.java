@@ -1,7 +1,9 @@
 package com.timelineofwealth.service;
 
+import com.google.common.collect.Iterables;
 import com.timelineofwealth.controllers.UserViewController;
 import com.timelineofwealth.dto.MutualFundDTO;
+import com.timelineofwealth.dto.NseBse500;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.*;
 import org.slf4j.Logger;
@@ -15,10 +17,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service("CommonService")
 @EnableCaching
@@ -138,6 +144,7 @@ public class CommonService {
      * Return Setup Dates
      * @return
      */
+    @Cacheable("SetupDates")
     public static SetupDates getSetupDates() {
         List<SetupDates> setupDatesList;
         SetupDates setupDates = new SetupDates();
@@ -153,6 +160,7 @@ public class CommonService {
      * Returns Asset Classifications
      * @return
      */
+    @Cacheable("AssetClassfication")
     public static List<AssetClassification> getAssetClassfication() {
 //        if (CommonService.assetClassificationRepository != null) {
 //            return  CommonService.assetClassificationRepository.findAll();
@@ -166,6 +174,7 @@ public class CommonService {
      * Return All Sub Industries
      * @return
      */
+    @Cacheable("Subindustries")
     public static List<Subindustry> getSubindustries() {
         return CommonService.subindustryRepository.findAll();
     }
@@ -263,5 +272,28 @@ public class CommonService {
     @Cacheable(value = "StockUniverse")
     public static List<StockUniverse> getAllStocks(){
         return CommonService.stockUniverseRepository.findAll();
+    }
+
+    /**
+     * Returns all stocks
+     * @return
+     */
+    @Cacheable(value = "NseBse500Basic")
+    public static List<NseBse500> getNseBse500() {
+        List<StockUniverse> nseBse500BasicList = CommonService.stockUniverseRepository.findAllByIsNse500OrIsBse500OrderByMarketcapDesc(1,1);
+        List<NseBse500> nseBse500List = new ArrayList<>();
+        List<Subindustry> subindustries = CommonService.getSubindustries();
+        for(StockUniverse stockUniverse : nseBse500BasicList){
+            NseBse500 nseBse500 = new NseBse500(stockUniverse);
+            List<Subindustry> subindustries1 = subindustries.stream()
+                    .filter( subindustry -> subindustry.getSubindustryid() == stockUniverse.getSubindustryid() )
+                    .collect(Collectors.toList());
+
+            nseBse500.setSectorNameDisplay(subindustries1.get(0).getSectorNameDisplay());
+            nseBse500.setIndustryNameDisplay(subindustries1.get(0).getIndustryNameDisplay());
+            nseBse500.setSubIndustryNameDisplay(subindustries1.get(0).getSubIndustryNameDisplay());
+            nseBse500List.add(nseBse500);
+        }
+        return nseBse500List;
     }
 }
