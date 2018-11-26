@@ -1,6 +1,7 @@
 package com.timelineofwealth.apis;
 
 import com.timelineofwealth.dto.MutualFundDTO;
+import com.timelineofwealth.dto.NseBse500;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.service.CommonService;
 import com.timelineofwealth.service.MemberService;
@@ -82,6 +83,13 @@ public class PublicApi {
         logger.debug(String.format("Call public/api/getallstocks/"));
 
         return CommonService.getAllStocks();
+    }
+
+    @RequestMapping(value = "/getnsebse500", method = RequestMethod.GET)
+    public List<NseBse500> getNseBse500(){
+        logger.debug(String.format("Call public/api/getnsebse500/"));
+
+        return CommonService.getNseBse500();
     }
 
 }

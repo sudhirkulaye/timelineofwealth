@@ -30,7 +30,7 @@ public class PublicViewController {
     public String index(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Weatlh");
+        model.addAttribute("title", "Timeline of Wealth");
         return "public/index";
     }
 
@@ -38,7 +38,7 @@ public class PublicViewController {
     public String  login(Model model, String error, String logout){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Weatlh");
+        model.addAttribute("title", "Timeline of Wealth");
         if (error != null)
             model.addAttribute("error", "Your username and password is invalid.");
 
@@ -55,7 +55,7 @@ public class PublicViewController {
         // set user to save last login time
         CommonService.updateLastLoginStatus(userDetails);
         if (CommonService.isAdmin(userDetails)){
-            return "redirect:admin/uploadeodstockprices";
+            return "redirect:admin/uploadnsedailypricedata";
         }
         if (CommonService.isAdviser(userDetails)){
             return "redirect:adviser/listofclients";
@@ -67,7 +67,7 @@ public class PublicViewController {
     public String services(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Weatlh");
+        model.addAttribute("title", "Timeline of Wealth");
         return "public/services";
     }
 
@@ -75,7 +75,7 @@ public class PublicViewController {
     public String contactus(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Weatlh");
+        model.addAttribute("title", "Timeline of Wealth");
         return "public/contactus";
     }
 
@@ -83,7 +83,7 @@ public class PublicViewController {
     public String faq(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Weatlh");
+        model.addAttribute("title", "Timeline of Wealth");
         return "public/faq";
     }
 
@@ -91,7 +91,7 @@ public class PublicViewController {
     public String privacy(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Weatlh");
+        model.addAttribute("title", "Timeline of Wealth");
         return "public/privacy";
     }
 
@@ -100,7 +100,7 @@ public class PublicViewController {
     public String assetClasses(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Weatlh");
+        model.addAttribute("title", "Timeline of Wealth");
         return "public/assetclasses";
     }
 
@@ -108,7 +108,7 @@ public class PublicViewController {
     public String mutualFundTypes(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Weatlh");
+        model.addAttribute("title", "Timeline of Wealth");
         return "public/mftypes";
     }
 
@@ -116,7 +116,23 @@ public class PublicViewController {
     public String mutualFundList(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Weatlh");
+        model.addAttribute("title", "Timeline of Wealth");
         return "public/mflist";
+    }
+
+    @RequestMapping(value = "/public/indexstats")
+    public String indexStats(Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Timeline of Wealth");
+        return "public/indexstats";
+    }
+
+    @RequestMapping(value = "/public/stocklist")
+    public String stockList(Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Timeline of Wealth");
+        return "public/stocklist";
     }
 }

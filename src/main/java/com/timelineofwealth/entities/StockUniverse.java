@@ -31,8 +31,8 @@ public class StockUniverse  implements Serializable {
     @Column(name = "ticker5")
     private String ticker5;
 
-    @Column(name = "nse_code")
-    private String nse_code;
+    @Column(name = "nseCode")
+    private String nseCode;
 
     @Column(name = "bse_code")
     private String bseCode;
@@ -54,6 +54,12 @@ public class StockUniverse  implements Serializable {
 
     @Column(name = "subindustryid")
     private int subindustryid;
+
+    @Column(name = "latest_price")
+    private BigDecimal latestPrice;
+
+    @Column(name = "date_latest_price")
+    private Date dateLatestPrice;
 
     @Column(name = "is_sensex")
     private int isSensex;
@@ -139,11 +145,11 @@ public class StockUniverse  implements Serializable {
         this.ticker5 = ticker5;
     }
 
-    public String getNse_code() {
-        return nse_code;
+    public String getNseCode() {
+        return nseCode;
     }
-    public void setNse_code(String nse_code) {
-        this.nse_code = nse_code;
+    public void setNseCode(String nseCode) {
+        this.nseCode = nseCode;
     }
 
     public String getBseCode() {
@@ -193,6 +199,20 @@ public class StockUniverse  implements Serializable {
     }
     public void setSubindustryid(int subindustryid) {
         this.subindustryid = subindustryid;
+    }
+
+    public BigDecimal getLatestPrice() {
+        return latestPrice;
+    }
+    public void setLatestPrice(BigDecimal latestPrice) {
+        this.latestPrice = latestPrice;
+    }
+
+    public Date getDateLatestPrice() {
+        return dateLatestPrice;
+    }
+    public void setDateLatestPrice(Date dateLatestPrice) {
+        this.dateLatestPrice = dateLatestPrice;
     }
 
     public int getIsSensex() {
