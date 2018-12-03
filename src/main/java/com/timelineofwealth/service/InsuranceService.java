@@ -62,9 +62,13 @@ public class InsuranceService {
         User user = CommonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In InsuranceService.addInsuranceRecord: Email %s", user.getEmail()));
         if(MemberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
-            int count = InsuranceService.insuranceRepository.countByKeyMemberid(newRecord.getKey().getMemberid()) + 1;
-            logger.debug(String.format("In InsuranceService.addInsuranceRecord: new insuranceid %d", count));
-            newRecord.getKey().setInsuranceid(count);
+            int newInsuranceid = 0;
+            int count = InsuranceService.insuranceRepository.countByKeyMemberid(newRecord.getKey().getMemberid());
+            if (count == 0) { newInsuranceid = 1; } else {
+                newInsuranceid = InsuranceService.insuranceRepository.findTopByKeyMemberidOrderByKeyInsuranceidDesc(newRecord.getKey().getMemberid()).getKey().getInsuranceid() + 1;
+            }
+            logger.debug(String.format("In InsuranceService.addInsuranceRecord: new insuranceid %d", newInsuranceid));
+            newRecord.getKey().setInsuranceid(newInsuranceid);
             InsuranceService.insuranceRepository.save(newRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");

@@ -90,11 +90,11 @@ module.controller('LiabilitiesController', function($scope, $http, $filter) {
         $scope.liabilityForm.key.loanid = "-1";
         $scope.liabilityForm.loanDesc = "";
         $scope.liabilityForm.loanType = "";
-        $scope.liabilityForm.disbursmentAmount = "";
+        $scope.liabilityForm.disbursementAmount = "";
         $scope.liabilityForm.disbursmentDate = "";
         $scope.liabilityForm.initialTotalEmis = "";
         $scope.liabilityForm.firstEmiDate = "";
-        $scope.liabilityForm.initialEmiAmount = "";
+        $scope.liabilityForm.initialEmiAmount = "0";
         $scope.liabilityForm.currentEmiAmount = "";
         $scope.liabilityForm.currentEmiDay = "";
         $scope.liabilityForm.lastEmiMonth = "";
@@ -129,6 +129,8 @@ module.controller('LiabilitiesController', function($scope, $http, $filter) {
     $scope.processLiabilityRecord = function processLiabilityRecord(){
         var method = "";
         var url = "";
+        $scope.disbursementDate = $scope.firstEmiDate;
+        $scope.initialEmiAmount = $scope.currentEmiAmount;
         //console.log($scope.LiabilityRecordHtmlForm.$valid);
         $scope.calculateRemainingEmis();
         $scope.calculatePV();
@@ -158,7 +160,9 @@ module.controller('LiabilitiesController', function($scope, $http, $filter) {
     }
 
     $scope.calculateRemainingEmis = function calculateRemainingEmis() {
-        if ($scope.liabilityForm.lastEmiMonth !=null && $scope.liabilityForm.currentEmiDay != null && $scope.liabilityForm.lastEmiYear != null){
+        if ($scope.liabilityForm.lastEmiMonth !=null &&
+            $scope.liabilityForm.currentEmiDay != null &&
+            $scope.liabilityForm.lastEmiYear != null){
             var today = new Date();
             var month = parseInt($scope.liabilityForm.lastEmiMonth) - 1;
             var lastEmiDate = new Date($scope.liabilityForm.lastEmiYear, month, $scope.liabilityForm.currentEmiDay);

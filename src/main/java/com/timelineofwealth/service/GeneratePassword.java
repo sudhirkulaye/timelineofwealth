@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class GeneratePassword {
     public static void main(String[] arg){
-        System.out.println("Hemant9999 :"+ passwordEncoder().encode("Hemant9999"));
+        System.out.println("Poonikh123 :"+ passwordEncoder().encode("Poonikh123"));
         //System.out.println("Mayank123 :"+ passwordEncoder().encode("Mayank123"));
         //System.out.println("Devang883 :"+ passwordEncoder().encode("Devang883"));
 
@@ -40,6 +40,7 @@ public class GeneratePassword {
         Uday123 :$2a$10$qhphlpplVA3JjuxJrnr2wOCJXjcqCr9WhR2Y2P2HVO92yyTDLE7Ry
         Mayank123 :$2a$10$u4pb/WR3qAG3KCHcfnJ.neH7o2SRV.2UAyn9PfgJq0FwSWmIAf8ca
         Devang883 :$2a$10$cw.lsbnBcVoSqpWUWoMJSeQ4Y.ikbqnBAfnc0rFLO5IFuU04vyk7O
+        Poonikh123 :
          */
 
     }

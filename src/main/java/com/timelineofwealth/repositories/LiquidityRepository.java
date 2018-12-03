@@ -10,4 +10,5 @@ import java.util.List;
 public interface LiquidityRepository extends JpaRepository<Liquidity, Liquidity.LiquidityKey> {
     public List<Liquidity> findByKeyMemberidInOrderByExpectedStartDateAsc(List<Long> memberids);
     public int countByKeyMemberid(long memberid);
+    public Liquidity findTopByKeyMemberidOrderByKeyLiquidityidDesc(Long memberid);
 }

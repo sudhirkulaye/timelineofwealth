@@ -61,9 +61,13 @@ public class LiabilityService {
         User user = CommonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In LiabilityService.addLiabilityRecord: Email %s", user.getEmail()));
         if(MemberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
-            int count = LiabilityService.liabilityRepository.countByKeyMemberid(newRecord.getKey().getMemberid()) + 1;
-            logger.debug(String.format("In LiabilityService.addLiabilityRecord: new loanid %d", count));
-            newRecord.getKey().setLoanid(count);
+            int newLoanid = 0;
+            int count = LiabilityService.liabilityRepository.countByKeyMemberid(newRecord.getKey().getMemberid());
+            if (count == 0) { newLoanid = 1;} else {
+                newLoanid = LiabilityService.liabilityRepository.findTopByKeyMemberidOrderByKeyLoanidDesc(newRecord.getKey().getMemberid()).getKey().getLoanid() + 1;
+            }
+            logger.debug(String.format("In LiabilityService.addLiabilityRecord: new loanid %d", newLoanid));
+            newRecord.getKey().setLoanid(newLoanid);
             LiabilityService.liabilityRepository.save(newRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");

@@ -44,7 +44,7 @@ public class WealthDetailsRestApi {
         return getWealthDetailsRecords();
     }
 
-    @RequestMapping(value = "/deletewealthdetailsrecord", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deletewealthdetailsrecord", method = RequestMethod.POST)
     public List<WealthDetails> deleteWealthDetailsRecord(@RequestBody WealthDetails deleteRecord) {
         logger.debug("Call user/api/deletewealthdetailsrecord/ " + deleteRecord.getKey().getMemberid());
         WealthDetailsService.deleteWealthDetailsRecord(deleteRecord);

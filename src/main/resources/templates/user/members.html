@@ -98,7 +98,7 @@
                                             <span class="fa fa-phone form-control-feedback right" aria-hidden="true"></span>
                                         </div>
                                         <div class="form-group">
-                                            <label class="control-label col-md-6 col-sm-6 col-xs-6">Relationship <span class="required">*</span> </label>
+                                            <label class="control-label col-md-6 col-sm-6 col-xs-6"><span class="docs-tooltip" data-toggle="tooltip" title="Self Relationship can only be assigned to one family member">Relationship </span><span class="required">*</span> </label>
                                             <div class="col-md-6 col-sm-6 col-xs-6">
                                                 <select class="form-control" ng-model="memberForm.relationship" required="required" ng-disabled="editMode" >
                                                     <option>Self</option>
@@ -115,13 +115,13 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group has-feedback">
                                             <label class="control-label col-md-6 col-sm-6 col-xs-6">
                                                 Date Of Birth <span class="required">*</span>
                                             </label>
                                             <div class="col-md-6 col-sm-6 col-xs-6">
                                                 <!--input type="text" class="form-control" placeholder="YYYY-MM-DD"-->
-                                                <input type="date" class="form-control" ng-model="memberForm.birthDate" placeholder="yyyy-MM-dd" required="required"  />
+                                                <input type="date" class="form-control" ng-model="memberForm.birthDate" placeholder="yyyy-MM-dd" required="required" max="{{dateToday}}"  />
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -135,7 +135,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="control-label col-md-6 col-sm-6 col-xs-12">Earning Status<span class="required">*</span></label>
+                                            <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Chose 'Dependent' for Kids, 'Not Earning' for Retired and NO Pension OR Currently Out of Workforce">Earning Status</span><span class="required">*</span></label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
                                                 <select class="form-control" ng-model="memberForm.earningStatus" required="required" >
                                                     <option>Dependent</option>
@@ -144,7 +144,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group ">
                                             <label class="control-label col-md-6 col-sm-6 col-xs-12">Marital Status</label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
                                                 <select class="form-control" ng-model="memberForm.maritalStatus">
@@ -155,7 +155,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="control-label col-md-6 col-sm-6 col-xs-12">Secured by Pension</label>
+                                            <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Especially by Employer">Secured by Pension</span></label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
                                                 <select class="form-control" ng-model="memberForm.isSecuredByPension">
                                                     <option value="Y">Yes</option>

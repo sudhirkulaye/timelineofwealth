@@ -83,9 +83,13 @@ public class SipService {
         User user = CommonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In SipService.addSipRecord: Email %s", user.getEmail()));
         if(MemberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
-            int count = SipService.sipRepository.countByKeyMemberid(newRecord.getKey().getMemberid()) + 1;
-            logger.debug(String.format("In SipService.addSipRecord: new sipid %d", count));
-            newRecord.getKey().setSipid(count);
+            int newSipid = 0;
+            int count = SipService.sipRepository.countByKeyMemberid(newRecord.getKey().getMemberid());
+            if (count == 0) { newSipid = 1;} else {
+                newSipid = SipService.sipRepository.findTopByKeyMemberidOrderByKeySipidDesc(newRecord.getKey().getMemberid()).getKey().getSipid() + 1;
+            }
+            logger.debug(String.format("In SipService.addSipRecord: new sipid %d", newSipid));
+            newRecord.getKey().setSipid(newSipid);
             SipService.sipRepository.save(newRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");

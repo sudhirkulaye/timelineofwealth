@@ -20,7 +20,7 @@ module.controller('MemberController', function($scope, $http, $filter) {
         "isSecuredByPension":"",
         "education":"",
         "isFinanceProfessional":"",
-        "expectedRetirementDate": new Date("2000-01-01"),
+        "expectedRetirementDate": new Date("2030-01-01"),
         "isAlive":"Y",
         "dateLastUpdate": new Date()
     };
@@ -31,6 +31,7 @@ module.controller('MemberController', function($scope, $http, $filter) {
     $scope.editMode = false;
     $scope.selfEditMode = false;
     $scope.relationshipError = false;
+    $scope.dateToday = new Date();
 
     showMembers();
 

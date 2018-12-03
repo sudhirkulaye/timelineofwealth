@@ -63,17 +63,18 @@
                             <label class="pull-left" >&nbsp;&nbsp;&nbsp; Filter By Asset Type: &nbsp;&nbsp;&nbsp;</label>
                             <select class="pull-left" ng-model="searchAssetClass" >
                                 <option value=""></option>
-                                <option>Cash - Cash/Bank Accounts</option>
-                                <option>Fixed Income - FDs/PPF</option>
-                                <option>Fixed Income - Endowment Insurance</option>
-                                <option>Fixed Income - Debt MFs</option>
-                                <option>Fixed Inc. &amp; Equity - ULIP/Pension Funds</option>
-                                <option>Fixed Inc. &amp; Equity - Hybrid MFs</option>
-                                <option>Diversified Equity - ETFs,MFs</option>
-                                <option>Individual Equity - Stocks</option>
-                                <option>Commodity</option>
-                                <option>Real Estate</option>
-                                <option>Alternative Investments</option>
+                                <option  ng-repeat="assetClass in assetClasses | unique:'assetClassGroup' | orderBy:'assetClassGroup'" >{{assetClass.assetClassGroup}}</option>
+                                <!--<option>01 - Cash - Cash/Bank Accounts</option>-->
+                                <!--<option>02 - Fixed Income - FDs/PPF</option>-->
+                                <!--<option>03 - Fixed Income - Endowment Insurance</option>-->
+                                <!--<option>04 - Fixed Income - Debt MFs</option>-->
+                                <!--<option value="05 - Fixed Inc. & Equity - ULIP/Pension Funds">05 - Fixed Inc. &amp; Equity - ULIP/Pension Funds</option>-->
+                                <!--<option value="06 - Fixed Inc. & Equity - Hybrid MFs">06 - Fixed Inc. &amp; Equity - Hybrid MFs</option>-->
+                                <!--<option>07 - Diversified Equity - ETFs,MFs</option>-->
+                                <!--<option>08 - Individual Equity - Stocks</option>-->
+                                <!--<option>09 - Commodity</option>-->
+                                <!--<option>10 - Real Estate</option>-->
+                                <!--<option>11 - Alternative Investments</option>-->
                             </select>
                             <lebel class="pull-left" >&nbsp;&nbsp;&nbsp;</lebel>
                             <input class="pull-left" type="text" placeholder="Search by Short Name" ng-model="searchText" />
@@ -84,7 +85,7 @@
                                     <thead>
                                     <tr>
                                         <th>Member</th>
-                                        <th>Asset Class-SubClass</th>
+                                        <th>Asset Class Group</th>
                                         <th>Short Name</th>
                                         <th align="right">Market Value</th>
                                         <th align="right">Net Profit</th>
@@ -96,7 +97,7 @@
                                     <tbody>
                                     <tr ng-repeat="wealthDetailsRecord in wealthDetailsRecords | filter:filterByMember | filter:filterByAssetClass | filter:searchTransaction ">
                                         <td>{{ (members | filter : { 'memberid' : wealthDetailsRecord.key.memberid })[0].firstName }}</td>
-                                        <td>{{ (assetClasses | filter : { 'classid' : wealthDetailsRecord.assetClassid})[0].subclassName }}</td>
+                                        <td>{{ (assetClasses | filter : { 'classid' : wealthDetailsRecord.assetClassid})[0].assetClassGroup }}</td>
                                         <td>{{wealthDetailsRecord.shortName}}</td>
                                         <td align="right">{{wealthDetailsRecord.marketValue | currency:"&#8377;":0}}</td>
                                         <td align="right">{{wealthDetailsRecord.netProfit | currency:"&#8377;":0 }}</td>
@@ -140,19 +141,19 @@
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="buyDateFlag">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">{{labelBuyDate}}<span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="{{labelBuyDateToolTip}}">{{labelBuyDate}}</span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="date" class="form-control" required="required" ng-disabled="editMode" ng-model="wealthDetailsRecordForm.key.buyDate" placeholder="yyyy-MM-dd"  />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="mutualFundFlag">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Fund House<span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Fund House">Fund House</span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="text" ng-change="resetDirectRegularDividendGrowth()" ng-model="dummy.fundHouse" uib-typeahead="fundHouse for fundHouse in fundHouses | filter:$viewValue | limitTo:8" class="form-control"  ng-disabled="editMode"/>
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="mutualFundFlag">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Direct/Regular<span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Direct OR Regular Mutual Fund">Direct/Regular</span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <select class="form-control" ng-model="dummy.directRegular" ng-change="getSchemeNames()"  >
                                             <option>Direct</option>
@@ -161,7 +162,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="mutualFundFlag">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Dividend/Growth<span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Dividend OR Growth Mutual Fund">Dividend/Growth</span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <select class="form-control" ng-model="dummy.dividendGrowth" ng-change="getSchemeNames()"  >
                                             <option>Dividend</option>
@@ -213,13 +214,13 @@
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="shortNameFlag" >
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">{{labelShortName}}<span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="{{labelShortNameToolTip}}">{{labelShortName}}</span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="text" ng-model="wealthDetailsRecordForm.shortName" class="form-control" ng-disabled="editMode" />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="nameFlag">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">{{labelFullName}}</label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="{{labelFullNameToolTip}}">{{labelFullName}}</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="text" ng-model="wealthDetailsRecordForm.name" class="form-control" ng-disabled="editMode"  />
                                     </div>
@@ -247,7 +248,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="rateFlag">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">{{labelRate}}</label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="{{labelRateToolTip}}">{{labelRate}}</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" ng-change="setCMPForStocks()" class="form-control" ng-model="wealthDetailsRecordForm.rate" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01"  />
                                     </div>
@@ -265,7 +266,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="totalCostFlag" >
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Total Cost</label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Total Purchase Cost including Tax and Brokerage">Total Cost</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12" >
                                         <!--<input type="hidden" class="form-control" ng-model="wealthDetailsRecordForm.totalCost"-->
                                                <!--ng-disabled="true" value="" /> --> <p />
@@ -273,52 +274,52 @@
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="netRateFlag"  vertical-align="middle">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Net Rate</label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Effective purchase rate per Unit">Net Rate</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.netRate" ng-disabled="true" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
                                         {{((wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.rate)+wealthDetailsRecordForm.brokerage+wealthDetailsRecordForm.tax)/wealthDetailsRecordForm.quantity}}
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="cmpFlag">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">{{labelCMP}}</label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="{{labelCMPToolTip}}">{{labelCMP}}</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.cmp" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="marketValueFlag" >
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Market Value</label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Market Value as of today">Market Value</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <!--<input type="hidden" class="form-control" ng-model="wealthDetailsRecordForm.marketValue" ng-disabled="true" />--><p />
                                         {{(wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.cmp)}}
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="holdingPeriodFlag">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Holding Period</label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Holding period in years">Holding Period</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.holdingPeriod" ng-disabled="true" />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="netProfitFlag">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Net Profit</label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Net Profit">Net Profit</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.netProfit" ng-disabled="true" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
                                         {{(wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.cmp) - ((wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.rate)+wealthDetailsRecordForm.brokerage+wealthDetailsRecordForm.tax)}}
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="absoluteReturnFlag">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Absolute Returns (in decimal 7% as 0.07)</label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Absolute Returns in decimal 7% as 0.07">Absolute Returns</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.absoluteReturn"  ng-disabled="true" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="annualizedReturnFlag">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Annualized Returns (in decimal 7% as 0.07)</label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Annualized Returns in decimal 7% as 0.07">Annualized Returns </span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.annualizedReturn"  ng-disabled="!FDRecord" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="maturityValueFlag">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Maturity Value<span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Applicable for FDs/Endowment Insurances like instruments">Maturity Value</span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.maturityValue"  />
                                     </div>

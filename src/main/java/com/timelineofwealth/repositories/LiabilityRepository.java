@@ -11,4 +11,5 @@ public interface LiabilityRepository extends JpaRepository<Liability, Liability.
 
     public List<Liability> findByKeyMemberidInOrderByKeyMemberidAscKeyLoanidAsc(List<Long> memberids);
     public int countByKeyMemberid(long memberid);
+    public Liability findTopByKeyMemberidOrderByKeyLoanidDesc(Long memberid);
 }

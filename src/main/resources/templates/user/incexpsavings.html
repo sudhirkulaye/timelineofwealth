@@ -116,7 +116,7 @@
                             <p />
                             <form name="IncExpSavingsRecordHtmlForm" class="form-horizontal form-label-left input_mask" >
                                 <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-6">Fin Year <span class="required">*</span> </label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-6"><span class="docs-tooltip" data-toggle="tooltip" title="Calender Year OR Tax Filing Year">Fin Year </span><span class="required">*</span> </label>
                                     <div class="col-md-6 col-sm-6 col-xs-6">
                                         <select class="form-control" ng-model="incExpSavingsRecordForm.key.finyear" ng-change="deesRecordexist()" required="required" ng-disabled="editMode">
                                             <option>2010</option>
@@ -127,6 +127,7 @@
                                             <option>2015</option>
                                             <option>2016</option>
                                             <option>2017</option>
+                                            <option>2018</option>
                                         </select>
                                     </div>
                                 </div>
@@ -139,7 +140,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Regular Income<span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Income From Salary/Business ">Regular Income</span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" class="form-control" required="required" ng-pattern="/^[0-9]{1,9}$/" ng-model="incExpSavingsRecordForm.regularIncome" />
                                     </div>
@@ -157,13 +158,13 @@
                                     <!--</div>-->
                                 <!--</div>-->
                                 <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Other Income<small>(Rent/Dividend/Interest)</small><span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Rental, Royalty, Dividend, Interest Income etc.">Other Income</span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.otherIncome" />
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Gross Total Income<span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="This should match ITR-IV/ITR-V Gross Total Income ">Annual Gross Total Income</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
                                         <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.grossTotalIncome" ng-disabled="true" />-->
                                         <label> <p />
@@ -175,13 +176,13 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Income Tax Paid<span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="This should match ITR-V Net tax payable Or ITR-IV Net tax liability">Income Tax Paid</span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.incomeTax" />
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Net Income <small>(A)</small><span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Total Amount Available for Spending">Annual Net Income</span><small> (A)</small> </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.netIncome" ng-disabled="true" />-->
                                         <label> <p />
@@ -193,23 +194,23 @@
                                         </label>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Tax Bracket<span class="required">*</span></label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.taxRate" />-->
-                                        <select class="form-control" required="required"  ng-model="incExpSavingsRecordForm.taxRate">
-                                            <option>0</option>
-                                            <!--<option>5</option>-->
-                                            <option>10</option>
-                                            <!--<option>15</option>-->
-                                            <option>20</option>
-                                            <!--<option>25</option>-->
-                                            <option>30</option>
-                                            <option>35</option>
-                                            <!--<option>40</option>-->
-                                        </select>
-                                    </div>
-                                </div>
+                                <!--<div class="form-group">-->
+                                    <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Tax Bracket<span class="required">*</span></label>-->
+                                    <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
+                                        <!--&lt;!&ndash;<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.taxRate" />&ndash;&gt;-->
+                                        <!--<select class="form-control" required="required"  ng-model="incExpSavingsRecordForm.taxRate">-->
+                                            <!--<option>0</option>-->
+                                            <!--&lt;!&ndash;<option>5</option>&ndash;&gt;-->
+                                            <!--<option>10</option>-->
+                                            <!--&lt;!&ndash;<option>15</option>&ndash;&gt;-->
+                                            <!--<option>20</option>-->
+                                            <!--&lt;!&ndash;<option>25</option>&ndash;&gt;-->
+                                            <!--<option>30</option>-->
+                                            <!--<option>35</option>-->
+                                            <!--&lt;!&ndash;<option>40</option>&ndash;&gt;-->
+                                        <!--</select>-->
+                                    <!--</div>-->
+                                <!--</div>-->
                                 <!--<div class="form-group">-->
                                     <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Increase in Bankbalance<span class="required">*</span></label>-->
                                     <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
@@ -217,7 +218,7 @@
                                     <!--</div>-->
                                 <!--</div>-->
                                 <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Investments in Tax Saving<span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Income Tax Saving for the year in PPF/ELSS etc. Refer ITR Filing - 80C/80CC/80CCD/80CCG">Annual Investments in Tax Saving</span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.investmentTaxSavings"  />
                                     </div>
@@ -235,7 +236,7 @@
                                     <!--</div>-->
                                 <!--</div>-->
                                 <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Other Investments <small>(MF/Stocks/Bonds/Bank)</small><span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="'New' Investments for the year in MF/Stocks/BondsBank as well as increase in Bank Balance">Other Investments</span> <span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.investmentInOther"  />
                                     </div>
@@ -254,23 +255,38 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Regular Expenses <span class="required">*</span></label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.normalizedRegularExpenses"  />
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Liability <small> (Sum of EMIs)</small> <span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Sum of Home/Car Loan EMIs">Annual EMI Payments </span> <span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.annualLiability"  />
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Infrequent Expenses <small>(Medical/Renovation/LoanPrePay)</small><span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Hospitalization Expenses/Home Renovation/Loan Pre Payment etc.">Any Infrequent Expenses </span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.infrequentTotalExpenses"  />
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Ideally it should be Net Income less Total Investments less EMI Payments less less any Irregular Expenses">Annual Regular Expenses</span> <span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <input type="number" class="form-control" required="required"  ng-model="incExpSavingsRecordForm.normalizedRegularExpenses"  />
+                                        It should be ideally {{incExpSavingsRecordForm.regularIncome
+                                        + incExpSavingsRecordForm.interestDividendIncome
+                                        + incExpSavingsRecordForm.rentIncome
+                                        + incExpSavingsRecordForm.otherIncome
+                                        - incExpSavingsRecordForm.incomeTax
+                                        - (
+                                        + incExpSavingsRecordForm.investmentIncreaseInBankbalance
+                                        + incExpSavingsRecordForm.investmentTaxSavings
+                                        + incExpSavingsRecordForm.investmentInEquity
+                                        + incExpSavingsRecordForm.investmentInFixedIncome
+                                        + incExpSavingsRecordForm.investmentInOther
+                                        ) - (
+                                        + incExpSavingsRecordForm.annualLiability
+                                        + incExpSavingsRecordForm.infrequentTotalExpenses)}}
+                                    </div>
+                                </div>
+
                                 <!--<div class="form-group">-->
                                     <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Infreqent Medical Expenses <span class="required">*</span></label>-->
                                     <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
@@ -289,40 +305,40 @@
                                         <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.infrequentOtherExpenses"  />-->
                                     <!--</div>-->
                                 <!--</div>-->
-                                <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Total Expenses<span> (C)</span> <span class="required">*</span></label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.grossTotalExpenses" ng-disabled="true"  />-->
-                                        <label> <p />
-                                            {{incExpSavingsRecordForm.normalizedRegularExpenses
-                                            + incExpSavingsRecordForm.annualLiability
-                                            + incExpSavingsRecordForm.infrequentTotalExpenses}}
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Adjustment <small>[Must be zero:(A)-(B)-(C)]</small></label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <!--<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.adjustment" ng-disabled="true"  />-->
-                                        <label> <p />
-                                            {{incExpSavingsRecordForm.regularIncome
-                                            + incExpSavingsRecordForm.interestDividendIncome
-                                            + incExpSavingsRecordForm.rentIncome
-                                            + incExpSavingsRecordForm.otherIncome
-                                            - incExpSavingsRecordForm.incomeTax
-                                            - (
-                                            + incExpSavingsRecordForm.investmentIncreaseInBankbalance
-                                            + incExpSavingsRecordForm.investmentTaxSavings
-                                            + incExpSavingsRecordForm.investmentInEquity
-                                            + incExpSavingsRecordForm.investmentInFixedIncome
-                                            + incExpSavingsRecordForm.investmentInOther
-                                            ) - (
-                                            incExpSavingsRecordForm.normalizedRegularExpenses
-                                            + incExpSavingsRecordForm.annualLiability
-                                            + incExpSavingsRecordForm.infrequentTotalExpenses)}}
-                                        </label>
-                                    </div>
-                                </div>
+                                <!--<div class="form-group">-->
+                                    <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Total Expenses<span> (C)</span> <span class="required">*</span></label>-->
+                                    <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
+                                        <!--&lt;!&ndash;<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.grossTotalExpenses" ng-disabled="true"  />&ndash;&gt;-->
+                                        <!--<label> <p />-->
+                                            <!--{{incExpSavingsRecordForm.normalizedRegularExpenses-->
+                                            <!--+ incExpSavingsRecordForm.annualLiability-->
+                                            <!--+ incExpSavingsRecordForm.infrequentTotalExpenses}}-->
+                                        <!--</label>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--<div class="form-group">-->
+                                    <!--<label class="control-label col-md-6 col-sm-6 col-xs-12">Adjustment <small>[Must be zero:(A)-(B)-(C)]</small></label>-->
+                                    <!--<div class="col-md-6 col-sm-6 col-xs-12">-->
+                                        <!--&lt;!&ndash;<input type="number" class="form-control" ng-model="incExpSavingsRecordForm.adjustment" ng-disabled="true"  />&ndash;&gt;-->
+                                        <!--<label> <p />-->
+                                            <!--{{incExpSavingsRecordForm.regularIncome-->
+                                            <!--+ incExpSavingsRecordForm.interestDividendIncome-->
+                                            <!--+ incExpSavingsRecordForm.rentIncome-->
+                                            <!--+ incExpSavingsRecordForm.otherIncome-->
+                                             <!-- - incExpSavingsRecordForm.incomeTax-->
+                                             <!-- - (-->
+                                            <!--+ incExpSavingsRecordForm.investmentIncreaseInBankbalance-->
+                                            <!--+ incExpSavingsRecordForm.investmentTaxSavings-->
+                                            <!--+ incExpSavingsRecordForm.investmentInEquity-->
+                                            <!--+ incExpSavingsRecordForm.investmentInFixedIncome-->
+                                            <!--+ incExpSavingsRecordForm.investmentInOther-->
+                                            <!--) - (-->
+                                            <!--incExpSavingsRecordForm.normalizedRegularExpenses-->
+                                            <!--+ incExpSavingsRecordForm.annualLiability-->
+                                            <!--+ incExpSavingsRecordForm.infrequentTotalExpenses)}}-->
+                                        <!--</label>-->
+                                    <!--</div>-->
+                                <!--</div>-->
                                 <div class="form-group">
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12">Related Note<small>(Max 100 Chars)</small></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">

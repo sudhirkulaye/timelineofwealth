@@ -11,4 +11,5 @@ public interface InsuranceRepository extends JpaRepository<Insurance, Insurance.
     //public List<Insurance> findByKeyMemberidInOrderByKeyMemberidAscKeyInsuranceidAsc(List<Long> memberids);
     public List<Insurance> findByKeyMemberidInOrderByExpiryDateAsc(List<Long> memberids);
     public int countByKeyMemberid(long memberid);
+    public Insurance findTopByKeyMemberidOrderByKeyInsuranceidDesc(Long memeberid);
 }
