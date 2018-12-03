@@ -45,7 +45,7 @@ public class LiquidityRestApi {
         return getLiquidities();
     }
 
-    @RequestMapping(value = "/deleteliquidity", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteliquidity", method = RequestMethod.POST)
     public List<Liquidity> deleteLiquidity(@RequestBody Liquidity deleteRecord) {
         logger.debug("Call user/api/deleteliquidity/ " + deleteRecord.getKey().getMemberid());
         LiquidityService.deleteLiquidityRecord(deleteRecord);

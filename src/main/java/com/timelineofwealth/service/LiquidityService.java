@@ -61,9 +61,13 @@ public class LiquidityService {
         User user = CommonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In LiquidityService.addLiquidityRecord: Email %s", user.getEmail()));
         if(MemberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
-            int count = LiquidityService.liquidityRepository.countByKeyMemberid(newRecord.getKey().getMemberid()) + 1;
-            logger.debug(String.format("In LiquidityService.addLiquidityRecord: new liquidityid %d", count));
-            newRecord.getKey().setLiquidityid(count);
+            int newLiquidityid = 0;
+            int count = LiquidityService.liquidityRepository.countByKeyMemberid(newRecord.getKey().getMemberid());
+            if (count == 0) { newLiquidityid = 1; } else {
+                newLiquidityid = LiquidityService.liquidityRepository.findTopByKeyMemberidOrderByKeyLiquidityidDesc(newRecord.getKey().getMemberid()).getKey().getLiquidityid() + 1;
+            }
+            logger.debug(String.format("In LiquidityService.addLiquidityRecord: new liquidityid %d", newLiquidityid));
+            newRecord.getKey().setLiquidityid(newLiquidityid);
             LiquidityService.liquidityRepository.save(newRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");

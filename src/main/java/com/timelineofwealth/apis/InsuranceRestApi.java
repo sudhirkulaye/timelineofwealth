@@ -45,7 +45,7 @@ public class InsuranceRestApi {
         return getInsurances();
     }
 
-    @RequestMapping(value = "/deleteinsurance", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteinsurance", method = RequestMethod.POST)
     public List<Insurance> deleteInsurance(@RequestBody Insurance deleteRecord) {
         logger.debug("Call user/api/deleteinsurance/ " + deleteRecord.getKey().getMemberid());
         InsuranceService.deleteInsuranceRecord(deleteRecord);

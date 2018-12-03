@@ -12,9 +12,9 @@ module.controller('InsurancesController', function($scope, $http, $filter) {
         "coverAmount":0,
         "premiumAmount":0,
         "premiumFrequencyInMonths":"12",
-        "lastDateOfPremium":new Date("2010-01-01"),
+        "lastDateOfPremium":"",
         "lifeTimeCover":"No",
-        "expiryDate":new Date("2010-01-01"),
+        "expiryDate":"",
         "maturityAmount": 0,
         "maturityFrequency": "0",
         "expectedBonusAmount":0,
@@ -88,9 +88,9 @@ module.controller('InsurancesController', function($scope, $http, $filter) {
         $scope.insuranceForm.coverAmount = 0;
         $scope.insuranceForm.premiumAmount = 0;
         $scope.insuranceForm.premiumFrequencyInMonths = "12";
-        $scope.insuranceForm.lastDateOfPremium = new Date("2018-01-01");
+        $scope.insuranceForm.lastDateOfPremium = new Date();
         $scope.insuranceForm.lifeTimeCover = "No";
-        $scope.insuranceForm.expiryDate = new Date("2030-01-01");
+        $scope.insuranceForm.expiryDate = new Date();
         $scope.insuranceForm.maturityAmount = 0;
         $scope.insuranceForm.maturityFrequency = "0";
         $scope.insuranceForm.expectedBonusAmount = 0;

@@ -49,7 +49,7 @@ public class SipRestApi {
         return getSips();
     }
 
-    @RequestMapping(value = "/deletesip", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deletesip", method = RequestMethod.POST)
     public List<SipForm> deleteSip(@RequestBody SipForm deleteRecord) {
         logger.debug("Call user/api/deletesip/ " + deleteRecord.getKey().getMemberid());
         Sip editedSipRecord = new Sip();

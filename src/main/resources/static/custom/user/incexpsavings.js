@@ -223,9 +223,9 @@ module.controller('IncExpSavingsController', function($scope, $http, $filter) {
                                                 + $scope.incExpSavingsRecordForm.annualLiability
                                                 + $scope.incExpSavingsRecordForm.infrequentTotalExpenses);
 
-        if($scope.incExpSavingsRecordForm.adjustment != 0){
+        /*if($scope.incExpSavingsRecordForm.adjustment != 0){
             $scope.nonZeroAdjustment = true;
-        }
+        }*/
 
         var index = $filter('filter')($scope.incExpSavingsRecords, {"key.memberid":$scope.incExpSavingsRecordForm.key.memberid,"key.finyear":$scope.incExpSavingsRecordForm.key.finyear}).length;
         if (index > 0 && $scope.editMode != true) {
@@ -233,8 +233,8 @@ module.controller('IncExpSavingsController', function($scope, $http, $filter) {
             $scope.recordAlreadyExist = true;
         }
 
-//        console.log($scope.incExpSavingsRecordForm);
-//        console.log($scope.IncExpSavingsRecordHtmlForm.$valid);
+        //console.log($scope.incExpSavingsRecordForm);
+        //console.log($scope.IncExpSavingsRecordHtmlForm.$valid);
         if($scope.IncExpSavingsRecordHtmlForm.$valid && !$scope.nonZeroAdjustment && !$scope.recordAlreadyExist)
         {
               //Submit your form

@@ -47,7 +47,7 @@ public class LiabilityRestApi {
         return getLiabilities();
     }
 
-    @RequestMapping(value = "/deleteliability", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteliability", method = RequestMethod.POST)
     public List<Liability> deleteLiability(@RequestBody Liability deleteRecord) {
         logger.debug("Call user/api/deleteliability/ " + deleteRecord.getKey().getMemberid());
         LiabilityService.deleteLiabilityRecord(deleteRecord);

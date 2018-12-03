@@ -25,6 +25,7 @@ public interface MutualFundUniverseRepository extends JpaRepository<MutualFundUn
 
     @Cacheable("SchemeById")
     public MutualFundUniverse findBySchemeCode(Long schemeCode);
+    public int countBySchemeCode(Long schemeCode);
     public List<MutualFundUniverse> findByIsinDivPayoutIsinGrowth(String isinDivPayoutOrIsinGrowth);
 
     //@Cacheable(value = "SchemeNamesByFundHouse")

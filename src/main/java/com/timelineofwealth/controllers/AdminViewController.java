@@ -5,14 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.timelineofwealth.apis.PublicApi;
 import com.timelineofwealth.dto.DailyDataBJSON;
 import com.timelineofwealth.dto.Ticker;
-import com.timelineofwealth.entities.BsePriceHistory;
-import com.timelineofwealth.entities.DailyDataB;
-import com.timelineofwealth.entities.MutualFundNavHistory;
-import com.timelineofwealth.entities.NsePriceHistory;
-import com.timelineofwealth.repositories.BsePriceHistoryRepository;
-import com.timelineofwealth.repositories.DailyDataBRepository;
-import com.timelineofwealth.repositories.MutualFundNavHistoryRepository;
-import com.timelineofwealth.repositories.NsePriceHistoryRepository;
+import com.timelineofwealth.entities.*;
+import com.timelineofwealth.repositories.*;
 import com.timelineofwealth.service.CSVUtils;
 import com.timelineofwealth.service.CommonService;
 import org.slf4j.Logger;
@@ -63,6 +57,12 @@ public class AdminViewController {
         this.mutualFundNavHistoryRepository = mutualFundNavHistoryRepository;
     }
     @Autowired
+    MutualFundUniverseRepository mutualFundUniverseRepository;
+    @Autowired
+    public void setMutualFundUniverseRepository(MutualFundUniverseRepository mutualFundUniverseRepository){
+        this.mutualFundNavHistoryRepository = mutualFundNavHistoryRepository;
+    }
+    @Autowired
     DailyDataBRepository dailyDataBRepository;
     @Autowired
     public void setDailyDataBRepository(DailyDataBRepository dailyDataBRepository){
@@ -98,18 +98,70 @@ public class AdminViewController {
             boolean isHeader = true;
             CSVUtils csvUtils = new CSVUtils();
             List<NsePriceHistory> nsePriceHistories = new ArrayList<>();
+            int nseTickerPosition = -1, seriesPosition = -1, openPosition = -1,
+                    highPosition = -1, lowPosition = -1, closePosition = -1,
+                    lastPosition = -1, previousClosePosition = -1, totalTradedQuantityPosition = -1,
+                    totalTradedValuePosition = -1, dateStringPosition = -1, totalTradesPosition = -1, isinCodePosition = -1;
             while (scanner.hasNext()) {
                 List<String> line = csvUtils.parseLine(scanner.nextLine());
                 if(isHeader){
                     isHeader = false;
+                    for (int i=0; i<line.size(); i++) {
+                        String column = line.get(i);
+                        if (column.trim().equalsIgnoreCase("SYMBOL")){
+                            nseTickerPosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("SERIES")){
+                            seriesPosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("OPEN") || column.trim().equalsIgnoreCase("Open Price")){
+                            openPosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("HIGH") || column.trim().equalsIgnoreCase("High Price")){
+                            highPosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("LOW") || column.trim().equalsIgnoreCase("Low Price")){
+                            lowPosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("LOW") || column.trim().equalsIgnoreCase("Low Price")){
+                            lowPosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("CLOSE") || column.trim().equalsIgnoreCase("Close Price")){
+                            closePosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("LAST") || column.trim().equalsIgnoreCase("Last Price")){
+                            lastPosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("PREVCLOSE") || column.trim().equalsIgnoreCase("Prev Close")){
+                            previousClosePosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("TOTTRDQTY") || column.trim().equalsIgnoreCase("Total Traded Quantity")){
+                            totalTradedQuantityPosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("TOTTRDVAL") || column.trim().equalsIgnoreCase("Turnover")){
+                            totalTradedValuePosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("TIMESTAMP") || column.trim().equalsIgnoreCase("Date")){
+                            dateStringPosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("TOTALTRADES") || column.trim().equalsIgnoreCase("No. of Trades")){
+                            totalTradesPosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("ISINISIN") ){
+                            isinCodePosition = i;
+                        }
+                    }
                     continue;
                 }
-                String nseTicker = line.get(0);
-                String dateString = line.get(10);
+                if (nseTickerPosition == -1 || dateStringPosition == -1){
+                    continue;
+                }
+                String nseTicker = line.get(nseTickerPosition);
+                String dateString = line.get(dateStringPosition);
                 if(nseTicker == null || nseTicker.isEmpty()|| dateString == null || dateString.isEmpty()){
                     continue;
                 }
-                String series = line.get(1);
+                String series = line.get(seriesPosition);
                 if(!(series.equalsIgnoreCase("EQ") ||
                         series.equalsIgnoreCase("BM") ||
                         series.equalsIgnoreCase("SM"))){
@@ -122,21 +174,58 @@ public class AdminViewController {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                BigDecimal opernPrice = line.get(2) != null && !line.get(2).isEmpty() ? new BigDecimal(line.get(2)) : new BigDecimal(0);
-                BigDecimal highPrice = line.get(3) != null && !line.get(3).isEmpty() ? new BigDecimal(line.get(3)) : new BigDecimal(0);
-                BigDecimal lowPrice = line.get(4) != null && !line.get(4).isEmpty() ? new BigDecimal(line.get(4)) : new BigDecimal(0);
-                BigDecimal closePrice = line.get(5) != null && !line.get(5).isEmpty() ? new BigDecimal(line.get(5)) : new BigDecimal(0);
-                BigDecimal lastPrice = line.get(6) != null && !line.get(6).isEmpty() ? new BigDecimal(line.get(6)) : new BigDecimal(0);
-                BigDecimal previousClosePrice = line.get(7) != null && !line.get(7).isEmpty() ? new BigDecimal(line.get(7)) : new BigDecimal(0);
-                BigDecimal totalTradedQuantity = line.get(8) != null && !line.get(8).isEmpty() ? new BigDecimal(line.get(8)) : new BigDecimal(0);
-                BigDecimal totalTradedValue = line.get(9) != null && !line.get(9).isEmpty() ? new BigDecimal(line.get(9)) : new BigDecimal(0);;
-                BigDecimal totalTrades = line.get(11) != null && !line.get(11).isEmpty() ? new BigDecimal(line.get(11)) : new BigDecimal(0);
-                String isinCode = line.get(12);
+                BigDecimal openPrice = new BigDecimal(0);
+                if(openPosition > -1){
+                    openPrice = line.get(openPosition) != null && !line.get(openPosition).isEmpty() ? new BigDecimal(line.get(openPosition).trim()) : new BigDecimal(0);
+                }
+
+                BigDecimal highPrice = new BigDecimal(0);
+                if(highPosition > -1) {
+                    highPrice = line.get(highPosition) != null && !line.get(highPosition).isEmpty() ? new BigDecimal(line.get(highPosition).trim()) : new BigDecimal(0);
+                }
+
+                BigDecimal lowPrice = new BigDecimal(0);
+                if(lowPosition > -1) {
+                    lowPrice = line.get(lowPosition) != null && !line.get(lowPosition).isEmpty() ? new BigDecimal(line.get(lowPosition).trim()) : new BigDecimal(0);
+                }
+
+                BigDecimal closePrice = new BigDecimal(0);
+                if (closePosition > -1) {
+                    closePrice = line.get(closePosition) != null && !line.get(closePosition).isEmpty() ? new BigDecimal(line.get(closePosition).trim()) : new BigDecimal(0);
+                }
+
+                BigDecimal lastPrice = new BigDecimal(0);
+                if (lastPosition > -1) {
+                    lastPrice = line.get(lastPosition) != null && !line.get(lastPosition).isEmpty() ? new BigDecimal(line.get(lastPosition).trim()) : new BigDecimal(0);
+                }
+
+                BigDecimal previousClosePrice = new BigDecimal(0);
+                if (previousClosePosition > -1) {
+                    previousClosePrice = line.get(previousClosePosition) != null && !line.get(previousClosePosition).isEmpty() ? new BigDecimal(line.get(previousClosePosition).trim()) : new BigDecimal(0);
+                }
+
+                BigDecimal totalTradedQuantity = new BigDecimal(0);
+                if (totalTradedQuantityPosition > -1){
+                    totalTradedQuantity = line.get(totalTradedQuantityPosition) != null && !line.get(totalTradedQuantityPosition).isEmpty() ? new BigDecimal(line.get(totalTradedQuantityPosition).trim()) : new BigDecimal(0);
+                }
+
+                BigDecimal totalTradedValue = new BigDecimal(0);
+                if (totalTradesPosition > -1) {
+                    totalTradedValue = line.get(totalTradedValuePosition) != null && !line.get(totalTradedValuePosition).isEmpty() ? new BigDecimal(line.get(totalTradedValuePosition).trim()) : new BigDecimal(0);
+                }
+
+                BigDecimal totalTrades = new BigDecimal(0);
+                if (totalTradesPosition > -1) {
+                    totalTrades = line.get(totalTradesPosition) != null && !line.get(totalTradesPosition).isEmpty() ? new BigDecimal(line.get(totalTradesPosition).trim()) : new BigDecimal(0);
+                }
+
+                String isinCode = "";
+                if (isinCodePosition > -1) { isinCode = line.get(isinCodePosition);}
 
                 NsePriceHistory nsePriceHistory = new NsePriceHistory();
                 nsePriceHistory.setKey(new NsePriceHistory.NsePriceHistoryKey(nseTicker, date));
                 nsePriceHistory.setSeries(series);
-                nsePriceHistory.setOpenPrice(opernPrice);
+                nsePriceHistory.setOpenPrice(openPrice);
                 nsePriceHistory.setHighPrice(highPrice);
                 nsePriceHistory.setLowPrice(lowPrice);
                 nsePriceHistory.setClosePrice(closePrice);
@@ -288,7 +377,7 @@ public class AdminViewController {
             boolean isHeader = true;
             CSVUtils csvUtils = new CSVUtils();
             List<MutualFundNavHistory> mutualFundNavHistories = new ArrayList<>();
-            int positionOfSchemeCode = 0, positionOfDate = 0, positionOfNav = 0;
+            int positionOfSchemeCode = 0, positionOfDate = 0, positionOfNav = 0, schemeNamePostion = 0;
             while (scanner.hasNext()) {
                 List<String> line = csvUtils.parseLine(scanner.nextLine(),';');
                 if(isHeader){
@@ -304,6 +393,9 @@ public class AdminViewController {
                         }
                         if (column.trim().equalsIgnoreCase("Date")){
                             positionOfDate = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("Scheme Name")){
+                            schemeNamePostion = i;
                         }
                     }
                     continue;
@@ -327,11 +419,37 @@ public class AdminViewController {
                     logger.debug(String.format("/Error in NAV for MutualFund(List)/%d/", code));
                     nav = new BigDecimal(0);
                 }
+                String schemeName = line.get(schemeNamePostion);
 
                 MutualFundNavHistory mutualFundNavHistory = new MutualFundNavHistory();
                 mutualFundNavHistory.setKey(new MutualFundNavHistory.MutualFundNavHistoryKey(code, date));
                 mutualFundNavHistory.setNav(nav);
                 mutualFundNavHistories.add(mutualFundNavHistory);
+                int countBySchemeCode = mutualFundUniverseRepository.countBySchemeCode(new Long(code));
+
+                if (countBySchemeCode == 0 && date.after(CommonService.getSetupDates().getDateLastTradingDay())){
+                    MutualFundUniverse mutualFundUniverse = new MutualFundUniverse();
+                    mutualFundUniverse.setSchemeCode(new Long(code));
+                    mutualFundUniverse.setSchemeNameFull(schemeName);
+                    mutualFundUniverse.setDateLatestNav(date);
+                    mutualFundUniverse.setFundHouse("XXX");
+                    mutualFundUniverse.setSchemeNamePart("XXX");
+                    mutualFundUniverse.setLatestNav(nav);
+                    if(schemeName.toLowerCase().contains("direct")){
+                        mutualFundUniverse.setDirectRegular("Direct");
+                    }
+                    if(schemeName.toLowerCase().contains("regular")){
+                        mutualFundUniverse.setDirectRegular("Regular");
+                    }
+                    if(schemeName.toLowerCase().contains("dividend")) {
+                        mutualFundUniverse.setDividendGrowth("Dividend");
+                    }
+                    if(schemeName.toLowerCase().contains("growth")) {
+                        mutualFundUniverse.setDividendGrowth("Growth");
+                    }
+                    mutualFundUniverse.setIsinDivPayoutIsinGrowth("XXX");
+                    mutualFundUniverseRepository.save(mutualFundUniverse);
+                }
             }
             mutualFundNavHistories.sort(Comparator.comparing(l->l.getKey().getSchemeCode()));
             //mutualFundRepository.deleteAllInBatch();

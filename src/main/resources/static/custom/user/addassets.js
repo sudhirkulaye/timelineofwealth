@@ -11,7 +11,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
     $scope.wealthDetailsRecords = [];
     $scope.dummy = {assetClassType : "", fundHouse : "", name : "", directRegular : "", dividendGrowth : "", realEstateType : "", altInvstType : ""};
     $scope.wealthDetailsRecordForm = {
-        "key":{"memberid":-1,"buyDate":new Date("2010-01-01"), "ticker":""},
+        "key":{"memberid":-1,"buyDate":"", "ticker":""},
         "name":"",
         "shortName":"",
         "assetClassid":"",
@@ -29,7 +29,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         "absoluteReturn":0,
         "annualizedReturn":0,
         "maturityValue":0,
-        "maturityDate":new Date("2010-01-01"),
+        "maturityDate":"",
         "lastValuationDate":new Date(),
     }
     $scope.hideForm = true;
@@ -71,13 +71,19 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
     $scope.mutualFundFlag = false;
     $scope.stockFlag = false;
     $scope.realEstateFlag = false;
+    $scope.alternativeInvestmentsFlag = false;
 
     $scope.labelBuyDate = "Purchase Date";
+    $scope.labelBuyDateToolTip = "Asset/Security Purchase/Transaction Date";
     $scope.labelShortName = "Short Name";
+    $scope.labelShortNameToolTip = "Short Name for display purpose"
     $scope.labelFullName = "Full Name";
+    $scope.labelFullNameToolTip = "Full Name/Description";
     $scope.labelCMP = "Current Market Price";
+    $scope.labelCMPToolTip = "Current Market Price per unit";
     $scope.labelLastValuationDate = "Last Valuation Date";
     $scope.labelRate = "Rate";
+    $scope.labelRateToolTip = "Purchase Rate per unit"
 
     $scope.dateToday = new Date();
 
@@ -207,6 +213,16 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
     }
 
     function setFieldsFlags(assetClassid, assetClassType) {
+        if (assetClassType != "" && assetClassType != undefined) {
+            var memberidSelected = $scope.wealthDetailsRecordForm.key.memberid;
+            $scope.showClearForm();
+            $scope.dummy.assetClassType = assetClassType;
+            $scope.wealthDetailsRecordForm.key.memberid = memberidSelected;
+        }
+        if (assetClassid != "" && assetClassid != undefined){
+            $scope.showClearForm();
+            $scope.editMode = true;
+        }
 
         if (assetClassid == 101010 || assetClassid == 101020 || assetClassType == 'Cash/Bank/Broker Account') {
 
@@ -234,9 +250,11 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
             $scope.lastValuationDateFlag = true;
 
             $scope.labelBuyDate = "Account Opening Date";
-            $scope.labelShortName = "Unique Short Name(e.g. SBI_1)";
-            $scope.labelFullName = "Unique Full Name (e.g. SBI_XYZ_BRN_ACC1)";
+            $scope.labelBuyDateToolTip = "Account Opening Date";
+            $scope.labelShortNameToolTip = "Unique Short Name for display purpose SBI_1 OR SBI_2 OR HDFC_1"
+            $scope.labelFullNameToolTip = "Bank Name-Branch Name-Account Number";
             $scope.labelCMP = "Cash Balance";
+            $scope.labelCMPToolTip = "Cash Balance needs to be updated regularly - at least monthly- by client"
             $scope.labelLastValuationDate = "Balance As On";
         }
         if (assetClassid == 201010 ||
@@ -270,8 +288,10 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
             $scope.lastValuationDateFlag = false;
 
             $scope.labelBuyDate = "Opening/Purchase Date";
-            $scope.labelShortName = "Unique Name (e.g. SBI_FD1_ExpirayDate_Amt)";
+            $scope.labelBuyDateToolTip = "FD Opening Date or Bond/CD Purchase Date"
+            $scope.labelShortNameToolTip = "Unique Short Name e.g. SBI_FD1";
             $scope.labelRate = "Principal Amount";
+            $scope.labelRateToolTip = "Principal Amount invested"
             $scope.labelLastValuationDate = "Valuation As On";
         }
         if (assetClassid == 203020 ||
@@ -280,7 +300,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
 
             $scope.buyDateFlag = true;
             $scope.tickerFlag = false;
-            $scope.nameFlag = true;
+            $scope.nameFlag = false;
             $scope.shortNameFlag = true;
             $scope.assetClassidFlag = false;
             $scope.subindustryidFlag = false;
@@ -301,8 +321,10 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
             $scope.lastValuationDateFlag = true;
 
             $scope.labelBuyDate = "Account Opening Date";
-            $scope.labelShortName = "NSC_SerialNo (e.g. PPF_1 Name)";
-            $scope.labelCMP = "Cash Balance";
+            $scope.labelBuyDateToolTip = "PPF Account Opening Date OR NSC purchase date"
+            $scope.labelShortNameToolTip = "Unique Short Name such as NSC_1, PPF_1";
+            $scope.labelCMP = "Balance";
+            $scope.labelCMPToolTip = "Balance of PPF and others needs to be updated regularly"
             $scope.labelLastValuationDate = "Balance As On";
         }
         if (assetClassid == 203050 ||
@@ -332,9 +354,11 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
             $scope.lastValuationDateFlag = true;
 
             $scope.labelBuyDate = "First Premium Date";
-            $scope.labelShortName = "Insurance UIN by IRDA or Unique Name (e.g. LIC_1 Name)";
-            $scope.labelFullName = "Insurance Name"
+            $scope.labelBuyDateToolTip = "Insurance first premium date"
+            $scope.labelShortNameToolTip = "Insurance UIN by IRDA OR Unique Name e.g. LIC_1 Name";
+            $scope.labelFullNameToolTip = "Insurance Full Name"
             $scope.labelCMP = "Surrender Value";
+            $scope.labelCMPToolTip = "Amount that will be received if policy is surrendered"
             $scope.labelLastValuationDate = "Surrender Value As On";
 
         }
@@ -365,10 +389,13 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
             $scope.lastValuationDateFlag = true;
 
             $scope.labelBuyDate = "Date of Purchase";
-            $scope.labelShortName = "ULIP/Pension Policy Code";
-            $scope.labelFullName = "ULIP/Pension Policy Name"
-            $scope.labelRate = "Purchase prise per Unit"
+            $scope.labelBuyDateToolTip = "ULIP or Pension Fund purchase date"
+            $scope.labelShortNameToolTip = "Unique ULIP/Pension Policy Code e.g. ULIP_1 ";
+            $scope.labelFullNameToolTip = "ULIP/Pension Policy Full Name";
+            $scope.labelRate = "Purchase prise per unit";
+            $scope.labelRateToolTip = "Purchase price per unit";
             $scope.labelCMP = "Latest NAV";
+            $scope.labelCMPToolTip = "Latest NAV of Mutual Fund";
             $scope.labelLastValuationDate = "Latest NAV As On";
         }
         if (assetClassid == 201020 ||
@@ -478,10 +505,13 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
             $scope.lastValuationDateFlag = true;
 
             $scope.labelBuyDate = "Date of Purchase";
-            $scope.labelShortName = "Commodity Code";
-            $scope.labelFullName = "Commodity Name"
-            $scope.labelRate = "Purchase cost"
+            $scope.labelBuyDateToolTip = "Date when the commodity purchased";
+            $scope.labelShortNameToolTip = "Commodity Code";
+            $scope.labelFullNameToolTip = "Commodity Full Name";
+            $scope.labelRate = "Purchase cost";
+            $scope.labelRateToolTip = "Purchase cost of commodity per unit"
             $scope.labelCMP = "Latest Market Value";
+            $scope.labelCMPToolTip = "Latest Market Value of the commodity";
             $scope.labelLastValuationDate = "Latest Value As On";
         }
         if ((assetClassid >= 601010 && assetClassid <= 602010) || assetClassType == 'Real Estate other than REIT') {
@@ -517,10 +547,13 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
             $scope.lastValuationDateFlag = true;
 
             $scope.labelBuyDate = "Date of Purchase/Inheritance";
-            $scope.labelShortName = "Short Name";
-            $scope.labelFullName = "Name"
-            $scope.labelRate = "Purchase Cost/Inheritance Value"
+            $scope.labelBuyDateToolTip = "Date when Real Estate was bought or transferred";
+            $scope.labelShortNameToolTip = "Short Name such as Rental_1, NA_Plot_1";
+            $scope.labelFullNameToolTip = "Description of Property"
+            $scope.labelRate = "Purchase Cost/Inheritance Value";
+            $scope.labelRateToolTip = "Purchase cost of real estate";
             $scope.labelCMP = "Latest Market Value";
+            $scope.labelCMPToolTip = "Latest Market Value of the Real Estate, needs to be updated at least annually"
             $scope.labelLastValuationDate = "Latest Value As On";
 
         }
@@ -557,10 +590,13 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
             $scope.lastValuationDateFlag = true;
 
             $scope.labelBuyDate = "Date of Purchase/Inheritance";
-            $scope.labelShortName = "Short Name";
-            $scope.labelFullName = "Name"
-            $scope.labelRate = "Purchase Cost/Inheritance Value"
+            $scope.labelBuyDateToolTip = "Date when alternative investment was made or transferred"
+            $scope.labelShortNameToolTip = "Short Name such as INVESCO_PMS_1, MOSL_PMS_2 or PE_1";
+            $scope.labelFullNameToolTip = "Description of Alternative Investment";
+            $scope.labelRate = "Purchase Cost/Inheritance Value";
+            $scope.labelRateToolTip = "Purchase Cost/Inheritance Value of Investment";
             $scope.labelCMP = "Latest Market Value";
+            $scope.labelCMPToolTip = "Latest Market Value of Investment, needs to be updated at least annually"
             $scope.labelLastValuationDate = "Latest Value As On";
         }
 
@@ -569,6 +605,8 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
     $scope.editWealthDetailsRecord = function editWealthDetailsRecord(wealthDetailsRecord){
         $scope.hideForm = false;
         $scope.editMode = true;
+        setFieldsFlags(wealthDetailsRecord.assetClassid, '');
+        //$scope.editMode = true;
 
         $scope.wealthDetailsRecordForm.key.memberid = ""+wealthDetailsRecord.key.memberid;
         $scope.wealthDetailsRecordForm.key.buyDate = new Date(wealthDetailsRecord.key.buyDate);
@@ -593,8 +631,6 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         $scope.wealthDetailsRecordForm.maturityDate = new Date(wealthDetailsRecord.maturityDate);
         $scope.wealthDetailsRecordForm.lastValuationDate = new Date(wealthDetailsRecord.lastValuationDate);
 
-        setFieldsFlags(wealthDetailsRecord.assetClassid, '');
-
     }
 
     $scope.onSelectionOfAssetType = function onSelectionOfAssetType(assetClassType) {
@@ -606,7 +642,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         $scope.editMode = false;
 
         $scope.wealthDetailsRecordForm.key.memberid = "";
-        $scope.wealthDetailsRecordForm.key.buyDate = new Date("2010-01-01");
+        $scope.wealthDetailsRecordForm.key.buyDate = "";
         $scope.wealthDetailsRecordForm.key.ticker = "";
         $scope.wealthDetailsRecordForm.name = "";
         $scope.wealthDetailsRecordForm.shortName = "";
@@ -625,8 +661,35 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         $scope.wealthDetailsRecordForm.absoluteReturn = 0;
         $scope.wealthDetailsRecordForm.annualizedReturn = 0;
         $scope.wealthDetailsRecordForm.maturityValue = 0;
-        $scope.wealthDetailsRecordForm.maturityDate = new Date("2010-01-01");
+        $scope.wealthDetailsRecordForm.maturityDate = "";
         $scope.wealthDetailsRecordForm.lastValuationDate = new Date();
+
+        $scope.buyDateFlag = false;
+        $scope.tickerFlag = false;
+        $scope.nameFlag = false;
+        $scope.shortNameFlag = false;
+        $scope.assetClassidFlag = false;
+        $scope.subindustryidFlag = false;
+        $scope.quantityFlag = false;
+        $scope.rateFlag = false;
+        $scope.brokerageFlag = false;
+        $scope.taxFlag = false;
+        $scope.totalCostFlag = false;
+        $scope.netRateFlag = false;
+        $scope.cmpFlag = false;
+        $scope.marketValueFlag = false;
+        $scope.holdingPeriodFlag = false;
+        $scope.netProfitFlag = false;
+        $scope.absoluteReturnFlag = false;
+        $scope.annualizedReturnFlag = false;
+        $scope.maturityValueFlag = false;
+        $scope.maturityDateFlag = false;
+        $scope.lastValuationDateFlag = false;
+        $scope.mutualFundFlag = false;
+        $scope.stockFlag = false;
+        $scope.realEstateFlag = false;
+        $scope.alternativeInvestmentsFlag = false;
+
 
         $scope.dummy.assetClassType = "";
         $scope.dummy.fundHouse = "";
@@ -662,6 +725,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         $scope.maturityValueFlag = false;
         $scope.maturityDateFlag = false;
         $scope.lastValuationDateFlag = false;
+        $scope.alternativeInvestmentsFlag = false;
 
         $scope.mutualFundFlag = false;
         $scope.stockFlag = false;
@@ -682,11 +746,16 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         $scope.alternativeInvestmentsRecord = false;
 
         $scope.labelBuyDate = "Purchase Date";
+        $scope.labelBuyDateToolTip = "Asset/Security Purchase/Transaction Date";
         $scope.labelShortName = "Short Name";
+        $scope.labelShortNameToolTip = "Short Name for display purpose"
         $scope.labelFullName = "Full Name";
+        $scope.labelFullNameToolTip = "Full Name/Description";
         $scope.labelCMP = "Current Market Price";
+        $scope.labelCMPToolTip = "Current Market Price per unit";
         $scope.labelLastValuationDate = "Last Valuation Date";
         $scope.labelRate = "Rate";
+        $scope.labelRateToolTip = "Purchase Rate per unit";
 
 
     }
@@ -753,6 +822,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         if ($scope.PPFRecord){
             if (!$scope.editMode) {
                 $scope.wealthDetailsRecordForm.key.ticker = $scope.wealthDetailsRecordForm.shortName;
+                $scope.wealthDetailsRecordForm.name = $scope.wealthDetailsRecordForm.shortName;
                 $scope.wealthDetailsRecordForm.assetClassid = 203020;
                 $scope.wealthDetailsRecordForm.subindustryid = 0;
                 $scope.wealthDetailsRecordForm.quantity = 1;
@@ -925,14 +995,18 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         if ($scope.searchAssetClass == undefined || $scope.searchAssetClass == "") {
             return true;
         } else {
-            if ($scope.searchAssetClass == 'Cash - Cash/Bank Accounts' ) {
+            var index = $scope.assetClasses.findIndex(x=>x.classid === wealthDetailsRecord.assetClassid);
+            if ($scope.assetClasses[index].assetClassGroup == $scope.searchAssetClass) {
+                return true;
+            }
+            /*if ($scope.searchAssetClass == '01 - Cash - Cash/Bank Accounts' ) {
                 if (wealthDetailsRecord.assetClassid == 101010 || wealthDetailsRecord.assetClassid == 101020) {
                     return true;
                 } else {
                     return false;
                 }
             }
-            if ($scope.searchAssetClass == 'Fixed Income - FDs/PPF' ) {
+            if ($scope.searchAssetClass == '02 - Fixed Income - FDs/PPF' ) {
                 if (wealthDetailsRecord.assetClassid == 201010 ||
                     wealthDetailsRecord.assetClassid == 202010 ||
                     wealthDetailsRecord.assetClassid == 203010 ||
@@ -942,14 +1016,14 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
                     return false;
                 }
             }
-            if ($scope.searchAssetClass == 'Fixed Income - Endowment Insurance' ) {
+            if ($scope.searchAssetClass == '03 - Fixed Income - Endowment Insurance' ) {
                 if (wealthDetailsRecord.assetClassid == 203050) {
                     return true;
                 } else {
                     return false;
                 }
             }
-            if ($scope.searchAssetClass == 'Fixed Income - Debt MFs' ) {
+            if ($scope.searchAssetClass == '04 - Fixed Income - Debt MFs' ) {
                 if (wealthDetailsRecord.assetClassid == 201020 ||
                     wealthDetailsRecord.assetClassid == 202020 ||
                     wealthDetailsRecord.assetClassid == 203040) {
@@ -958,14 +1032,14 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
                     return false;
                 }
             }
-            if ($scope.searchAssetClass == 'Fixed Inc. & Equity - ULIP/Pension Funds' ) {
+            if ($scope.searchAssetClass == '05 - Fixed Inc. & Equity - ULIP/Pension Funds' ) {
                 if (wealthDetailsRecord.assetClassid == 301030) {
                     return true;
                 } else {
                     return false;
                 }
             }
-            if ($scope.searchAssetClass == 'Fixed Inc. &amp; Equity - Hybrid MFs' ) {
+            if ($scope.searchAssetClass == '06 - Fixed Inc. & Equity - Hybrid MFs' ) {
                 if (wealthDetailsRecord.assetClassid >= 301010 &&
                     wealthDetailsRecord.assetClassid <= 301020) {
                     return true;
@@ -973,7 +1047,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
                     return false;
                 }
             }
-            if ($scope.searchAssetClass == 'Diversified Equity - ETFs,MFs' ) {
+            if ($scope.searchAssetClass == '07 - Diversified Equity - ETFs,MFs' ) {
                 if (wealthDetailsRecord.assetClassid >= 401010 &&
                     wealthDetailsRecord.assetClassid <= 405040) {
                     return true;
@@ -981,7 +1055,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
                     return false;
                 }
             }
-            if ($scope.searchAssetClass == 'Individual Equity - Stocks' ) {
+            if ($scope.searchAssetClass == '08 - Individual Equity - Stocks' ) {
                 if (wealthDetailsRecord.assetClassid >= 406010 &&
                     wealthDetailsRecord.assetClassid <= 408040) {
                     return true;
@@ -989,7 +1063,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
                     return false;
                 }
             }
-            if ($scope.searchAssetClass == 'Commodity' ) {
+            if ($scope.searchAssetClass == '09 - Commodity' ) {
                 if (wealthDetailsRecord.assetClassid >= 501010 &&
                     wealthDetailsRecord.assetClassid <= 502030) {
                     return true;
@@ -997,7 +1071,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
                     return false;
                 }
             }
-            if ($scope.searchAssetClass == 'Real Estate' ) {
+            if ($scope.searchAssetClass == '10 - Real Estate' ) {
                 if (wealthDetailsRecord.assetClassid >= 601010 &&
                     wealthDetailsRecord.assetClassid <= 602010) {
                     return true;
@@ -1005,16 +1079,43 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
                     return false;
                 }
             }
-            if ($scope.searchAssetClass == 'Alternative Investments' ) {
+            if ($scope.searchAssetClass == '11 - Alternative Investments' ) {
                 if (wealthDetailsRecord.assetClassid >= 701010 &&
                     wealthDetailsRecord.assetClassid <= 701070) {
                     return true;
                 } else {
                     return false;
                 }
-            }
+            }*/
         }
         return false;
     }
 
+});
+
+module.filter('unique', function() {
+   // we will return a function which will take in a collection
+   // and a keyname
+   return function(collection, keyname) {
+      // we define our output and keys array;
+      var output = [],
+          keys = [];
+
+      // we utilize angular's foreach function
+      // this takes in our original collection and an iterator function
+      angular.forEach(collection, function(item) {
+          // we check to see whether our object exists
+          var key = item[keyname];
+          // if it's not already part of our keys array
+          if(keys.indexOf(key) === -1) {
+              // add it to our keys array
+              keys.push(key);
+              // push this item to our final output array
+              output.push(item);
+          }
+      });
+      // return our array which should be devoid of
+      // any duplicates
+      return output;
+   };
 });

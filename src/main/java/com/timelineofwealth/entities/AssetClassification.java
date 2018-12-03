@@ -16,6 +16,8 @@ public class AssetClassification implements Serializable {
     private String className;
     @Column(name = "subclass_name")
     private String subclassName;
+    @Column(name = "asset_class_group")
+    private String assetClassGroup;
     @Column(name = "subclass_description")
     private String subclassDescription;
 
@@ -38,6 +40,13 @@ public class AssetClassification implements Serializable {
     }
     public void setSubclassName(String subclassName) {
         this.subclassName = subclassName;
+    }
+
+    public String getAssetClassGroup() {
+        return assetClassGroup;
+    }
+    public void setAssetClassGroup(String assetClassGroup) {
+        this.assetClassGroup = assetClassGroup;
     }
 
     public String getSubclassDescription() {
