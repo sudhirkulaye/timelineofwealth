@@ -31,7 +31,6 @@ module.controller('IncExpSavingsController', function($scope, $http, $filter) {
         "note":""
     };
     $scope.consolidatedIncExp = [];
-    $scope.consolidatedIncExp1 = [];
     $scope.labelsYears = [];
     $scope.chartSeriesIncExp = ['Net Inc','Gross Exp'];
     $scope.newColors = ['#26B99A', '#03586A', '#1E947B', '#1a3c33', '#DCDCDC', '#46BFBD', '#FDB45C'];
