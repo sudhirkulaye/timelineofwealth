@@ -11,7 +11,7 @@ module.controller('InsurancesController', function($scope, $http, $filter) {
         "category":"",
         "coverAmount":0,
         "premiumAmount":0,
-        "premiumFrequencyInMonths":"12",
+        "premiumFrequencyInMonths":"1",
         "lastDateOfPremium":"",
         "lifeTimeCover":"No",
         "expiryDate":"",
@@ -87,7 +87,7 @@ module.controller('InsurancesController', function($scope, $http, $filter) {
         $scope.insuranceForm.category = "";
         $scope.insuranceForm.coverAmount = 0;
         $scope.insuranceForm.premiumAmount = 0;
-        $scope.insuranceForm.premiumFrequencyInMonths = "12";
+        $scope.insuranceForm.premiumFrequencyInMonths = "1";
         $scope.insuranceForm.lastDateOfPremium = new Date();
         $scope.insuranceForm.lifeTimeCover = "No";
         $scope.insuranceForm.expiryDate = new Date();
@@ -104,7 +104,7 @@ module.controller('InsurancesController', function($scope, $http, $filter) {
     $scope.deleteInsuranceRecord = function deleteInsuranceRecord(insuranceRecord) {
         var result = confirm("Are you sure you want to delete this item?");
         if (result) {
-            var method = "DELETE";
+            var method = "POST";
             var url = "/deleteinsurance";
             $http({
                       method: method,

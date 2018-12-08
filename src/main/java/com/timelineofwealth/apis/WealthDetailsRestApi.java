@@ -2,6 +2,7 @@ package com.timelineofwealth.apis;
 
 import com.timelineofwealth.entities.User;
 import com.timelineofwealth.entities.WealthDetails;
+import com.timelineofwealth.entities.WealthHistory;
 import com.timelineofwealth.service.CommonService;
 import com.timelineofwealth.service.WealthDetailsService;
 import org.slf4j.Logger;
@@ -13,7 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "user/api/")
@@ -50,5 +55,16 @@ public class WealthDetailsRestApi {
         WealthDetailsService.deleteWealthDetailsRecord(deleteRecord);
         return getWealthDetailsRecords();
     }
+
+    @RequestMapping(value = "/getwealthhistory", method = RequestMethod.GET)
+    public Map<Date, Map<Long, BigDecimal>> getWealthHistory() {
+        logger.debug(String.format("Call user/api/getwealthhistory/"));
+
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        return WealthDetailsService.getWealthHistoryRecords(user.getEmail());
+    }
+
 
 }

@@ -225,6 +225,15 @@
                                         <input type="text" ng-model="wealthDetailsRecordForm.name" class="form-control" ng-disabled="editMode"  />
                                     </div>
                                 </div>
+                                <div class="form-group" ng-if="sipidFlag">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Linked to SIP (Sip# | Amt | Start Date | Freq)</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <select class="form-control" ng-model="wealthDetailsRecordForm.sipid" >
+                                            <option value="0"></option>
+                                            <option ng-repeat="sipRecord in sips" value="{{sipRecord.key.sipid}}">{{sipRecord.key.sipid}}|{{sipRecord.amount}}|{{sipRecord.startDate}}|{{sipRecord.sipFreq | frequency}}</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="form-group" ng-if="assetClassidFlag">
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12">Asset Class - Subclass</label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
@@ -244,25 +253,29 @@
                                 <div class="form-group" ng-if="quantityFlag" >
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12">Quantity/Units</label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.quantity" ng-disabled="editMode" ng-pattern="/^[0-9]+(\.[0-9]{1,3})?$/" step="0.001" />-->
                                         <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.quantity" ng-disabled="editMode" />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="rateFlag">
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="{{labelRateToolTip}}">{{labelRate}}</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <input type="number" ng-change="setCMPForStocks()" class="form-control" ng-model="wealthDetailsRecordForm.rate" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01"  />
+                                        <!--<input type="number" ng-change="setCMPForStocks()" class="form-control" ng-model="wealthDetailsRecordForm.rate" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
+                                        <input type="number" ng-change="setCMPForStocks()" class="form-control" ng-model="wealthDetailsRecordForm.rate" step="0.001" />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="brokerageFlag">
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12">Brokerage</label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.brokerage" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+                                        <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.brokerage" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.brokerage"  />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="taxFlag">
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12">Tax</label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.tax" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+                                        <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.tax" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.tax" />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="totalCostFlag" >
@@ -270,57 +283,62 @@
                                     <div class="col-md-6 col-sm-6 col-xs-12" >
                                         <!--<input type="hidden" class="form-control" ng-model="wealthDetailsRecordForm.totalCost"-->
                                                <!--ng-disabled="true" value="" /> --> <p />
-                                        {{(wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.rate)+wealthDetailsRecordForm.brokerage+wealthDetailsRecordForm.tax}}
+                                        {{(wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.rate)+wealthDetailsRecordForm.brokerage+wealthDetailsRecordForm.tax | number:2}}
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="netRateFlag"  vertical-align="middle">
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Effective purchase rate per Unit">Net Rate</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.netRate" ng-disabled="true" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
-                                        {{((wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.rate)+wealthDetailsRecordForm.brokerage+wealthDetailsRecordForm.tax)/wealthDetailsRecordForm.quantity}}
+                                        {{((wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.rate)+wealthDetailsRecordForm.brokerage+wealthDetailsRecordForm.tax)/wealthDetailsRecordForm.quantity | number:2}}
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="cmpFlag">
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="{{labelCMPToolTip}}">{{labelCMP}}</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.cmp" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+                                        <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.cmp" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.cmp" step="0.001" />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="marketValueFlag" >
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Market Value as of today">Market Value</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <!--<input type="hidden" class="form-control" ng-model="wealthDetailsRecordForm.marketValue" ng-disabled="true" />--><p />
-                                        {{(wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.cmp)}}
+                                        {{(wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.cmp) | number:2}}
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="holdingPeriodFlag">
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Holding period in years">Holding Period</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.holdingPeriod" ng-disabled="true" />
+                                        <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.holdingPeriod" ng-disabled="true"  />-->
+                                        {{wealthDetailsRecordForm.holdingPeriod | number:2}}
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="netProfitFlag">
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Net Profit">Net Profit</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.netProfit" ng-disabled="true" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
-                                        {{(wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.cmp) - ((wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.rate)+wealthDetailsRecordForm.brokerage+wealthDetailsRecordForm.tax)}}
+                                        {{((wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.cmp) - ((wealthDetailsRecordForm.quantity*wealthDetailsRecordForm.rate)+wealthDetailsRecordForm.brokerage+wealthDetailsRecordForm.tax)) | number:2}}
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="absoluteReturnFlag">
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Absolute Returns in decimal 7% as 0.07">Absolute Returns</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.absoluteReturn"  ng-disabled="true" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+                                        <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.absoluteReturn"  ng-disabled="true" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.absoluteReturn"  ng-disabled="true" />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="annualizedReturnFlag">
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Annualized Returns in decimal 7% as 0.07">Annualized Returns </span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.annualizedReturn"  ng-disabled="!FDRecord" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+                                        <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.annualizedReturn"  ng-disabled="!FDRecord" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
+                                        <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.annualizedReturn"  ng-disabled="!FDRecord"  />
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="maturityValueFlag">
                                     <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="Applicable for FDs/Endowment Insurances like instruments">Maturity Value</span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <!--<input type="number" class="form-control" ng-model="wealthDetailsRecordForm.maturityValue"  ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />-->
                                         <input type="number" class="form-control" ng-model="wealthDetailsRecordForm.maturityValue"  />
                                     </div>
                                 </div>

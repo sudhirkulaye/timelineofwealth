@@ -55,6 +55,49 @@
                             <font color="red"> Note: Deleting or Editing Record may affect auto addition of Mutual Funds transactions </font>
                         </div>
                         <div class="x_content" ng-hide="!hideForm">
+                            <font color="green"><strong><h2>Summary : </h2> </strong> </font>
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th><h2><strong>Total Annual Investments</strong></h2></th>
+                                            <td><h2><strong>{{totalAnnualInvestment | currency:"&#8377;":0}}</strong></h2></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Investments in Endowment Insurance</th>
+                                            <td>{{totalAnnualInvestmentInEndowmentInsurance | currency:"&#8377;":0}} / {{totalAnnualInvestmentInEndowmentInsurancePercent | number:2}}%</td>
+                                            <th>Investments in PPF-FD-RD</th>
+                                            <td>{{totalAnnualInvestmentInPPFFDRD | currency:"&#8377;":0}} / {{totalAnnualInvestmentInPPFFDRDPercent | number:2}}%</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Investments in ULIP</th>
+                                            <td>{{totalAnnualInvestmentInULIP | currency:"&#8377;":0}} / {{totalAnnualInvestmentInULIPPercent | number:2}}%</td>
+                                            <th>Investments in Other</th>
+                                            <td>{{totalAnnualInvestmentInOther | currency:"&#8377;":0}} / {{totalAnnualInvestmentInOtherPercent | number:2}}%</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4">
+                                                <p /><strong>Investments in Mutual Funds</strong>
+                                                <p />{{totalAnnualInvestmentInMutualFunds | currency:"&#8377;":0}} / {{totalAnnualInvestmentInMutualFundsPercent | number:2}}%
+                                                <p /><strong>Investment in Mutual Funds by Category</strong>
+                                                <p /><strong>Debt MF: </strong> {{totalAnnualInvestmentInDebtMF | currency:"&#8377;":0}} / {{totalAnnualInvestmentInDebtMFPercent | number:2}}%
+                                                <strong>Hybrid MF: </strong>  {{totalAnnualInvestmentInHybridMF | currency:"&#8377;":0}} / {{totalAnnualInvestmentInHybridMFPercent | number:2}}%
+                                                <strong>Equity Large Cap MF: </strong>  {{totalAnnualInvestmentInEquityLargeMF | currency:"&#8377;":0}} / {{totalAnnualInvestmentInEquityLargeMFPercent | number:2}}%
+                                                <strong>Equity Mid Cap MF:</strong>  {{totalAnnualInvestmentInEquityMidMF | currency:"&#8377;":0}} / {{totalAnnualInvestmentInEquityMidMFPercent | number:2}}%
+                                                <p /><strong>Equity Small Cap MF: </strong>  {{totalAnnualInvestmentInEquitySmallMF | currency:"&#8377;":0}} / {{totalAnnualInvestmentInEquitySmallMFPercent | number:2}}%
+                                                <strong>Equity Multi Cap MF: </strong>  {{totalAnnualInvestmentInEquityMultiMF | currency:"&#8377;":0}} / {{totalAnnualInvestmentInEquityMultiMFPercent | number:2}}%
+                                                <strong>Equity ELSS Cap MF: </strong> {{totalAnnualInvestmentInEquityElssMF | currency:"&#8377;":0}} / {{totalAnnualInvestmentInEquityElssMFPercent | number:2}}%
+                                                <strong>Equity Other Cap MF: </strong> {{totalAnnualInvestmentInEquityOtherMF | currency:"&#8377;":0}} / {{totalAnnualInvestmentInEquityOtherMFPercent | number:2}}%
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="x_content" ng-hide="!hideForm">
                             <br />
                             <div class="table-responsive">
                                 <table class="table table-hover">
@@ -209,7 +252,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Deduction Day<span class="required">*</span></label>
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-12"><span class="docs-tooltip" data-toggle="tooltip" title="NAV of deduction date will be considered for Mutual Fund SIP">Deduction Day</span><span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
                                         <input type="number" class="form-control"  required="required" ng-pattern="/^[0-9]{1,2}$/" min="1" max="31" ng-model="sipForm.deductionDay" />
                                     </div>
@@ -225,10 +268,13 @@
                                     <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
                                         <select class="form-control" required="required" ng-model="sipForm.sipFreq" ng-disabled="editMode" >
                                             <option value="0">One Time</option>
-                                            <option value="1">Monthly</option>
-                                            <option value="3">Quarterly</option>
-                                            <option value="6">Semi Annually</option>
-                                            <option value="12">Annually</option>
+                                            <!--<option value="250">Daily</option>-->
+                                            <!--<option value="52">Weekly</option>-->
+                                            <!--<option value="24">Fortnightly</option>-->
+                                            <option value="12">Monthly</option>
+                                            <!--<option value="4">Quarterly</option>-->
+                                            <!--<option value="2">Semi Annually</option>-->
+                                            <!--<option value="1">Annually</option>-->
                                         </select>
                                     </div>
                                 </div>

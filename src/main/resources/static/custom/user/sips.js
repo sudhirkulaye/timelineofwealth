@@ -26,6 +26,37 @@ module.controller('SipsController', function($scope, $http, $filter) {
         "sipFreq":0,
         "isActive":"Yes"
     };
+    $scope.totalAnnualInvestment = 0;
+    $scope.totalAnnualInvestmentInEndowmentInsurance = 0;
+    $scope.totalAnnualInvestmentInEndowmentInsurancePercent = 0;
+    $scope.totalAnnualInvestmentInPPFFDRD = 0;
+    $scope.totalAnnualInvestmentInPPFFDRDPercent = 0;
+    $scope.totalAnnualInvestmentInULIP = 0;
+    $scope.totalAnnualInvestmentInULIPPercent = 0;
+    $scope.totalAnnualInvestmentInOther = 0;
+    $scope.totalAnnualInvestmentInOtherPercent = 0;
+    $scope.totalAnnualInvestmentInMutualFunds = 0;
+    $scope.totalAnnualInvestmentInMutualFundsPercent = 0;
+
+    $scope.totalAnnualInvestmentInDebtMF = 0;
+    $scope.totalAnnualInvestmentInHybridMF = 0;
+    $scope.totalAnnualInvestmentInEquityLargeMF = 0;
+    $scope.totalAnnualInvestmentInEquityMidMF = 0;
+    $scope.totalAnnualInvestmentInEquitySmallMF = 0;
+    $scope.totalAnnualInvestmentInEquityMultiMF = 0;
+    $scope.totalAnnualInvestmentInEquityElssMF = 0;
+    $scope.totalAnnualInvestmentInEquityOtherMF = 0;
+
+    $scope.totalAnnualInvestmentInDebtMFPercent = 0;
+    $scope.totalAnnualInvestmentInHybridMFPercent = 0;
+    $scope.totalAnnualInvestmentInEquityLargeMFPercent = 0;
+    $scope.totalAnnualInvestmentInEquityMidMFPercent = 0;
+    $scope.totalAnnualInvestmentInEquitySmallMFPercent = 0;
+    $scope.totalAnnualInvestmentInEquityMultiMFPercent = 0;
+    $scope.totalAnnualInvestmentInEquityElssMFPercent = 0;
+    $scope.totalAnnualInvestmentInEquityOtherMFPercent = 0;
+
+
 
     $scope.hideForm = true;
     $scope.editMode = false;
@@ -66,6 +97,7 @@ module.controller('SipsController', function($scope, $http, $filter) {
             then(function (response) {
                 if (response != undefined) {
                     $scope.sips = response.data;
+                    computeSummary();
                 } else {
                     $scope.sips = [];
                 }
@@ -187,12 +219,13 @@ module.controller('SipsController', function($scope, $http, $filter) {
 
     $scope.showTable = function showTable() {
         $scope.hideForm = true;
+        computeSummary();
     }
 
     $scope.deleteSipRecord = function deleteSipRecord(sipRecord) {
         var result = confirm("Are you sure you want to delete this item?");
         if (result) {
-            var method = "DELETE";
+            var method = "POST";
             var url = "/deletesip";
             $http({
                       method: method,
@@ -203,6 +236,7 @@ module.controller('SipsController', function($scope, $http, $filter) {
                       }
                   }).then(_success, _error);
         }
+        computeSummary();
     }
 
     $scope.processSipRecord = function processSipRecord(){
@@ -230,6 +264,110 @@ module.controller('SipsController', function($scope, $http, $filter) {
         }
     }
 
+    function computeSummary() {
+        $scope.totalAnnualInvestment = 0;
+        $scope.totalAnnualInvestmentInEndowmentInsurance = 0;
+        $scope.totalAnnualInvestmentInEndowmentInsurancePercent = 0;
+        $scope.totalAnnualInvestmentInPPFFDRD = 0;
+        $scope.totalAnnualInvestmentInPPFFDRDPercent = 0;
+        $scope.totalAnnualInvestmentInULIP = 0;
+        $scope.totalAnnualInvestmentInULIPPercent = 0;
+        $scope.totalAnnualInvestmentInOther = 0;
+        $scope.totalAnnualInvestmentInOtherPercent = 0;
+        $scope.totalAnnualInvestmentInMutualFunds = 0;
+        $scope.totalAnnualInvestmentInMutualFundsPercent = 0;
+
+        $scope.totalAnnualInvestmentInDebtMF = 0;
+        $scope.totalAnnualInvestmentInHybridMF = 0;
+        $scope.totalAnnualInvestmentInEquityLargeMF = 0;
+        $scope.totalAnnualInvestmentInEquityMidMF = 0;
+        $scope.totalAnnualInvestmentInEquitySmallMF = 0;
+        $scope.totalAnnualInvestmentInEquityMultiMF = 0;
+        $scope.totalAnnualInvestmentInEquityElssMF = 0;
+        $scope.totalAnnualInvestmentInEquityOtherMF = 0;
+
+        $scope.totalAnnualInvestmentInDebtMFPercent = 0;
+        $scope.totalAnnualInvestmentInHybridMFPercent = 0;
+        $scope.totalAnnualInvestmentInEquityLargeMFPercent = 0;
+        $scope.totalAnnualInvestmentInEquityMidMFPercent = 0;
+        $scope.totalAnnualInvestmentInEquitySmallMFPercent = 0;
+        $scope.totalAnnualInvestmentInEquityMultiMFPercent = 0;
+        $scope.totalAnnualInvestmentInEquityElssMFPercent = 0;
+        $scope.totalAnnualInvestmentInEquityOtherMFPercent = 0;
+
+        var multiplier = 0;
+        for (i=0; i<$scope.sips.length; i++){
+
+//            if ($scope.sips[i].sipFreq == 0) {multiplier = 0;}
+//            if ($scope.sips[i].sipFreq == 1) {multiplier = 12;}
+//            if ($scope.sips[i].sipFreq == 3) {multiplier = 4;}
+//            if ($scope.sips[i].sipFreq == 12) {multiplier = 1;}
+            multiplier = $scope.sips[i].sipFreq;
+
+            $scope.totalAnnualInvestment = $scope.totalAnnualInvestment + ($scope.sips[i].amount*multiplier);
+
+            if($scope.sips[i].instrumentType == "Mutual Fund") {
+                $scope.totalAnnualInvestmentInMutualFunds = $scope.totalAnnualInvestmentInMutualFunds + ($scope.sips[i].amount*multiplier);
+                var category = $scope.sips[i].category;
+                if(category.includes("Debt-")){
+                    $scope.totalAnnualInvestmentInDebtMF = $scope.totalAnnualInvestmentInDebtMF + ($scope.sips[i].amount*multiplier);
+                }
+                if(category.includes("Hybrid-")){
+                    $scope.totalAnnualInvestmentInHybridMF = $scope.totalAnnualInvestmentInHybridMF + ($scope.sips[i].amount*multiplier);
+                }
+                if(category.includes("Equity-ELSS")){
+                    $scope.totalAnnualInvestmentInEquityElssMF = $scope.totalAnnualInvestmentInEquityElssMF + ($scope.sips[i].amount*multiplier);
+                }
+                if(category.includes("Equity-Large")){
+                    $scope.totalAnnualInvestmentInEquityLargeMF = $scope.totalAnnualInvestmentInEquityLargeMF + ($scope.sips[i].amount*multiplier);
+                }
+                if(category.includes("Equity-Midcap")){
+                    $scope.totalAnnualInvestmentInEquityMidMF = $scope.totalAnnualInvestmentInEquityMidMF + ($scope.sips[i].amount*multiplier);
+                }
+                if(category.includes("Equity-Small")){
+                    $scope.totalAnnualInvestmentInEquitySmallMF = $scope.totalAnnualInvestmentInEquitySmallMF + ($scope.sips[i].amount*multiplier);
+                }
+                if(category.includes("Equity-Multi")){
+                    $scope.totalAnnualInvestmentInEquityMultiMF = $scope.totalAnnualInvestmentInEquityMultiMF + ($scope.sips[i].amount*multiplier);
+                }
+            }
+            if($scope.sips[i].instrumentType == "PPF-FD-RD") {
+                $scope.totalAnnualInvestmentInPPFFDRD = $scope.totalAnnualInvestmentInPPFFDRD + ($scope.sips[i].amount*multiplier);
+            }
+            if($scope.sips[i].instrumentType == "Endowment Insurance") {
+                $scope.totalAnnualInvestmentInEndowmentInsurance = $scope.totalAnnualInvestmentInEndowmentInsurance + ($scope.sips[i].amount*multiplier);
+            }
+            if($scope.sips[i].instrumentType == "ULIP") {
+                $scope.totalAnnualInvestmentInULIP = $scope.totalAnnualInvestmentInULIP + ($scope.sips[i].amount*multiplier);
+            }
+            if($scope.sips[i].instrumentType == "Other") {
+                $scope.totalAnnualInvestmentInOther = $scope.totalAnnualInvestmentInOther + ($scope.sips[i].amount*multiplier);
+            }
+        }
+
+        $scope.totalAnnualInvestmentInEquityOtherMF = $scope.totalAnnualInvestmentInMutualFunds -
+                                                    (
+                                                        $scope.totalAnnualInvestmentInDebtMF + $scope.totalAnnualInvestmentInHybridMF +
+                                                        $scope.totalAnnualInvestmentInEquityElssMF + $scope.totalAnnualInvestmentInEquityLargeMF +
+                                                        $scope.totalAnnualInvestmentInEquityMidMF + $scope.totalAnnualInvestmentInEquitySmallMF +
+                                                        $scope.totalAnnualInvestmentInEquityMultiMF
+                                                    );
+        $scope.totalAnnualInvestmentInMutualFundsPercent = ($scope.totalAnnualInvestmentInMutualFunds/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInPPFFDRDPercent = ($scope.totalAnnualInvestmentInPPFFDRD/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInEndowmentInsurancePercent = ($scope.totalAnnualInvestmentInEndowmentInsurance/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInULIPPercent = ($scope.totalAnnualInvestmentInULIP/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInEndowmentInsurancePercent = ($scope.totalAnnualInvestmentInEndowmentInsurance/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInOtherPercent = ($scope.totalAnnualInvestmentInOther/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInDebtMFPercent = ($scope.totalAnnualInvestmentInDebtMF/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInHybridMFPercent = ($scope.totalAnnualInvestmentInHybridMF/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInEquityLargeMFPercent = ($scope.totalAnnualInvestmentInEquityLargeMF/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInEquityMidMFPercent = ($scope.totalAnnualInvestmentInEquityMidMF/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInEquitySmallMFPercent = ($scope.totalAnnualInvestmentInEquitySmallMF/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInEquityMultiMFPercent = ($scope.totalAnnualInvestmentInEquityMultiMF/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInEquityElssMFPercent = ($scope.totalAnnualInvestmentInEquityElssMF/$scope.totalAnnualInvestment)*100;
+        $scope.totalAnnualInvestmentInEquityOtherMFPercent = ($scope.totalAnnualInvestmentInEquityOtherMF/$scope.totalAnnualInvestment)*100;
+    }
+
     function _success(res) {
         if (res != undefined) {
             $scope.sips = res.data;
@@ -254,10 +392,13 @@ module.filter("frequency", function () {
     return function (frequency) {
         switch (frequency) {
             case 0: return "One Time";
-            case 1: return "Monthly";
-            case 3: return "Quarterly";
-            case 6: return "Semi Annually";
-            case 12: return "Annually";
+            case 1: return "Annually";
+            case 2: return "Semi Annually";
+            case 4: return "Quarterly";
+            case 12: return "Monthly";
+            case 24: return "Fortnightly";
+            case 52: return "Weekly";
+            case 250: return "Daily";
         }
     }
 })

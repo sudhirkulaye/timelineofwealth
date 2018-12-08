@@ -81,6 +81,8 @@ public class WealthDetails implements Serializable {
     private Date maturityDate;
     @Column(name = "last_valuation_date")
     private Date lastValuationDate;
+    @Column(name = "sipid")
+    private int sipid;
 
     public WealthDetailsKey getKey() {
         return key;
@@ -220,5 +222,12 @@ public class WealthDetails implements Serializable {
     }
     public void setLastValuationDate(Date lastValuationDate) {
         this.lastValuationDate = lastValuationDate;
+    }
+
+    public int getSipid() {
+        return sipid;
+    }
+    public void setSipid(int sipid) {
+        this.sipid = sipid;
     }
 }

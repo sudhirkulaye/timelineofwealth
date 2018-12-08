@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: common-header" />
-<body class="nav-md" ng-app="SipsManagement" ng-controller="SipsController">
+<body class="nav-md" ng-app="WealthHistoryDistributionManagement" ng-controller="WealthHistoryDistributionController">
 <!-- iCheck -->
 <link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
 <!-- bootstrap-wysiwyg -->
@@ -26,8 +26,19 @@
 <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
 <!-- ui-bootstrap-tpls.js -->
 <script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
+<!--Angular custom filter (for group by) JS-->
+<script src="../../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
+<!-- D3.js -->
+<script src='https://d3js.org/d3.v4.min.js'></script>
+<!-- Chart.js -->
+<script src="../../static/vendors/Chart.js/dist/Chart.min.js" th:src="@{/vendors/Chart.js/dist/Chart.min.js}"></script>
+<!-- angular.chartjs -->
+<script src="../../static/vendors/angular.chartjs/angular-chart.min.js" th:src="@{/vendors/angular.chartjs/angular-chart.min.js}"></script>
+<!-- Additional js for stack charts -->
+<script src="https://cdn3.devexpress.com/jslib/18.2.3/js/dx.all.js"></script>
+<script>window.angular || document.write(decodeURIComponent('%3Cscript src="js/angular.min.js"%3E%3C\/script%3E'))</script>
 <!-- custom angular script -->
-<script type="text/javascript" src="../../static/custom/user/wealthhistory.js" th:src="@{/custom/user/addassets.js}"></script>
+<script type="text/javascript" src="../../static/custom/user/wealthhistory.js" th:src="@{/custom/user/wealthhistory.js}"></script>
 <div class="container body">
     <div class="main_container">
         <!-- sidebar menu -->
@@ -46,72 +57,49 @@
                     <br />
                     <div class="x_panel">
                         <div class="x_title" ng-hide="!hideForm">
-                            <h1>XXX </h1>
-                            <p />XXXXXXXXXXXXXXX
+                            <h1>Historical Wealth Distribution</h1>
+                            <p />Wealth distribution across major asset classes
                             <div class="clearfix"></div>
                         </div>
-                        <div class="x_content" ng-hide="!hideForm">
-                            <button type="button" ng-click="showClearForm()" class="btn btn-success  pull-left btn-xs">Add New</button>
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <p />
+                            <label class="pull-left" >Filter By Member: &nbsp;&nbsp;&nbsp;</label>
+                            <select class="pull-left" ng-model="searchMember" ng-change="callSetChartData()" >
+                                <option value = "0"></option>
+                                <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
+                            </select>
+                            <lebel class="pull-left" >&nbsp;&nbsp;&nbsp;</lebel>
+                            <label class="pull-left" >Total Wealth: &nbsp;&nbsp;&nbsp;</label>
+                            <label class="pull-left" >{{latestTotalWealth | currency:"&#8377;":0}} &nbsp;&nbsp;&nbsp;</label>
                         </div>
-                        <div class="x_content" ng-hide="!hideForm">
-                            <br />
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                    <tr>
-                                        <th>Member</th>
-                                        <th></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr ng-repeat="xxxRecord in xxxs">
-                                        <td>{{ (members | filter : { 'memberid' : xxxRecord.key.memberid })[0].firstName }}</td>
-                                        <td>
-                                            <button type="button" ng-click="deleteSipRecord(xxxRecord)" class="btn btn-danger  pull-right btn-xs" > Delete </button>
-                                            <button type="button" ng-click="editSipRecord(xxxRecord)" class="btn btn-warning  pull-right btn-xs" > Edit </button>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Wealth Distribution<small>Current Wealth Distribution </small></h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Settings 1</a>
+                                                </li>
+                                                <li><a href="#">Settings 2</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <br />
+                                    <canvas id="incExpChart"  class="chart chart-line" chart-colors="newColors" chart-options="chartOptions"
+                                            chart-data="wealthHistoryData" chart-labels="labelsDates"  chart-series="chartSeriesIncExp"></canvas>
+                                    <br /><br />
+                                </div>
                             </div>
-                        </div>
-                        <div  class="col-md-6 col-xs-12" ng-hide="hideForm">
-                            <form name="SipRecordHtmlForm" class="form-horizontal form-label-left input_mask" >
-                                <div class="form-group" ng-if="xxxForm.instrumentType == 'Mutual Fund'">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Scheme Name<span class="required">*</span></label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <input type="text" typeahead-on-select="setSchemeDetails($item)" ng-model="xxxForm.schemeName" uib-typeahead="fundDTO.schemeNameFull for fundDTO in fundsDTO | filter:$viewValue | limitTo:8" class="form-control" ng-disabled="editMode" />
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Start Date<span class="required">*</span></label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12"  vertical-align="middle">
-                                        <input type="date" class="form-control" required="required" ng-model="xxxForm.startDate" placeholder="yyyy-MM-dd" ng-disabled="editMode" />
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Deduction Day<span class="required">*</span></label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                        <input type="number" class="form-control"  required="required" ng-pattern="/^[0-9]{1,2}$/" min="1" max="31" ng-model="xxxForm.deductionDay" />
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label col-md-6 col-sm-6 col-xs-12">Is Active?<span class="required">*</span></label>
-                                    <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                        <select class="form-control"  ng-model="xxxForm.isActive" >
-                                            <option>No</option>
-                                            <option>Yes</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-4 col-sm-4 col-xs-12  col-md-offset-8">
-                                        <button type="submit" class="btn btn-success" ng-click="processSipRecord()">Save</button>
-                                        <button class="btn btn-success" ng-click="showTable()">Cancel</button>
-                                        <br /> <br />
-                                    </div>
-                                </div>
-                            </form>
                         </div>
                     </div>
                 </div>

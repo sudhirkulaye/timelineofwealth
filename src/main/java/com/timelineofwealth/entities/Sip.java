@@ -51,6 +51,16 @@ public class Sip implements Serializable {
     private int sipFreq;
     @Column(name = "is_active")
     private String isActive;
+    /*@Column(name = "last_processing_date")
+    private Date lastProcessingDate;
+    @Column(name = "next_processing_date")
+    private Date nextProcessingDate;
+    @Column(name = "absolute_return")
+    private BigDecimal absoluteReturn;
+    @Column(name = "irr_return")
+    private BigDecimal irrReturn;
+    @Column(name = "twr_return")
+    private BigDecimal twrReturn;*/
 
     public Sip(){
         this.key = new Sip.SipKey();
@@ -125,4 +135,40 @@ public class Sip implements Serializable {
     public void setIsActive(String isActive) {
         this.isActive = isActive;
     }
+
+    /*public Date getLastProcessingDate() {
+        return lastProcessingDate;
+    }
+    public void setLastProcessingDate(Date lastProcessingDate) {
+        this.lastProcessingDate = lastProcessingDate;
+    }
+
+    public Date getNextProcessingDate() {
+        return nextProcessingDate;
+    }
+    public void setNextProcessingDate(Date nextProcessingDate) {
+        this.nextProcessingDate = nextProcessingDate;
+    }
+
+    public BigDecimal getAbsoluteReturn() {
+        return absoluteReturn;
+    }
+    public void setAbsoluteReturn(BigDecimal absoluteReturn) {
+        this.absoluteReturn = absoluteReturn;
+    }
+
+    public BigDecimal getIrrReturn() {
+        return irrReturn;
+    }
+    public void setIrrReturn(BigDecimal irrReturn) {
+        this.irrReturn = irrReturn;
+    }
+
+    public BigDecimal getTwrReturn() {
+        return twrReturn;
+    }
+    public void setTwrReturn(BigDecimal twrReturn) {
+        this.twrReturn = twrReturn;
+    }*/
+
 }

@@ -9,10 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,6 +26,16 @@ public class SipRestApi {
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = CommonService.getLoggedInUser(userDetails);
         return SipService.getSipRecords(user.getEmail());
+    }
+
+    @RequestMapping(value = "/getsipbyschemecode/{memberid}/{schemecode}", method = RequestMethod.GET)
+    public List<Sip> getSipsBySchemeCode(@PathVariable int memberid, @PathVariable int schemecode) {
+        logger.debug(String.format("Call user/api/getsipbyschemecode/%d/%d",memberid, schemecode));
+
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        return SipService.getSipRecordsBySchemeCode(user.getEmail(), memberid, schemecode);
     }
 
     @RequestMapping(value = "/updatesip", method = RequestMethod.PUT)

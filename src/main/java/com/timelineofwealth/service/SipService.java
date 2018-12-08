@@ -57,10 +57,19 @@ public class SipService {
             }
             SipForm sipFormRecord = new SipForm(sipRecord,scheme);
             sipFormRecords.add(sipFormRecord);
-
         }
-
         return sipFormRecords;
+    }
+
+    public static List<Sip> getSipRecordsBySchemeCode(String email, long memberid, long schemeCode) {
+        logger.debug(String.format("In SipService.getSipRecordsBySchemeCode: Email: %s, Member id: %d, Scheme Code: %d", email,memberid,schemeCode));
+        List<Sip> sipRecords;
+        if(MemberService.isAuthorised(email, memberid)){
+            sipRecords = sipRepository.findByKeyMemberidAndSchemeCodeOrderByKeySipid(memberid,schemeCode);
+        } else {
+            throw new InsufficientAuthenticationException("User is not authorized");
+        }
+        return sipRecords;
     }
 
     public static void updateSipRecord(Sip editedRecord) {

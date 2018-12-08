@@ -113,7 +113,7 @@ module.controller('LiabilitiesController', function($scope, $http, $filter) {
     $scope.deleteLiabilityRecord = function deleteLiabilityRecord(liabilityRecord) {
         var result = confirm("Are you sure you want to delete this item?");
         if (result) {
-            var method = "DELETE";
+            var method = "POST";
             var url = "/deleteliability";
             $http({
                       method: method,

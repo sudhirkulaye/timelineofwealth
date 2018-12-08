@@ -86,7 +86,7 @@ module.controller('LiquiditiesController', function($scope, $http, $filter) {
     $scope.deleteLiquidityRecord = function deleteLiquidityRecord(liquidityRecord) {
         var result = confirm("Are you sure you want to delete this item?");
         if (result) {
-            var method = "DELETE";
+            var method = "POST";
             var url = "/deleteliquidity";
             $http({
                       method: method,
@@ -148,10 +148,13 @@ module.filter("frequency", function () {
     return function (frequency) {
         switch (frequency) {
             case 0: return "One Time";
-            case 1: return "Monthly";
-            case 3: return "Quarterly";
-            case 6: return "Semi Annually";
-            case 12: return "Annually";
+            case 1: return "Annually";
+            case 2: return "Semi Annually";
+            case 4: return "Quarterly";
+            case 12: return "Monthly";
+            case 24: return "Fortnightly";
+            case 52: return "Weekly";
+            case 250: return "Daily";
         }
     }
 })
