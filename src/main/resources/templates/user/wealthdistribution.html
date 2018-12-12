@@ -66,13 +66,46 @@
                                 <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
                             </select>
                             <lebel class="pull-left" >&nbsp;&nbsp;&nbsp;</lebel>
-                            <label class="pull-left" >Total Market Value: &nbsp;&nbsp;&nbsp;</label>
+                            <label class="pull-left" >Total Market Value By Class (Last Processing Day): &nbsp;&nbsp;&nbsp;</label>
+                            <label class="pull-left" >{{totalMarketValueByClassGroup | currency:"&#8377;":0}} &nbsp;&nbsp;&nbsp;</label>
+                            <lebel class="pull-left" >&nbsp;&nbsp;&nbsp;</lebel>
+                            <label class="pull-left" >Total Market Value (Current): &nbsp;&nbsp;&nbsp;</label>
                             <label class="pull-left" >{{totalMarketValue | currency:"&#8377;":0}} &nbsp;&nbsp;&nbsp;</label>
                         </div>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                             <div class="x_panel">
                                 <div class="x_title">
-                                    <h2>Wealth Distribution<small>Current Wealth Distribution </small></h2>
+                                    <h2>Wealth Distribution<small>Current Wealth Distribution - Asset Classes </small></h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Settings 1</a>
+                                                </li>
+                                                <li><a href="#">Settings 2</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <br />
+                                    <canvas id="wealthDistributionChartA" class="chart chart-doughnut"
+                                            chart-data="marketValuesByClassGroups" chart-labels="assetClassGroups">
+                                    </canvas>
+                                    <br /><br />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Wealth Distribution<small>Current Wealth Distribution - Sub-Class</small></h2>
                                     <ul class="nav navbar-right panel_toolbox">
                                         <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                         </li>
@@ -99,31 +132,58 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="x_content">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                    <tr>
-                                        <!--<th>Member</th>-->
-                                        <th>Asset Class Group</th>
-                                        <th>Asset Sub-Class</th>
-                                        <th align="right">Amount In INR</th>
-                                        <th align="right">Percentage(%)</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr ng-repeat="(key, wealthDetailsRecord) in wealthDetailsRecords | filter:filterByMember  | groupBy: 'assetClassid'">
-                                        <!--<td>{{ (members | filter : { 'memberid' : wealthDetailsRecord.key.memberid })[0].firstName }}</td>-->
-                                        <td>{{ (assetClasses | filter : { 'classid' : key})[0].assetClassGroup }}</td>
-                                        <td>{{ (assetClasses | filter : { 'classid' : key})[0].subclassName }}</td>
-                                        <td align="right">{{getMarketValue(wealthDetailsRecord) | currency:"&#8377;":0}}</td>
-                                        <td  align="right">{{(getMarketValue(wealthDetailsRecord)/totalMarketValue)*100 | number:2}}%</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <div class="x_content">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+                                            <!--<th>Member</th>-->
+                                            <!--<th>Asset Class Group</th>-->
+                                            <th>Asset Class</th>
+                                            <th align="right">Amount</th>
+                                            <th align="right">(%)</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="(key, wealthAssetAllocationHistoryRecord) in wealthAssetAllocationHistoryRecords | filter:filterByMember  | groupBy: 'key.assetClassGroup'">
+                                            <!--<td>{{ (members | filter : { 'memberid' : wealthDetailsRecord.key.memberid })[0].firstName }}</td>-->
+                                            <!--<td>{{ (assetClasses | filter : { 'classid' : key})[0].assetClassGroup }}</td>-->
+                                            <td>{{ key }}</td>
+                                            <td align="right">{{getMarketValueByGroup(wealthAssetAllocationHistoryRecord) | currency:"&#8377;":0}}</td>
+                                            <td  align="right">{{(getMarketValueByGroup(wealthAssetAllocationHistoryRecord)/totalMarketValueByClassGroup)*100 | number:2}}%</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <div class="x_content">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+                                            <!--<th>Member</th>-->
+                                            <!--<th>Asset Class Group</th>-->
+                                            <th>Asset Sub-Class</th>
+                                            <th align="right">Amount</th>
+                                            <th align="right">(%)</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="(key, wealthDetailsRecord) in wealthDetailsRecords | filter:filterByMember  | groupBy: 'assetClassid'">
+                                            <!--<td>{{ (members | filter : { 'memberid' : wealthDetailsRecord.key.memberid })[0].firstName }}</td>-->
+                                            <!--<td>{{ (assetClasses | filter : { 'classid' : key})[0].assetClassGroup }}</td>-->
+                                            <td>{{ (assetClasses | filter : { 'classid' : key})[0].subclassName }}</td>
+                                            <td align="right">{{getMarketValue(wealthDetailsRecord) | currency:"&#8377;":0}}</td>
+                                            <td  align="right">{{(getMarketValue(wealthDetailsRecord)/totalMarketValue)*100 | number:2}}%</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

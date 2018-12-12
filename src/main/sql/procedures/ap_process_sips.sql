@@ -121,22 +121,20 @@ BEGIN
         END IF;
 	END IF;
 
-    INSERT INTO log_table values (now(), concat('In sip_process_log_cursor: ',var_memberid, '|',var_sipid, '|',var_scheme_code));
+    -- INSERT INTO log_table values (now(), concat('In sip_process_log_cursor: ',var_memberid, '|',var_sipid, '|',var_scheme_code));
 
     IF(var_nav <> 0) THEN
-		SELECT nav INTO var_nav
+		/*SELECT nav INTO var_nav
 		FROM mutual_fund_nav_history
 		WHERE scheme_code = var_scheme_code
-		AND date = var_next_process_date;
+		AND date = var_next_process_date;*/
 
 		SELECT amount, start_date INTO var_sip_amount, var_sip_start_date
 		FROM sip
 		WHERE memberid = var_memberid
         AND sipid = var_sipid;
 
-        IF var_nav <> 0 THEN
-			SET var_new_units = ROUND(var_sip_amount/var_nav, 3);
-		END IF;
+        SET var_new_units = ROUND(var_sip_amount/var_nav, 3);
 
         SELECT count(1) INTO var_count FROM wealth_details a
         WHERE a.memberid = var_memberid

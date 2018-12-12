@@ -4,6 +4,8 @@ import com.timelineofwealth.apis.PublicApi;
 import com.timelineofwealth.service.CommonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -11,14 +13,20 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Date;
 
 @Controller
 public class UserViewController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserViewController.class);
-
     private java.sql.Date dateToday; // = new PublicApi().getSetupDates().getDateToday();
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Autowired
+    public UserViewController(Environment environment){}
 
     @RequestMapping(value = "/user/members", method = RequestMethod.GET)
     public String members(Model model, @AuthenticationPrincipal UserDetails userDetails){

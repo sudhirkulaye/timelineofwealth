@@ -100,6 +100,22 @@ public class WealthDetailsService {
         }
     }
 
+    public static List<WealthAssetAllocationHistory> getCurrentAssetAllocation(String email){
+        logger.debug(String.format("In WealthDetailsService.getCurrentAssetAllocation: Email %s", email));
+
+        List<WealthAssetAllocationHistory> wealthAssetAllocationHistoryRecords;
+        List<Member> members = MemberService.getUserMembers(email);
+        List<Long> membersIds = new ArrayList<>();
+        for (Member member : members ){
+            membersIds.add(new Long(member.getMemberid()));
+        }
+
+        Date dateToday = CommonService.getSetupDates().getDateToday();
+        wealthAssetAllocationHistoryRecords = wealthAssetAllocationHistoryRepository.findAllByKeyMemberidInAndKeyDateOrderByKeyMemberidAscKeyAssetClassGroupAsc(membersIds,dateToday);
+
+        return wealthAssetAllocationHistoryRecords;
+    }
+
     public static Map<Date, Map<Long, BigDecimal>> getWealthHistoryRecords(String email){
         logger.debug(String.format("In WealthDetailsService.getWealthHistoryRecords: Email %s", email));
 
