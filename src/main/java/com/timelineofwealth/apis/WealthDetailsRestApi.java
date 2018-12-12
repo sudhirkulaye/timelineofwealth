@@ -1,6 +1,7 @@
 package com.timelineofwealth.apis;
 
 import com.timelineofwealth.entities.User;
+import com.timelineofwealth.entities.WealthAssetAllocationHistory;
 import com.timelineofwealth.entities.WealthDetails;
 import com.timelineofwealth.entities.WealthHistory;
 import com.timelineofwealth.service.CommonService;
@@ -64,6 +65,16 @@ public class WealthDetailsRestApi {
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = CommonService.getLoggedInUser(userDetails);
         return WealthDetailsService.getWealthHistoryRecords(user.getEmail());
+    }
+
+    @RequestMapping(value = "/getcurretassetallocation", method = RequestMethod.GET)
+    public List<WealthAssetAllocationHistory> getCurrentAssetAllocation() {
+        logger.debug(String.format("Call user/api/getcurretassetallocation/"));
+
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        return WealthDetailsService.getCurrentAssetAllocation(user.getEmail());
     }
 
 

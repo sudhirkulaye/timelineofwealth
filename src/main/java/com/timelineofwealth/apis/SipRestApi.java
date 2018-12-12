@@ -7,16 +7,27 @@ import com.timelineofwealth.service.CommonService;
 import com.timelineofwealth.service.SipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @RestController
 @RequestMapping(value = "user/api/")
 public class SipRestApi {
     private static final Logger logger = LoggerFactory.getLogger(SipRestApi.class);
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Autowired
+    public SipRestApi(Environment environment){}
 
     @RequestMapping(value = "/getsips", method = RequestMethod.GET)
     public List<SipForm> getSips() {
@@ -48,11 +59,11 @@ public class SipRestApi {
     }
 
     @RequestMapping(value = "/addsip", method = RequestMethod.POST)
-    public List<SipForm> addSip(@RequestBody SipForm newRecord) {
+    public List<SipForm> addSip(Model model, @RequestBody SipForm newRecord) {
         logger.debug("Call user/api/addsip/ " + newRecord.getKey().getMemberid());
         Sip editedSipRecord = new Sip();
         setSipFromSipForm(editedSipRecord,newRecord);
-        SipService.addSipRecord(editedSipRecord);
+        SipService.addSipRecord(model, editedSipRecord, entityManager);
         return getSips();
     }
 

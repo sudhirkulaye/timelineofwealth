@@ -6,13 +6,15 @@ module.controller('WealthDistributionController', function($scope, $http, $filte
     $scope.assetClasses = [];
     $scope.industries = [];
     $scope.wealthDetailsRecords = [];
+    $scope.wealthAssetAllocationHistoryRecords = [];
     $scope.totalMarketValue = 0.0;
+    $scope.totalMarketValueByClassGroup = 0.0;
 
     showRecords();
 
     function showRecords(){
         $scope.wealthDetailsRecords = new Array;
-        $scope.hideForm = true;
+        $scope.wealthAssetAllocationHistoryRecords = new Array;
 
         var url = "/getusermembers";
         $http.get(urlBase + url).
@@ -34,7 +36,7 @@ module.controller('WealthDistributionController', function($scope, $http, $filte
                 }
             });
 
-        publicapiurl = "/public/api/getsubindustries";
+        /*publicapiurl = "/public/api/getsubindustries";
         $http.get(publicapiurl).
             then(function (response) {
                 if (response != undefined) {
@@ -42,7 +44,7 @@ module.controller('WealthDistributionController', function($scope, $http, $filte
                 } else {
                     $scope.industries = [];
                 }
-            });
+            });*/
 
         url = "/getwealthdetailsrecords";
         $http.get(urlBase + url).
@@ -52,6 +54,17 @@ module.controller('WealthDistributionController', function($scope, $http, $filte
                     setChartData();
                 } else {
                     $scope.wealthDetailsRecords = [];
+                }
+            });
+
+        url = "/getcurretassetallocation";
+        $http.get(urlBase + url).
+            then(function (response) {
+                if (response != undefined) {
+                    $scope.wealthAssetAllocationHistoryRecords = response.data;
+                    setChartData();
+                } else {
+                    $scope.wealthAssetAllocationHistoryRecords = [];
                 }
             });
     }
@@ -78,6 +91,31 @@ module.controller('WealthDistributionController', function($scope, $http, $filte
            $scope.assetSubClasses.push($filter('filter')($scope.assetClasses, {classid:assetClassid})[0].subclassName);
            $scope.marketValuesBySubClasses.push($filter('number')($scope.getMarketValue(map[assetClassid]),0));
         }
+
+        //set asset class chart
+        $scope.assetClassGroups = [];
+        $scope.marketValuesByClassGroups = [];
+        $scope.totalMarketValueByClassGroup = 0;
+        var classwiseFilteredRecords = $scope.wealthAssetAllocationHistoryRecords;
+        if ($scope.searchMember != undefined && $scope.searchMember != 0) {
+           classwiseFilteredRecords = $filter('filter')(classwiseFilteredRecords, {key:{memberid:$scope.searchMember}} );
+        }
+        if (classwiseFilteredRecords == undefined || classwiseFilteredRecords.length < 1) {
+            $scope.totalMarketValueByClassGroup = 0;
+        } else {
+            for (var i = classwiseFilteredRecords.length - 1; i >= 0; i--){
+                $scope.totalMarketValueByClassGroup += parseInt(classwiseFilteredRecords[i].value);
+            }
+        }
+        var map1 = $filter('groupBy')(classwiseFilteredRecords, 'key.assetClassGroup');
+        console.log(classwiseFilteredRecords);
+        for(var assetClassGroup in map1){
+           $scope.assetClassGroups.push(assetClassGroup);
+           $scope.marketValuesByClassGroups.push($filter('number')($scope.getMarketValueByGroup(map1[assetClassGroup]),0));
+        }
+        console.log($scope.assetClassGroups);
+        console.log($scope.marketValuesByClassGroups);
+
         $locale.NUMBER_FORMATS.GROUP_SEP = ',';
     }
 
@@ -91,11 +129,17 @@ module.controller('WealthDistributionController', function($scope, $http, $filte
         .reduce(function(a, b) { return a + b; });
     }
 
-    $scope.filterByMember = function (wealthDetailsRecord) {
+    $scope.getMarketValueByGroup = function(wealthAssetAllocationHistoryRecord) {
+        return wealthAssetAllocationHistoryRecord
+        .map(function(x) { return x.value; })
+        .reduce(function(a, b) { return a + b; });
+    }
+
+    $scope.filterByMember = function (record) {
         if ($scope.searchMember == undefined || $scope.searchMember == 0) {
             return true;
         } else {
-            if (wealthDetailsRecord.key.memberid == $scope.searchMember ) {
+            if (record.key.memberid == $scope.searchMember ) {
                 return true;
             }
         }

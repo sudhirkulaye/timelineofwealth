@@ -15,7 +15,7 @@ public class WealthAssetAllocationHistory implements Serializable {
         @Column(name = "date")
         private Date date;
         @Column(name = "asset_class_group")
-        private String assetGlassGroup;
+        private String assetClassGroup;
 
         public long getMemberid() {
             return memberid;
@@ -29,6 +29,13 @@ public class WealthAssetAllocationHistory implements Serializable {
         }
         public void setDate(Date buyDate) {
             this.date = buyDate;
+        }
+
+        public String getAssetClassGroup() {
+            return assetClassGroup;
+        }
+        public void setAssetClassGroup(String assetClassGroup) {
+            this.assetClassGroup = assetClassGroup;
         }
     }
     @EmbeddedId

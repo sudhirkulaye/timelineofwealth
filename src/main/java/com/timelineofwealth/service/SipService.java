@@ -1,11 +1,7 @@
 package com.timelineofwealth.service;
 
-import com.timelineofwealth.apis.PublicApi;
 import com.timelineofwealth.dto.SipForm;
-import com.timelineofwealth.entities.Member;
-import com.timelineofwealth.entities.MutualFundUniverse;
-import com.timelineofwealth.entities.Sip;
-import com.timelineofwealth.entities.User;
+import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.MutualFundUniverseRepository;
 import com.timelineofwealth.repositories.SipRepository;
 import org.slf4j.Logger;
@@ -15,7 +11,12 @@ import org.springframework.security.authentication.InsufficientAuthenticationExc
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 
+import javax.persistence.EntityManager;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +86,8 @@ public class SipService {
         }
     }
 
-    public static void addSipRecord(Sip newRecord) {
+    @Transactional
+    public static void addSipRecord(Model model, Sip newRecord, EntityManager entityManager) {
         logger.debug(String.format("In SipService.addSipRecord: newRecord.key.memberid %d", newRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -100,6 +102,24 @@ public class SipService {
             logger.debug(String.format("In SipService.addSipRecord: new sipid %d", newSipid));
             newRecord.getKey().setSipid(newSipid);
             SipService.sipRepository.save(newRecord);
+            if(newRecord.getInstrumentType().equals("Mutual Fund")) {
+                if (entityManager != null) {
+                    StoredProcedureQuery storedProcedure = entityManager.createStoredProcedureQuery("ap_process_sip_history");
+
+                    storedProcedure.registerStoredProcedureParameter(1, Long.class, ParameterMode.IN);
+                    storedProcedure.registerStoredProcedureParameter(2, Integer.class, ParameterMode.IN);
+                    storedProcedure.setParameter(1, Long.valueOf(newRecord.getKey().getMemberid()));
+                    storedProcedure.setParameter(2, Integer.valueOf(newSipid));
+                    boolean result = storedProcedure.execute();
+                    //List<Object[]> storedProcedureResults = storedProcedure.getResultList();
+                    //result = (boolean) storedProcedureResults.get(0)[0];
+                    if (!result) {
+                        model.addAttribute("message", "Successfully posted SIPs consolidated units in Add Asset");
+                    } else {
+                        model.addAttribute("message", "Failed to post SIP consolidated units in Ad Asset");
+                    }
+                }
+            }
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }
