@@ -79,12 +79,28 @@ public class PublicViewController {
         return "public/contactus";
     }
 
-    @RequestMapping(value = "/public/faq")
-    public String faq(Model model){
+    @RequestMapping(value = "/public/whatwedo")
+    public String whatWeDo(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Timeline of Wealth");
-        return "public/faq";
+        return "public/whatwedo";
+    }
+
+    @RequestMapping(value = "/public/ethicalstandards")
+    public String ethicalStandards(Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Timeline of Wealth");
+        return "public/ethicalstandards";
+    }
+
+    @RequestMapping(value = "/public/whyindependentadvice")
+    public String whyIndependentAdvice(Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Timeline of Wealth");
+        return "public/whyindependentadvice";
     }
 
     @RequestMapping(value = "/public/privacy")
@@ -96,12 +112,12 @@ public class PublicViewController {
     }
 
 
-    @RequestMapping(value = "/public/assetclasses")
+    @RequestMapping(value = "/public/saa")
     public String assetClasses(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Timeline of Wealth");
-        return "public/assetclasses";
+        return "public/saa";
     }
 
     @RequestMapping(value = "/public/mftypes")
