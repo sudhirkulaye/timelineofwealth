@@ -60,7 +60,7 @@ BEGIN
           -- INSERT record into wealth_details
           INSERT INTO wealth_details VALUES (in_memberid, var_sip_start_date, var_scheme_code, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '1900-01-01', var_date_today, in_sipid);
 
-		  WHILE (var_next_process_date <= var_date_today) DO
+		  WHILE (var_next_process_date <= var_date_today AND var_next_process_date <= var_sip_end_date) DO
 			SELECT count(1) INTO var_count
 			FROM mutual_fund_nav_history
 			WHERE scheme_code = var_scheme_code
@@ -141,4 +141,4 @@ BEGIN
   INSERT INTO log_table
   VALUES      (now(), 'ap_process_sip_history: End ');
 
-END;
+END
