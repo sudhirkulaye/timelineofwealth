@@ -1,0 +1,97 @@
+<div class="col-md-3 left_col" th:fragment="common-advisersidebarmenu">
+    <div class="left_col scroll-view">
+        <div class="navbar nav_title" style="border: 0;">
+            <a href="/" class="site_title">
+                <img src="../../static/images/tow.png" th:src="@{/images/tow.png}" height="25" width="25" />
+                <span>Timeline of Wealth</span>
+            </a>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <!-- menu profile quick info -->
+        <div class="profile clearfix">
+            <div class="profile_pic">
+                <img src="../../static/images/profile.png" th:src="@{/images/profile.png}" alt="..." class="img-circle profile_img" />
+            </div>
+            <div class="profile_info">
+                <span><h2>Welcome,</h2></span>
+                <h2><span th:text="${welcomeMessage}"></span></h2>
+            </div>
+        </div>
+        <!-- /menu profile quick info -->
+
+        <div class="form-group">
+            <label>Select Client</label>
+            <div class="clearfix"></div>
+            <div>
+                <input type="text" typeahead-on-select="setSelectedClient($item)" ng-model="selectedClient" uib-typeahead="clientEmail for clientEmail in clientEmails | filter:$viewValue | limitTo:8"  />
+                <!--<select class="form-control" ng-model="selectedClient">-->
+                    <!--<option ng-repeat="clientEmail in clientEmails" value="{{clientEmail}}">{{clientEmail}}</option>-->
+                <!--</select>-->
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+        <!-- sidebar menu -->
+        <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+            <div class="menu_section">
+                <h3>Wealth Management</h3>
+                <ul class="nav side-menu">
+                    <li><a href="/adviser/listofclients"><i class="fa fa-laptop"></i> Dashobard </a></li>
+                    <li><a><i class="fa fa-user"></i> Clients <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="/adviser/members">Family Background</a></li>
+                            <li><a href="/adviser/incexpsavings">Family Earnings &amp; Savings</a></li>
+                            <li><a href="/adviser/liabilities">Liabilities</a></li>
+                            <li><a href="/adviser/insurances">Insurances</a></li>
+                            <li><a href="/adviser/liquidities">Liquidity Need/Goals</a></li>
+                        </ul>
+                    </li>
+                    <li><a><i class="fa fa-money"></i> Transactions <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="/adviser/sip">Regular Investments/SIPs</a></li>
+                            <li><a href="/adviser/addassets">Add/Audit Assets</a></li>
+                            <li><a href="/adviser/sellassets">Sell Assets</a></li>
+                        </ul>
+                    </li>
+                    <li><a><i class="fa fa-pie-chart"></i> Wealth Distribution <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="/adviser/wealthdistribution">Current Distribution</a></li>
+                            <li><a href="/adviser/wealthhistory">Historical Distribution</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="menu_section">
+                <h3>Advise</h3>
+                <ul class="nav side-menu">
+                    <li><a><i class="fa fa-comments-o"></i> Communications <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="/adviser/ips">Investment Policy Statement</a></li>
+                            <li><a href="/adviser/queries">Queries</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- /sidebar menu -->
+
+        <!-- /menu footer buttons -->
+        <div class="sidebar-footer hidden-small">
+            <a data-toggle="tooltip" data-placement="top" title="Settings">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="Lock">
+                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+            </a>
+        </div>
+        <!-- /menu footer buttons -->
+    </div>
+</div>

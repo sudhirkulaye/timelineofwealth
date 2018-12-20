@@ -47,7 +47,7 @@ public class SipService {
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
         }
-        sipRecords = sipRepository.findByKeyMemberidInOrderByKeySipid(membersIds);
+        sipRecords = sipRepository.findByKeyMemberidInOrderByKeyMemberidAscKeySipidAsc(membersIds);
         List<SipForm> sipFormRecords = new ArrayList<>();
         MutualFundUniverse scheme;
         for (Sip sipRecord : sipRecords) {
