@@ -9,7 +9,7 @@ import java.util.List;
 
 @RepositoryRestResource
 public interface SipRepository extends JpaRepository<Sip, Sip.SipKey> {
-    public List<Sip> findByKeyMemberidInOrderByKeySipid(List<Long> memberids);
+    public List<Sip> findByKeyMemberidInOrderByKeyMemberidAscKeySipidAsc(List<Long> memberids);
     public List<Sip> findByKeyMemberidAndSchemeCodeOrderByKeySipid(long memberids, long schemeCode);
     public int countByKeyMemberid(long memberid);
     public Sip findTopByKeyMemberidOrderByKeySipidDesc(Long memberid);
