@@ -1,5 +1,6 @@
 package com.timelineofwealth.apis;
 
+import com.timelineofwealth.dto.ConsolidatedAssetsDTO;
 import com.timelineofwealth.entities.User;
 import com.timelineofwealth.entities.WealthAssetAllocationHistory;
 import com.timelineofwealth.entities.WealthDetails;
@@ -34,6 +35,16 @@ public class WealthDetailsRestApi {
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = CommonService.getLoggedInUser(userDetails);
         return WealthDetailsService.getWealthDetailsRecords(user.getEmail());
+    }
+
+    @RequestMapping(value = "/getconsolidatedwealthdetailsrecords", method = RequestMethod.GET)
+    public List<ConsolidatedAssetsDTO> getConsolidatedWealthDetailsRecords() {
+        logger.debug(String.format("Call user/api/getconsolidatedwealthdetailsrecords/"));
+
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        return WealthDetailsService.getConsolidatedWealthDetailsRecords(user.getEmail());
     }
 
     @RequestMapping(value = "/updatewealthdetailsrecord", method = RequestMethod.PUT)

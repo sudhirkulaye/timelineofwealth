@@ -29,7 +29,7 @@ module.controller('MFListController', function($scope, $http, $filter) {
                 }
             });
 
-        publicapiurl = "/public/api/getSchemeDetails/"+$scope.fundHouse+"/"+$scope.category;
+        publicapiurl = "/public/api/getschemedetails/"+$scope.fundHouse+"/"+$scope.category;
         $http.get(publicapiurl).
             then(function (response) {
                 if (response != undefined) {
@@ -42,7 +42,7 @@ module.controller('MFListController', function($scope, $http, $filter) {
     }
 
     $scope.getSchemeDetails = function() {
-        var publicapiurl = "/public/api/getSchemeDetails";
+        var publicapiurl = "/public/api/getschemedetails";
         var params = "";
         if ($scope.fundHouse != "" || $scope.fundHouse != undefined){
             params = params + "/" + $scope.fundHouse;

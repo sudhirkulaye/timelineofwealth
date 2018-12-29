@@ -73,7 +73,7 @@ public class UserViewController {
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth- Liquidities");
+        model.addAttribute("title", "TimelineOfWealth- Liquidity Needs");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/liquidities";
     }
@@ -113,7 +113,7 @@ public class UserViewController {
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth- Sell Transaction");
+        model.addAttribute("title", "TimelineOfWealth- Wealth Distribution");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/wealthdistribution";
     }
@@ -123,7 +123,7 @@ public class UserViewController {
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth- Sell Transaction");
+        model.addAttribute("title", "TimelineOfWealth- Wealth History");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/wealthhistory";
     }

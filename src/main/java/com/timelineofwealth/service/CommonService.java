@@ -76,6 +76,13 @@ public class CommonService {
         CommonService.setupDatesRepository = setupDatesRepository;
     }
 
+    @Autowired
+    private static IndexValuationRepository indexValuationRepository;
+    @Autowired
+    public void setIndexValuationRepository(IndexValuationRepository indexValuationRepository){
+        CommonService.indexValuationRepository = indexValuationRepository;
+    }
+
 
     /**
      * Returns true if SignIn User is Admin
@@ -295,5 +302,18 @@ public class CommonService {
             nseBse500List.add(nseBse500);
         }
         return nseBse500List;
+    }
+
+    /**
+     * Get Index Valuation
+     * @return
+     */
+    //@Cacheable(value = "IndexValuation")
+    public static List<IndexValuation> getIndexValuation(){
+        return CommonService.indexValuationRepository.findAllByKeyTickerOrderByKeyDate("NIFTY");
+        //List<IndexValuation> list = CommonService.indexValuationRepository.findAllByKeyTickerAndKeyDateBetweenOrderByKeyDate("NIFTY", getSetupDates().getDateStart4Quarter() , getSetupDates().getDateToday());
+        //System.out.println("list.size()::"+ list.size());
+        //return list;
+
     }
 }

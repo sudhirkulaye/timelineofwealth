@@ -151,4 +151,13 @@ public class PublicViewController {
         model.addAttribute("title", "Timeline of Wealth");
         return "public/stocklist";
     }
+
+    @RequestMapping(value = "/public/indianeconomy")
+    public String indianEconomy(Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Timeline of Wealth");
+        return "public/indianeconomy";
+    }
+
 }

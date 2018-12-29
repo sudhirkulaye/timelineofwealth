@@ -1,7 +1,45 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: common-header" />
-<body class="nav-md">
+<body class="nav-md" ng-app="IndexStatsManagement" ng-controller="IndexStatController">
+<!-- iCheck -->
+<link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
+<!-- bootstrap-wysiwyg -->
+<link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" th:href="@{/vendors/google-code-prettify/bin/prettify.min.css}"  rel="stylesheet" />
+<!-- Select2 -->
+<link href="../../static/vendors/select2/dist/css/select2.min.css" th:href="@{/vendors/select2/dist/css/select2.min.css}"  rel="stylesheet" />
+<!-- Switchery -->
+<link href="../../static/vendors/switchery/dist/switchery.min.css" th:href="@{/vendors/switchery/dist/switchery.min.css}" rel="stylesheet" />
+<!-- starrr -->
+<link href="../../static/vendors/starrr/dist/starrr.css" th:href="@{/vendors/starrr/dist/starrr.css}"  rel="stylesheet" />
+<!-- bootstrap-daterangepicker -->
+<link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}"  rel="stylesheet" />
+<!-- Animate.css -->
+<link href="../../static/vendors/animate.css/animate.min.css" th:href="@{/vendors/animate.css/animate.min.css}" rel="stylesheet" />
+<!-- jQuery custom content scroller -->
+<link href="../../static/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" th:href="@{/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css}" rel="stylesheet" />
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- ui-bootstrap-tpls.js -->
+<script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
+<!--Angular custom filter (for group by) JS-->
+<script src="../../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
+<!-- D3.js -->
+<script src='https://d3js.org/d3.v4.min.js'></script>
+<!-- Chart.js -->
+<script src="../../static/vendors/Chart.js/dist/Chart.min.js" th:src="@{/vendors/Chart.js/dist/Chart.min.js}"></script>
+<!-- angular.chartjs -->
+<script src="../../static/vendors/angular.chartjs/angular-chart.min.js" th:src="@{/vendors/angular.chartjs/angular-chart.min.js}"></script>
+<!-- Additional js for stack charts -->
+<script src="https://cdn3.devexpress.com/jslib/18.2.3/js/dx.all.js"></script>
+<script>window.angular || document.write(decodeURIComponent('%3Cscript src="js/angular.min.js"%3E%3C\/script%3E'))</script>
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/public/indexstats.js" th:src="@{/custom/public/indexstats.js}"></script>
+
 <div class="container body">
     <div class="main_container">
         <!-- sidebar menu -->
@@ -22,7 +60,7 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <h2>NIFTY50 Returns Statistics over last 18 Years (Last updated: 16-Dec-2018) </h2>
+                            <h1>NIFTY50 Returns Statistics </h1><h2>over last 18 Years (Last updated: 23-Dec-2018, Source: NSE) </h2>
                             <table class="table">
                                 <thead>
                                 <tr>
@@ -79,6 +117,20 @@
                                 </tr>
                                 </tbody>
                             </table>
+                            <div class="x_content">
+                                <h1><strong>Historical Trailing PE: </strong></h1> <p />
+                                <br />
+                                <select ng-model="yearFilter" ng-change="callSetChartData()">
+                                    <option value="1" selected="true">Last 1 Year</option>
+                                    <option value="3">Last 3 Years</option>
+                                    <option value="5">Last 5 Years</option>
+                                    <option value="20">All</option>
+                                </select>
+                                <br />
+                                <canvas id="indexStatChart"  class="chart chart-line" chart-colors="newColors" chart-options="chartOptions"
+                                        chart-data="chartData" chart-dataset-override="chartDatasetOverride" chart-labels="labelsDates"  chart-series="chartSeries"></canvas>
+                                <br /><br />
+                            </div>
                             <h1><strong>Conclusions from Statistical Data: </strong></h1> <p />
                             <h2>
                                 Equity Market Returns are more volatile (riskier) for the shorter period. Standard Deviation, a measure of risk is the highest for 1-year returns and lowest for 10-year yields. In simple term longer the period you hold equity class is better.<p />
