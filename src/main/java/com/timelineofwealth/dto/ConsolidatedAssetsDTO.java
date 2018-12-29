@@ -4,28 +4,28 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class ConsolidatedAssetsDTO implements Serializable {
-    private long memberid;
+    private String memberid;
     private String ticker;
     private String name;
     private String shortName;
-    private int assetClassid;
-    private long subindustryid;
-    private BigDecimal quantity;
-    private BigDecimal rate;
-    private BigDecimal brokerage;
-    private BigDecimal tax;
-    private BigDecimal totalCost;
-    private BigDecimal netRate;
-    private BigDecimal cmp;
-    private BigDecimal marketValue;
-    private BigDecimal netProfit;
-    private BigDecimal absoluteReturn;
-    private BigDecimal annualizedReturn;
+    private String assetClassid;
+    private String subindustryid;
+    private String quantity;
+    private String rate;
+    private String brokerage;
+    private String tax;
+    private String totalCost;
+    private String netRate;
+    private String cmp;
+    private String marketValue;
+    private String netProfit;
+    private String absoluteReturn;
+    private String annualizedReturn;
 
-    public long getMemberid() {
+    public String getMemberid() {
         return memberid;
     }
-    public void setMemberid(long memberid) {
+    public void setMemberid(String memberid) {
         this.memberid = memberid;
     }
 
@@ -50,94 +50,94 @@ public class ConsolidatedAssetsDTO implements Serializable {
         this.shortName = shortName;
     }
 
-    public int getAssetClassid() {
+    public String getAssetClassid() {
         return assetClassid;
     }
-    public void setAssetClassid(int assetClassid) {
+    public void setAssetClassid(String assetClassid) {
         this.assetClassid = assetClassid;
     }
 
-    public long getSubindustryid() {
+    public String getSubindustryid() {
         return subindustryid;
     }
-    public void setSubindustryid(long subindustryid) {
+    public void setSubindustryid(String subindustryid) {
         this.subindustryid = subindustryid;
     }
 
-    public BigDecimal getQuantity() {
+    public String getQuantity() {
         return quantity;
     }
-    public void setQuantity(BigDecimal quantity) {
+    public void setQuantity(String quantity) {
         this.quantity = quantity;
     }
 
-    public BigDecimal getRate() {
+    public String getRate() {
         return rate;
     }
-    public void setRate(BigDecimal rate) {
+    public void setRate(String rate) {
         this.rate = rate;
     }
 
-    public BigDecimal getBrokerage() {
+    public String getBrokerage() {
         return brokerage;
     }
-    public void setBrokerage(BigDecimal brokerage) {
+    public void setBrokerage(String brokerage) {
         this.brokerage = brokerage;
     }
 
-    public BigDecimal getTax() {
+    public String getTax() {
         return tax;
     }
-    public void setTax(BigDecimal tax) {
+    public void setTax(String tax) {
         this.tax = tax;
     }
 
-    public BigDecimal getTotalCost() {
+    public String getTotalCost() {
         return totalCost;
     }
-    public void setTotalCost(BigDecimal totalCost) {
+    public void setTotalCost(String totalCost) {
         this.totalCost = totalCost;
     }
 
-    public BigDecimal getNetRate() {
+    public String getNetRate() {
         return netRate;
     }
-    public void setNetRate(BigDecimal netRate) {
+    public void setNetRate(String netRate) {
         this.netRate = netRate;
     }
 
-    public BigDecimal getCmp() {
+    public String getCmp() {
         return cmp;
     }
-    public void setCmp(BigDecimal cmp) {
+    public void setCmp(String cmp) {
         this.cmp = cmp;
     }
 
-    public BigDecimal getMarketValue() {
+    public String getMarketValue() {
         return marketValue;
     }
-    public void setMarketValue(BigDecimal marketValue) {
+    public void setMarketValue(String marketValue) {
         this.marketValue = marketValue;
     }
 
-    public BigDecimal getNetProfit() {
+    public String getNetProfit() {
         return netProfit;
     }
-    public void setNetProfit(BigDecimal netProfit) {
+    public void setNetProfit(String netProfit) {
         this.netProfit = netProfit;
     }
 
-    public BigDecimal getAbsoluteReturn() {
+    public String getAbsoluteReturn() {
         return absoluteReturn;
     }
-    public void setAbsoluteReturn(BigDecimal absoluteReturn) {
+    public void setAbsoluteReturn(String absoluteReturn) {
         this.absoluteReturn = absoluteReturn;
     }
 
-    public BigDecimal getAnnualizedReturn() {
+    public String getAnnualizedReturn() {
         return annualizedReturn;
     }
-    public void setAnnualizedReturn(BigDecimal annualizedReturn) {
+    public void setAnnualizedReturn(String annualizedReturn) {
         this.annualizedReturn = annualizedReturn;
     }
 }

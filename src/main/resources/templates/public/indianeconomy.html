@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h1>Economic Indicators - India</h1>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> GDP Annual Growth Rate :  </strong>  </h2>
+                            <iframe src="https://tradingeconomics.com/embed/?s=ingdpy&amp;v=201811301239a1&amp;h=300&amp;w=600&amp;ref=/india/gdp-growth-annual" height="300" width="600"  frameborder="0" scrolling="no"></iframe><br />source: <a href="https://tradingeconomics.com/india/gdp-growth-annual">tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Inflation (CPI Annual Rate) :  </strong>  </h2>
+                            <iframe src='https://tradingeconomics.com/embed/?s=incpiiny&amp;v=201812121215a1&amp;h=300&amp;w=600&amp;ref=/india/inflation-cpi' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/inflation-cpi'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> RBI Key Policy Rate :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=rspoyld&amp;v=201812050923a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/interest-rate'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> 10 Year G-Sec Bond Yield :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=gind10yr&amp;v=201812281200a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/government-bond-yield'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Prime Lending Rate :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=indiabanlenrat&amp;v=201812221010a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/bank-lending-rate'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Loan Growth :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=indialoagro&amp;v=201812211131a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/loan-growth'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Business Confidence :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=inrbc&amp;v=201810031515a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/business-confidence'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Car Production :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=indiacarpro&amp;v=201812151029a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/car-production'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Manufacturing PMI :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=indiamanpmi&amp;lbl=0&amp;v=201812031013a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/manufacturing-pmi'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Services PMI :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=indiaserpmi&amp;lbl=0&amp;v=201812051043a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/services-pmi'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> India Mining Production :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=indiaminpro&amp;v=201812121209a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/mining-production'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Steel Production :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=insteel&amp;v=201812221043a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/steel-production'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Consumer Confidence :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=inrcc&amp;v=201812081011a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/consumer-confidence'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Consumer Confidence :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=inrcc&amp;v=201812081011a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/consumer-confidence'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Current Account :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=inbqcur&amp;v=201812071213a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/current-account'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Current Account to GDP :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=indca2gdp&amp;v=201810021230a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/current-account-to-gdp'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Export :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=inmtexud&amp;v=201812141413a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/exports'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Exports By Category :  </strong>  </h2>
+                            <iframe src='https://comtrade.tradingeconomics.com/comtrade/share?r=ind&amp;c=0000&amp;v=treemapcategories&amp;t=2&amp;title=' height='300' width='600'  style='0' scrolling='no'></iframe>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Exports By Country :  </strong>  </h2>
+                            <iframe src='https://comtrade.tradingeconomics.com/comtrade/share?r=ind&amp;c=0000&amp;v=treemapmarkets&amp;t=2&amp;title=' height='300' width='600'  style='0' scrolling='no'></iframe>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Total External Debt :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=indiaextdeb&amp;v=201809281226a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/external-debt'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Foreign Direct Investment :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=indiaextdeb&amp;v=201809281226a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/external-debt'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Imports :  </strong>  </h2>
+                            <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=inmtimud&amp;v=201812141413a1&amp;d1=20080101&amp;d2=20181231&amp;h=300&amp;w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/india/imports'>tradingeconomics.com</a>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Imports By Category :  </strong>  </h2>
+                            <iframe src='https://comtrade.tradingeconomics.com/comtrade/share?r=ind&amp;c=0000&amp;v=treemapcategories&amp;t=1&amp;title=' height='300' width='600' style='0' scrolling='no'></iframe>
+                            </p>
+                        </div>
+                        <div class="x_content">
+                            <p>
+                            <h2><i class="fa fa-check-square-o"></i><strong> Imports By Country :  </strong>  </h2>
+                            <iframe src='https://comtrade.tradingeconomics.com/comtrade/share?r=ind&amp;c=0000&amp;v=treemapmarkets&amp;t=1&amp;title=' height='300' width='600' style='0' scrolling='no'></iframe>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>

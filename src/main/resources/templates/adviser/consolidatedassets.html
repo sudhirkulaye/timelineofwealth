@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: common-header" />
-<body class="nav-md" ng-app="WealthHistoryDistributionManagement" ng-controller="WealthHistoryDistributionController">
-<!-- iCheck -->
+<body class="nav-md" ng-app="ConsolidatedAssetsManagement" ng-controller="ConsolidatedAssetsController">
 <link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
 <!-- bootstrap-wysiwyg -->
 <link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" th:href="@{/vendors/google-code-prettify/bin/prettify.min.css}"  rel="stylesheet" />
@@ -28,22 +27,12 @@
 <script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
 <!--Angular custom filter (for group by) JS-->
 <script src="../../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
-<!-- D3.js -->
-<script src='https://d3js.org/d3.v4.min.js'></script>
-<!-- Chart.js -->
-<script src="../../static/vendors/Chart.js/dist/Chart.min.js" th:src="@{/vendors/Chart.js/dist/Chart.min.js}"></script>
-<!-- angular.chartjs -->
-<script src="../../static/vendors/angular.chartjs/angular-chart.min.js" th:src="@{/vendors/angular.chartjs/angular-chart.min.js}"></script>
-<!-- Additional js for stack charts -->
-<script src="https://cdn3.devexpress.com/jslib/18.2.3/js/dx.all.js"></script>
-<script>window.angular || document.write(decodeURIComponent('%3Cscript src="js/angular.min.js"%3E%3C\/script%3E'))</script>
 <!-- custom angular script -->
-<script type="text/javascript" src="../../static/custom/user/wealthhistory.js" th:src="@{/custom/user/wealthhistory.js}"></script>
+<script type="text/javascript" src="../../static/custom/adviser/consolidatedassets.js" th:src="@{/custom/adviser/consolidatedassets.js}"></script>
 <div class="container body">
     <div class="main_container">
         <!-- sidebar menu -->
-        <div th:replace="fragments/usersidebarmenu :: common-usersidebarmenu" />
-
+        <div th:replace="fragments/advisersidebarmenu :: common-advisersidebarmenu" />
         <!-- /sidebar menu -->
 
         <!-- top navigation -->
@@ -56,49 +45,56 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <br />
                     <div class="x_panel">
-                        <div class="x_title" ng-hide="!hideForm">
-                            <h1>Historical Wealth Distribution</h1>
-                            <p />Wealth distribution across major asset classes
+                        <div class="x_title">
+                            <h1>Consolidated Assets</h1>
                             <div class="clearfix"></div>
                         </div>
-                        <div class="col-md-12 col-sm-12 col-xs-12">
-                            <p />
+                        <div class="x_content">
                             <label class="pull-left" >Filter By Member: &nbsp;&nbsp;&nbsp;</label>
-                            <select class="pull-left" ng-model="searchMember" ng-change="callSetChartData()" >
+                            <select class="pull-left" ng-model="searchMember" >
                                 <option value = "0"></option>
-                                <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
+                                <option ng-repeat="client in clients" value="{{client.memberid}}">{{client.memberName}}</option>
+                            </select>
+                            <label class="pull-left" >&nbsp;&nbsp;&nbsp; Filter By Asset Type: &nbsp;&nbsp;&nbsp;</label>
+                            <select class="pull-left" ng-model="searchAssetClass" >
+                                <option value=""></option>
+                                <option  ng-repeat="assetClass in assetClasses | unique:'assetClassGroup' | orderBy:'assetClassGroup'" >{{assetClass.assetClassGroup}}</option>
                             </select>
                             <lebel class="pull-left" >&nbsp;&nbsp;&nbsp;</lebel>
-                            <label class="pull-left" >Total Wealth: &nbsp;&nbsp;&nbsp;</label>
-                            <label class="pull-left" >{{latestTotalWealth | currency:"&#8377;":0}} &nbsp;&nbsp;&nbsp;</label>
+                            <input class="pull-left" type="text" placeholder="Search by Short Name" ng-model="searchText" />
                         </div>
-                        <div class="col-md-12 col-sm-12 col-xs-12">
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Wealth Distribution<small>Current Wealth Distribution </small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <br />
-                                    <canvas id="wealthHistoryChart"  class="chart chart-line" chart-colors="newColors" chart-options="chartOptions"
-                                            chart-data="wealthHistoryData" chart-labels="labelsDates"  chart-series="chartSeries"></canvas>
-                                    <br /><br />
-                                </div>
+                        <div class="x_content">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Member ID</th>
+                                        <th>Asset</th>
+                                        <th>Asset Class Type</th>
+                                        <th>Industry-Sub-Industry</th>
+                                        <th>Quantity</th>
+                                        <th>Net Rate</th>
+                                        <th>Purchase Cost</th>
+                                        <th>Market Value</th>
+                                        <th>Unrealized Profit</th>
+                                        <th>Absolute Returns%</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="consolidatedAsset in consolidatedAssets | filter:filterByMember | filter:filterByAssetClass | filter:searchTransaction ">
+                                        <td>{{ (clients | filter : { 'memberid' : consolidatedAsset.memberid })[0].memberName }}</td>
+                                        <td>{{consolidatedAsset.shortName}}</td>
+                                        <td>{{ (assetClasses | filter : { 'classid' : consolidatedAsset.assetClassid})[0].assetClassGroup }}</td>
+                                        <td><div ng-if="consolidatedAsset.subindustryid!=0">{{ (industries | filter : { 'subindustryid' : consolidatedAsset.subindustryid})[0].subIndustryNameDisplay }}</div></td>
+                                        <td align="right">{{consolidatedAsset.quantity}}</td>
+                                        <td align="right">{{consolidatedAsset.netRate | currency:"&#8377;":2}}</td>
+                                        <td align="right">{{consolidatedAsset.totalCost | currency:"&#8377;":0}}</td>
+                                        <td align="right">{{consolidatedAsset.marketValue | currency:"&#8377;":0}}</td>
+                                        <td align="right">{{consolidatedAsset.netProfit | currency:"&#8377;":0}}</td>
+                                        <td align="right">{{consolidatedAsset.absoluteReturn*100 | number:2}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -112,8 +108,6 @@
         <!-- /footer content -->
     </div>
 </div>
-
-
 <!-- FastClick -->
 <script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
 <!-- NProgress -->

@@ -522,3 +522,55 @@ CREATE TABLE sip_process_msg_log (
   PRIMARY KEY (date,memberid,sipid,scheme_code)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='SIP Process Erro Log ';
 
+-- Drop table adviser_user_mapping
+CREATE TABLE adviser_user_mapping (
+  adviserid varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Email ID or login ID of adviser',
+  userid varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Email ID or login ID of adviser',
+  is_adviser_manager varchar(3) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Yes: Will have edit access to edit cliens data NO: can only give opinion',
+  PRIMARY KEY (adviserid, userid)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Adviser User Mapping ';
+
+SELECT * from adviser_user_mapping;
+--  insert into adviser_user_mapping (select 'sudhirkulaye', email, 'Yes' from user where email <> 'sudhirkulaye' and email not in (select userid from adviser_user_mapping where adviserid = 'sudhirkulaye'));
+
+CREATE TABLE daily_data_s (
+  date date NOT NULL,
+  rank int(11) DEFAULT '0',
+  name varchar(100) CHARACTER SET latin1 NOT NULL,
+  cmp decimal(10,3) DEFAULT '0.000',
+  market_cap decimal(20,3) DEFAULT '0.000',
+  last_result_date int(11) DEFAULT '0',
+  net_profit decimal(20,2) DEFAULT '0.00',
+  sales decimal(20,2) DEFAULT '0.00',
+  yoy_quarterly_sales_growth decimal(10,2) DEFAULT '0.00',
+  yoy_quarterly_profit_growth decimal(10,2) DEFAULT '0.00',
+  qoq_sales_growth decimal(10,2) DEFAULT '0.00',
+  qoq_profit_growth decimal(10,2) DEFAULT '0.00',
+  opm_latest_quarter decimal(10,2) DEFAULT '0.00',
+  opm_last_year decimal(10,2) DEFAULT '0.00',
+  npm_latest_quarter decimal(10,2) DEFAULT '0.00',
+  npm_last_year decimal(10,2) DEFAULT '0.00',
+  profit_growth_3years decimal(10,2) DEFAULT '0.00',
+  sales_growth_3years decimal(10,2) DEFAULT '0.00',
+  pe_ttm decimal(10,2) DEFAULT '0.00',
+  historical_pe_3years decimal(10,2) DEFAULT '0.00',
+  peg_ratio decimal(10,2) DEFAULT '0.00',
+  pb_ttm decimal(10,2) DEFAULT '0.00',
+  ev_to_ebit decimal(10,2) DEFAULT '0.00',
+  dividend_payout decimal(10,2) DEFAULT '0.00',
+  roe decimal(10,2) DEFAULT '0.00',
+  avg_roe_3years decimal(10,2) DEFAULT '0.00',
+  debt decimal(20,2) DEFAULT '0.00',
+  debt_to_equity decimal(10,2) DEFAULT '0.00',
+  debt_3years_back decimal(20,2) DEFAULT '0.00',
+  mcap_to_netprofit decimal(10,2) DEFAULT '0.00',
+  mcap_to_sales decimal(10,2) DEFAULT '0.00',
+  sector varchar(50) CHARACTER SET latin1 DEFAULT 'NA',
+  industry varchar(100) CHARACTER SET latin1 DEFAULT 'NA',
+  sub_industry varchar(100) CHARACTER SET latin1 DEFAULT 'NA',
+  PRIMARY KEY (date,name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Securities - Daily Data obtained from Screener Watchlist';
+
+select count(1) from daily_data_s a where date = (select date_today from setup_dates);
+
+

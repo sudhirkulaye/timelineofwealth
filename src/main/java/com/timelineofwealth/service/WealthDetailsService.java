@@ -1,5 +1,6 @@
 package com.timelineofwealth.service;
 
+import com.timelineofwealth.dto.ConsolidatedAssetsDTO;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.WealthAssetAllocationHistoryRepository;
 import com.timelineofwealth.repositories.WealthDetailsRepository;
@@ -53,6 +54,42 @@ public class WealthDetailsService {
         wealthDetailsRecords = wealthDetailsRepository.findByKeyMemberidInOrderByKeyMemberidAscAssetClassidAscKeyTickerAscKeyBuyDateAsc(membersIds);
 
         return wealthDetailsRecords;
+    }
+
+    public static List<ConsolidatedAssetsDTO> getConsolidatedWealthDetailsRecords(String email){
+        logger.debug(String.format("In WealthDetailsService.getConsolidatedWealthDetailsRecords: Email %s", email));
+
+        List<Object[]> objects;
+        List<ConsolidatedAssetsDTO> dtos = new ArrayList<>();
+        List<Member> members = MemberService.getUserMembers(email);
+        List<Long> membersIds = new ArrayList<>();
+        for (Member member : members ){
+            membersIds.add(new Long(member.getMemberid()));
+        }
+        objects = wealthDetailsRepository.findByKeyMemberidInGroupByKeyMemberidAndKeyTicker(membersIds);
+        for (Object[] object : objects) {
+            ConsolidatedAssetsDTO dto = new ConsolidatedAssetsDTO();
+            dto.setMemberid(""+object[0]);
+            dto.setTicker(""+object[1]);
+            dto.setName(""+object[2]);
+            dto.setShortName(""+object[3]);
+            dto.setAssetClassid(""+object[4]);
+            dto.setSubindustryid(""+object[5]);
+            dto.setQuantity(""+object[6]);
+            dto.setRate(""+object[7]);
+            dto.setBrokerage(""+object[8]);
+            dto.setTax(""+object[9]);
+            dto.setTotalCost(""+object[10]);
+            dto.setNetRate(""+object[11]);
+            dto.setCmp(""+object[12]);
+            dto.setMarketValue(""+object[13]);
+            dto.setNetProfit(""+object[14]);
+            dto.setAbsoluteReturn(""+object[15]);
+            dto.setAnnualizedReturn(""+object[16]);
+            dtos.add(dto);
+        }
+
+        return dtos;
     }
 
     public static void updateWealthDetailsRecord(WealthDetails editedRecord) {

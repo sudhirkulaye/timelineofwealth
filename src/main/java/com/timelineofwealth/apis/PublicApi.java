@@ -71,9 +71,9 @@ public class PublicApi {
         return CommonService.getSchemeNames(fundHouse,directRegular,dividendGrowth);
     }
 
-    @RequestMapping(value = "/getSchemeDetails/{fundHouse}/{category}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getschemedetails/{fundHouse}/{category}", method = RequestMethod.GET)
     public List<MutualFundDTO> getSchemeDetails(@PathVariable String fundHouse, @PathVariable String category) {
-        logger.debug(String.format("Call public/api/getschemenames/"+fundHouse+"/"+category));
+        logger.debug(String.format("Call public/api/getschemedetails/"+fundHouse+"/"+category));
 
         return CommonService.getSchemeDetails(fundHouse,category);
     }
@@ -90,6 +90,12 @@ public class PublicApi {
         logger.debug(String.format("Call public/api/getnsebse500/"));
 
         return CommonService.getNseBse500();
+    }
+
+    @RequestMapping(value = "/getindexvaluation", method = RequestMethod.GET)
+    public List<IndexValuation> getIndexValutiaon(){
+        logger.debug(String.format("Call public/api/getindexvaluation"));
+        return CommonService.getIndexValuation();
     }
 
 }

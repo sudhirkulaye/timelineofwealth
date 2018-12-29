@@ -8,7 +8,7 @@ module.controller('WealthHistoryDistributionController', function($scope, $http,
 
     $scope.wealthHistoryData = [];
     $scope.labelsDates = [];
-    $scope.chartSeriesIncExp = ['Total Wealth'];
+    $scope.chartSeries = ['Total Wealth'];
     $scope.newColors = ['#26B99A', '#03586A', '#1E947B', '#1a3c33', '#DCDCDC', '#46BFBD', '#FDB45C'];
     $scope.chartOptions = { scales: { yAxes: [{ ticks: { min:0 } }] } };
 
