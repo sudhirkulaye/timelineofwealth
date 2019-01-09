@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="RetirementFundCalculationManagement" ng-controller="RetirementFundCalculationController">
+<!-- iCheck -->
+<link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
+<!-- bootstrap-wysiwyg -->
+<link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" th:href="@{/vendors/google-code-prettify/bin/prettify.min.css}"  rel="stylesheet" />
+<!-- Select2 -->
+<link href="../../static/vendors/select2/dist/css/select2.min.css" th:href="@{/vendors/select2/dist/css/select2.min.css}"  rel="stylesheet" />
+<!-- Switchery -->
+<link href="../../static/vendors/switchery/dist/switchery.min.css" th:href="@{/vendors/switchery/dist/switchery.min.css}" rel="stylesheet" />
+<!-- starrr -->
+<link href="../../static/vendors/starrr/dist/starrr.css" th:href="@{/vendors/starrr/dist/starrr.css}"  rel="stylesheet" />
+<!-- bootstrap-daterangepicker -->
+<link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}"  rel="stylesheet" />
+<!-- Animate.css -->
+<link href="../../static/vendors/animate.css/animate.min.css" th:href="@{/vendors/animate.css/animate.min.css}" rel="stylesheet" />
+<!-- jQuery custom content scroller -->
+<link href="../../static/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" th:href="@{/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css}" rel="stylesheet" />
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/public/retirementfundcalculation.js" th:src="@{/custom/public/retirementfundcalculation.js}"></script>
+
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h1>Required Core Capital / Retirement Fund Calculation</h1>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <h2>
+                                We have assumed Risk Tolerance as below average (post-retirement lifestyle stage). So, there are restrictions on maximum returns likely to be earned on the Retirement Fund. Assumed Asset Allocation could be: 30-50% Real Estate, 25-35% Diversified Equity, 25-35% Fixed Income and 5-7% Cash.
+                                <p />
+                                Long Term  Returns on Investment (after tax) Min-Max Range = 8.00% to 10.50%
+                                <p />
+                                Inflation Min-Max Range = 3.00% to 6.00%
+                                <p />
+                            </h2>
+                            <p />
+                        </div>
+                        <div class="x_content">
+                            <div  class="col-md-9 col-xs-12">
+                                <form name="RetirementFundCalculationForm" class="form-horizontal form-label-left input_mask">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Assumed Returns on Assets(%)<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <input type="number" class="form-control" ng-change="getRetirementFundAmount()" required="required" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" min="8.00" max="10.50" step="0.10" value="8.50" ng-model="returnsAssumed" />
+                                            <!--<input class="knob" data-width="100" data-height="120" data-angleOffset="-125" data-angleArc="250" data-fgColor="#34495E" data-rotation="clockwise" value="8.5" />-->
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Assumed Inflation(%)<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <input type="number" class="form-control" ng-change="getRetirementFundAmount()" required="required" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" min="3.00" max="6.00" step="0.10" value="4.50" ng-model="inflationAssumed" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Annual Lifestyle Spending <strong>last year</strong> <span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <input type="number" class="form-control" ng-change="getRetirementFundAmount()" required="required" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" min="1.00" max="100.00" step="0.10" value="10" ng-model="spendingNeedAssumed" /> (in Lakhs, Min 1, Max 100)
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">No. of Years to Retire<span class="required">*</span></label>
+                                        <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
+                                            <input type="number" class="form-control" ng-change="getRetirementFundAmount()" required="required" ng-pattern="/^[0-9]{1,9}$/" min="0" max="25" step="1" value="5"  ng-model="yearsToRetire" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Amount Retired</label>
+                                        <strong>{{fundRequired | number:2}} Lakhs </strong> Assuming inputs given
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Minimum Amount Retired</label>
+                                        <strong>{{minFundRequired | number:2}} Lakhs </strong> Assuming Max Returns(10.5%) &amp; Min Inflation(3%)
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Maximum Amount Retired</label>
+                                        <strong>{{maxFundRequired | number:2}} Lakhs </strong> Assuming Min Returns(8%) &amp; Max Inflation(6%)
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="x_content">
+                            <div  class="col-md-12 col-xs-12">
+                                <h2>
+                                    <strong>There are two ways to find Core Capital (i.e., capital required for lifestyle spending)</strong>
+                                    <p />
+                                    In the <strong>First Method</strong>, we find out future spending need, let say for the n-th year, as follows:
+                                    <p />
+                                    <blockquote>  Spending Need at y0 x (1 + Risk Free Rate)^n </blockquote>
+                                    <p />
+                                    Then multiply the above number by n-th year actuarial assumption (i.e., a probability of survival of couple/individual at the n-th year, this changes for a race, sex, geographical location, so on)
+                                    <p />
+                                    Like this, we can calculate the spending requirement for all future years.
+                                    <p />
+                                    Then Core Capital Requirement is:
+                                    <p />
+                                    <blockquote>Sum of Present Values (discounted at Risk-Free Rate) of all future spending requirements.</blockquote>
+                                    <p />
+                                    We don't need to assume inflation in this method. (As it cancels out whiling computing spending need at the n-th year and then discounting it back to PV)
+                                    <p />
+                                    The <strong>Second Method</strong> is simple but comes with assumptions of required return on assets and inflation.
+                                    <p />
+                                    This method is indeed easy but with two significant assumptions. Moreover, if assumption goes wrong, our calculation may go wrong.
+                                    <p />
+                                    Funding Required =
+                                    <blockquote>[ Last Year Spending Amount x ( 1 + Inflation%)^(1 + years to retire) ] / [ Assumed Returns on Assets% - Inflation% ]</blockquote>
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>s
+</html>

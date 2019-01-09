@@ -160,4 +160,11 @@ public class PublicViewController {
         return "public/indianeconomy";
     }
 
+    @RequestMapping(value = "/public/retirementfundcalculation")
+    public String retirementFundCalculation(Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Timeline of Wealth");
+        return "public/retirementfundcalculation";
+    }
 }
