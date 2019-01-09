@@ -60,7 +60,7 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <h1>NIFTY50 Returns Statistics </h1><h2>over last 18 Years (Last updated: 23-Dec-2018, Source: NSE) </h2>
+                            <h1>NIFTY50 Returns Statistics </h1><h2>over last 18 Years (Last updated: {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE) </h2>
                             <table class="table">
                                 <thead>
                                 <tr>
@@ -70,55 +70,94 @@
                                     <th>Minimum Returns</th>
                                     <th>Maximum Returns</th>
                                     <th>Standard Deviation</th>
-                                    <!--<th align="right">Kurtosis</th>-->
-                                    <!--<th align="right">Skewness</th>-->
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr>
                                     <th>1 Year Returns </th>
-                                    <td align="right">15.46%</td>
-                                    <td align="right">12.70%</td>
-                                    <td align="right">-56.23% (Jan-08 to Jan-09)</td>
-                                    <td align="right">102.57% (Apr-03 to Apr-04)</td>
-                                    <td align="right">27.18%</td>
-                                    <!--<td align="right">41.54%</td>-->
-                                    <!--<td align="right">37.03%</td>-->
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanReturns1yr*100 | number:2}}%</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianReturns1yr*100 | number:2}}%</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns1yr*100 | number:2}}% (Jan-08 to Jan-09)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns1yr*100 | number:2}}% (Apr-03 to Apr-04)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].standardDeviation1yr*100 | number:2}}%</td>
                                 </tr>
                                 <tr>
                                     <th>3 Year Returns (Annualized) </th>
-                                    <td align="right">14.67%</td>
-                                    <td align="right">11.01%</td>
-                                    <td align="right">-16.38% (Apr-00 to Apr-03)</td>
-                                    <td align="right">58.78% (May-03 to May-06)</td>
-                                    <td align="right">13.58%</td>
-                                    <!--<td align="right">18.40%</td>-->
-                                    <!--<td align="right">70.45%</td>-->
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanReturns3yr*100 | number:2}}%</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianReturns3yr*100 | number:2}}%</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns3yr*100 | number:2}}% (Apr-00 to Apr-03)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns3yr*100 | number:2}}% (May-03 to May-06)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].standardDeviation3yr*100 | number:2}}%</td>
                                 </tr>
                                 <tr>
                                     <th>5 Year Returns (Annualized) </th>
-                                    <td align="right">15.10%</td>
-                                    <td align="right">12.34%</td>
-                                    <td align="right">-1.17% (Nov-07 to Nov-12)</td>
-                                    <td align="right">44.52% (Oct-02 to Oct-07)</td>
-                                    <td align="right">9.67%</td>
-                                    <!--<td align="right">33.65%</td>-->
-                                    <!--<td align="right">95.45%</td>-->
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanReturns5yr*100 | number:2}}%</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianReturns5yr*100 | number:2}}%</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns5yr*100 | number:2}}% (Nov-07 to Nov-12)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns5yr*100 | number:2}}% (Oct-02 to Oct-07)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].standardDeviation5yr*100 | number:2}}%</td>
                                 </tr>
                                 <tr>
                                     <th>10 Year Returns (Annualized) </th>
-                                    <td align="right">13.62%</td>
-                                    <td align="right">14.54%</td>
-                                    <td align="right">5.21% (Dec-07 to Dec-17)</td>
-                                    <td align="right">20.61% (May-03 to May-13)</td>
-                                    <td align="right">3.92%</td>
-                                    <!--<td align="right">33.65%</td>-->
-                                    <!--<td align="right">95.45%</td>-->
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanReturns10yr*100 | number:2}}%</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianReturns10yr*100 | number:2}}%</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns10yr*100 | number:2}}% (Dec-07 to Dec-17)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns10yr*100 | number:2}}% (May-03 to May-13)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].standardDeviation10yr*100 | number:2}}%</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <p />
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Mean PE</th>
+                                    <th>Median PE</th>
+                                    <th>Minimum PE</th>
+                                    <th>Maximum PE</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th>1 Year PE </th>
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanPe1yr | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianPe1yr | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumPe1yr | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumPe1yr | number:2}}</td>
+                                </tr>
+                                <tr>
+                                    <th>3 Year PE </th>
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanPe3yr | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianPe3yr | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumPe3yr | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumPe3yr | number:2}}</td>
+                                </tr>
+                                <tr>
+                                    <th>5 Year PE </th>
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanPe5yr | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianPe5yr | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumPe5yr | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumPe5yr | number:2}}</td>
+                                </tr>
+                                <tr>
+                                    <th>10 Year PE </th>
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanPe10yr | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianPe10yr | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumPe10yr | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumPe10yr | number:2}}</td>
+                                </tr>
+                                <tr>
+                                    <th>All Time (18 Years) PE </th>
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanPe | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianPe | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumPe | number:2}}</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumPe | number:2}}</td>
                                 </tr>
                                 </tbody>
                             </table>
                             <div class="x_content">
-                                <h1><strong>Historical Trailing PE: </strong></h1> <p />
+                                <h1><strong>Historical Trailing PE: </strong></h1> <p /><h2>Current PE {{indexConsolidatedStatistics[0].currentPe}} (Last updated: {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE) </h2>
                                 <br />
                                 <select ng-model="yearFilter" ng-change="callSetChartData()">
                                     <option value="1" selected="true">Last 1 Year</option>

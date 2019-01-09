@@ -65,3 +65,7 @@ select * from sip_process_msg_log a where memberid in (1031,1030) order by date 
 select max(buy_date), ticker, short_name, sum(quantity), sum(market_value), sum(net_profit) from wealth_details a where memberid in (1007,1015,1058) group by ticker order by memberid, ticker; 
 UPDATE wealth_details set maturity_date = '2000-01-01' where maturity_date is null;
 select * from member;
+
+select * from member a where last_name like 'Rane%';
+select * from sip a where a.memberid in (1016, 1059, 1060) order by memberid, scheme_name;
+select * from wealth_details a where a.memberid in (1016, 1059, 1060) order by memberid, name;

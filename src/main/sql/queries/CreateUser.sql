@@ -19,3 +19,4 @@ select * from user_members a order by a.memberid desc;
 insert into user_members values ('vishnupadave', 1065, 'Self');
 
 insert into adviser_user_mapping values ('sudhirkulaye', 'vishnupadave', 'Yes');
+select * from adviser_user_mapping;
