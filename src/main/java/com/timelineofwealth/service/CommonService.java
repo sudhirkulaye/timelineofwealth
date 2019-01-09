@@ -83,6 +83,12 @@ public class CommonService {
         CommonService.indexValuationRepository = indexValuationRepository;
     }
 
+    @Autowired
+    private static IndexStatisticsRepository indexStatisticsRepository;
+    @Autowired
+    public void setIndexStatisticsRepository(IndexStatisticsRepository indexStatisticsRepository){
+        CommonService.indexStatisticsRepository = indexStatisticsRepository;
+    }
 
     /**
      * Returns true if SignIn User is Admin
@@ -315,5 +321,13 @@ public class CommonService {
         //System.out.println("list.size()::"+ list.size());
         //return list;
 
+    }
+
+    /**
+     * Get Index Statistics
+     * @return
+     */
+    public static List<IndexStatistics> getIndexStatistics(){
+        return CommonService.indexStatisticsRepository.findAll();
     }
 }

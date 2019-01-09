@@ -3,6 +3,7 @@ var module = angular.module('IndexStatsManagement', ['angular.filter','chart.js'
 module.controller('IndexStatController', function($scope, $http, $filter, $locale) {
     var urlBase="/public/api";
     $scope.indexStatRecords = [];
+    $scope.indexConsolidatedStatistics = [];
     $scope.chartData = [];
     $scope.labelsDates = [];
     $scope.chartSeries = ['Index Trailing PE', 'Index Value'];
@@ -45,10 +46,21 @@ module.controller('IndexStatController', function($scope, $http, $filter, $local
                     $scope.indexStatRecords = [];
                 }
             });
+
+        url = "/getindexstatistics";
+        $http.get(urlBase + url).
+            then(function (response) {
+                if (response != undefined) {
+                    $scope.indexConsolidatedStatistics = response.data;
+                    setChartData();
+                } else {
+                    $scope.indexConsolidatedStatistics = [];
+                }
+            });
     }
 
     function setChartData(){
-        console.log("index data length" + $scope.indexStatRecords.length);
+        //console.log("index data length" + $scope.indexStatRecords.length);
         $scope.labelsDates = [];
         $scope.chartData = [];
 
@@ -56,12 +68,12 @@ module.controller('IndexStatController', function($scope, $http, $filter, $local
         var peData = [];
         var indexValue = [];
         var filterDate = new Date();
-        console.log("$scope.yearFilter " + $scope.yearFilter);
+        //console.log("$scope.yearFilter " + $scope.yearFilter);
         if ($scope.yearFilter == undefined){
             $scope.yearFilter = 1;
         }
         filterDate.setDate(filterDate.getDate() - $scope.yearFilter*365);
-        console.log("filterDate " + filterDate);
+        //console.log("filterDate " + filterDate);
         for (var i = 0; i < $scope.indexStatRecords.length; i++ ) {
           if (new Date(filterDate) < new Date($scope.indexStatRecords[i].key.date)){
               dates.push($filter('date')(new Date($scope.indexStatRecords[i].key.date),'yyyy-MM-dd'));
@@ -69,7 +81,7 @@ module.controller('IndexStatController', function($scope, $http, $filter, $local
               indexValue.push($scope.indexStatRecords[i].value);
           }
         }
-        console.log(peData);
+        //console.log(peData);
         $scope.labelsDates = dates;
         $scope.chartData.push(peData);
         $scope.chartData.push(indexValue);

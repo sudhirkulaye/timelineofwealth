@@ -98,4 +98,9 @@ public class PublicApi {
         return CommonService.getIndexValuation();
     }
 
+    @RequestMapping(value = "/getindexstatistics", method = RequestMethod.GET)
+    public List<IndexStatistics> getIndexStatistics(){
+        logger.debug(String.format("Call public/api/getindexstatistics"));
+        return CommonService.getIndexStatistics();
+    }
 }
