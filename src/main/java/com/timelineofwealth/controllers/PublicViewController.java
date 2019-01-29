@@ -167,4 +167,12 @@ public class PublicViewController {
         model.addAttribute("title", "Timeline of Wealth");
         return "public/retirementfundcalculation";
     }
+
+    @RequestMapping(value = "/public/midandsmallcapindexstats")
+    public String midAndSmallCapIndexStats(Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Timeline of Wealth");
+        return "public/midandsmallcapindexstats";
+    }
 }

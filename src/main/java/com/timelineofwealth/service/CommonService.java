@@ -327,7 +327,13 @@ public class CommonService {
      * Get Index Statistics
      * @return
      */
-    public static List<IndexStatistics> getIndexStatistics(){
-        return CommonService.indexStatisticsRepository.findAll();
+    public static List<IndexStatistics> getIndexStatistics(String index){
+        if (index.equalsIgnoreCase("NIFTY")) {
+            return CommonService.indexStatisticsRepository.findOneByTicker("NIFTY");
+        } else {
+            List<IndexStatistics> indexStatistics = CommonService.indexStatisticsRepository.findOneByTicker("BSEMidCap");
+            indexStatistics.addAll(CommonService.indexStatisticsRepository.findOneByTicker("BSESmallCap"));
+            return indexStatistics;
+        }
     }
 }

@@ -20,7 +20,7 @@ group by date order by date desc;
 select * from daily_data_b where date = (select date_today from setup_dates) order by market_cap desc;
 
 -- proceed EOD
-CALL ap_update_wealth_data();
+call ap_update_wealth_data();
 select * from log_table;
 truncate table log_table;
 
@@ -123,5 +123,6 @@ select * from daily_data_s where 1 = 2;
 select count(1), date from daily_data_s where date >= (select date_last_trading_day from setup_dates)  group by date order by date desc;
 
 select * from index_valuation a where a.date = (select max(date) from index_valuation);
+SELECT * from index_statistics a; 
 
 commit;

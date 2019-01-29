@@ -101,6 +101,12 @@ public class PublicApi {
     @RequestMapping(value = "/getindexstatistics", method = RequestMethod.GET)
     public List<IndexStatistics> getIndexStatistics(){
         logger.debug(String.format("Call public/api/getindexstatistics"));
-        return CommonService.getIndexStatistics();
+        return CommonService.getIndexStatistics("NIFTY");
+    }
+
+    @RequestMapping(value = "/getmidandsmallcapindexstatistics", method = RequestMethod.GET)
+    public List<IndexStatistics> getMidAndSmallCapIndexStatistics(){
+        logger.debug(String.format("Call public/api/getmidandsmallcapindexstatistics"));
+        return CommonService.getIndexStatistics("Mid&Small");
     }
 }

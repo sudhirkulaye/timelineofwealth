@@ -157,8 +157,11 @@
                                 </tbody>
                             </table>
                             <div class="x_content">
-                                <h1><strong>Historical Trailing PE: </strong></h1> <p /><h2>Current PE {{indexConsolidatedStatistics[0].currentPe}} (Last updated: {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE) </h2>
+                                <h1><strong>NIFTY50 Historical Trailing PE: </strong></h1> <p /><h2>Current PE {{indexConsolidatedStatistics[0].currentPe}} (Last updated: {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE) </h2>
                                 <br />
+                                <strong>Note:</strong> A market is always forward-looking. So, Forward PE is more appropriate for analysis. However, it is subjective and also not available publicly. (There is consensus forward PE published by some firms, but publicly not available. Moreover, even the methodology of deriving forward PE is also not available.)
+                                <br />
+                                Select Years:
                                 <select ng-model="yearFilter" ng-change="callSetChartData()">
                                     <option value="1" selected="true">Last 1 Year</option>
                                     <option value="3">Last 3 Years</option>

@@ -68,17 +68,29 @@ module.controller('IndexStatController', function($scope, $http, $filter, $local
         var peData = [];
         var indexValue = [];
         var filterDate = new Date();
+        var oneYearBeforeDate = new Date();
         //console.log("$scope.yearFilter " + $scope.yearFilter);
         if ($scope.yearFilter == undefined){
             $scope.yearFilter = 1;
         }
         filterDate.setDate(filterDate.getDate() - $scope.yearFilter*365);
+        oneYearBeforeDate.setDate(oneYearBeforeDate.getDate() - 365);
         //console.log("filterDate " + filterDate);
+        //console.log("oneYearBeforeDate " + oneYearBeforeDate);
         for (var i = 0; i < $scope.indexStatRecords.length; i++ ) {
           if (new Date(filterDate) < new Date($scope.indexStatRecords[i].key.date)){
-              dates.push($filter('date')(new Date($scope.indexStatRecords[i].key.date),'yyyy-MM-dd'));
-              peData.push($scope.indexStatRecords[i].pe);
-              indexValue.push($scope.indexStatRecords[i].value);
+              if (new Date(oneYearBeforeDate) < new Date($scope.indexStatRecords[i].key.date)) { // put all records
+                  dates.push($filter('date')(new Date($scope.indexStatRecords[i].key.date),'yyyy-MM-dd'));
+                  peData.push($scope.indexStatRecords[i].pe);
+                  indexValue.push($scope.indexStatRecords[i].value);
+              } else { // put only weekly data
+                  //console.log("Day"+ (new Date($scope.indexStatRecords[i].key.date)).getDay());
+                  if ((new Date($scope.indexStatRecords[i].key.date)).getDay() == "5") {
+                      dates.push($filter('date')(new Date($scope.indexStatRecords[i].key.date),'yyyy-MM-dd'));
+                      peData.push($scope.indexStatRecords[i].pe);
+                      indexValue.push($scope.indexStatRecords[i].value);
+                  }
+              }
           }
         }
         //console.log(peData);
