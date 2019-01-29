@@ -630,3 +630,162 @@ CREATE TABLE index_statistics (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Statistics - Index Statistic Data';
 
 select * from index_statistics; 
+
+-- drop table mutual_fund_stats;
+CREATE TABLE mutual_fund_stats (
+  scheme_code int(15) NOT NULL COMMENT 'PK Mutual Fund Scheme Code Unique',
+  scheme_name_part varchar(1000) NOT NULL COMMENT 'Mutual Fund Scheme Short Name',
+  scheme_type varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'MF Type',
+  scheme_index varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'MF Benchmark Index',
+  scheme_investment_style varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'MF Investment Style',
+  total_returns_y0 DECIMAL(10,3) NOT NULL COMMENT 'Current Year Returns (YTD)',
+  total_returns_y1 DECIMAL(10,3) NOT NULL COMMENT '1 Year before Returns',
+  total_returns_y2 DECIMAL(10,3) NOT NULL COMMENT '2 Year before Returns',
+  total_returns_y3 DECIMAL(10,3) NOT NULL COMMENT '3 Year before Returns',
+  total_returns_y4 DECIMAL(10,3) NOT NULL COMMENT '4 Year before Returns',
+  total_returns_y5 DECIMAL(10,3) NOT NULL COMMENT '5 Year before Returns',
+  total_returns_y6 DECIMAL(10,3) NOT NULL COMMENT '6 Year before Returns',
+  total_returns_y7 DECIMAL(10,3) NOT NULL COMMENT '7 Year before Returns',
+  total_returns_y8 DECIMAL(10,3) NOT NULL COMMENT '8 Year before Returns',
+  total_returns_y9 DECIMAL(10,3) NOT NULL COMMENT '9 Year before Returns',
+  total_returns_y10 DECIMAL(10,3) NOT NULL COMMENT '10 Year before Returns',
+  trailing_return_1yr DECIMAL(10,3) NOT NULL COMMENT '1 Year Trailing Returns',
+  trailing_return_3yr DECIMAL(10,3) NOT NULL COMMENT '3 Years Trailing Returns',
+  trailing_return_5yr DECIMAL(10,3) NOT NULL COMMENT '5 Years Trailing Returns',
+  trailing_return_10yr DECIMAL(10,3) NOT NULL COMMENT '10 Years Trailing Returns',
+  quartile_rank_y1 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 1 Year before Returns',
+  quartile_rank_y2 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 2 Year before Returns',
+  quartile_rank_y3 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 3 Year before Returns',
+  quartile_rank_y4 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 4 Year before Returns',
+  quartile_rank_y5 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 5 Year before Returns',
+  quartile_rank_y6 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 6 Year before Returns',
+  quartile_rank_y7 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 7 Year before Returns',
+  quartile_rank_y8 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 8 Year before Returns',
+  quartile_rank_y9 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 9 Year before Returns',
+  quartile_rank_y10 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 10 Year before Returns',
+  quartile_rank_1yr DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 1 Year Trailing Returns',
+  quartile_rank_3yr DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 3 Years Trailing Returns',
+  quartile_rank_5yr DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 5 Years Trailing Returns',
+  quartile_rank_10yr DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 10 Years Trailing Returns',
+  sector_basic_materials DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector basic materials',
+  sector_consumer_cyclical DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector consumer cyclical',
+  sector_finacial_services DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector finacial services',
+  sector_industrial DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector industrial',
+  sector_technology DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector technology',
+  sector_consumer_defensive DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector consumer defensive',
+  sector_healthcare DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector healthcare',
+  stock_1 varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT '1st Preferred Stock',
+  stock_2 varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT '2nd Preferred Stock',
+  stock_3 varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT '3rd Preferred Stock',
+  stock_4 varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT '4th Preferred Stock',
+  PRIMARY KEY (scheme_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Selected Mutual Fund Statistics';
+
+select * from mutual_fund_stats; 
+
+-- drop table mutual_fund_house; 
+create table mutual_fund_house (
+  fund_house varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Mutual Fund House Name',
+  fund_house_agency varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Mutual Fund House Agency Name',
+  PRIMARY KEY (fund_house)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Mutual Fund House And Agency';
+SELECT * from mutual_fund_house; 
+
+-- drop table stock_pnl;
+create table stock_pnl (
+  ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Index ticker',
+  cons_standalone varchar(1) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK C: Consolidated S:Standalone ',
+  date date NOT NULL COMMENT 'PK Date',
+  sales DECIMAL(20,3) NOT NULL COMMENT 'Annual Sales',
+  expenses DECIMAL(20,3) NOT NULL COMMENT 'Annual Expense',
+  operating_profit DECIMAL(20,3) NOT NULL COMMENT 'Annual Operating Profit',
+  other_income DECIMAL(20,3) NOT NULL COMMENT 'Annual Other Income',
+  depreciation DECIMAL(20,3) NOT NULL COMMENT 'Annual Depreciation',
+  interest DECIMAL(20,3) NOT NULL COMMENT 'Annual Interest',
+  profit_before_tax DECIMAL(20,3) NOT NULL COMMENT 'Annual profit before tax',
+  tax DECIMAL(20,3) NOT NULL COMMENT 'Annual tax',
+  net_profit DECIMAL(20,3) NOT NULL COMMENT 'Annual net Profit',
+  eps DECIMAL(10,3) NOT NULL COMMENT 'Annual earning per share',
+  pe DECIMAL(10,3) NOT NULL COMMENT 'Annual price to earnings',
+  price DECIMAL(10,3) NOT NULL COMMENT 'Share Price',
+  dummy1 DECIMAL(10,3) NOT NULL COMMENT 'dummy1',
+  ratios DECIMAL(10,3) NOT NULL COMMENT 'Ratios',
+  dividend_payout DECIMAL(10,3) NOT NULL COMMENT 'Dividend Payout',
+  opm DECIMAL(10,3) NOT NULL COMMENT 'Operating Profit Margine',
+  npm DECIMAL(10,3) NOT NULL COMMENT 'Net Profit Margine',
+  re DECIMAL(10,3) NOT NULL COMMENT 'Return on Equity',
+  PRIMARY KEY (ticker, cons_standalone, date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Annual P&L Results';
+
+select count(1), year(date) from stock_pnl a group by year(date) order by date desc; 
+select count(1) from stock_pnl a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
+
+
+-- drop table stock_quarter;
+create table stock_quarter (
+  ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Index ticker',
+  cons_standalone varchar(1) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK C: Consolidated S:Standalone ',
+  date date NOT NULL COMMENT 'PK Date',
+  sales DECIMAL(20,3) NOT NULL COMMENT 'Annual Sales',
+  expenses DECIMAL(20,3) NOT NULL COMMENT 'Annual Expense',
+  operating_profit DECIMAL(20,3) NOT NULL COMMENT 'Annual Operating Profit',
+  other_income DECIMAL(20,3) NOT NULL COMMENT 'Annual Other Income',
+  depreciation DECIMAL(20,3) NOT NULL COMMENT 'Annual Depreciation',
+  interest DECIMAL(20,3) NOT NULL COMMENT 'Annual Interest',
+  profit_before_tax DECIMAL(20,3) NOT NULL COMMENT 'Annual profit before tax',
+  tax DECIMAL(20,3) NOT NULL COMMENT 'Annual tax',
+  net_profit DECIMAL(20,3) NOT NULL COMMENT 'Annual net Profit',
+  dummy1 DECIMAL(10,3) NOT NULL COMMENT 'dummy1',
+  opm DECIMAL(10,3) NOT NULL COMMENT 'Operating Profit Margine',
+  PRIMARY KEY (ticker, cons_standalone, date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Quarter P&L Results';
+
+select count(1), year(date) from stock_quarter a group by year(date) order by date desc; 
+select * from stock_quarter a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
+
+-- drop table stock_balancesheet;
+create table stock_balancesheet (
+  ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Index ticker',
+  cons_standalone varchar(1) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK C: Consolidated S:Standalone ',
+  date date NOT NULL COMMENT 'PK Date',
+  equity_share_capital DECIMAL(20,3) NOT NULL COMMENT 'Equity share capital',
+  reserves DECIMAL(20,3) NOT NULL COMMENT 'Reserves',
+  borrowings DECIMAL(20,3) NOT NULL COMMENT 'Borrowings',
+  other_liabilities DECIMAL(20,3) NOT NULL COMMENT 'Other liabilities',
+  total_equity_and_debt DECIMAL(20,3) NOT NULL COMMENT 'Total equity and debt',
+  dummy1 DECIMAL(20,3) NOT NULL COMMENT 'Dummy1',
+  net_block DECIMAL(20,3) NOT NULL COMMENT 'Net block',
+  capital_work_in_progress DECIMAL(20,3) NOT NULL COMMENT 'Capital work in progress',
+  investments DECIMAL(20,3) NOT NULL COMMENT 'Investments',
+  other_assets DECIMAL(20,3) NOT NULL COMMENT 'Other assets',
+  total_assets DECIMAL(20,3) NOT NULL COMMENT 'Total assets',
+  capex DECIMAL(20,3) NOT NULL COMMENT 'Capex',
+  working_capital DECIMAL(20,3) NOT NULL COMMENT 'Working capital',
+  debtors DECIMAL(20,3) NOT NULL COMMENT 'Debtors',
+  inventory DECIMAL(20,3) NOT NULL COMMENT 'Inventory',
+  dummy2 DECIMAL(20,3) NOT NULL COMMENT 'Dummy2',
+  debtor_days DECIMAL(20,3) NOT NULL COMMENT 'Debtor days',
+  inventory_turnover DECIMAL(20,3) NOT NULL COMMENT 'Inventory turnover',
+  dummy3 DECIMAL(20,3) NOT NULL COMMENT 'Dummy3',
+  return_on_equity DECIMAL(20,3) NOT NULL COMMENT 'Return on equity',
+  return_on_capital_emp DECIMAL(20,3) NOT NULL COMMENT 'Return on capital employed',
+  PRIMARY KEY (ticker, cons_standalone, date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Balancesheet';
+
+select count(1), year(date) from stock_balancesheet a group by year(date) order by date desc; 
+select count(1) from stock_balancesheet a where a.ticker = 'PGHH' and 1=2;
+
+-- drop table stock_cashflow;
+create table stock_cashflow (
+  ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Index ticker',
+  cons_standalone varchar(1) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK C: Consolidated S:Standalone ',
+  date date NOT NULL COMMENT 'PK Date',
+  cash_from_operating_activity DECIMAL(20,3) NOT NULL COMMENT 'Cash from operating activity',
+  cash_from_investing_activity DECIMAL(20,3) NOT NULL COMMENT 'Cash from investing activity',
+  cash_from_financing_activity DECIMAL(20,3) NOT NULL COMMENT 'Cash from financing activity',
+  net_cashflow DECIMAL(20,3) NOT NULL COMMENT 'Net Cashflow',
+  PRIMARY KEY (ticker, cons_standalone, date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Cashflow';
+
+select count(1), year(date) from stock_cashflow a group by year(date) order by date desc; 
+select count(1) from stock_cashflow a where a.ticker = 'PGHH' and 1=2;

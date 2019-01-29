@@ -8,4 +8,5 @@ import java.util.List;
 public interface IndexStatisticsRepository extends JpaRepository<IndexStatistics, String> {
 //    @Cacheable("IndexStatistics")
     public List<IndexStatistics> findAll();
+    public List<IndexStatistics> findOneByTicker(String ticker);
 }
