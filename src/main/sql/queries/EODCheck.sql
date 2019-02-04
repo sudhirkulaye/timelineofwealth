@@ -126,3 +126,24 @@ select * from index_valuation a where a.date = (select max(date) from index_valu
 SELECT * from index_statistics a; 
 
 commit;
+
+-- Change of ticker
+select distinct(name) from daily_data_s a where a.date = (select max(date) from daily_data_s) and a.name not in (select ticker5 from stock_universe) order by rank; 
+select * from stock_universe a where a.name like 'Techno%'; 
+select * from daily_data_s a where a.name like 'IDFC%';
+select * from daily_data_b a where ticker_b = 'IDFCBK:IN';
+-- update stock_universe a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
+-- update stock_universe a set ticker5 = 'IDFC First' where ticker = 'IDFCBANK';
+-- update stock_universe a set ticker2 = 'IDFCFB:IN' where ticker = 'IDFCFIRSTB';
+-- update daily_data_b a set ticker_b = 'IDFCFB:IN' where ticker_b = 'IDFCBK:IN';
+-- update daily_data_s a set a.name = 'Strides Pharma' where a.name = 'Strides Shasun'; 
+-- update nse_price_history a set nse_ticker = 'IDFCFIRSTB' where nse_ticker = 'IDFCBANK';
+-- update stock_pnl a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
+-- update stock_quarter a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
+-- update stock_balancesheet a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
+-- update stock_cashflow a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
+select * from wealth_details a where a.ticker = 'IDFCFIRSTB';
+-- update wealth_details a set a.ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
+select * from stock_universe a where ticker in ('IDFCFIRSTB','BAJAJCON');
+-- BAJAJCORP to BAJAJCON and 'Bajaj Corp' to 'Bajaj Consumer'
+-- IDFCBANK to IDFCFIRSTB and 'IDFC Bank' to 'IDFC First Bank'

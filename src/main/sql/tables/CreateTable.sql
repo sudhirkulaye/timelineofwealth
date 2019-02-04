@@ -236,27 +236,29 @@ CREATE TABLE stock_universe (
   isin_code varchar(20) COLLATE utf8_unicode_ci DEFAULT '' COMMENT 'ISIN Code ',
   short_name varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Short Name for Display Purpose',
   name varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Full Name on as of NSE or BSE',
-  asset_classid int(6) DEFAULT 0 COMMENT 'Stock Asset classid',
+  asset_classid int(6) DEFAULT '0' COMMENT 'Stock Asset classid',
   bse_industry varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'BSE industry classification',
-  subindustryid int(8) DEFAULT 0 COMMENT 'Sub Industry ID',
-  latest_price decimal(20,3) DEFAULT 0 COMMENT 'Latest Price',
-  date_latest_price date DEFAULT '2018-01-01' COMMENT 'Date of latest price',
-  is_sensex int(1) DEFAULT 0 COMMENT '1 = If Stock is in SENSEX ',
-  is_nifty50 int(1) DEFAULT 0 COMMENT '1 = If Stock is in NIFTY50',
-  is_niftyjr int(1) DEFAULT 0 COMMENT '1 = If Stock is in NIFTY JR',
-  is_bse100 int(1) DEFAULT 0 COMMENT '1 = If Stock is in BSE100',
-  is_nse100 int(1) DEFAULT 0 COMMENT '1 = If Stock is in NSE100',
-  is_bse200 int(1) DEFAULT 0 COMMENT '1 = If Stock is in NSE200',
-  is_nse200 int(1) DEFAULT 0 COMMENT '1 = If Stock is in NSE200',
-  is_bse500 int(1) DEFAULT 0 COMMENT '1 = If Stock is in BSE500',
-  is_nse500 int(1) DEFAULT 0 COMMENT '1 = If Stock is in NSE500',
-  marketcap decimal(20,0) DEFAULT 0 COMMENT 'Market Cap in Rs',
-  marketcap_rank int(5) DEFAULT 0 COMMENT 'Market Cap Rank',
+  subindustryid int(8) DEFAULT '0' COMMENT 'Sub Industry ID',
+  latest_price decimal(20,3) DEFAULT '0.000' COMMENT 'Latest Price',
+  date_latest_price date DEFAULT '2000-01-01' COMMENT 'Date of latest price',
+  is_sensex int(1) DEFAULT '0' COMMENT '1 = If Stock is in SENSEX ',
+  is_nifty50 int(1) DEFAULT '0' COMMENT '1 = If Stock is in NIFTY50',
+  is_niftyjr int(1) DEFAULT '0' COMMENT '1 = If Stock is in NIFTY JR',
+  is_bse100 int(1) DEFAULT '0' COMMENT '1 = If Stock is in BSE100',
+  is_nse100 int(1) DEFAULT '0' COMMENT '1 = If Stock is in NSE100',
+  is_bse200 int(1) DEFAULT '0' COMMENT '1 = If Stock is in NSE200',
+  is_nse200 int(1) DEFAULT '0' COMMENT '1 = If Stock is in NSE200',
+  is_bse500 int(1) DEFAULT '0' COMMENT '1 = If Stock is in BSE500',
+  is_nse500 int(1) DEFAULT '0' COMMENT '1 = If Stock is in NSE500',
+  marketcap decimal(20,0) DEFAULT '0' COMMENT 'Market Cap in Rs',
+  marketcap_rank int(5) DEFAULT '0' COMMENT 'Market Cap Rank',
   pe_ttm decimal(10,2) DEFAULT NULL COMMENT 'Company Latest TTM PE ratio',
   ticker_old varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Old Ticker',
-  listing_date date  DEFAULT '2000-01-01' COMMENT 'Listing Date on NSE or BSE',
+  listing_date date DEFAULT '2000-01-01' COMMENT 'Listing Date on NSE or BSE',
   PRIMARY KEY (ticker),
-  UNIQUE KEY (isin_code)
+  UNIQUE KEY isin_code (isin_code),
+  KEY ticker5 (ticker5),
+  KEY ticker2 (ticker2)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Securities - Company universe composed of NIFTY50, NIFTY JR, NIFTY100/BSE100, NIFTY200/BSE200, NIFTY500/BSE500 and other small stocks tracked by brokerage houses';
 
 select * from stock_universe a where a.is_nse500 = 1;
@@ -568,7 +570,8 @@ CREATE TABLE daily_data_s (
   sector varchar(50) CHARACTER SET latin1 DEFAULT 'NA',
   industry varchar(100) CHARACTER SET latin1 DEFAULT 'NA',
   sub_industry varchar(100) CHARACTER SET latin1 DEFAULT 'NA',
-  PRIMARY KEY (date,name)
+  PRIMARY KEY (date,name),
+  KEY name (name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Securities - Daily Data obtained from Screener Watchlist';
 
 select count(1) from daily_data_s a where date = (select date_today from setup_dates);
@@ -653,20 +656,20 @@ CREATE TABLE mutual_fund_stats (
   trailing_return_3yr DECIMAL(10,3) NOT NULL COMMENT '3 Years Trailing Returns',
   trailing_return_5yr DECIMAL(10,3) NOT NULL COMMENT '5 Years Trailing Returns',
   trailing_return_10yr DECIMAL(10,3) NOT NULL COMMENT '10 Years Trailing Returns',
-  quartile_rank_y1 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 1 Year before Returns',
-  quartile_rank_y2 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 2 Year before Returns',
-  quartile_rank_y3 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 3 Year before Returns',
-  quartile_rank_y4 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 4 Year before Returns',
-  quartile_rank_y5 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 5 Year before Returns',
-  quartile_rank_y6 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 6 Year before Returns',
-  quartile_rank_y7 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 7 Year before Returns',
-  quartile_rank_y8 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 8 Year before Returns',
-  quartile_rank_y9 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 9 Year before Returns',
-  quartile_rank_y10 DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 10 Year before Returns',
-  quartile_rank_1yr DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 1 Year Trailing Returns',
-  quartile_rank_3yr DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 3 Years Trailing Returns',
-  quartile_rank_5yr DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 5 Years Trailing Returns',
-  quartile_rank_10yr DECIMAL(10,3) NOT NULL COMMENT 'Quartile Rank for 10 Years Trailing Returns',
+  quartile_rank_y1 INT(1) NOT NULL COMMENT 'Quartile Rank for 1 Year before Returns',
+  quartile_rank_y2 INT(1) NOT NULL COMMENT 'Quartile Rank for 2 Year before Returns',
+  quartile_rank_y3 INT(1) NOT NULL COMMENT 'Quartile Rank for 3 Year before Returns',
+  quartile_rank_y4 INT(1) NOT NULL COMMENT 'Quartile Rank for 4 Year before Returns',
+  quartile_rank_y5 INT(1) NOT NULL COMMENT 'Quartile Rank for 5 Year before Returns',
+  quartile_rank_y6 INT(1) NOT NULL COMMENT 'Quartile Rank for 6 Year before Returns',
+  quartile_rank_y7 INT(1) NOT NULL COMMENT 'Quartile Rank for 7 Year before Returns',
+  quartile_rank_y8 INT(1) NOT NULL COMMENT 'Quartile Rank for 8 Year before Returns',
+  quartile_rank_y9 INT(1) NOT NULL COMMENT 'Quartile Rank for 9 Year before Returns',
+  quartile_rank_y10 INT(1) NOT NULL COMMENT 'Quartile Rank for 10 Year before Returns',
+  quartile_rank_1yr INT(1) NOT NULL COMMENT 'Quartile Rank for 1 Year Trailing Returns',
+  quartile_rank_3yr INT(1) NOT NULL COMMENT 'Quartile Rank for 3 Years Trailing Returns',
+  quartile_rank_5yr INT(1) NOT NULL COMMENT 'Quartile Rank for 5 Years Trailing Returns',
+  quartile_rank_10yr INT(1) NOT NULL COMMENT 'Quartile Rank for 10 Years Trailing Returns',
   sector_basic_materials DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector basic materials',
   sector_consumer_cyclical DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector consumer cyclical',
   sector_finacial_services DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector finacial services',
@@ -742,6 +745,9 @@ create table stock_quarter (
 
 select count(1), year(date) from stock_quarter a group by year(date) order by date desc; 
 select * from stock_quarter a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
+-- pending results
+SELECT b.ticker from daily_data_s a, stock_universe b where a.name = b.ticker5 and a.last_result_date = '201812' and date = '2019-02-01' and b.ticker not in (select distinct ticker from stock_quarter a where date = '2018-12-31');
+
 
 -- drop table stock_balancesheet;
 create table stock_balancesheet (

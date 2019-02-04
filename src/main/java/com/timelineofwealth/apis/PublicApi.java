@@ -78,6 +78,13 @@ public class PublicApi {
         return CommonService.getSchemeDetails(fundHouse,category);
     }
 
+    @RequestMapping(value = "/getselectedmf", method = RequestMethod.GET)
+    public List<MutualFundStats> getSelectedMF() {
+        logger.debug(String.format("Call public/api/getschemedetails/"));
+
+        return CommonService.getSelectedMF();
+    }
+
     @RequestMapping(value = "/getallstocks", method = RequestMethod.GET)
     public List<StockUniverse> getAllStocks(){
         logger.debug(String.format("Call public/api/getallstocks/"));

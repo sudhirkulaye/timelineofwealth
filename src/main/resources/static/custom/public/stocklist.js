@@ -5,6 +5,13 @@ module.controller('StockListController', function($scope, $http, $filter) {
     $scope.industries = [];
     $scope.stocks = [];
     $scope.indexFilter = "SENSEX";
+    $scope.flagBasicInfo = false;
+    $scope.flagFundamentalInfo = true;
+    $scope.flagCapitalStructureInfo = true;
+    $scope.flagValuations = true;
+    $scope.flagPricePerformance = true;
+    $scope.flagAnalystsCall = true;
+    $scope.reverseSort = false;
 
     showRecords();
 
@@ -113,6 +120,68 @@ module.controller('StockListController', function($scope, $http, $filter) {
             }
         }
         return false;
+    }
+
+    $scope.showColumns = function(selectedOption) {
+        if (selectedOption == "BasicInfo") {
+            $scope.flagBasicInfo = false;
+            $scope.flagFundamentalInfo = true;
+            $scope.flagCapitalStructureInfo = true;
+            $scope.flagValuations = true;
+            $scope.flagPricePerformance = true;
+            $scope.flagAnalystsCall = true;
+        }
+        if (selectedOption == "FundamentalInfo") {
+            $scope.flagBasicInfo = true;
+            $scope.flagFundamentalInfo = false;
+            $scope.flagCapitalStructureInfo = true;
+            $scope.flagValuations = true;
+            $scope.flagPricePerformance = true;
+            $scope.flagAnalystsCall = true;
+        }
+        if (selectedOption == "CapitalStructureInfo") {
+            $scope.flagBasicInfo = true;
+            $scope.flagFundamentalInfo = true;
+            $scope.flagCapitalStructureInfo = false;
+            $scope.flagValuations = true;
+            $scope.flagPricePerformance = true;
+            $scope.flagAnalystsCall = true;
+        }
+        if (selectedOption == "Valuations") {
+            $scope.flagBasicInfo = true;
+            $scope.flagFundamentalInfo = true;
+            $scope.flagCapitalStructureInfo = true;
+            $scope.flagValuations = false;
+            $scope.flagPricePerformance = true;
+            $scope.flagAnalystsCall = true;
+        }
+        if (selectedOption == "PricePerformance") {
+            $scope.flagBasicInfo = true;
+            $scope.flagFundamentalInfo = true;
+            $scope.flagCapitalStructureInfo = true;
+            $scope.flagValuations = true;
+            $scope.flagPricePerformance = false;
+            $scope.flagAnalystsCall = true;
+        }
+        if (selectedOption == "AnalystsCall") {
+            $scope.flagBasicInfo = true;
+            $scope.flagFundamentalInfo = true;
+            $scope.flagCapitalStructureInfo = true;
+            $scope.flagValuations = true;
+            $scope.flagPricePerformance = true;
+            $scope.flagAnalystsCall = false;
+        }
+    }
+
+    $scope.sortData = function (column) {
+        $scope.reverseSort = ($scope.sortColumn == column) ? !$scope.reverseSort : false;
+        $scope.sortColumn = column;
+    }
+    $scope.getSortClass = function (column) {
+        if ($scope.sortColumn == column) {
+            return $scope.reverseSort ? 'fa fa-sort-up fa-fw' : 'fa fa-sort-down fa-fw'
+        }
+        return '';
     }
 
 });

@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -63,10 +60,24 @@ public class CommonService {
     }
 
     @Autowired
+    private static MutualFundStatsRepository mutualFundStatsRepository;
+    @Autowired
+    public void setMutualFundStatsRepository(MutualFundStatsRepository mutualFundStatsRepository){
+        CommonService.mutualFundStatsRepository = mutualFundStatsRepository;
+    }
+
+    @Autowired
     private static StockUniverseRepository stockUniverseRepository;
     @Autowired
     public void setStockUniverseRepository(StockUniverseRepository stockUniverseRepository){
         CommonService.stockUniverseRepository = stockUniverseRepository;
+    }
+
+    @Autowired
+    private static DailyDataSRepository dailyDataSRepository;
+    @Autowired
+    public void setDailyDataSRepository(DailyDataSRepository dailyDataSRepository) {
+        CommonService.dailyDataSRepository = dailyDataSRepository;
     }
 
     @Autowired
@@ -278,6 +289,15 @@ public class CommonService {
         return fundsDTO;
     }
 
+    @Cacheable(value = "SelectedMFStats")
+    public static List<MutualFundStats> getSelectedMF() {
+        //return null;
+        List<MutualFundStats> mfStats =  CommonService.mutualFundStatsRepository.findAll();
+        mfStats.sort(Comparator.comparing(l->l.getSchemeNamePart()));
+        mfStats.sort(Comparator.comparing(l->l.getSchemeType()));
+        return mfStats;
+    }
+
     /**
      * Returns all stocks
      * @return
@@ -294,6 +314,7 @@ public class CommonService {
     @Cacheable(value = "NseBse500Basic")
     public static List<NseBse500> getNseBse500() {
         List<StockUniverse> nseBse500BasicList = CommonService.stockUniverseRepository.findAllByIsNse500OrIsBse500OrderByMarketcapDesc(1,1);
+        List<DailyDataS> dailyDataSList = CommonService.dailyDataSRepository.findAllByKeyDate(getSetupDates().getDateToday());
         List<NseBse500> nseBse500List = new ArrayList<>();
         List<Subindustry> subindustries = CommonService.getSubindustries();
         for(StockUniverse stockUniverse : nseBse500BasicList){
@@ -305,6 +326,9 @@ public class CommonService {
             nseBse500.setSectorNameDisplay(subindustries1.get(0).getSectorNameDisplay());
             nseBse500.setIndustryNameDisplay(subindustries1.get(0).getIndustryNameDisplay());
             nseBse500.setSubIndustryNameDisplay(subindustries1.get(0).getSubIndustryNameDisplay());
+
+            nseBse500.setDailyDataS(dailyDataSList.stream().filter(dailyDataS -> nseBse500.getTicker5().equals(dailyDataS.getKey().getName())).findAny().orElse(null));
+
             nseBse500List.add(nseBse500);
         }
         return nseBse500List;

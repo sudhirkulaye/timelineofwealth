@@ -6,7 +6,7 @@ ADD COLUMN irr_return decimal(20,3) DEFAULT 0 COMMENT 'Unrealized IRR return' AF
 ADD COLUMN twr_return decimal(20,3) DEFAULT 0 COMMENT 'Unrealized TWRR return' AFTER next_processing_date; */
 
 select distinct category from mutual_fund_universe; 
-select * from wealth_details where memberid = 1022 order by name; -- 1019;
+select * from wealth_details where memberid = 1011 order by name; -- 1019;
 SELECT * from sip  where memberid = 1022;-- 25 records
 select ticker, buy_date, sum(quantity), name, rate, total_cost, net_Rate from wealth_details where memberid = 1003 group by memberid, ticker order by name; 
 select * from wealth_details where memberid = 1046; -- 1019;
@@ -68,5 +68,5 @@ select * from member;
 
 select * from member a where last_name like 'Rane%';
 select * from sip a where a.memberid in (1016, 1059, 1060) order by memberid, scheme_name;
-select * from wealth_details a where a.memberid in (1016, 1059, 1060) order by memberid, name;
+select * from wealth_details a where a.memberid in (1007, 1015, 1058) order by memberid, name;
 select * from mutual_fund_house;

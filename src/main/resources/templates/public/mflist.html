@@ -48,52 +48,103 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <label class="pull-left" >Fund House : &nbsp;&nbsp;&nbsp;</label>
-                            <select class="pull-left" ng-change="getSchemeDetails()" ng-model="fundHouse" >
-                                <option ng-repeat="fundHouse in fundHouses" value="{{fundHouse}}">{{fundHouse}}</option>
-                            </select>
+                            <!--<label class="pull-left" >Fund House : &nbsp;&nbsp;&nbsp;</label>-->
+                            <!--<select class="pull-left" ng-change="getSchemeDetails()" ng-model="fundHouse" >-->
+                                <!--<option ng-repeat="fundHouse in fundHouses" value="{{fundHouse}}">{{fundHouse}}</option>-->
+                            <!--</select>-->
                             <label class="pull-left" >&nbsp;&nbsp;&nbsp;</label>
                             <label class="pull-left" >Category : &nbsp;&nbsp;&nbsp;</label>
-                            <select class="pull-left" ng-change="getSchemeDetails()" ng-model="category" >
-                                <option>Debt</option>
-                                <option>Equity</option>
-                                <option>Hybrid</option>
-                                <option>Gold</option>
+                            <select class="pull-left" ng-model="category" >
+                                <option></option>
+                                <option selected="true">Large Cap</option>
+                                <option>Mid Cap</option>
+                                <option>Multi Cap</option>
+                                <option>Small Cap</option>
                             </select>
                             <lebel class="pull-left" >&nbsp;&nbsp;&nbsp;</lebel>
                             <input class="pull-left" type="text" placeholder="Search by Name" ng-model="searchText" />
+                            <lebel class="pull-left" >&nbsp;&nbsp;&nbsp; Show &nbsp;&nbsp;&nbsp; </lebel>
+                            <lebel class="pull-left" > <input type="radio" checked="" value="returns" id="optionsRadios1" name="optionsRadios" ng-click="showColumns('YearlyReturns')" /> Year wise Returns &nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios2" name="optionsRadios" ng-click="showColumns('TrailingReturns')" /> Trailing Returns &nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios3" name="optionsRadios" ng-click="showColumns('SectorAllocation')" /> Sector Allocation &nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios4" name="optionsRadios" ng-click="showColumns('TopStocks')" /> Top Stocks &nbsp;&nbsp;&nbsp;</lebel>
                         </div>
                         <div class="x_content">
                             <p>
                                 <lable style="float: right;" th:text="${dateToday}"></lable>
-                                <lable style="float: right;">Last updated : </lable>
+                                <lable style="float: right;">&nbsp;&nbsp;&nbsp; Last updated : </lable>
+                                <lable style="float: right;">* Returns 1-Jan-2019 till Date  </lable>
+                                <label style="float: left;"><font color="red"> Return columns are sortable. Click on header to sort.</font></label>
                             </p>
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th colspan="4"></th>
-                                        <th colspan="4">Returns</th>
+                                        <th colspan="2"></th>
+                                        <th colspan="10" ng-hide="flagYearlyReurns">Year wise Returns</th>
+                                        <th colspan="4" ng-hide="flagTrailingReturns">Trailing Absolute Returns</th>
+                                        <th colspan="7" ng-hide="flagSectorAllocation">Sector Allocation</th>
+                                        <th colspan="4" ng-hide="flagTopStocks">Top 4 Stock Holdings</th>
                                     </tr>
                                     <tr>
-                                        <!--<th>Asset Class</th>-->
-                                        <th>Category</th>
-                                        <th>Name</th>
-                                        <th>NAV</th>
-                                        <th>1 Yr</th>
-                                        <th>3 Yr</th>
-                                        <th>5 Yr</th>
-                                        <th>10 Yr</th>
+                                        <th ng-click="sortData('schemeType')" >Category<i ng-class="getSortClass('schemeType')" /></th>
+                                        <th ng-click="sortData('schemeNamePart')" >Name<i ng-class="getSortClass('schemeNamePart')" /></th>
+                                        <th ng-click="sortData('totalReturnsY0')" ng-hide="flagYearlyReurns">2019*<i ng-class="getSortClass('totalReturnsY0')" /></th>
+                                        <th ng-click="sortData('totalReturnsY1')" ng-hide="flagYearlyReurns">2018<i ng-class="getSortClass('totalReturnsY1')" /></th>
+                                        <th ng-click="sortData('totalReturnsY2')" ng-hide="flagYearlyReurns">2017<i ng-class="getSortClass('totalReturnsY2')" /></th>
+                                        <th ng-click="sortData('totalReturnsY3')" ng-hide="flagYearlyReurns">2016<i ng-class="getSortClass('totalReturnsY3')" /></th>
+                                        <th ng-click="sortData('totalReturnsY4')" ng-hide="flagYearlyReurns">2015<i ng-class="getSortClass('totalReturnsY4')" /></th>
+                                        <th ng-click="sortData('totalReturnsY5')" ng-hide="flagYearlyReurns">2014<i ng-class="getSortClass('totalReturnsY5')" /></th>
+                                        <th ng-click="sortData('totalReturnsY6')" ng-hide="flagYearlyReurns">2013<i ng-class="getSortClass('totalReturnsY6')" /></th>
+                                        <th ng-click="sortData('totalReturnsY7')" ng-hide="flagYearlyReurns">2012<i ng-class="getSortClass('totalReturnsY7')" /></th>
+                                        <th ng-click="sortData('totalReturnsY8')" ng-hide="flagYearlyReurns">2011<i ng-class="getSortClass('totalReturnsY8')" /></th>
+                                        <th ng-click="sortData('totalReturnsY9')" ng-hide="flagYearlyReurns">2010<i ng-class="getSortClass('totalReturnsY9')" /></th>
+                                        <th ng-click="sortData('totalReturnsY10')" ng-hide="flagYearlyReurns">2009<i ng-class="getSortClass('totalReturnsY10')" /></th>
+                                        <th ng-click="sortData('trailingReturn1yr')" ng-hide="flagTrailingReturns">1 Yr<i ng-class="getSortClass('trailingReturn1yr')" /></th>
+                                        <th ng-click="sortData('trailingReturn3yr')" ng-hide="flagTrailingReturns">3 Yr<i ng-class="getSortClass('trailingReturn3yr')" /></th>
+                                        <th ng-click="sortData('trailingReturn5yr')" ng-hide="flagTrailingReturns">5 Yr<i ng-class="getSortClass('trailingReturn5yr')" /></th>
+                                        <th ng-click="sortData('trailingReturn10yr')" ng-hide="flagTrailingReturns">6 Yr<i ng-class="getSortClass('trailingReturn10yr')" /></th>
+                                        <th ng-hide="flagSectorAllocation">Basic Materials</th>
+                                        <th ng-hide="flagSectorAllocation">Consumer Cyclical</th>
+                                        <th ng-hide="flagSectorAllocation">Financial Services</th>
+                                        <th ng-hide="flagSectorAllocation">Industrial</th>
+                                        <th ng-hide="flagSectorAllocation">Technology</th>
+                                        <th ng-hide="flagSectorAllocation">Consumer Defensive</th>
+                                        <th ng-hide="flagSectorAllocation">Healthcare</th>
+                                        <th ng-hide="flagTopStocks">Stock 1</th>
+                                        <th ng-hide="flagTopStocks">Stock 2</th>
+                                        <th ng-hide="flagTopStocks">Stock 3</th>
+                                        <th ng-hide="flagTopStocks">Stock 4</th>
                                     </tr>
                                     <tbody>
-                                        <tr ng-repeat="fund in fundsDTO | filter:searchFund ">
-                                            <!--<td>{{ (assetClasses | filter : { 'classid' : fund.assetClassid})[0].subclassName }}</td>-->
-                                            <td>{{fund.category}}</td>
-                                            <td>{{fund.schemeNameFull}}</td>
-                                            <td align="right">{{fund.latestNav}}</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
+                                        <tr ng-repeat="fund in fundsDTO | filter:searchFund | filter:filterByCategory | orderBy:sortColumn:reverseSort">
+                                            <td>{{fund.schemeType}}</td>
+                                            <td>{{fund.schemeNamePart}}</td>
+                                            <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY0}}%</td>
+                                            <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY1}}%</td>
+                                            <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY2}}%</td>
+                                            <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY3}}%</td>
+                                            <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY4}}%</td>
+                                            <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY5}}%</td>
+                                            <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY6}}%</td>
+                                            <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY7}}%</td>
+                                            <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY8}}%</td>
+                                            <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY9}}%</td>
+                                            <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY10}}%</td>
+                                            <td ng-hide="flagTrailingReturns">{{fund.trailingReturn1yr}}%</td>
+                                            <td ng-hide="flagTrailingReturns">{{fund.trailingReturn3yr}}%</td>
+                                            <td ng-hide="flagTrailingReturns">{{fund.trailingReturn5yr}}%</td>
+                                            <td ng-hide="flagTrailingReturns">{{fund.trailingReturn10yr}}%</td>
+                                            <td ng-hide="flagSectorAllocation">{{fund.sectorBasicMaterials}}%</td>
+                                            <td ng-hide="flagSectorAllocation">{{fund.sectorConsumerCyclical}}%</td>
+                                            <td ng-hide="flagSectorAllocation">{{fund.sectorFinacialServices}}%</td>
+                                            <td ng-hide="flagSectorAllocation">{{fund.sectorIndustrial}}%</td>
+                                            <td ng-hide="flagSectorAllocation">{{fund.sectorTechnology}}%</td>
+                                            <td ng-hide="flagSectorAllocation">{{fund.sectorConsumerDefensive}}%</td>
+                                            <td ng-hide="flagSectorAllocation">{{fund.sectorHealthcare}}%</td>
+                                            <td ng-hide="flagTopStocks">{{fund.stock1}}</td>
+                                            <td ng-hide="flagTopStocks">{{fund.stock2}}</td>
+                                            <td ng-hide="flagTopStocks">{{fund.stock3}}</td>
+                                            <td ng-hide="flagTopStocks">{{fund.stock4}}</td>
                                         </tr>
                                     </tbody>
                                 </thead>
