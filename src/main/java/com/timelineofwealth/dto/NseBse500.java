@@ -1,5 +1,6 @@
 package com.timelineofwealth.dto;
 
+import com.timelineofwealth.entities.DailyDataS;
 import com.timelineofwealth.entities.StockUniverse;
 
 import java.io.Serializable;
@@ -42,6 +43,7 @@ public class NseBse500 implements Serializable {
     private String sectorNameDisplay;
     private String industryNameDisplay;
     private String subIndustryNameDisplay;
+    private DailyDataS dailyDataS;
 
     public NseBse500(){}
     public NseBse500(StockUniverse stockUniverse){
@@ -99,7 +101,6 @@ public class NseBse500 implements Serializable {
     public String getTicker() {
         return ticker;
     }
-
     public void setTicker(String ticker) {
         this.ticker = ticker;
     }
@@ -107,7 +108,6 @@ public class NseBse500 implements Serializable {
     public String getTicker1() {
         return ticker1;
     }
-
     public void setTicker1(String ticker1) {
         this.ticker1 = ticker1;
     }
@@ -115,7 +115,6 @@ public class NseBse500 implements Serializable {
     public String getTicker2() {
         return ticker2;
     }
-
     public void setTicker2(String ticker2) {
         this.ticker2 = ticker2;
     }
@@ -123,7 +122,6 @@ public class NseBse500 implements Serializable {
     public String getTicker3() {
         return ticker3;
     }
-
     public void setTicker3(String ticker3) {
         this.ticker3 = ticker3;
     }
@@ -131,7 +129,6 @@ public class NseBse500 implements Serializable {
     public String getTicker4() {
         return ticker4;
     }
-
     public void setTicker4(String ticker4) {
         this.ticker4 = ticker4;
     }
@@ -139,7 +136,6 @@ public class NseBse500 implements Serializable {
     public String getTicker5() {
         return ticker5;
     }
-
     public void setTicker5(String ticker5) {
         this.ticker5 = ticker5;
     }
@@ -147,7 +143,6 @@ public class NseBse500 implements Serializable {
     public String getNseCode() {
         return nseCode;
     }
-
     public void setNseCode(String nseCode) {
         this.nseCode = nseCode;
     }
@@ -155,7 +150,6 @@ public class NseBse500 implements Serializable {
     public String getBseCode() {
         return bseCode;
     }
-
     public void setBseCode(String bseCode) {
         this.bseCode = bseCode;
     }
@@ -163,7 +157,6 @@ public class NseBse500 implements Serializable {
     public String getIsinCode() {
         return isinCode;
     }
-
     public void setIsinCode(String isinCode) {
         this.isinCode = isinCode;
     }
@@ -171,7 +164,6 @@ public class NseBse500 implements Serializable {
     public String getShortName() {
         return shortName;
     }
-
     public void setShortName(String shortName) {
         this.shortName = shortName;
     }
@@ -179,7 +171,6 @@ public class NseBse500 implements Serializable {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -187,7 +178,6 @@ public class NseBse500 implements Serializable {
     public int getAssetClassid() {
         return assetClassid;
     }
-
     public void setAssetClassid(int assetClassid) {
         this.assetClassid = assetClassid;
     }
@@ -195,7 +185,6 @@ public class NseBse500 implements Serializable {
     public String getBseIndustry() {
         return bseIndustry;
     }
-
     public void setBseIndustry(String bseIndustry) {
         this.bseIndustry = bseIndustry;
     }
@@ -203,7 +192,6 @@ public class NseBse500 implements Serializable {
     public int getSubindustryid() {
         return subindustryid;
     }
-
     public void setSubindustryid(int subindustryid) {
         this.subindustryid = subindustryid;
     }
@@ -211,7 +199,6 @@ public class NseBse500 implements Serializable {
     public BigDecimal getLatestPrice() {
         return latestPrice;
     }
-
     public void setLatestPrice(BigDecimal latestPrice) {
         this.latestPrice = latestPrice;
     }
@@ -219,7 +206,6 @@ public class NseBse500 implements Serializable {
     public Date getDateLatestPrice() {
         return dateLatestPrice;
     }
-
     public void setDateLatestPrice(Date dateLatestPrice) {
         this.dateLatestPrice = dateLatestPrice;
     }
@@ -227,7 +213,6 @@ public class NseBse500 implements Serializable {
     public int getIsSensex() {
         return isSensex;
     }
-
     public void setIsSensex(int isSensex) {
         this.isSensex = isSensex;
     }
@@ -235,7 +220,6 @@ public class NseBse500 implements Serializable {
     public int getIsNifty50() {
         return isNifty50;
     }
-
     public void setIsNifty50(int isNifty50) {
         this.isNifty50 = isNifty50;
     }
@@ -243,7 +227,6 @@ public class NseBse500 implements Serializable {
     public int getIsNiftyjr() {
         return isNiftyjr;
     }
-
     public void setIsNiftyjr(int isNiftyjr) {
         this.isNiftyjr = isNiftyjr;
     }
@@ -251,7 +234,6 @@ public class NseBse500 implements Serializable {
     public int getIsBse100() {
         return isBse100;
     }
-
     public void setIsBse100(int isBse100) {
         this.isBse100 = isBse100;
     }
@@ -259,7 +241,6 @@ public class NseBse500 implements Serializable {
     public int getIsNse100() {
         return isNse100;
     }
-
     public void setIsNse100(int isNse100) {
         this.isNse100 = isNse100;
     }
@@ -267,7 +248,6 @@ public class NseBse500 implements Serializable {
     public int getIsBse200() {
         return isBse200;
     }
-
     public void setIsBse200(int isBse200) {
         this.isBse200 = isBse200;
     }
@@ -275,7 +255,6 @@ public class NseBse500 implements Serializable {
     public int getIsNse200() {
         return isNse200;
     }
-
     public void setIsNse200(int isNse200) {
         this.isNse200 = isNse200;
     }
@@ -283,7 +262,6 @@ public class NseBse500 implements Serializable {
     public int getIsBse500() {
         return isBse500;
     }
-
     public void setIsBse500(int isBse500) {
         this.isBse500 = isBse500;
     }
@@ -291,7 +269,6 @@ public class NseBse500 implements Serializable {
     public int getIsNse500() {
         return isNse500;
     }
-
     public void setIsNse500(int isNse500) {
         this.isNse500 = isNse500;
     }
@@ -299,7 +276,6 @@ public class NseBse500 implements Serializable {
     public BigDecimal getMarketcap() {
         return marketcap;
     }
-
     public void setMarketcap(BigDecimal marketcap) {
         this.marketcap = marketcap;
     }
@@ -307,7 +283,6 @@ public class NseBse500 implements Serializable {
     public BigDecimal getPeTtm() {
         return peTtm;
     }
-
     public void setPeTtm(BigDecimal peTtm) {
         this.peTtm = peTtm;
     }
@@ -315,7 +290,6 @@ public class NseBse500 implements Serializable {
     public String getTickerOld() {
         return tickerOld;
     }
-
     public void setTickerOld(String tickerOld) {
         this.tickerOld = tickerOld;
     }
@@ -323,7 +297,6 @@ public class NseBse500 implements Serializable {
     public Date getListingDate() {
         return listingDate;
     }
-
     public void setListingDate(Date listingDate) {
         this.listingDate = listingDate;
     }
@@ -331,7 +304,6 @@ public class NseBse500 implements Serializable {
     public String getIncludedIndexName() {
         return includedIndexName;
     }
-
     public void setIncludedIndexName(String includedIndexName) {
         this.includedIndexName = includedIndexName;
     }
@@ -339,7 +311,6 @@ public class NseBse500 implements Serializable {
     public String getSectorNameDisplay() {
         return sectorNameDisplay;
     }
-
     public void setSectorNameDisplay(String sectorNameDisplay) {
         this.sectorNameDisplay = sectorNameDisplay;
     }
@@ -347,7 +318,6 @@ public class NseBse500 implements Serializable {
     public String getIndustryNameDisplay() {
         return industryNameDisplay;
     }
-
     public void setIndustryNameDisplay(String industryNameDisplay) {
         this.industryNameDisplay = industryNameDisplay;
     }
@@ -355,8 +325,14 @@ public class NseBse500 implements Serializable {
     public String getSubIndustryNameDisplay() {
         return subIndustryNameDisplay;
     }
-
     public void setSubIndustryNameDisplay(String subIndustryNameDisplay) {
         this.subIndustryNameDisplay = subIndustryNameDisplay;
+    }
+
+    public DailyDataS getDailyDataS() {
+        return dailyDataS;
+    }
+    public void setDailyDataS(DailyDataS dailyDataS) {
+        this.dailyDataS = dailyDataS;
     }
 }
