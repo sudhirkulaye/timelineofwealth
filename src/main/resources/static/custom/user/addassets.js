@@ -32,7 +32,8 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         "maturityValue":0.00,
         "maturityDate":"",
         "lastValuationDate":new Date(),
-        "sipid":0
+        "sipid":0,
+        "portfoliono":""
     }
     var subindustryidInt = 0;
     $scope.hideForm = true;
@@ -76,6 +77,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
     $scope.realEstateFlag = false;
     $scope.alternativeInvestmentsFlag = false;
     $scope.sipidFlag = false;
+    $scope.portfolionoFlag = false;
 
     $scope.labelBuyDate = "Purchase Date";
     $scope.labelBuyDateToolTip = "Asset/Security Purchase/Transaction Date";
@@ -458,6 +460,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
             $scope.maturityDateFlag = false;
             $scope.lastValuationDateFlag = true;
             $scope.sipidFlag = true;
+            $scope.portfolionoFlag = true;
 
         }
         if ((assetClassid >= 406010 && assetClassid <= 408040) || assetClassType == 'Stocks') {
@@ -647,6 +650,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         $scope.wealthDetailsRecordForm.maturityValue = wealthDetailsRecord.maturityValue;
         $scope.wealthDetailsRecordForm.maturityDate = new Date(wealthDetailsRecord.maturityDate);
         $scope.wealthDetailsRecordForm.lastValuationDate = new Date(wealthDetailsRecord.lastValuationDate);
+        $scope.wealthDetailsRecordForm.portfoliono = wealthDetailsRecord.portfoliono;
 
 
         if (wealthDetailsRecord.assetClassid == 201020 ||
@@ -699,6 +703,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         $scope.wealthDetailsRecordForm.maturityDate = "";
         $scope.wealthDetailsRecordForm.lastValuationDate = new Date();
         $scope.wealthDetailsRecordForm.sipid = 0;
+        $scope.wealthDetailsRecordForm.portfoliono = "";
 
         subindustryidInt = 0;
 
@@ -728,6 +733,7 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         $scope.realEstateFlag = false;
         $scope.alternativeInvestmentsFlag = false;
         $scope.sipidFlag = false;
+        $scope.portfolionoFlag = false;
 
         $scope.dummy.assetClassType = "";
         $scope.dummy.fundHouse = "";
@@ -760,13 +766,15 @@ module.controller('WealthDetailsController', function($scope, $http, $filter) {
         $scope.marketValueFlag = false;
         $scope.holdingPeriodFlag = false;
         $scope.netProfitFlag = false;
-        $scope.absoluteReturnFlag = false;
+        $scope.absoluteRet$scope.portfolionoFlag = false;urnFlag = false;
         $scope.annualizedReturnFlag = false;
         $scope.maturityValueFlag = false;
         $scope.maturityDateFlag = false;
         $scope.lastValuationDateFlag = false;
         $scope.alternativeInvestmentsFlag = false;
         $scope.sipidFlag = false;
+        $scope.portfolionoFlag = false;
+
 
         $scope.mutualFundFlag = false;
         $scope.stockFlag = false;

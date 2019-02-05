@@ -308,10 +308,11 @@ CREATE TABLE wealth_details (
   maturity_date date DEFAULT '1900-01-01' COMMENT 'Security Maturity Value especially for FDs',
   last_valuation_date date DEFAULT '1900-01-01' COMMENT 'Last Valution Date',
   sipid INT(2) NULL DEFAULT 0 COMMENT 'SIP ID for automatic transaction',
+  portfoliono VARCHAR(45) NULL DEFAULT '0' COMMENT 'Portfolio Number in case of Mutual Fund',
   PRIMARY KEY (memberid,ticker,buy_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Members current wealth Wealth at transaction level';
 
-select * from wealth_details a  where a.memberid in (1000) order by a.memberid, a.asset_classid, a.ticker, a.buy_date;
+select * from wealth_details a  where a.memberid in (1002) order by a.memberid, a.asset_classid, a.ticker, a.buy_date;
 update wealth_details a, stock_universe b set a.asset_classid = b.asset_classid where a.ticker = b.ticker;
 
 CREATE TABLE setup_dates (
