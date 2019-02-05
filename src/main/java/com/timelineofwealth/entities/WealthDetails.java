@@ -83,6 +83,8 @@ public class WealthDetails implements Serializable {
     private Date lastValuationDate;
     @Column(name = "sipid")
     private int sipid;
+    @Column(name = "portfoliono")
+    private String portfoliono;
 
     public WealthDetailsKey getKey() {
         return key;
@@ -229,5 +231,12 @@ public class WealthDetails implements Serializable {
     }
     public void setSipid(int sipid) {
         this.sipid = sipid;
+    }
+
+    public String getPortfoliono() {
+        return portfoliono;
+    }
+    public void setPortfoliono(String portfoliono) {
+        this.portfoliono = portfoliono;
     }
 }
