@@ -222,3 +222,4 @@ update stock_universe a, stock_universe_bloomberg b set a.ticker2 = b.ticker_b w
 
 select * from stock_universe a where (a.is_nse500 = 1 or a.is_bse500 = 1) and ticker2 ='' order by asset_classid, marketcap desc, ticker;
 
+select * from stock_universe a WHERE a.ticker like 'BAJ%';

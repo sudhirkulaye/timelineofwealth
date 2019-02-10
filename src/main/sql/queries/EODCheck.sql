@@ -41,7 +41,7 @@ truncate table log_table;
 SELECT count(1), listing_date from stock_universe a group by a.listing_date order by a.listing_date desc; -- WHERE listing_date; > '2018-11-26';
 
 -- stock split probable candidate
-select * from stock_split_probability a where a.is_processed = 'NO';
+select * from stock_split_probability a where a.is_processed = 'NO' order by date desc;
 
 -- new Mutual Fund Entry
 select count(1), date_latest_nav from mutual_fund_universe a where a.isin_div_payout_or_isin_growth = 'XXX' group by date_latest_nav order by date_latest_nav desc;
@@ -147,3 +147,4 @@ select * from wealth_details a where a.ticker = 'IDFCFIRSTB';
 select * from stock_universe a where ticker in ('IDFCFIRSTB','BAJAJCON');
 -- BAJAJCORP to BAJAJCON and 'Bajaj Corp' to 'Bajaj Consumer'
 -- IDFCBANK to IDFCFIRSTB and 'IDFC Bank' to 'IDFC First Bank'
+select * from stock_cashflow a where ticker = 'BAJFINANCE';

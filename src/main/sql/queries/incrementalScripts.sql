@@ -69,4 +69,5 @@ select * from member;
 select * from member a where last_name like 'Rane%';
 select * from sip a where a.memberid in (1016, 1059, 1060) order by memberid, scheme_name;
 select * from wealth_details a where a.memberid in (1007, 1015, 1058) order by memberid, name;
+select distinct(portfoliono) from wealth_details a where a.short_name like '%-Reg-%' and a.memberid in (1007, 1015, 1058) order by memberid, name;
 select * from mutual_fund_house;
