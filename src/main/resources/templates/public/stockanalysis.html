@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="StockAnalysisManagement" ng-controller="StockAnalysisController">
+<!-- iCheck -->
+<link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
+<!-- bootstrap-wysiwyg -->
+<link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" th:href="@{/vendors/google-code-prettify/bin/prettify.min.css}"  rel="stylesheet" />
+<!-- Select2 -->
+<link href="../../static/vendors/select2/dist/css/select2.min.css" th:href="@{/vendors/select2/dist/css/select2.min.css}"  rel="stylesheet" />
+<!-- Switchery -->
+<link href="../../static/vendors/switchery/dist/switchery.min.css" th:href="@{/vendors/switchery/dist/switchery.min.css}" rel="stylesheet" />
+<!-- starrr -->
+<link href="../../static/vendors/starrr/dist/starrr.css" th:href="@{/vendors/starrr/dist/starrr.css}"  rel="stylesheet" />
+<!-- bootstrap-daterangepicker -->
+<link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}"  rel="stylesheet" />
+<!-- Animate.css -->
+<link href="../../static/vendors/animate.css/animate.min.css" th:href="@{/vendors/animate.css/animate.min.css}" rel="stylesheet" />
+<!-- jQuery custom content scroller -->
+<link href="../../static/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" th:href="@{/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css}" rel="stylesheet" />
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!--Angular custom filter (for group by) JS-->
+<script src="../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
+<!-- Chart.js -->
+<script src="../../static/vendors/Chart.js/dist/Chart.min.js" th:src="@{/vendors/Chart.js/dist/Chart.min.js}"></script>
+<!-- angular.chartjs -->
+<script src="../../static/vendors/angular.chartjs/angular-chart.min.js" th:src="@{/vendors/angular.chartjs/angular-chart.min.js}"></script>
+<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>-->
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/public/stockanalysis.js" th:src="@{/custom/public/stockanalysis.js}"></script>
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <br />
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h1>Stock Analysis: {{stockDetails.shortName}}</h1>
+                            <p />Detailed Analysis of Stock
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Sector</th>
+                                        <td>{{stockDetails.sectorNameDisplay}}</td>
+                                        <th>Industry</th>
+                                        <td>{{stockDetails.industryNameDisplay}}</td>
+                                        <th>Sub-Industry</th>
+                                        <td>{{stockDetails.subIndustryNameDisplay}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Market Cap. (Cr)</th>
+                                        <td>{{stockDetails.dailyDataS.marketCap | currency:"&#8377;":0}}</td>
+                                        <th>TTM PE</th>
+                                        <td>{{stockDetails.dailyDataS.peTtm}}</td>
+                                        <th>TTM PB</th>
+                                        <td>{{stockDetails.dailyDataS.pbTtm}}</td>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Annual Sales &amp; Net Profit <small>Consolidated Sales &amp; Net Profit (or Standalone in case consolidated not available)</small></h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Settings 1</a>
+                                                </li>
+                                                <li><a href="#">Settings 2</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <canvas id="pnlchart"  class="chart chart-bar" chart-colors="newColors" chart-options="chartOptionsStockPnl"
+                                            chart-data="stockPnl" chart-labels="labelsYearsStockPnl" chart-dataset-override="stockPnlDataOverride"  ></canvas>
+                                </div>
+                            </div>
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Quarterly Sales &amp; Net Profit <small>Consolidated Sales &amp; Net Profit (or Standalone in case consolidated not available)</small></h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Settings 1</a>
+                                                </li>
+                                                <li><a href="#">Settings 2</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <canvas id="quarterchart"  class="chart chart-bar" chart-colors="newColors" chart-options="chartOptionsStockQuarter"
+                                            chart-data="stockQuarter" chart-labels="labelsYearsStockQuarter" chart-dataset-override="stockQuarterDataOverride"  ></canvas>
+                                </div>
+                            </div>
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Valuation Levels<small>Price to Consolidated Earnings (or Standalone in case consolidated not available)</small></h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Settings 1</a>
+                                                </li>
+                                                <li><a href="#">Settings 2</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <canvas id="valuationchart"  class="chart chart-line" chart-colors="newColors" chart-options="chartOptions"
+                                            chart-data="stockValuation" chart-labels="labelsYearsStockValuation" ></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- bootstrap-progressbar -->
+<script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js" th:src="@{/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js}"></script>
+<!-- iCheck -->
+<script src="../../static/vendors/iCheck/icheck.min.js" th:src="@{/vendors/iCheck/icheck.min.js}"></script>
+<!-- jquery.inputmask -->
+<script src="../../static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js" th:src="@{/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js}"></script>
+<!-- bootstrap-daterangepicker -->
+<script src="../../static/vendors/moment/min/moment.min.js" th:src="@{/vendors/moment/min/moment.min.js}"></script>
+<script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js" th:src="@{/vendors/bootstrap-daterangepicker/daterangepicker.js}"></script>
+<!-- bootstrap-wysiwyg -->
+<script src="../../static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js" th:src="@{/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js}"></script>
+<script src="../../static/vendors/jquery.hotkeys/jquery.hotkeys.js" th:src="@{/vendors/jquery.hotkeys/jquery.hotkeys.js}"></script>
+<script src="../../static/vendors/google-code-prettify/src/prettify.js" th:src="@{/vendors/google-code-prettify/src/prettify.js}"></script>
+<!-- jQuery Tags Input -->
+<script src="../../static/vendors/jquery.tagsinput/src/jquery.tagsinput.js" th:src="@{/vendors/jquery.tagsinput/src/jquery.tagsinput.js}"></script>
+<!-- Switchery -->
+<script src="../../static/vendors/switchery/dist/switchery.min.js" th:src="@{/vendors/switchery/dist/switchery.min.js}"></script>
+<!-- Select2 -->
+<script src="../../static/vendors/select2/dist/js/select2.full.min.js" th:src="@{/vendors/select2/dist/js/select2.full.min.js}"></script>
+<!-- Parsley -->
+<script src="../../static/vendors/parsleyjs/dist/parsley.min.js" th:src="@{/vendors/parsleyjs/dist/parsley.min.js}"></script>
+<!-- Autosize -->
+<script src="../../static/vendors/autosize/dist/autosize.min.js" th:src="@{/vendors/autosize/dist/autosize.min.js}"></script>
+<!-- jQuery autocomplete -->
+<script src="../../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js" th:src="@{/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js}"></script>
+<!-- starrr -->
+<script src="../../static/vendors/starrr/dist/starrr.js" th:src="@{/vendors/starrr/dist/starrr.js}"></script>
+
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>

@@ -42,7 +42,7 @@ select * from mutual_fund_nav_history where scheme_code = 119347 and date > '201
 select date_add('2019-01-01', INTERVAL 5 DAY);
 
 select * from wealth_history a where a.memberid = 1022;
-select * from wealth_asset_allocation_history a where a.memberid = 1022;
+select * from wealth_asset_allocation_history a where a.memberid in (1022) and date = (select date_today from setup_dates);
 
 -- query to update CMP, market_vaue, net_profit & absolute_return
 /*
@@ -66,8 +66,25 @@ select max(buy_date), ticker, short_name, sum(quantity), sum(market_value), sum(
 UPDATE wealth_details set maturity_date = '2000-01-01' where maturity_date is null;
 select * from member;
 
-select * from member a where last_name like 'Rane%';
-select * from sip a where a.memberid in (1016, 1059, 1060) order by memberid, scheme_name;
+select * from member a where last_name like 'V%';
+select * from sip a where a.memberid in (1007, 1015, 1058) order by memberid, scheme_name;
+
 select * from wealth_details a where a.memberid in (1007, 1015, 1058) order by memberid, name;
+
+-- Query to count Direct & Regular MF Exposures
+select sum(market_value), count(market_value) from wealth_details a  where a.memberid in (1007, 1015, 1058) and short_name like '%-%Dir%-%' order by memberid, name;
+select sum(market_value), count(market_value) from wealth_details a  where a.memberid in (1007, 1015, 1058) and short_name like '%-%Reg%-%' order by memberid, name;
+-- Query for MF Analysis
+select a.memberid Member, b.asset_class_group AssetClass, if(locate('-Reg', short_name) > 0, 'Regular', 'Direct') RegDir, if(locate('-G', short_name) > 0, 'Growth', 'Dividend') GrowthDiv, short_name ShortName, portfoliono FolioNO, a.quantity units, round(market_value, 0) MktValue, if(sipid > 0, 'Yes', '') Sip, if(datediff(now(),buy_date)/365 > 1, 'All', '-') Units, buy_date, a.ticker schemeCode 
+from wealth_details a, asset_classification b 
+where a.memberid in (1007, 1015, 1058) and 
+a.asset_classid = b.classid and
+(a.asset_classid in (201020, 202020, 203040, 301010, 301020) or (a.asset_classid > 401010 and a.asset_classid < 405040))
+order by memberid, asset_class_group, name;
+
+select * from mutual_fund_stats a where a.scheme_code in (101002,103155,102920,103215,105989,103360,103155,103174,103174,112323,100471,102000,109445,108909,103504,103504,103504,101922,100520,100520,103151,107578,111381,105989,105989,103360,103155,102920,105989);
+
+
 select distinct(portfoliono) from wealth_details a where a.short_name like '%-Reg-%' and a.memberid in (1007, 1015, 1058) order by memberid, name;
 select * from mutual_fund_house;
+

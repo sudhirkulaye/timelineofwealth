@@ -92,11 +92,39 @@ public class PublicApi {
         return CommonService.getAllStocks();
     }
 
+    @RequestMapping(value = "/getstockvaluation/{ticker}", method = RequestMethod.GET)
+    public List<StockPnl> getStockValuation(@PathVariable String ticker){
+        logger.debug(String.format("Call public/api/getstockvaluation/"+ticker));
+
+        return CommonService.getStockPnl(ticker);
+    }
+
+    @RequestMapping(value = "/getstockpnl/{ticker}", method = RequestMethod.GET)
+    public List<StockPnl> getStockPnl(@PathVariable String ticker){
+        logger.debug(String.format("Call public/api/getstockpnl/"+ticker));
+
+        return CommonService.getStockPnl(ticker);
+    }
+
+    @RequestMapping(value = "/getstockquarter/{ticker}", method = RequestMethod.GET)
+    public List<StockQuarter> getStockQuarter(@PathVariable String ticker){
+        logger.debug(String.format("Call public/api/getstockquarter/"+ticker));
+
+        return CommonService.getStockQuarter(ticker);
+    }
+
     @RequestMapping(value = "/getnsebse500", method = RequestMethod.GET)
     public List<NseBse500> getNseBse500(){
         logger.debug(String.format("Call public/api/getnsebse500/"));
 
         return CommonService.getNseBse500();
+    }
+
+    @RequestMapping(value = "/getstockdetails/{ticker}", method = RequestMethod.GET)
+    public NseBse500 getStockDetails(@PathVariable String ticker){
+        logger.debug(String.format("Call public/api/getstockdetails/"+ticker));
+
+        return CommonService.getStockDetails(ticker);
     }
 
     @RequestMapping(value = "/getindexvaluation", method = RequestMethod.GET)

@@ -74,6 +74,20 @@ public class CommonService {
     }
 
     @Autowired
+    private static StockPnlRepository stockPnlRepository;
+    @Autowired
+    public void setStockPnlRepository(StockPnlRepository stockPnlRepository){
+        CommonService.stockPnlRepository = stockPnlRepository;
+    }
+
+    @Autowired
+    private static StockQuarterRepository stockQuarterRepository;
+    @Autowired
+    public void setStockQuarterRepository(StockQuarterRepository stockQuarterRepository){
+        CommonService.stockQuarterRepository = stockQuarterRepository;
+    }
+
+    @Autowired
     private static DailyDataSRepository dailyDataSRepository;
     @Autowired
     public void setDailyDataSRepository(DailyDataSRepository dailyDataSRepository) {
@@ -100,6 +114,9 @@ public class CommonService {
     public void setIndexStatisticsRepository(IndexStatisticsRepository indexStatisticsRepository){
         CommonService.indexStatisticsRepository = indexStatisticsRepository;
     }
+
+    private static List<StockUniverse> nseBse500BasicList;
+    private static List<NseBse500> nseBse500List;
 
     /**
      * Returns true if SignIn User is Admin
@@ -307,15 +324,16 @@ public class CommonService {
         return CommonService.stockUniverseRepository.findAll();
     }
 
+
     /**
      * Returns all stocks
      * @return
      */
     @Cacheable(value = "NseBse500Basic")
     public static List<NseBse500> getNseBse500() {
-        List<StockUniverse> nseBse500BasicList = CommonService.stockUniverseRepository.findAllByIsNse500OrIsBse500OrderByMarketcapDesc(1,1);
+        nseBse500BasicList = CommonService.stockUniverseRepository.findAllByIsNse500OrIsBse500OrderByMarketcapDesc(1,1);
         List<DailyDataS> dailyDataSList = CommonService.dailyDataSRepository.findAllByKeyDate(getSetupDates().getDateToday());
-        List<NseBse500> nseBse500List = new ArrayList<>();
+        nseBse500List = new ArrayList<>();
         List<Subindustry> subindustries = CommonService.getSubindustries();
         for(StockUniverse stockUniverse : nseBse500BasicList){
             NseBse500 nseBse500 = new NseBse500(stockUniverse);
@@ -332,6 +350,62 @@ public class CommonService {
             nseBse500List.add(nseBse500);
         }
         return nseBse500List;
+    }
+
+    /**
+     * Get Stock Details
+     * @param ticker
+     * @return
+     */
+    public static NseBse500 getStockDetails(String ticker) {
+        if (nseBse500List == null) {
+            nseBse500List = getNseBse500();
+        }
+        return nseBse500List.stream().filter(stock -> stock.getTicker().equals(ticker)).collect(Collectors.toList()).get(0);
+    }
+
+    /**
+     * Get consolidated Sales and Profits, if consolidated not available then standalone
+     * @param ticker
+     * @return
+     */
+    public static List<StockQuarter> getStockQuarter(String ticker){
+        List<java.sql.Date> dates = CommonService.stockQuarterRepository.findDistinctDatesForTicker(ticker);
+        List<StockQuarter> stockQuarterList = new ArrayList<>();
+        for(java.sql.Date date: dates){
+            StockQuarter stockQuarter = CommonService.stockQuarterRepository.findAllByKeyTickerAndKeyConsStandaloneAndKeyDate(ticker,"C", date);
+            if (stockQuarter != null) {
+                stockQuarterList.add(stockQuarter);
+            } else {
+                stockQuarter = CommonService.stockQuarterRepository.findAllByKeyTickerAndKeyConsStandaloneAndKeyDate(ticker,"S", date);
+                if (stockQuarter != null){
+                    stockQuarterList.add(stockQuarter);
+                }
+            }
+        }
+        return stockQuarterList;
+    }
+
+    /**
+     * Get consolidated Sales and Profits, if consolidated not available then standalone
+     * @param ticker
+     * @return
+     */
+    public static List<StockPnl> getStockPnl(String ticker){
+        List<java.sql.Date> dates = CommonService.stockPnlRepository.findDistinctDatesForTicker(ticker);
+        List<StockPnl> stockPnlList = new ArrayList<>();
+        for(java.sql.Date date: dates){
+            StockPnl stockPnl = CommonService.stockPnlRepository.findAllByKeyTickerAndKeyConsStandaloneAndKeyDate(ticker,"C", date);
+            if (stockPnl != null) {
+                stockPnlList.add(stockPnl);
+            } else {
+                stockPnl = CommonService.stockPnlRepository.findAllByKeyTickerAndKeyConsStandaloneAndKeyDate(ticker,"S", date);
+                if (stockPnl != null){
+                    stockPnlList.add(stockPnl);
+                }
+            }
+        }
+        return stockPnlList;
     }
 
     /**

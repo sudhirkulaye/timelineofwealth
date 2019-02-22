@@ -96,7 +96,9 @@ module.controller('WealthDistributionController', function($scope, $http, $filte
         $scope.assetClassGroups = [];
         $scope.marketValuesByClassGroups = [];
         $scope.totalMarketValueByClassGroup = 0;
+        $scope.wealthAssetAllocationHistoryRecords = $filter('orderBy')($scope.wealthAssetAllocationHistoryRecords, 'key.assetClassGroup')
         var classwiseFilteredRecords = $scope.wealthAssetAllocationHistoryRecords;
+
         if ($scope.searchMember != undefined && $scope.searchMember != 0) {
            classwiseFilteredRecords = $filter('filter')(classwiseFilteredRecords, {key:{memberid:$scope.searchMember}} );
         }
@@ -108,13 +110,13 @@ module.controller('WealthDistributionController', function($scope, $http, $filte
             }
         }
         var map1 = $filter('groupBy')(classwiseFilteredRecords, 'key.assetClassGroup');
-        console.log(classwiseFilteredRecords);
+        //console.log(classwiseFilteredRecords);
         for(var assetClassGroup in map1){
            $scope.assetClassGroups.push(assetClassGroup);
            $scope.marketValuesByClassGroups.push($filter('number')($scope.getMarketValueByGroup(map1[assetClassGroup]),0));
         }
-        console.log($scope.assetClassGroups);
-        console.log($scope.marketValuesByClassGroups);
+        //console.log($scope.assetClassGroups);
+        //console.log($scope.marketValuesByClassGroups);
 
         $locale.NUMBER_FORMATS.GROUP_SEP = ',';
     }

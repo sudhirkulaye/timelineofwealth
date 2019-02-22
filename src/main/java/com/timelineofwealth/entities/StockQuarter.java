@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 
 @Entity
-@Table(name = "stock_pnl")
+@Table(name = "stock_quarter")
 public class StockQuarter implements Serializable {
     @Embeddable
     public static class StockQuarterKey implements Serializable {

@@ -140,13 +140,13 @@
                                         <tr>
                                             <!--<th>Member</th>-->
                                             <!--<th>Asset Class Group</th>-->
-                                            <th>Asset Class</th>
+                                            <th>Asset Category</th>
                                             <th align="right">Amount</th>
                                             <th align="right">(%)</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr ng-repeat="(key, wealthAssetAllocationHistoryRecord) in wealthAssetAllocationHistoryRecords | filter:filterByMember  | groupBy: 'key.assetClassGroup'">
+                                        <tr ng-repeat="(key, wealthAssetAllocationHistoryRecord) in wealthAssetAllocationHistoryRecords | filter:filterByMember  | groupBy: 'key.assetClassGroup' ">
                                             <!--<td>{{ (members | filter : { 'memberid' : wealthDetailsRecord.key.memberid })[0].firstName }}</td>-->
                                             <!--<td>{{ (assetClasses | filter : { 'classid' : key})[0].assetClassGroup }}</td>-->
                                             <td>{{ key }}</td>

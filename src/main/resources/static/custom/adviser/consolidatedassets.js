@@ -54,7 +54,6 @@ module.controller('ConsolidatedAssetsController', function($scope, $http, $filte
                     $scope.industries = [];
                 }
             });
-
     }
 
     $scope.getConsolidatedAssets = function(){

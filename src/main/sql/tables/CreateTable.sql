@@ -182,7 +182,7 @@ CREATE TABLE asset_classification (
   PRIMARY KEY (classid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Asset Classification';
 
-select * from asset_classification;
+select * from asset_classification order by asset_Class_group;
 
 -- create table mutual_fund_universe_old as select * from mutual_fund_universe;
 -- drop table mutual_fund_universe;
@@ -746,6 +746,7 @@ create table stock_quarter (
 
 select count(1), year(date) from stock_quarter a group by year(date) order by date desc; 
 select * from stock_quarter a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
+select * from stock_quarter a where a.ticker like 'ASIANPAINT%';
 -- pending results
 SELECT b.ticker from daily_data_s a, stock_universe b where a.name = b.ticker5 and a.last_result_date = '201812' and date = '2019-02-01' and b.ticker not in (select distinct ticker from stock_quarter a where date = '2018-12-31');
 

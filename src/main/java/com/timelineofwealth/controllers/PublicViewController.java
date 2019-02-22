@@ -8,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -150,6 +151,15 @@ public class PublicViewController {
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Timeline of Wealth");
         return "public/stocklist";
+    }
+
+    @RequestMapping(value = "/public/stockanalysis/{ticker}")
+    public String stockAnalysis(@PathVariable("ticker") String ticker, Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("ticker", ticker);
+        return "public/stockanalysis";
     }
 
     @RequestMapping(value = "/public/indianeconomy")
