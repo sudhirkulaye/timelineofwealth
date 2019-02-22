@@ -82,7 +82,7 @@
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios3" name="optionsRadios" ng-click="showColumns('CapitalStructureInfo')" /> Capital Structure &nbsp;&nbsp;&nbsp;</lebel>
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios4" name="optionsRadios" ng-click="showColumns('Valuations')" /> Y-o-Y Growth &amp; Valuations &nbsp;&nbsp;&nbsp;</lebel>
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios5" name="optionsRadios" ng-click="showColumns('PricePerformance')" /> Price Performance [Up coming]&nbsp;&nbsp;&nbsp;</lebel>
-                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios5" name="optionsRadios" ng-click="showColumns('AnalystsCall')" /> Analysts View [Up coming]&nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios6" name="optionsRadios" ng-click="showColumns('AnalystsCall')" /> Analysts View [Up coming]&nbsp;&nbsp;&nbsp;</lebel>
                         </div>
                         <div class="x_content">
                             <p>
@@ -136,7 +136,7 @@
                                     <!--<td>{{ (assetClasses | filter : { 'classid' : stock.assetClassid})[0].subclassName }}</td>-->
                                     <!--<td>{{stock.ticker}}</td>-->
                                     <td >{{stock.includedIndexName}}</td>
-                                    <td >{{stock.shortName}}</td>
+                                    <td ><a href="/public/stockanalysis/{{stock.ticker}}" target="_blank">{{stock.shortName}}</a></td>
                                     <!--<td>{{(industries | filter : { 'subindustryid' : stock.subindustryid})[0].sectorNameDisplay}}-{{(industries | filter : { 'subindustryid' : stock.subindustryid})[0].industryNameDisplay}}</td>-->
                                     <td ng-hide="flagBasicInfo">{{stock.sectorNameDisplay}}</td>
                                     <td ng-hide="flagBasicInfo">{{stock.industryNameDisplay}}</td>

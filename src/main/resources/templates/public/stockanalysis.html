@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: common-header" />
-<body class="nav-md" ng-app="WealthDistributionManagement" ng-controller="WealthDistributionController">
+<body class="nav-md" ng-app="StockAnalysisManagement" ng-controller="StockAnalysisController">
 <!-- iCheck -->
 <link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
 <!-- bootstrap-wysiwyg -->
@@ -20,31 +20,23 @@
 <link href="../../static/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" th:href="@{/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css}" rel="stylesheet" />
 <!--Angular JS-->
 <script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
-<!-- jQuery -->
-<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
-<!-- Bootstrap -->
-<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
-<!-- ui-bootstrap-tpls.js -->
-<script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
 <!--Angular custom filter (for group by) JS-->
-<script src="../../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
-<!-- D3.js -->
-<script src='https://d3js.org/d3.v4.min.js'></script>
+<script src="../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
 <!-- Chart.js -->
 <script src="../../static/vendors/Chart.js/dist/Chart.min.js" th:src="@{/vendors/Chart.js/dist/Chart.min.js}"></script>
 <!-- angular.chartjs -->
 <script src="../../static/vendors/angular.chartjs/angular-chart.min.js" th:src="@{/vendors/angular.chartjs/angular-chart.min.js}"></script>
+<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>-->
 <!-- custom angular script -->
-<script type="text/javascript" src="../../static/custom/user/wealthdistribution.js" th:src="@{/custom/user/wealthdistribution.js}"></script>
+<script type="text/javascript" src="../../static/custom/public/stockanalysis.js" th:src="@{/custom/public/stockanalysis.js}"></script>
 <div class="container body">
     <div class="main_container">
         <!-- sidebar menu -->
-        <div th:replace="fragments/usersidebarmenu :: common-usersidebarmenu" />
-
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
         <!-- /sidebar menu -->
 
         <!-- top navigation -->
-        <div th:replace="fragments/usertopnavigation :: common-usertopnavigation" />
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
         <!-- /top navigation -->
 
         <!-- page content -->
@@ -53,29 +45,37 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <br />
                     <div class="x_panel">
-                        <div class="x_title" ng-hide="!hideForm">
-                            <h1>Current Wealth Distribution</h1>
-                            <p />Current Wealth Distribution across Asset Classes and Sub-Classes
+                        <div class="x_title">
+                            <h1>Stock Analysis: {{stockDetails.shortName}}</h1>
+                            <p />Detailed Analysis of Stock
                             <div class="clearfix"></div>
                         </div>
+                        <div class="x_content">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Sector</th>
+                                        <td>{{stockDetails.sectorNameDisplay}}</td>
+                                        <th>Industry</th>
+                                        <td>{{stockDetails.industryNameDisplay}}</td>
+                                        <th>Sub-Industry</th>
+                                        <td>{{stockDetails.subIndustryNameDisplay}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Market Cap. (Cr)</th>
+                                        <td>{{stockDetails.dailyDataS.marketCap | currency:"&#8377;":0}}</td>
+                                        <th>TTM PE</th>
+                                        <td>{{stockDetails.dailyDataS.peTtm}}</td>
+                                        <th>TTM PB</th>
+                                        <td>{{stockDetails.dailyDataS.pbTtm}}</td>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
                         <div class="col-md-12 col-sm-12 col-xs-12">
-                            <p />
-                            <label class="pull-left" >Filter By Member: &nbsp;&nbsp;&nbsp;</label>
-                            <select class="pull-left" ng-model="searchMember" ng-change="callSetChartData()" >
-                                <option value = "0"></option>
-                                <option ng-repeat="member in members" value="{{member.memberid}}">{{member.firstName}}</option>
-                            </select>
-                            <lebel class="pull-left" >&nbsp;&nbsp;&nbsp;</lebel>
-                            <label class="pull-left" >Total Market Value By Class (Last Processing Day): &nbsp;&nbsp;&nbsp;</label>
-                            <label class="pull-left" >{{totalMarketValueByClassGroup | currency:"&#8377;":0}} &nbsp;&nbsp;&nbsp;</label>
-                            <lebel class="pull-left" >&nbsp;&nbsp;&nbsp;</lebel>
-                            <label class="pull-left" >Total Market Value (Current): &nbsp;&nbsp;&nbsp;</label>
-                            <label class="pull-left" >{{totalMarketValue | currency:"&#8377;":0}} &nbsp;&nbsp;&nbsp;</label>
-                        </div>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
                             <div class="x_panel">
                                 <div class="x_title">
-                                    <h2>Wealth Distribution<small>Current Wealth Distribution - Asset Classes </small></h2>
+                                    <h2>Annual Sales &amp; Net Profit <small>Consolidated Sales &amp; Net Profit (or Standalone in case consolidated not available)</small></h2>
                                     <ul class="nav navbar-right panel_toolbox">
                                         <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                         </li>
@@ -94,18 +94,13 @@
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
-                                    <br />
-                                    <canvas id="wealthDistributionChartA" class="chart chart-doughnut"
-                                            chart-data="marketValuesByClassGroups" chart-labels="assetClassGroups">
-                                    </canvas>
-                                    <br /><br />
+                                    <canvas id="pnlchart"  class="chart chart-bar" chart-colors="newColors" chart-options="chartOptionsStockPnl"
+                                            chart-data="stockPnl" chart-labels="labelsYearsStockPnl" chart-dataset-override="stockPnlDataOverride"  ></canvas>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
                             <div class="x_panel">
                                 <div class="x_title">
-                                    <h2>Wealth Distribution<small>Current Wealth Distribution - Sub-Class</small></h2>
+                                    <h2>Quarterly Sales &amp; Net Profit <small>Consolidated Sales &amp; Net Profit (or Standalone in case consolidated not available)</small></h2>
                                     <ul class="nav navbar-right panel_toolbox">
                                         <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                         </li>
@@ -124,63 +119,33 @@
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
-                                    <br />
-                                    <canvas id="wealthDistributionChart" class="chart chart-doughnut"
-                                            chart-data="marketValuesBySubClasses" chart-labels="assetSubClasses">
-                                    </canvas>
-                                    <br /><br />
+                                    <canvas id="quarterchart"  class="chart chart-bar" chart-colors="newColors" chart-options="chartOptionsStockQuarter"
+                                            chart-data="stockQuarter" chart-labels="labelsYearsStockQuarter" chart-dataset-override="stockQuarterDataOverride"  ></canvas>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                            <div class="x_content">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                        <tr>
-                                            <!--<th>Member</th>-->
-                                            <!--<th>Asset Class Group</th>-->
-                                            <th>Asset Category</th>
-                                            <th align="right">Amount</th>
-                                            <th align="right">(%)</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr ng-repeat="(key, wealthAssetAllocationHistoryRecord) in wealthAssetAllocationHistoryRecords | filter:filterByMember  | groupBy: 'key.assetClassGroup' ">
-                                            <!--<td>{{ (members | filter : { 'memberid' : wealthDetailsRecord.key.memberid })[0].firstName }}</td>-->
-                                            <!--<td>{{ (assetClasses | filter : { 'classid' : key})[0].assetClassGroup }}</td>-->
-                                            <td>{{ key }}</td>
-                                            <td align="right">{{getMarketValueByGroup(wealthAssetAllocationHistoryRecord) | currency:"&#8377;":0}}</td>
-                                            <td  align="right">{{(getMarketValueByGroup(wealthAssetAllocationHistoryRecord)/totalMarketValueByClassGroup)*100 | number:2}}%</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Valuation Levels<small>Price to Consolidated Earnings (or Standalone in case consolidated not available)</small></h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Settings 1</a>
+                                                </li>
+                                                <li><a href="#">Settings 2</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                            <div class="x_content">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                        <tr>
-                                            <!--<th>Member</th>-->
-                                            <!--<th>Asset Class Group</th>-->
-                                            <th>Asset Sub-Class</th>
-                                            <th align="right">Amount</th>
-                                            <th align="right">(%)</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr ng-repeat="(key, wealthDetailsRecord) in wealthDetailsRecords | filter:filterByMember  | groupBy: 'assetClassid'">
-                                            <!--<td>{{ (members | filter : { 'memberid' : wealthDetailsRecord.key.memberid })[0].firstName }}</td>-->
-                                            <!--<td>{{ (assetClasses | filter : { 'classid' : key})[0].assetClassGroup }}</td>-->
-                                            <td>{{ (assetClasses | filter : { 'classid' : key})[0].subclassName }}</td>
-                                            <td align="right">{{getMarketValue(wealthDetailsRecord) | currency:"&#8377;":0}}</td>
-                                            <td  align="right">{{(getMarketValue(wealthDetailsRecord)/totalMarketValue)*100 | number:2}}%</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                <div class="x_content">
+                                    <canvas id="valuationchart"  class="chart chart-line" chart-colors="newColors" chart-options="chartOptions"
+                                            chart-data="stockValuation" chart-labels="labelsYearsStockValuation" ></canvas>
                                 </div>
                             </div>
                         </div>
@@ -195,8 +160,10 @@
         <!-- /footer content -->
     </div>
 </div>
-
-
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
 <!-- FastClick -->
 <script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
 <!-- NProgress -->
