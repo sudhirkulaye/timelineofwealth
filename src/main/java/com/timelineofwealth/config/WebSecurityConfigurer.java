@@ -3,6 +3,7 @@ package com.timelineofwealth.config;
 import com.timelineofwealth.repositories.UserRepository;
 import com.timelineofwealth.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
