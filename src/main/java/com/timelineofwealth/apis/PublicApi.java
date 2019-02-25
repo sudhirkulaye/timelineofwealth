@@ -2,6 +2,7 @@ package com.timelineofwealth.apis;
 
 import com.timelineofwealth.dto.MutualFundDTO;
 import com.timelineofwealth.dto.NseBse500;
+import com.timelineofwealth.dto.StockValuationHistory;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.service.CommonService;
 import com.timelineofwealth.service.MemberService;
@@ -92,11 +93,11 @@ public class PublicApi {
         return CommonService.getAllStocks();
     }
 
-    @RequestMapping(value = "/getstockvaluation/{ticker}", method = RequestMethod.GET)
-    public List<StockPnl> getStockValuation(@PathVariable String ticker){
-        logger.debug(String.format("Call public/api/getstockvaluation/"+ticker));
+    @RequestMapping(value = "/getstockvaluationhistory/{ticker}", method = RequestMethod.GET)
+    public List<StockValuationHistory> getStockValuationHistory(@PathVariable String ticker){
+        logger.debug(String.format("Call public/api/getstockvaluationhistory/"+ticker));
 
-        return CommonService.getStockPnl(ticker);
+        return CommonService.getStockValuationHistory(ticker);
     }
 
     @RequestMapping(value = "/getstockpnl/{ticker}", method = RequestMethod.GET)

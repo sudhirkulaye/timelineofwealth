@@ -69,7 +69,8 @@ select * from member;
 select * from member a where last_name like 'V%';
 select * from sip a where a.memberid in (1007, 1015, 1058) order by memberid, scheme_name;
 
-select * from wealth_details a where a.memberid in (1007, 1015, 1058) order by memberid, name;
+select * from wealth_details a where a.memberid in (1016, 1059, 1060) order by memberid, name;
+SELECT * FROM wealth_asset_allocation_history a WHERE a.memberid in (1016, 1059, 1060) and date = '2019-02-21' order by date desc, memberid, asset_class_group;
 
 -- Query to count Direct & Regular MF Exposures
 select sum(market_value), count(market_value) from wealth_details a  where a.memberid in (1007, 1015, 1058) and short_name like '%-%Dir%-%' order by memberid, name;

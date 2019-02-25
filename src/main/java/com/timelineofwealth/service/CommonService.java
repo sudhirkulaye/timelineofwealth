@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import com.timelineofwealth.controllers.UserViewController;
 import com.timelineofwealth.dto.MutualFundDTO;
 import com.timelineofwealth.dto.NseBse500;
+import com.timelineofwealth.dto.StockValuationHistory;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.*;
 import org.slf4j.Logger;
@@ -406,6 +407,26 @@ public class CommonService {
             }
         }
         return stockPnlList;
+    }
+
+    /**
+     * Get Valuaitn History for Charts
+     * @param ticker
+     * @return
+     */
+    public static List<StockValuationHistory> getStockValuationHistory(String ticker){
+        List<StockValuationHistory> valuationHistories = new ArrayList<>();
+        List<StockPnl> stockPnlList = getStockPnl(ticker);
+        stockPnlList.sort(Comparator.comparing(l->l.getKey().getDate()));
+        for (StockPnl stockPnl: stockPnlList) {
+            StockValuationHistory history = new StockValuationHistory();
+            history.setTicker(ticker);
+            history.setDate(stockPnl.getKey().getDate());
+            history.setPe(stockPnl.getPe());
+            //history.setPb(stockPnl.getPrice());
+            valuationHistories.add(history);
+        }
+        return valuationHistories;
     }
 
     /**
