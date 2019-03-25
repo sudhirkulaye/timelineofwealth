@@ -797,3 +797,24 @@ create table stock_cashflow (
 
 select count(1), year(date) from stock_cashflow a group by year(date) order by date desc; 
 select count(1) from stock_cashflow a where a.ticker = 'PGHH' and 1=2;
+
+-- drop table stock_price_movement;
+CREATE TABLE stock_price_movement (
+  ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Index ticker',
+  return_1D DECIMAL(10,3) NOT NULL COMMENT '1 Day Returns',
+  return_1W DECIMAL(10,3) NOT NULL COMMENT '1 Week Returns',
+  return_2W DECIMAL(10,3) NOT NULL COMMENT '2 Weeks Returns',
+  return_1M DECIMAL(10,3) NOT NULL COMMENT '1 Month Returns',
+  return_2M DECIMAL(10,3) NOT NULL COMMENT '2 Months Returns',
+  return_3M DECIMAL(10,3) NOT NULL COMMENT '3 Months Returns',
+  return_6M DECIMAL(10,3) NOT NULL COMMENT '6 Months Returns',
+  return_9M DECIMAL(10,3) NOT NULL COMMENT '9 Months Returns',
+  return_1Y DECIMAL(10,3) NOT NULL COMMENT '1 Year Returns',
+  return_2Y DECIMAL(10,3) NOT NULL COMMENT '2 Years Returns',
+  return_3Y DECIMAL(10,3) NOT NULL COMMENT '3 Years Returns',
+  return_5Y DECIMAL(10,3) NOT NULL COMMENT '5 Years Returns',
+  return_10Y DECIMAL(10,3) NOT NULL COMMENT '10 Years Returns',
+  return_YTD DECIMAL(10,3) NOT NULL COMMENT 'YTD Returns',
+  PRIMARY KEY (ticker)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Price Movement';
+

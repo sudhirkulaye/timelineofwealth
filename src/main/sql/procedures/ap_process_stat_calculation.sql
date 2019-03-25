@@ -71,7 +71,7 @@ BEGIN
       WHERE date = var_date_today
       AND a.series = 'EQ'
       AND a.nse_ticker NOT IN (SELECT ticker FROM stock_universe)
-      AND a.isin_code <> ''
+      AND a.isin_code <> '' -- (since isin_code is unique so cannot be null)
   );
 
   -- Log Stocks with Splits/Bonus Probability
@@ -84,8 +84,14 @@ BEGIN
     AND close_price > 5
   );
 
+  -- Compute Mutual Fund Stats
+  call ap_process_mf_returns();
+
+  -- Compute Stock Pirce Returns
+  call ap_process_stock_returns();
+
   INSERT INTO log_table
   VALUES      (now(), 'ap_process_stat_calculation: End');
 
   commit;
-END;
+END

@@ -1,7 +1,5 @@
 package com.timelineofwealth.service;
 
-import com.google.common.collect.Iterables;
-import com.timelineofwealth.controllers.UserViewController;
 import com.timelineofwealth.dto.MutualFundDTO;
 import com.timelineofwealth.dto.NseBse500;
 import com.timelineofwealth.dto.StockValuationHistory;
@@ -18,10 +16,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service("CommonService")
@@ -93,6 +89,13 @@ public class CommonService {
     @Autowired
     public void setDailyDataSRepository(DailyDataSRepository dailyDataSRepository) {
         CommonService.dailyDataSRepository = dailyDataSRepository;
+    }
+
+    @Autowired
+    private static StockPriceMovementRepository stockPriceMovementRepository;
+    @Autowired
+    public void setStockPriceMovementRepository(StockPriceMovementRepository stockPriceMovementRepository) {
+        CommonService.stockPriceMovementRepository = stockPriceMovementRepository;
     }
 
     @Autowired
@@ -334,6 +337,7 @@ public class CommonService {
     public static List<NseBse500> getNseBse500() {
         nseBse500BasicList = CommonService.stockUniverseRepository.findAllByIsNse500OrIsBse500OrderByMarketcapDesc(1,1);
         List<DailyDataS> dailyDataSList = CommonService.dailyDataSRepository.findAllByKeyDate(getSetupDates().getDateToday());
+        List<StockPriceMovement> stockPriceMovementList = CommonService.stockPriceMovementRepository.findAll();
         nseBse500List = new ArrayList<>();
         List<Subindustry> subindustries = CommonService.getSubindustries();
         for(StockUniverse stockUniverse : nseBse500BasicList){
@@ -347,6 +351,7 @@ public class CommonService {
             nseBse500.setSubIndustryNameDisplay(subindustries1.get(0).getSubIndustryNameDisplay());
 
             nseBse500.setDailyDataS(dailyDataSList.stream().filter(dailyDataS -> nseBse500.getTicker5().equals(dailyDataS.getKey().getName())).findAny().orElse(null));
+            nseBse500.setStockPriceMovement(stockPriceMovementList.stream().filter(stockPriceMovement -> nseBse500.getTicker().equals(stockPriceMovement.getTicker())).findAny().orElse(null));
 
             nseBse500List.add(nseBse500);
         }

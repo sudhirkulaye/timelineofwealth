@@ -35,7 +35,7 @@ select max(buy_date), ticker, short_name, sum(quantity), sum(market_value), sum(
 UPDATE wealth_details set maturity_date = '2000-01-01' where maturity_date is null;
 select * from member;
 
-select * from wealth_details a where memberid = 1046;
+select * from wealth_details a where memberid = 1018;
 select * from mutual_fund_nav_history where scheme_code = 119347 and date > '2018-12-01';
 
 
@@ -89,3 +89,4 @@ select * from mutual_fund_stats a where a.scheme_code in (101002,103155,102920,1
 select distinct(portfoliono) from wealth_details a where a.short_name like '%-Reg-%' and a.memberid in (1007, 1015, 1058) order by memberid, name;
 select * from mutual_fund_house;
 
+SELECT * from wealth_details a where a.memberid in (1002, 1018) and asset_classid in ('201010','202010');
