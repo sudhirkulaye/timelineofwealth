@@ -39,6 +39,7 @@ truncate table log_table;
 
 -- find new stocks or modified stocks -- last count 64 on 26th Nov 2018
 SELECT count(1), listing_date from stock_universe a group by a.listing_date order by a.listing_date desc; -- WHERE listing_date; > '2018-11-26';
+select * from stock_universe a where listing_date >= '2019-01-01'; 
 
 -- stock split probable candidate
 select * from stock_split_probability a where a.is_processed = 'NO' order by date desc;
@@ -129,6 +130,7 @@ update sip a, mutual_fund_universe b set a.scheme_name = b.scheme_name_part wher
 
 select * from daily_data_s where 1 = 2;
 select count(1), date from daily_data_s where date >= (select date_last_trading_day from setup_dates)  group by date order by date desc;
+select max(date) from daily_data_s;
 
 select * from index_valuation a where a.date = (select max(date) from index_valuation);
 SELECT * from index_statistics a; 
@@ -156,3 +158,8 @@ select * from stock_universe a where ticker in ('IDFCFIRSTB','BAJAJCON');
 -- BAJAJCORP to BAJAJCON and 'Bajaj Corp' to 'Bajaj Consumer'
 -- IDFCBANK to IDFCFIRSTB and 'IDFC Bank' to 'IDFC First Bank'
 select * from stock_cashflow a where ticker = 'BAJFINANCE';
+
+-- Stock Split, Bonus
+SELECT date, close_price from nse_price_history a where a.nse_ticker = 'WIPRO' and date <= '2019-03-06' order by date desc; 
+-- update nse_price_history a set close_price = close_price * (3/4) where a.nse_ticker = 'WIPRO' and date < '2019-03-06';
+

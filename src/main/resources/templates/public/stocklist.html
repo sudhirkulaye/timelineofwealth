@@ -81,7 +81,7 @@
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios2" name="optionsRadios" ng-click="showColumns('FundamentalInfo')" /> TTM Sales, Profit, Margins &nbsp;&nbsp;&nbsp;</lebel>
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios3" name="optionsRadios" ng-click="showColumns('CapitalStructureInfo')" /> Capital Structure &nbsp;&nbsp;&nbsp;</lebel>
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios4" name="optionsRadios" ng-click="showColumns('Valuations')" /> Y-o-Y Growth &amp; Valuations &nbsp;&nbsp;&nbsp;</lebel>
-                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios5" name="optionsRadios" ng-click="showColumns('PricePerformance')" /> Price Performance [Up coming]&nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios5" name="optionsRadios" ng-click="showColumns('PricePerformance')" /> Price Performance &nbsp;&nbsp;&nbsp;</lebel>
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios6" name="optionsRadios" ng-click="showColumns('AnalystsCall')" /> Analysts View [Up coming]&nbsp;&nbsp;&nbsp;</lebel>
                         </div>
                         <div class="x_content">
@@ -121,13 +121,20 @@
                                     <th ng-click="sortData('dailyDataS.peTtm')" ng-hide="flagValuations">TTM PE<i ng-class="getSortClass('dailyDataS.peTtm')" /></th>
                                     <th ng-click="sortData('dailyDataS.pbTtm')" ng-hide="flagValuations">TTM PB<i ng-class="getSortClass('dailyDataS.pbTtm')" /></th>
                                     <th ng-hide="flagValuations">Sales/MCap</th>
-                                    <th ng-hide="flagPricePerformance">1Day</th>
-                                    <th ng-hide="flagPricePerformance">1Week</th>
-                                    <th ng-hide="flagPricePerformance">1Month</th>
-                                    <th ng-hide="flagPricePerformance">3Month</th>
-                                    <th ng-hide="flagPricePerformance">6Month</th>
-                                    <th ng-hide="flagPricePerformance">1Year</th>
-                                    <th ng-hide="flagPricePerformance">3Years</th>
+                                    <th ng-click="sortData('stockPriceMovement.return1D')" ng-hide="flagPricePerformance">1D<i ng-class="getSortClass('stockPriceMovement.return1D')" /></th>
+                                    <th ng-click="sortData('stockPriceMovement.return1W')" ng-hide="flagPricePerformance">1W<i ng-class="getSortClass('stockPriceMovement.return1W')" /></th>
+                                    <th ng-click="sortData('stockPriceMovement.return2W')" ng-hide="flagPricePerformance">2W<i ng-class="getSortClass('stockPriceMovement.return2W')" /></th>
+                                    <th ng-click="sortData('stockPriceMovement.return1M')" ng-hide="flagPricePerformance">1M<i ng-class="getSortClass('stockPriceMovement.return1M')" /></th>
+                                    <th ng-click="sortData('stockPriceMovement.return2M')" ng-hide="flagPricePerformance">2M<i ng-class="getSortClass('stockPriceMovement.return2M')" /></th>
+                                    <th ng-click="sortData('stockPriceMovement.return3M')" ng-hide="flagPricePerformance">3M<i ng-class="getSortClass('stockPriceMovement.return3M')" /></th>
+                                    <th ng-click="sortData('stockPriceMovement.return6M')" ng-hide="flagPricePerformance">6M<i ng-class="getSortClass('stockPriceMovement.return6M')" /></th>
+                                    <th ng-click="sortData('stockPriceMovement.return9M')" ng-hide="flagPricePerformance">9M<i ng-class="getSortClass('stockPriceMovement.return9M')" /></th>
+                                    <th ng-click="sortData('stockPriceMovement.returnYTD')" ng-hide="flagPricePerformance">1YTD<i ng-class="getSortClass('stockPriceMovement.returnYTD')" /></th>
+                                    <th ng-click="sortData('stockPriceMovement.return1Y')" ng-hide="flagPricePerformance">1Y<i ng-class="getSortClass('stockPriceMovement.return1Y')" /></th>
+                                    <th ng-click="sortData('stockPriceMovement.return2Y')" ng-hide="flagPricePerformance">2Y<i ng-class="getSortClass('stockPriceMovement.return2Y')" /></th>
+                                    <th ng-click="sortData('stockPriceMovement.return3Y')" ng-hide="flagPricePerformance">3Y<i ng-class="getSortClass('stockPriceMovement.return3Y')" /></th>
+                                    <!--<th ng-hide="flagPricePerformance">5Y</th>-->
+                                    <!--<th ng-hide="flagPricePerformance">10Y</th>-->
                                     <!--<th ng-hide="flagPricePerformance">5Years</th>-->
                                     <!--<th ng-hide="flagPricePerformance">10Years</th>-->
                                 </tr>
@@ -164,13 +171,20 @@
                                     <td ng-hide="flagValuations">{{stock.dailyDataS.peTtm}}</td>
                                     <td ng-hide="flagValuations">{{stock.dailyDataS.pbTtm}}</td>
                                     <td ng-hide="flagValuations">{{stock.dailyDataS.sales/stock.dailyDataS.marketCap | number:2}}</td>
-                                    <th ng-hide="flagPricePerformance">-</th>
-                                    <th ng-hide="flagPricePerformance">-</th>
-                                    <th ng-hide="flagPricePerformance">-</th>
-                                    <th ng-hide="flagPricePerformance">-</th>
-                                    <th ng-hide="flagPricePerformance">-</th>
-                                    <th ng-hide="flagPricePerformance">-</th>
-                                    <th ng-hide="flagPricePerformance">-</th>
+                                    <th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return1D | number:2}}%</th>
+                                    <th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return1W | number:2}}%</th>
+                                    <th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return2W | number:2}}%</th>
+                                    <th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return1M | number:2}}%</th>
+                                    <th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return2M | number:2}}%</th>
+                                    <th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return3M | number:2}}%</th>
+                                    <th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return6M | number:2}}%</th>
+                                    <th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return9M | number:2}}%</th>
+                                    <th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.returnYTD | number:2}}%</th>
+                                    <th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return1Y | number:2}}%</th>
+                                    <th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return2Y | number:2}}%</th>
+                                    <th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return3Y | number:2}}%</th>
+                                    <!--<th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return5Y | number:2}}%</th>-->
+                                    <!--<th ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return10Y | number:2}}%</th>-->
                                     <!--<th ng-hide="flagPricePerformance">-</th>-->
                                     <!--<th ng-hide="flagPricePerformance">-</th>-->
                                 </tr>
