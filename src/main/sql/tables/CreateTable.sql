@@ -211,6 +211,7 @@ create table mutual_fund_universe (
 select * from mutual_fund_universe a where a.scheme_code = 145112;
 select distinct asset_classid, category, equity_style_box, debt_style_box from mutual_fund_universe a;
 -- update mutual_fund_universe a set a.scheme_name_part = concat(fund_house, ' ',a.scheme_name_part);
+select * from mutual_fund_universe a order by scheme_name_full;
 
 -- Drop table subindustry
 CREATE TABLE subindustry (
@@ -746,7 +747,7 @@ create table stock_quarter (
 
 select count(1), year(date) from stock_quarter a group by year(date) order by date desc; 
 select * from stock_quarter a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
-select * from stock_quarter a where a.ticker like 'ASIANPAINT%';
+select * from stock_quarter a where a.ticker like 'EQUI%';
 -- pending results
 SELECT b.ticker from daily_data_s a, stock_universe b where a.name = b.ticker5 and a.last_result_date = '201812' and date = '2019-02-01' and b.ticker not in (select distinct ticker from stock_quarter a where date = '2018-12-31');
 
@@ -801,20 +802,25 @@ select count(1) from stock_cashflow a where a.ticker = 'PGHH' and 1=2;
 -- drop table stock_price_movement;
 CREATE TABLE stock_price_movement (
   ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Index ticker',
-  return_1D DECIMAL(10,3) NOT NULL COMMENT '1 Day Returns',
-  return_1W DECIMAL(10,3) NOT NULL COMMENT '1 Week Returns',
-  return_2W DECIMAL(10,3) NOT NULL COMMENT '2 Weeks Returns',
-  return_1M DECIMAL(10,3) NOT NULL COMMENT '1 Month Returns',
-  return_2M DECIMAL(10,3) NOT NULL COMMENT '2 Months Returns',
-  return_3M DECIMAL(10,3) NOT NULL COMMENT '3 Months Returns',
-  return_6M DECIMAL(10,3) NOT NULL COMMENT '6 Months Returns',
-  return_9M DECIMAL(10,3) NOT NULL COMMENT '9 Months Returns',
-  return_1Y DECIMAL(10,3) NOT NULL COMMENT '1 Year Returns',
-  return_2Y DECIMAL(10,3) NOT NULL COMMENT '2 Years Returns',
-  return_3Y DECIMAL(10,3) NOT NULL COMMENT '3 Years Returns',
-  return_5Y DECIMAL(10,3) NOT NULL COMMENT '5 Years Returns',
-  return_10Y DECIMAL(10,3) NOT NULL COMMENT '10 Years Returns',
-  return_YTD DECIMAL(10,3) NOT NULL COMMENT 'YTD Returns',
+  CMP decimal(20,3) DEFAULT NULL COMMENT 'CMP',
+  52w_min decimal(20,3) DEFAULT NULL COMMENT '52-Week Min Price',
+  52w_max decimal(20,3) DEFAULT NULL COMMENT '52-Week Max Price',
+  up_52w_min decimal(10,3) DEFAULT NULL COMMENT 'Up from 52-Week Min Price',
+  down_52w_max decimal(10,3) DEFAULT NULL COMMENT 'Down from 52-Week Max Price',
+  return_1D decimal(10,3) DEFAULT NULL COMMENT '1 Day Returns',
+  return_1W decimal(10,3) DEFAULT NULL COMMENT '1 Week Returns',
+  return_2W decimal(10,3) DEFAULT NULL COMMENT '2 Weeks Returns',
+  return_1M decimal(10,3) DEFAULT NULL COMMENT '1 Month Returns',
+  return_2M decimal(10,3) DEFAULT NULL COMMENT '2 Months Returns',
+  return_3M decimal(10,3) DEFAULT NULL COMMENT '3 Months Returns',
+  return_6M decimal(10,3) DEFAULT NULL COMMENT '6 Months Returns',
+  return_9M decimal(10,3) DEFAULT NULL COMMENT '9 Months Returns',
+  return_1Y decimal(10,3) DEFAULT NULL COMMENT '1 Year Returns',
+  return_2Y decimal(10,3) DEFAULT NULL COMMENT '2 Years Returns',
+  return_3Y decimal(10,3) DEFAULT NULL COMMENT '3 Years Returns',
+  return_5Y decimal(10,3) DEFAULT NULL COMMENT '5 Years Returns',
+  return_10Y decimal(10,3) DEFAULT NULL COMMENT '10 Years Returns',
+  return_YTD decimal(10,3) DEFAULT NULL COMMENT 'YTD Returns',
   PRIMARY KEY (ticker)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Price Movement';
 

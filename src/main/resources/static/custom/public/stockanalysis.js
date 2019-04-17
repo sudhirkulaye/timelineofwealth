@@ -26,6 +26,12 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
     $scope.stockValuationDataOverride = [];
     $scope.chartOptionsStockValuation = {};
 
+    $scope.recentValuations = [];
+    $scope.dataRecentPE = [];
+    $scope.dataRecentPB = [];
+    $scope.dataRecentEvToEbita = [];
+    $scope.labelsRecentPE = [];
+
     showRecords();
 
     function showRecords(){
@@ -64,7 +70,19 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                     $scope.stockQuarter = [];
                     $scope.stockQuarterOriginal = [];
                 }
-            });
+        });
+
+        url = "/getrecentvaluations/"+$scope.ticker;
+        $http.get(urlBase + url).
+            then(function (response) {
+                if (response != undefined) {
+                    $scope.recentValuations = response.data;
+                    populateStockRecentPE();
+                } else {
+                    $scope.recentValuations = [];
+                }
+        });
+
     }
 
     function populateStockPnlChart() {
@@ -180,11 +198,30 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
 
     }
 
+    function populateStockRecentPE() {
+        //console.log($scope.stockRecentPE);
+        var recentpe = [];
+        var recentpb = [];
+        var recentevtoebita = [];
+        var recentpedate = [];
+
+        for (var i = 0; i < $scope.recentValuations.length; i++) {
+            recentpe.push($scope.recentValuations[i].pe);
+            recentpb.push($scope.recentValuations[i].pb);
+            recentevtoebita.push($scope.recentValuations[i].evToEbita);
+            recentpedate.push($scope.recentValuations[i].date);
+        }
+        $scope.dataRecentPE.push(recentpe);
+        $scope.dataRecentPB.push(recentpb);
+        $scope.dataRecentEvToEbita.push(recentevtoebita);
+        $scope.labelsRecentPE = recentpedate;
+    }
+
     function populateStockQuarterChart() {
 
         /* Begin: Populate Quarter Sales and Profit */
         var sortedStockQuarter = $filter('orderBy')($scope.stockQuarter,'key.date');
-        console.log("$scope.stockQuarter"+$scope.stockQuarter);
+        //console.log("$scope.stockQuarter"+$scope.stockQuarter);
         var map = $filter('groupBy')(sortedStockQuarter, 'key.date');
         //console.log("map"+map);
 
