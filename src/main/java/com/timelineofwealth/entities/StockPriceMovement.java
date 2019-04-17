@@ -14,6 +14,16 @@ public class StockPriceMovement implements Serializable {
     @Id
     @Column(name = "ticker")
     private String ticker;
+    @Column(name = "CMP")
+    private BigDecimal cmp;
+    @Column(name = "52w_min")
+    private BigDecimal _52wMin;
+    @Column(name = "52w_max")
+    private BigDecimal _52wMax;
+    @Column(name = "up_52w_min")
+    private BigDecimal up52wMin;
+    @Column(name = "down_52w_max")
+    private BigDecimal down52wMax;
     @Column(name = "return_1D")
     private BigDecimal return1D;
     @Column(name = "return_1W")
@@ -48,6 +58,41 @@ public class StockPriceMovement implements Serializable {
     }
     public void setTicker(String ticker) {
         this.ticker = ticker;
+    }
+
+    public BigDecimal getCmp() {
+        return cmp;
+    }
+    public void setCmp(BigDecimal cmp) {
+        this.cmp = cmp;
+    }
+
+    public BigDecimal get_52wMin() {
+        return _52wMin;
+    }
+    public void set_52wMin(BigDecimal _52wMin) {
+        this._52wMin = _52wMin;
+    }
+
+    public BigDecimal get_52wMax() {
+        return _52wMax;
+    }
+    public void set_52wMax(BigDecimal _52wMax) {
+        this._52wMax = _52wMax;
+    }
+
+    public BigDecimal getUp52wMin() {
+        return up52wMin;
+    }
+    public void setUp52wMin(BigDecimal up52wMin) {
+        this.up52wMin = up52wMin;
+    }
+
+    public BigDecimal getDown52wMax() {
+        return down52wMax;
+    }
+    public void setDown52wMax(BigDecimal down52wMax) {
+        this.down52wMax = down52wMax;
     }
 
     public BigDecimal getReturn1D() {

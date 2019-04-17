@@ -136,6 +136,12 @@ select * from index_valuation a where a.date = (select max(date) from index_valu
 SELECT * from index_statistics a; 
 
 commit;
+-- new quarter results
+SELECT b.ticker from daily_data_s a, stock_universe b 
+where a.name = b.ticker5 and 
+a.last_result_date = '201903' and 
+date = (select max(date) from daily_data_s a) and 
+b.ticker not in (select distinct ticker from stock_quarter a where date = '2019-03-31');
 
 -- Change of ticker
 select distinct(name) from daily_data_s a where a.date = (select max(date) from daily_data_s) and a.name not in (select ticker5 from stock_universe) order by rank; 

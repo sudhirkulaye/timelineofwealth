@@ -2,15 +2,12 @@ package com.timelineofwealth.apis;
 
 import com.timelineofwealth.dto.MutualFundDTO;
 import com.timelineofwealth.dto.NseBse500;
+import com.timelineofwealth.dto.RecentValuations;
 import com.timelineofwealth.dto.StockValuationHistory;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.service.CommonService;
-import com.timelineofwealth.service.MemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -98,6 +95,12 @@ public class PublicApi {
         logger.debug(String.format("Call public/api/getstockvaluationhistory/"+ticker));
 
         return CommonService.getStockValuationHistory(ticker);
+    }
+
+    @RequestMapping(value = "/getrecentvaluations/{ticker}", method = RequestMethod.GET)
+    public List<RecentValuations> getRecentValuations(@PathVariable String ticker){
+        logger.debug((String.format("Call public/api/getrecentpe"+ticker)));
+        return CommonService.getRecentValuations(ticker);
     }
 
     @RequestMapping(value = "/getstockpnl/{ticker}", method = RequestMethod.GET)

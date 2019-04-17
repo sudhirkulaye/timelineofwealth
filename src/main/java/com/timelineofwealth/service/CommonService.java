@@ -2,6 +2,7 @@ package com.timelineofwealth.service;
 
 import com.timelineofwealth.dto.MutualFundDTO;
 import com.timelineofwealth.dto.NseBse500;
+import com.timelineofwealth.dto.RecentValuations;
 import com.timelineofwealth.dto.StockValuationHistory;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.*;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.cache.annotation.Cacheable;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -432,6 +434,30 @@ public class CommonService {
             valuationHistories.add(history);
         }
         return valuationHistories;
+    }
+
+    /**
+     *
+     * @param ticker
+     * @return
+     */
+    public static List<RecentValuations> getRecentValuations(String ticker) {
+        List<RecentValuations> recentPES = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+        LocalDate oneYearOld = now.minusDays(365);
+        NseBse500 stockDetails = getStockDetails(ticker);
+
+        List<DailyDataS> dailyDataSList = CommonService.dailyDataSRepository.findAllByKeyNameAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker5(),java.sql.Date.valueOf(oneYearOld));
+        for(DailyDataS dailyDataS: dailyDataSList){
+            RecentValuations recentPE = new RecentValuations();
+            recentPE.setTicker(ticker);
+            recentPE.setDate(dailyDataS.getKey().getDate());
+            recentPE.setPe(dailyDataS.getPeTtm());
+            recentPE.setPb(dailyDataS.getPbTtm());
+            recentPE.setEvToEbita(dailyDataS.getEvToEbit());
+            recentPES.add(recentPE);
+        }
+        return recentPES;
     }
 
     /**
