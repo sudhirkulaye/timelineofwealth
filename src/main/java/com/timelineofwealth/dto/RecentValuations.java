@@ -10,6 +10,7 @@ public class RecentValuations implements Serializable {
     private BigDecimal pe;
     private BigDecimal pb;
     private BigDecimal evToEbita;
+    private BigDecimal marketCap;
 
     public String getTicker() {
         return ticker;
@@ -44,5 +45,12 @@ public class RecentValuations implements Serializable {
     }
     public void setEvToEbita(BigDecimal evToEbita) {
         this.evToEbita = evToEbita;
+    }
+
+    public BigDecimal getMarketCap() {
+        return marketCap;
+    }
+    public void setMarketCap(BigDecimal marketCap) {
+        this.marketCap = marketCap;
     }
 }

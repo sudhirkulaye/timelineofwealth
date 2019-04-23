@@ -455,6 +455,7 @@ public class CommonService {
             recentPE.setPe(dailyDataS.getPeTtm());
             recentPE.setPb(dailyDataS.getPbTtm());
             recentPE.setEvToEbita(dailyDataS.getEvToEbit());
+            recentPE.setMarketCap(dailyDataS.getMarketCap());
             recentPES.add(recentPE);
         }
         return recentPES;
