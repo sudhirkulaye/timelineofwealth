@@ -28,6 +28,7 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
 
     $scope.recentValuations = [];
     $scope.dataRecentPE = [];
+    $scope.dataRecentMCap = []; // Added new variable
     $scope.dataRecentPB = [];
     $scope.dataRecentEvToEbita = [];
     $scope.labelsRecentPE = [];
@@ -201,17 +202,21 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
     function populateStockRecentPE() {
         //console.log($scope.stockRecentPE);
         var recentpe = [];
+        var recentmcap = [];
         var recentpb = [];
         var recentevtoebita = [];
         var recentpedate = [];
 
         for (var i = 0; i < $scope.recentValuations.length; i++) {
             recentpe.push($scope.recentValuations[i].pe);
+            recentmcap.push($scope.recentValuations[i].marketCap); //populate
             recentpb.push($scope.recentValuations[i].pb);
             recentevtoebita.push($scope.recentValuations[i].evToEbita);
             recentpedate.push($scope.recentValuations[i].date);
         }
         $scope.dataRecentPE.push(recentpe);
+        $scope.dataRecentMCap.push(recentmcap);
+        //console.log($scope.dataRecentMCap);
         $scope.dataRecentPB.push(recentpb);
         $scope.dataRecentEvToEbita.push(recentevtoebita);
         $scope.labelsRecentPE = recentpedate;

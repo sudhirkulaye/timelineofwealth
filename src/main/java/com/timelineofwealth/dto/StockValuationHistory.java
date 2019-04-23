@@ -10,6 +10,7 @@ public class StockValuationHistory implements Serializable {
     private BigDecimal pe;
     private BigDecimal pb;
     private BigDecimal priceToSales;
+    private BigDecimal marketCap;
 
     public String getTicker() {
         return ticker;
@@ -44,5 +45,12 @@ public class StockValuationHistory implements Serializable {
     }
     public void setPriceToSales(BigDecimal priceToSales) {
         this.priceToSales = priceToSales;
+    }
+
+    public BigDecimal getMarketCap() {
+        return marketCap;
+    }
+    public void setMarketCap(BigDecimal marketCap) {
+        this.marketCap = marketCap;
     }
 }
