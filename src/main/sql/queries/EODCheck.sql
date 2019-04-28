@@ -128,7 +128,7 @@ update wealth_details a, mutual_fund_universe b set a.short_name = b.scheme_name
 update wealth_details a, stock_universe b set a.short_name = b.short_name, a.subindustryid = b.subindustryid, a.asset_classid = b.asset_classid where a.ticker = b.ticker;
 update sip a, mutual_fund_universe b set a.scheme_name = b.scheme_name_part where a.scheme_code = b.scheme_code;
 
-select * from daily_data_s where 1 = 2;
+select * from daily_data_s where date = (select date_today from setup_dates) and 1 = 2;
 select count(1), date from daily_data_s where date >= (select date_last_trading_day from setup_dates)  group by date order by date desc;
 select max(date) from daily_data_s;
 

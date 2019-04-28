@@ -723,8 +723,8 @@ create table stock_pnl (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Annual P&L Results';
 
 select count(1), year(date) from stock_pnl a group by year(date) order by date desc; 
-select count(1) from stock_pnl a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
-
+select * from stock_pnl a where ticker in ('INFY', 'TCS') and date > '2009-03-31' and sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
+select distinct ticker from stock_pnl a where date = '2017-12-31';
 
 -- drop table stock_quarter;
 create table stock_quarter (
@@ -747,7 +747,7 @@ create table stock_quarter (
 
 select count(1), year(date) from stock_quarter a group by year(date) order by date desc; 
 select * from stock_quarter a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
-select * from stock_quarter a where a.ticker like 'ICIG%';
+select * from stock_quarter a where a.ticker in ('ACC','COROMANDEL', 'IBULISL', 'ISEC', 'LUXIND', 'STRTECH', 'TATAGLOBAL', 'HEXAWARE', 'IBREALEST','IBULHSGFIN', 'M&MFIN', 'ULTRACEMCO', 'TATAELXSI') and date = '2019-03-31';
 -- pending results
 SELECT b.ticker from daily_data_s a, stock_universe b where a.name = b.ticker5 and a.last_result_date = '201812' and date = '2019-02-01' and b.ticker not in (select distinct ticker from stock_quarter a where date = '2018-12-31');
 
