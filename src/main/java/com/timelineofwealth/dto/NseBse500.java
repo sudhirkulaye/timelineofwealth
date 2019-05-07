@@ -2,6 +2,7 @@ package com.timelineofwealth.dto;
 
 import com.timelineofwealth.entities.DailyDataS;
 import com.timelineofwealth.entities.StockPriceMovement;
+import com.timelineofwealth.entities.StockPriceMovementHistory;
 import com.timelineofwealth.entities.StockUniverse;
 
 import java.io.Serializable;
@@ -344,4 +345,5 @@ public class NseBse500 implements Serializable {
     public void setStockPriceMovement(StockPriceMovement stockPriceMovement) {
         this.stockPriceMovement = stockPriceMovement;
     }
+
 }

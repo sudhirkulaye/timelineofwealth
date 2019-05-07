@@ -121,6 +121,13 @@ public class CommonService {
         CommonService.indexStatisticsRepository = indexStatisticsRepository;
     }
 
+    @Autowired
+    private static StockPriceMovementHistoryRepository stockPriceMovementHistoryRepository;
+    @Autowired
+    public void setStockPriceMovementHistoryRepository(StockPriceMovementHistoryRepository stockPriceMovementHistoryRepository){
+        CommonService.stockPriceMovementHistoryRepository = stockPriceMovementHistoryRepository;
+    }
+
     private static List<StockUniverse> nseBse500BasicList;
     private static List<NseBse500> nseBse500List;
 
@@ -434,6 +441,21 @@ public class CommonService {
             valuationHistories.add(history);
         }
         return valuationHistories;
+    }
+
+    /**
+     *
+     * @param ticker
+     * @return
+     */
+    public static List<StockPriceMovementHistory> getPriceMovements(String ticker) {
+        List<StockPriceMovementHistory> stockPriceMovementHistoryList = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+        LocalDate oneYearOld = now.minusDays(365);
+
+        stockPriceMovementHistoryList = CommonService.stockPriceMovementHistoryRepository.findAllByKeyTickerAndKeyDateGreaterThanOrderByKeyDateAsc(ticker,java.sql.Date.valueOf(oneYearOld));
+
+        return stockPriceMovementHistoryList;
     }
 
     /**

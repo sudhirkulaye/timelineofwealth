@@ -1,5 +1,6 @@
 /* Get members id*/
 SELECT * from user_members;
+SELECT * from member;
 /* Get Wealth Distribution of client */
 SELECT memberid, asset_class_group, round(value) FROM wealth_asset_allocation_history a 
 WHERE 
@@ -49,11 +50,13 @@ select * from mutual_fund_house;
 select * from mutual_fund_house a order by fund_house;
 
 -- Stock analysis
-SELECT a.memberid, b.asset_class_group, c.sub_industry_name_display, short_name, sum(a.quantity), max(buy_date), round(sum(total_cost)), round(sum(market_value)), round(sum(net_profit)), round(avg(absolute_return),4), round(avg(annualized_return),4) 
+SELECT /*a.memberid,*/ b.asset_class_group, c.sub_industry_name_display, short_name, sum(a.quantity), max(buy_date), round(sum(total_cost)), round(sum(market_value)), round(sum(net_profit)), round(avg(absolute_return),4), round(avg(annualized_return),4) 
 FROM wealth_details a, asset_classification b, subindustry c
-where a.memberid in (1003, 1019) and 
+where a.memberid in (1000, 1011) and 
 a.asset_classid = b.classid and
 a.subindustryid = c.subindustryid and
 (a.asset_classid > 406000 and a.asset_classid < 409000)
-group by ticker, memberid
-order by memberid, asset_class_group, short_name;
+group by ticker-- , memberid
+order by /*memberid,*/ sum(market_value) desc, asset_class_group, short_name;
+
+select * from wealth_details where memberid in (1000, 1011);
