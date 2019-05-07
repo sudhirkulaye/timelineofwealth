@@ -824,3 +824,18 @@ CREATE TABLE stock_price_movement (
   PRIMARY KEY (ticker)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Price Movement';
 
+-- drop table stock_price_movement_history;
+CREATE TABLE stock_price_movement_history (
+  date date NOT NULL COMMENT 'PK Date',
+  ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Index ticker',
+  return_1D decimal(10,3) DEFAULT NULL COMMENT '1 Day Returns',
+  return_1W decimal(10,3) DEFAULT NULL COMMENT '1 Week Returns',
+  return_2W decimal(10,3) DEFAULT NULL COMMENT '2 Weeks Returns',
+  return_1M decimal(10,3) DEFAULT NULL COMMENT '1 Month Returns',
+  PRIMARY KEY (date, ticker)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Price Movement History';
+-- TRUNCATE stock_price_movement_history
+SELECT * from stock_price_movement_history WHERE ticker like 'TCS%' order by date desc;
+SELECT * from stock_price_movement_history WHERE date = '2019-05-06' order by ticker, date desc;
+SELECT * from stock_price_movement order by ticker;
+   

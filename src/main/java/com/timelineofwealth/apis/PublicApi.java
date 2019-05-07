@@ -103,6 +103,12 @@ public class PublicApi {
         return CommonService.getRecentValuations(ticker);
     }
 
+    @RequestMapping(value = "/getpricemovements/{ticker}", method = RequestMethod.GET)
+    public List<StockPriceMovementHistory> getPriceMovements(@PathVariable String ticker){
+        logger.debug((String.format("Call public/api/getpricemovements"+ticker)));
+        return CommonService.getPriceMovements(ticker);
+    }
+
     @RequestMapping(value = "/getstockpnl/{ticker}", method = RequestMethod.GET)
     public List<StockPnl> getStockPnl(@PathVariable String ticker){
         logger.debug(String.format("Call public/api/getstockpnl/"+ticker));

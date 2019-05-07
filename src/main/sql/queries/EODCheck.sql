@@ -37,6 +37,12 @@ call ap_process_stat_calculation();
 select * from log_table;
 truncate table log_table;
 
+/*
+Historical Price Movements
+Call ap_process_stock_returns_history();
+select * from log_table;
+truncate table log_table;
+*/
 -- find new stocks or modified stocks -- last count 64 on 26th Nov 2018
 SELECT count(1), listing_date from stock_universe a group by a.listing_date order by a.listing_date desc; -- WHERE listing_date; > '2018-11-26';
 select * from stock_universe a where listing_date >= '2019-01-01'; 
@@ -142,6 +148,8 @@ where a.name = b.ticker5 and
 a.last_result_date = '201903' and 
 date = (select max(date) from daily_data_s a) and 
 b.ticker not in (select distinct ticker from stock_quarter a where date = '2019-03-31');
+-- new annual p&L 
+select distinct ticker, max(date) from stock_pnl a where month(date) != 3 group by ticker having max(date) not in ('2018-12-31', '2019-03-31', '2018-06-30') ORDER BY max(date) desc;
 
 -- Change of ticker
 select distinct(name) from daily_data_s a where a.date = (select max(date) from daily_data_s) and a.name not in (select ticker5 from stock_universe) order by rank; 

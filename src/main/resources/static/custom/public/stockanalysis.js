@@ -33,6 +33,22 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
     $scope.dataRecentEvToEbita = [];
     $scope.labelsRecentPE = [];
 
+    $scope.priceMovements = [];
+    $scope.dataPriceMovements = [];
+    $scope.data1DPriceMovements = [];
+    $scope.data1WPriceMovements = [];
+    $scope.data2WPriceMovements = [];
+    $scope.data1MPriceMovements = [];
+    $scope.labelsPriceMovements = [];
+    $scope.mean1D = 0.00;
+    $scope.median1D = 0.00;
+    $scope.mean1W = 0.00;
+    $scope.median1W = 0.00;
+    $scope.mean2W = 0.00;
+    $scope.median2W = 0.00;
+    $scope.mean1M = 0.00;
+    $scope.median1M = 0.00;
+
     showRecords();
 
     function showRecords(){
@@ -81,6 +97,17 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                     populateStockRecentPE();
                 } else {
                     $scope.recentValuations = [];
+                }
+        });
+
+        url = "/getpricemovements/"+$scope.ticker;
+        $http.get(urlBase + url).
+            then(function (response) {
+                if (response != undefined) {
+                    $scope.priceMovements = response.data;
+                    populateStockPriceMovements();
+                } else {
+                    $scope.priceMovements = [];
                 }
         });
 
@@ -196,6 +223,69 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 type: 'line'
               },
         ];
+
+    }
+
+    function populateStockPriceMovements() {
+        var data1dpricemovements = [];
+        var data1wpricemovements = [];
+        var data2wpricemovements = [];
+        var data1mpricemovements = [];
+        var labelspricemovements = [];
+
+        for (var i = 0; i < $scope.priceMovements.length; i++) {
+            data1dpricemovements.push($scope.priceMovements[i].return1D);
+            data1wpricemovements.push($scope.priceMovements[i].return1W);
+            data2wpricemovements.push($scope.priceMovements[i].return2W);
+            data1mpricemovements.push($scope.priceMovements[i].return1M);
+            labelspricemovements.push($scope.priceMovements[i].key.date);
+        }
+        $scope.data1DPriceMovements.push(data1dpricemovements);
+        $scope.data1WPriceMovements.push(data1wpricemovements);
+        $scope.data2WPriceMovements.push(data2wpricemovements);
+        $scope.data1MPriceMovements.push(data1mpricemovements);
+       /* $scope.dataPriceMovements.push(data1dpricemovements);
+        $scope.dataPriceMovements.push(data1wpricemovements);
+        $scope.dataPriceMovements.push(data2wpricemovements);
+        $scope.dataPriceMovements.push(data1mpricemovements);*/
+
+        $scope.labelsPriceMovements = labelspricemovements;
+
+        var count1D = data1dpricemovements.length;
+        var sum1D = data1dpricemovements.reduce((previous, current) => current += previous);
+        $scope.mean1D = sum1D/count1D;
+        var dummyArray1D = Array.from(data1dpricemovements);
+        dummyArray1D.sort((a, b) => a - b);
+        var lowMiddle1D = Math.floor((dummyArray1D.length - 1) / 2);
+        var highMiddle1D = Math.ceil((dummyArray1D.length - 1) / 2);
+        $scope.median1D = (dummyArray1D[lowMiddle1D] + dummyArray1D[highMiddle1D]) / 2;
+
+        var count1W = data1wpricemovements.length;
+        var sum1W = data1wpricemovements.reduce((previous, current) => current += previous);
+        $scope.mean1W = sum1W/count1W;
+        var dummyArray1W = Array.from(data1wpricemovements);
+        dummyArray1W.sort((a, b) => a - b);
+        var lowMiddle1W = Math.floor((dummyArray1W.length - 1) / 2);
+        var highMiddle1W = Math.ceil((dummyArray1W.length - 1) / 2);
+        $scope.median1W = (dummyArray1W[lowMiddle1W] + dummyArray1W[highMiddle1W]) / 2;
+
+        var count2W = data2wpricemovements.length;
+        var sum2W = data2wpricemovements.reduce((previous, current) => current += previous);
+        $scope.mean2W = sum2W/count2W;
+        var dummyArray2W = Array.from(data2wpricemovements);
+        dummyArray2W.sort((a, b) => a - b);
+        var lowMiddle2W = Math.floor((dummyArray2W.length - 1) / 2);
+        var highMiddle2W = Math.ceil((dummyArray2W.length - 1) / 2);
+        $scope.median2W = (dummyArray2W[lowMiddle2W] + dummyArray2W[highMiddle2W]) / 2;
+
+        var count1M = data1mpricemovements.length;
+        var sum1M = data1mpricemovements.reduce((previous, current) => current += previous);
+        $scope.mean1M = sum1M/count1M;
+        var dummyArray1M = Array.from(data1mpricemovements);
+        dummyArray1M.sort((a, b) => a - b);
+        var lowMiddle1M = Math.floor((dummyArray1M.length - 1) / 2);
+        var highMiddle1M = Math.ceil((dummyArray1M.length - 1) / 2);
+        $scope.median1M = (dummyArray1M[lowMiddle1M] + dummyArray1M[highMiddle1M]) / 2;
 
     }
 
