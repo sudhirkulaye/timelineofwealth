@@ -50,13 +50,14 @@ select * from mutual_fund_house;
 select * from mutual_fund_house a order by fund_house;
 
 -- Stock analysis
-SELECT /*a.memberid,*/ b.asset_class_group, c.sub_industry_name_display, short_name, sum(a.quantity), max(buy_date), round(sum(total_cost)), round(sum(market_value)), round(sum(net_profit)), round(avg(absolute_return),4), round(avg(annualized_return),4) 
-FROM wealth_details a, asset_classification b, subindustry c
-where a.memberid in (1000, 1011) and 
+SELECT a.memberid, d.first_name, b.asset_class_group, c.sub_industry_name_display, short_name, sum(a.quantity), max(buy_date), round(sum(total_cost)), round(sum(market_value)), round(sum(net_profit)), round(avg(absolute_return),4), round(avg(annualized_return),4) 
+FROM wealth_details a, asset_classification b, subindustry c, member d
+where a.memberid IN (1000, 1001, 1002, 1005, 1007, 1008, 1010, 1011, 1018, 1025, 1034, 1038, 1040, 1051, 1057) and -- in (1000, 1011) and 
+a.memberid = d.memberid and
 a.asset_classid = b.classid and
 a.subindustryid = c.subindustryid and
-(a.asset_classid > 406000 and a.asset_classid < 409000)
+(a.asset_classid >= 406000 and a.asset_classid < 409000)
 group by ticker-- , memberid
-order by /*memberid,*/ sum(market_value) desc, asset_class_group, short_name;
+order by memberid, sum(market_value) desc, asset_class_group, short_name;
 
 select * from wealth_details where memberid in (1000, 1011);

@@ -1,9 +1,9 @@
 DROP PROCEDURE IF EXISTS ap_process_stock_returns;
-CREATE PROCEDURE `ap_process_stock_returns`()
+CREATE PROCEDURE ap_process_stock_returns()
 BEGIN
 
   DECLARE var_finished, var_count INT DEFAULT 0;
-  DECLARE var_price_today, var_price_history DECIMAL(20,3);
+  DECLARE var_price_today, var_price_history, var_52w_min, var_52w_max DECIMAL(20,3);
   DECLARE var_date_today, var_date_last_trading_day, var_date_current_year_start,
 		  var_date_1_w_before, var_date_2_w_before, var_date_1_mt_before,
           var_date_2_mt_before, var_date_3_mt_before, var_date_6_mt_before, var_date_9_mt_before,
@@ -35,7 +35,8 @@ BEGIN
    ticker NOT IN (SELECT ticker FROM stock_price_movement));
 
   UPDATE stock_price_movement
-  SET return_1D = 0, return_1W = 0, return_2W = 0, return_1M = 0, return_2M = 0,
+  SET CMP = 0, 52w_min = 0, 52w_max = 0, up_52w_min = 0, down_52w_max = 0,
+      return_1D = 0, return_1W = 0, return_2W = 0, return_1M = 0, return_2M = 0,
       return_3M = 0, return_6M = 0, return_9M = 0, return_1Y = 0, return_2Y = 0,
       return_3Y = 0, return_5Y = 0, return_10Y = 0, return_YTD = 0;
 
@@ -68,8 +69,8 @@ BEGIN
 
 	SELECT count(1)
 	INTO var_count
-	FROM nse_price_history
-	WHERE nse_ticker = var_ticker;
+	FROM stock_universe
+	WHERE nse_code = var_ticker;
 
     IF (var_count > 0) THEN
 		SET var_is_nse_ticker = 'Y';
@@ -78,603 +79,768 @@ BEGIN
     END IF;
 
     SET var_count = 0;
-
-	SELECT latest_price
-	INTO var_price_today
-	FROM stock_universe
-	WHERE ticker = var_ticker;
+    SET var_price_today = 0;
 
 	IF (var_is_nse_ticker = 'Y') THEN
-		SELECT close_price
-		INTO var_price_history
+		SELECT count(1)
+		INTO var_count
 		FROM nse_price_history
 		WHERE nse_ticker = var_ticker AND
-		date = (SELECT MAX(date)
-				FROM nse_price_history
-				WHERE nse_ticker = var_ticker AND
-				date <= var_date_last_trading_day);
-	ELSE
-		SELECT close_price
-		INTO var_price_history
+        date = var_date_today;
+
+        IF (var_count > 0) THEN
+			SELECT close_price
+			INTO var_price_today
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date = var_date_today;
+        END IF;
+    ELSE
+		SELECT count(1)
+		INTO var_count
 		FROM bse_price_history
 		WHERE bse_ticker = var_ticker AND
-		date = (SELECT MAX(date)
-				FROM bse_price_history
-				WHERE bse_ticker = var_ticker AND
-				date <= var_date_last_trading_day);
+        date = var_date_today;
+
+        IF (var_count > 0) THEN
+			SELECT close_price
+			INTO var_price_today
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date = var_date_today;
+        END IF;
+    END IF;
+
+    UPDATE stock_price_movement
+    SET CMP = var_price_today
+    WHERE ticker = var_ticker;
+
+    SET var_price_history = 0;
+
+	IF (var_price_today > 0 AND var_is_nse_ticker = 'Y') THEN
+		SELECT count(1)
+		INTO var_count
+		FROM nse_price_history
+		WHERE nse_ticker = var_ticker AND
+		date = var_date_last_trading_day;
+
+		IF (var_count > 0) THEN
+			SELECT close_price
+			INTO var_price_history
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date = (SELECT MAX(date)
+					FROM nse_price_history
+					WHERE nse_ticker = var_ticker AND
+					date = var_date_last_trading_day);
+		END IF;
+	END IF;
+    IF (var_price_today > 0 AND var_is_nse_ticker = 'N') THEN
+		SELECT count(1)
+		INTO var_count
+		FROM bse_price_history
+		WHERE bse_ticker = var_ticker AND
+		date = var_date_last_trading_day;
+
+		IF (var_count > 0) THEN
+			SELECT close_price
+			INTO var_price_history
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date = (SELECT MAX(date)
+					FROM bse_price_history
+					WHERE bse_ticker = var_ticker AND
+					date = var_date_last_trading_day);
+		END IF;
     END IF;
 
 	-- INSERT INTO log_table
 	-- VALUES      (now(), concat('ap_process_stock_returns: var_ticker-', var_ticker, '-IsNSE?-',var_is_nse_ticker, '-CMP-', var_price_today, '-var_price_history-',var_price_history ));
 
-	IF var_price_history <> 0 THEN
+	IF (var_price_today <> 0 AND var_price_history <> 0) THEN
 		UPDATE stock_price_movement
 		SET return_1D = ((var_price_today/var_price_history) - 1)*100
 		WHERE ticker = var_ticker;
     END IF;
 
-    -- 1 Week Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_1_w_before;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_1_w_before;
-    END IF;
-
-	IF(var_count > 0) THEN
+    IF (var_price_today <> 0) THEN
+		-- 1 Week Change
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_1_w_before);
+			date <= var_date_1_w_before AND
+			date > var_date_2_w_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_1_w_before);
-        END IF;
+			date <= var_date_1_w_before AND
+			date > var_date_2_w_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_1W = ((var_price_today/var_price_history) - 1)*100
-        WHERE ticker = var_ticker;
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date <= var_date_1_w_before AND
+						date > var_date_2_w_before);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date <= var_date_1_w_before AND
+						date > var_date_2_w_before);
+			END IF;
 
-    END IF;
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_1W = ((var_price_today/var_price_history) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
 
-    -- 2 Week Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_2_w_before;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_2_w_before;
-    END IF;
+		END IF;
 
-	IF(var_count > 0) THEN
+		-- 2 Week Change
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_2_w_before);
+			date <= var_date_2_w_before AND
+			date > var_date_1_mt_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_2_w_before);
-        END IF;
+			date <= var_date_2_w_before AND
+			date > var_date_1_mt_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_2W = ((var_price_today/var_price_history) - 1)*100
-        WHERE ticker = var_ticker;
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date <= var_date_2_w_before AND
+						date > var_date_1_mt_before);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date <= var_date_2_w_before AND
+						date > var_date_1_mt_before);
+			END IF;
 
-    END IF;
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_2W = ((var_price_today/var_price_history) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
 
-    -- 1 Month Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_1_mt_before;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_1_mt_before;
-    END IF;
+		END IF;
 
-	IF(var_count > 0) THEN
+		-- 1 Month Change
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_1_mt_before);
+			date <= var_date_1_mt_before AND
+			date > var_date_2_mt_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_1_mt_before);
-        END IF;
+			date <= var_date_1_mt_before AND
+			date > var_date_2_mt_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_1M = ((var_price_today/var_price_history) - 1)*100
-        WHERE ticker = var_ticker;
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date <= var_date_1_mt_before AND
+						date > var_date_2_mt_before);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date <= var_date_1_mt_before AND
+						date > var_date_2_mt_before);
+			END IF;
 
-    END IF;
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_1M = ((var_price_today/var_price_history) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
 
-    -- 2 Month Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_2_mt_before;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_2_mt_before;
-    END IF;
+		END IF;
 
-	IF(var_count > 0) THEN
+		-- 2 Month Change
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_2_mt_before);
+			date <= var_date_2_mt_before AND
+			date > var_date_3_mt_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_2_mt_before);
-        END IF;
+			date <= var_date_2_mt_before AND
+			date > var_date_3_mt_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_2M = ((var_price_today/var_price_history) - 1)*100
-        WHERE ticker = var_ticker;
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date <= var_date_2_mt_before AND
+						date > var_date_3_mt_before);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date <= var_date_2_mt_before AND
+						date > var_date_3_mt_before);
+			END IF;
 
-    END IF;
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_2M = ((var_price_today/var_price_history) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
 
-    -- 3 Month Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_3_mt_before;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_3_mt_before;
-    END IF;
+		END IF;
 
-	IF(var_count > 0) THEN
+		-- 3 Month Change
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_3_mt_before);
+			date <= var_date_3_mt_before AND
+			date > var_date_6_mt_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_3_mt_before);
-        END IF;
+			date <= var_date_3_mt_before AND
+			date > var_date_6_mt_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_3M = ((var_price_today/var_price_history) - 1)*100
-        WHERE ticker = var_ticker;
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date <= var_date_3_mt_before AND
+						date > var_date_6_mt_before);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date <= var_date_3_mt_before AND
+						date > var_date_6_mt_before);
+			END IF;
 
-    END IF;
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_3M = ((var_price_today/var_price_history) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
+		END IF;
 
-    -- 6 Month Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_6_mt_before;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_6_mt_before;
-    END IF;
-
-	IF(var_count > 0) THEN
+		-- 6 Month Change
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_6_mt_before);
+			date <= var_date_6_mt_before AND
+			date > var_date_9_mt_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_6_mt_before);
-        END IF;
+			date <= var_date_6_mt_before AND
+			date > var_date_9_mt_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_6M = ((var_price_today/var_price_history) - 1)*100
-        WHERE ticker = var_ticker;
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date <= var_date_6_mt_before AND
+						date > var_date_9_mt_before);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date <= var_date_6_mt_before AND
+						date > var_date_9_mt_before);
+			END IF;
 
-    END IF;
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_6M = ((var_price_today/var_price_history) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
 
-    -- 9 Month Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_9_mt_before;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_9_mt_before;
-    END IF;
+		END IF;
 
-	IF(var_count > 0) THEN
+		-- 9 Month Change
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_9_mt_before);
+			date <= var_date_9_mt_before AND
+			date > var_date_1_yr_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_9_mt_before);
-        END IF;
+			date <= var_date_9_mt_before AND
+			date > var_date_1_yr_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_9M = ((var_price_today/var_price_history) - 1)*100
-        WHERE ticker = var_ticker;
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date <= var_date_9_mt_before AND
+						date > var_date_1_yr_before);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date <= var_date_9_mt_before AND
+						date > var_date_1_yr_before);
+			END IF;
 
-    END IF;
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_9M = ((var_price_today/var_price_history) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
 
-    -- 1 Year Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_1_yr_before;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_1_yr_before;
-    END IF;
+		END IF;
 
-	IF(var_count > 0) THEN
+		-- 1 Year Change
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_1_yr_before);
+			date <= var_date_1_yr_before AND
+			date > var_date_2_yr_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_1_yr_before);
-        END IF;
+			date <= var_date_1_yr_before AND
+			date > var_date_2_yr_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_1Y = ((var_price_today/var_price_history) - 1)*100
-        WHERE ticker = var_ticker;
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date <= var_date_1_yr_before AND
+						date > var_date_2_yr_before);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date <= var_date_1_yr_before AND
+						date > var_date_2_yr_before);
+			END IF;
 
-    END IF;
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_1Y = ((var_price_today/var_price_history) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
+		END IF;
 
-    -- 2 Year Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_2_yr_before;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_2_yr_before;
-    END IF;
-
-	IF(var_count > 0) THEN
+		-- 52W High & Low
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_2_yr_before);
+			date <= var_date_today AND
+			date > var_date_1_yr_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_2_yr_before);
-        END IF;
+			date <= var_date_today AND
+			date > var_date_1_yr_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_2Y = (pow((var_price_today/var_price_history), 0.5) - 1)*100
-        WHERE ticker = var_ticker;
+		IF (var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT min(close_price), max(close_price)
+				INTO var_52w_min, var_52w_max
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker
+				AND date > var_date_1_yr_before;
+			ELSE
+				SELECT min(close_price), max(close_price)
+				INTO var_52w_min, var_52w_max
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker
+				AND date > var_date_1_yr_before;
+			END IF;
 
-    END IF;
+			IF (var_price_today <> 0 AND var_52w_min <> 0 AND var_52w_max <> 0) THEN
+				UPDATE stock_price_movement
+				SET 52w_min = var_52w_min, 52w_max = var_52w_max,
+				up_52w_min = ((var_price_today/var_52w_min) - 1)*100,
+				down_52w_max = ((var_price_today/var_52w_max) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
 
-    -- 3 Year Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_3_yr_before;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_3_yr_before;
-    END IF;
+		END IF;
 
-	IF(var_count > 0) THEN
+		-- 2 Year Change
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_3_yr_before);
+			date <= var_date_2_yr_before AND
+			date > var_date_3_yr_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_3_yr_before);
-        END IF;
+			date <= var_date_2_yr_before AND
+			date > var_date_3_yr_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_3Y = (pow((var_price_today/var_price_history), (1/3)) - 1)*100
-        WHERE ticker = var_ticker;
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date <= var_date_2_yr_before AND
+						date > var_date_3_yr_before);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date <= var_date_2_yr_before AND
+						date > var_date_3_yr_before);
+			END IF;
 
-    END IF;
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_2Y = (pow((var_price_today/var_price_history), 0.5) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
 
-    -- 5 Year Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_5_yr_before;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_5_yr_before;
-    END IF;
+		END IF;
 
-	IF(var_count > 0) THEN
+		-- 3 Year Change
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_5_yr_before);
+			date <= var_date_3_yr_before AND
+			date > var_date_5_yr_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_5_yr_before);
-        END IF;
+			date <= var_date_3_yr_before AND
+			date > var_date_5_yr_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_5Y = (pow((var_price_today/var_price_history), 0.2) - 1)*100
-        WHERE ticker = var_ticker;
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date <= var_date_3_yr_before AND
+						date > var_date_5_yr_before);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date <= var_date_3_yr_before AND
+						date > var_date_5_yr_before);
+			END IF;
 
-    END IF;
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_3Y = (pow((var_price_today/var_price_history), (1/3)) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
 
-    -- 10 Year Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_10_yr_before;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_10_yr_before;
-    END IF;
+		END IF;
 
-	IF(var_count > 0) THEN
+		-- 5 Year Change
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_10_yr_before);
+			date <= var_date_5_yr_before AND
+			date > var_date_10_yr_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_10_yr_before);
-        END IF;
+			date <= var_date_5_yr_before AND
+			date > var_date_10_yr_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_10Y = (pow((var_price_today/var_price_history), 0.1) - 1)*100
-        WHERE ticker = var_ticker;
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date <= var_date_5_yr_before AND
+						date > var_date_10_yr_before);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date <= var_date_5_yr_before AND
+						date > var_date_10_yr_before);
+			END IF;
 
-    END IF;
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_5Y = (pow((var_price_today/var_price_history), 0.2) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
 
-    -- YTD Change
-	SET var_count = 0;
-    IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
-		FROM nse_price_history
-		WHERE nse_ticker = var_ticker AND
-		date < var_date_current_year_start;
-    ELSE
-		SELECT count(1)
-		INTO var_count
-		FROM bse_price_history
-		WHERE bse_ticker = var_ticker AND
-		date < var_date_current_year_start;
-    END IF;
+		END IF;
 
-	IF(var_count > 0) THEN
+		-- 10 Year Change
+		SET var_count = 0;
 		IF (var_is_nse_ticker = 'Y') THEN
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM nse_price_history
-					WHERE nse_ticker = var_ticker AND
-					date < var_date_current_year_start);
+			date <= var_date_10_yr_before;
 		ELSE
-			SELECT close_price
-			INTO var_price_history
+			SELECT count(1)
+			INTO var_count
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = (SELECT MAX(date)
-					FROM bse_price_history
-					WHERE bse_ticker = var_ticker AND
-					date < var_date_current_year_start);
-        END IF;
+			date <= var_date_10_yr_before;
+		END IF;
 
-		UPDATE stock_price_movement
-        SET return_YTD = ((var_price_today/var_price_history) - 1)*100
-        WHERE ticker = var_ticker;
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date <= var_date_10_yr_before);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date <= var_date_10_yr_before);
+			END IF;
 
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_10Y = (pow((var_price_today/var_price_history), 0.1) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
+
+		END IF;
+
+		-- YTD Change
+		SET var_count = 0;
+		IF (var_is_nse_ticker = 'Y') THEN
+			SELECT count(1)
+			INTO var_count
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date < var_date_current_year_start;
+		ELSE
+			SELECT count(1)
+			INTO var_count
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date < var_date_current_year_start;
+		END IF;
+
+		IF(var_count > 0) THEN
+			IF (var_is_nse_ticker = 'Y') THEN
+				SELECT close_price
+				INTO var_price_history
+				FROM nse_price_history
+				WHERE nse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM nse_price_history
+						WHERE nse_ticker = var_ticker AND
+						date < var_date_current_year_start);
+			ELSE
+				SELECT close_price
+				INTO var_price_history
+				FROM bse_price_history
+				WHERE bse_ticker = var_ticker AND
+				date = (SELECT MAX(date)
+						FROM bse_price_history
+						WHERE bse_ticker = var_ticker AND
+						date < var_date_current_year_start);
+			END IF;
+
+			IF (var_price_today <> 0 AND var_price_history <> 0) THEN
+				UPDATE stock_price_movement
+				SET return_YTD = ((var_price_today/var_price_history) - 1)*100
+				WHERE ticker = var_ticker;
+			END IF;
+
+		END IF;
     END IF;
-
   END LOOP fetch_data;
 
   CLOSE stock_price_movement_cursor;
+
+  DELETE FROM stock_price_movement_history WHERE date = var_date_today;
+  INSERT INTO stock_price_movement_history (date, ticker, return_1D, return_1W, return_2W, return_1M)
+  (SELECT var_date_today, ticker,  return_1D, return_1W, return_2W, return_1M FROM stock_price_movement);
 
   INSERT INTO log_table
   VALUES      (now(), 'ap_process_stock_returns: End');

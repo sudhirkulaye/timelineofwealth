@@ -1,5 +1,5 @@
 DROP PROCEDURE IF EXISTS ap_process_mf_returns;
-CREATE PROCEDURE `ap_process_mf_returns`()
+CREATE PROCEDURE ap_process_mf_returns()
 BEGIN
 
   DECLARE var_finished, var_count, var_scheme_code INT DEFAULT 0;

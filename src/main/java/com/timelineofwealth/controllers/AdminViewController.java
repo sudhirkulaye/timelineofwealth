@@ -9,6 +9,9 @@ import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.*;
 import com.timelineofwealth.service.CSVUtils;
 import com.timelineofwealth.service.CommonService;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.StoredProcedureQuery;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,6 +43,10 @@ public class AdminViewController {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminViewController.class);
     private java.sql.Date dateToday;
+    public static final String AP_PROCESS_EOD = "ap_process_eod";
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     NsePriceHistoryRepository nsePriceHistoryRepository;
@@ -68,7 +78,12 @@ public class AdminViewController {
     public void setDailyDataBRepository(DailyDataBRepository dailyDataBRepository){
         this.dailyDataBRepository = dailyDataBRepository;
     }
-
+    @Autowired
+    DailyDataSRepository dailyDataSRepository;
+    @Autowired
+    public void setDailyDataSRepository(DailyDataSRepository dailyDataSRepository){
+        this.dailyDataSRepository = dailyDataSRepository;
+    }
     @Autowired
     public AdminViewController(Environment environment){}
 
@@ -475,15 +490,132 @@ public class AdminViewController {
         return "admin/uploadindexdata";
     }
 
-    @RequestMapping(value = "/admin/uploaddailydatab")
+    @RequestMapping(value = "/admin/uploaddailydatas")
     public String uploadDailyDataB(Model model, @AuthenticationPrincipal UserDetails userDetails){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
-        return "admin/uploaddailydatab";
+        return "admin/uploaddailydatas";
     }
 
+    @RequestMapping(value=("/admin/uploaddailydatasstatus"),headers=("content-type=multipart/*"),method= RequestMethod.POST)
+    public String uploadDailyDataSStatus (Model model, @RequestParam("file") MultipartFile file){
+        if (file.isEmpty()) {
+            model.addAttribute("message", "Please select a file to upload");
+            return "redirect:admin/uploaddailydatas";
+        }
+        try {
+            List<DailyDataS> dailyDataSList = new ArrayList<>();
+            XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+            XSSFSheet worksheet = workbook.getSheetAt(0);
+
+            for(int i=1;i<worksheet.getPhysicalNumberOfRows() ;i++) {
+                DailyDataS dailyDataS = new DailyDataS();
+
+                XSSFRow row = worksheet.getRow(i);
+                dailyDataS.setKey(new DailyDataS.DailyDataSKey());
+                dailyDataS.getKey().setDate(new java.sql.Date(row.getCell(0).getDateCellValue().getTime()));
+                dailyDataS.setRank((int) row.getCell(1).getNumericCellValue());
+                dailyDataS.getKey().setName((String) row.getCell(2).getStringCellValue());
+                dailyDataS.setCmp(new BigDecimal(row.getCell(3).getNumericCellValue()));
+                dailyDataS.setMarketCap(new BigDecimal(row.getCell(4).getNumericCellValue()));
+                dailyDataS.setLastResultDate((int) row.getCell(5).getNumericCellValue());
+                dailyDataS.setNetProfit(new BigDecimal(row.getCell(6).getNumericCellValue()));
+                dailyDataS.setSales(new BigDecimal(row.getCell(7).getNumericCellValue()));
+                dailyDataS.setYoyQuarterlySalesGrowth(new BigDecimal(row.getCell(8).getNumericCellValue()));
+                dailyDataS.setYoyQuarterlyProfitGrowth(new BigDecimal(row.getCell(9).getNumericCellValue()));
+                dailyDataS.setQoqSalesGrowth(new BigDecimal(row.getCell(10).getNumericCellValue()));
+                dailyDataS.setQoqProfitGrowth(new BigDecimal(row.getCell(11).getNumericCellValue()));
+                dailyDataS.setOpmLatestQuarter(new BigDecimal(row.getCell(12).getNumericCellValue()));
+                dailyDataS.setOpmLastYear(new BigDecimal(row.getCell(13).getNumericCellValue()));
+                dailyDataS.setNpmLatestQuarter(new BigDecimal(row.getCell(14).getNumericCellValue()));
+                dailyDataS.setNpmLastYear(new BigDecimal(row.getCell(15).getNumericCellValue()));
+                dailyDataS.setProfitGrowth3years(new BigDecimal(row.getCell(16).getNumericCellValue()));
+                dailyDataS.setSalesGrowth3years(new BigDecimal(row.getCell(17).getNumericCellValue()));
+                dailyDataS.setPeTtm(new BigDecimal(row.getCell(18).getNumericCellValue()));
+                dailyDataS.setHistoricalPe3years(new BigDecimal(row.getCell(19).getNumericCellValue()));
+                dailyDataS.setPegRatio(new BigDecimal(row.getCell(20).getNumericCellValue()));
+                dailyDataS.setPbTtm(new BigDecimal(row.getCell(21).getNumericCellValue()));
+                dailyDataS.setEvToEbit(new BigDecimal(row.getCell(22).getNumericCellValue()));
+                dailyDataS.setDividendPayout(new BigDecimal(row.getCell(23).getNumericCellValue()));
+                dailyDataS.setRoe(new BigDecimal(row.getCell(24).getNumericCellValue()));
+                dailyDataS.setAvgRoe3years(new BigDecimal(row.getCell(25).getNumericCellValue()));
+                dailyDataS.setDebt(new BigDecimal(row.getCell(26).getNumericCellValue()));
+                dailyDataS.setDebtToEquity(new BigDecimal(row.getCell(27).getNumericCellValue()));
+                dailyDataS.setDebt3yearsback(new BigDecimal(row.getCell(28).getNumericCellValue()));
+                dailyDataS.setMcapToNetprofit(new BigDecimal(0));
+                dailyDataS.setMcapToSales(new BigDecimal(0));
+                dailyDataS.setSector("");
+                dailyDataS.setIndustry("");
+                dailyDataS.setSubIndustry("");
+
+                dailyDataSList.add(dailyDataS);
+            }
+            dailyDataSList.sort(Comparator.comparing(DailyDataS::getMarketCap).reversed());
+            dailyDataSRepository.save(dailyDataSList);
+
+            model.addAttribute("message",
+                    "You successfully uploaded '" + file.getOriginalFilename() + "'");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "admin/uploaddailydatas";
+    }
+
+    @RequestMapping(value = "/admin/eodprocs")
+    public String eodProcs(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        List<Object[]> objects = nsePriceHistoryRepository.findMaxDateAndCount();
+        for (Object[] object : objects) {
+            model.addAttribute("nsecount", object[0]);
+            model.addAttribute("nsemaxdate", object[1]);
+        }
+        List<Object[]> objects1 = bsePriceHistoryRepository.findMaxDateAndCount();
+        for (Object[] object : objects1) {
+            model.addAttribute("bsecount", object[0]);
+            model.addAttribute("bsemaxdate", object[1]);
+        }
+        List<Object[]> objects2 = mutualFundNavHistoryRepository.findMaxDateAndCount();
+        for (Object[] object : objects2) {
+            model.addAttribute("mfcount", object[0]);
+            model.addAttribute("mfmaxdate", object[1]);
+        }
+        List<Object[]> objects3 = dailyDataSRepository.findMaxDateAndCount();
+        for (Object[] object : objects3) {
+            model.addAttribute("screenercount", object[0]);
+            model.addAttribute("screenermaxdate", object[1]);
+        }
+
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "TimelineOfWealth");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "admin/eodprocs";
+    }
+
+    @RequestMapping(value=("/admin/eodprocsstatus"),method=RequestMethod.POST)
+    public String processDailyDataStatus(Model model, @RequestParam("confirmation") String confirmation){
+        if (confirmation.equalsIgnoreCase("yes")) {
+            StoredProcedureQuery storedProcedure = entityManager.createStoredProcedureQuery(AP_PROCESS_EOD);
+            boolean result = storedProcedure.execute();
+            if (!result) {
+                model.addAttribute("message", "Successfully ran EOD procedures");
+            } else {
+                model.addAttribute("message", "Failed to run EOD procedures successfully. Check log_table.");
+            }
+            return "admin/eodprocs";
+        } else {
+            model.addAttribute("message", "Please confirm Yes/No to process daily data");
+            return "admin/eodprocs";
+        }
+    }
+
+    /**
+     * Bloomberg JSON file upload login -- Now not in use since Bloomberg Data is not available
+     * @param model
+     * @param file
+     * @return
+     */
     @RequestMapping(value=("/admin/uploaddailydatabstatus"),headers=("content-type=multipart/*"),method= RequestMethod.POST)
     public String uploadDailyDataBStatus (Model model, @RequestParam("file") MultipartFile file){
         if (file.isEmpty()) {

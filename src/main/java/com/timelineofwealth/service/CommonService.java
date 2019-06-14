@@ -94,6 +94,13 @@ public class CommonService {
     }
 
     @Autowired
+    private static DailyDataBRepository dailyDataBRepository;
+    @Autowired
+    public void setDailyDataBRepository(DailyDataBRepository dailyDataBRepository) {
+        CommonService.dailyDataBRepository = dailyDataBRepository;
+    }
+
+    @Autowired
     private static StockPriceMovementRepository stockPriceMovementRepository;
     @Autowired
     public void setStockPriceMovementRepository(StockPriceMovementRepository stockPriceMovementRepository) {
@@ -470,6 +477,7 @@ public class CommonService {
         NseBse500 stockDetails = getStockDetails(ticker);
 
         List<DailyDataS> dailyDataSList = CommonService.dailyDataSRepository.findAllByKeyNameAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker5(),java.sql.Date.valueOf(oneYearOld));
+        //List<DailyDataB> dailyDataBList = CommonService.dailyDataBRepository.findAllByKeyTickerBAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker2(),java.sql.Date.valueOf(oneYearOld));
         for(DailyDataS dailyDataS: dailyDataSList){
             RecentValuations recentPE = new RecentValuations();
             recentPE.setTicker(ticker);
@@ -480,6 +488,22 @@ public class CommonService {
             recentPE.setMarketCap(dailyDataS.getMarketCap());
             recentPES.add(recentPE);
         }
+        // set PB from bloomberg data
+        // commenting following code since bloomberg data is now not available
+        /*for(DailyDataB dailyDataB: dailyDataBList){
+            List<RecentValuations> recentPES1 = recentPES.stream()
+                    .filter( recentPE -> recentPE.getDate().equals(dailyDataB.getKey().getDate()) )
+                    .collect(Collectors.toList());
+            if (recentPES1.size() > 0) {
+                RecentValuations recentPE = recentPES1.get(0);
+                if (dailyDataB.getPriceBook().floatValue() > 0) {
+                    recentPE.setPb(dailyDataB.getPriceBook());
+                }
+                if (dailyDataB.getCurrentPe().floatValue() > 0) {
+                    recentPE.setPe(dailyDataB.getCurrentPe());
+                }
+            }
+        }*/
         return recentPES;
     }
 

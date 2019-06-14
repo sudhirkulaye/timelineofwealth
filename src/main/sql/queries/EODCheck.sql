@@ -10,11 +10,11 @@ where date = (select max(date) from bse_price_history)
 group by date order by date desc;
 
 select count(1), date from mutual_fund_nav_history
-where date >= (select date_last_trading_day from setup_dates)
+where date > (select date_last_trading_day from setup_dates)
 group by date order by date desc;
 
-select count(1), date from daily_data_b
-where date >= (select date_last_trading_day from setup_dates)
+select count(1), date from daily_data_s
+where date = (select max(date) from daily_data_s)
 group by date order by date desc;
 
 select * from daily_data_b where date = (select date_today from setup_dates) order by market_cap desc;
@@ -48,8 +48,8 @@ SELECT count(1), listing_date from stock_universe a group by a.listing_date orde
 select * from stock_universe a where listing_date >= '2019-01-01'; 
 
 -- stock split probable candidate
-select * from stock_split_probability a where a.is_processed = 'NO' order by date desc;
-
+select a.* from stock_split_probability a where a.is_processed = 'NO' order by date desc;
+select * from stock_universe a where a.ticker IN ('MCL','NANDANI','ONEPOINT','AIRAN','AKASH') ;
 -- new Mutual Fund Entry
 select count(1), date_latest_nav from mutual_fund_universe a where a.isin_div_payout_or_isin_growth = 'XXX' group by date_latest_nav order by date_latest_nav desc;
 -- select distinct fund_house from mutual_fund_universe;
@@ -166,14 +166,22 @@ select * from daily_data_b a where ticker_b = 'IDFCBK:IN';
 -- update stock_quarter a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
 -- update stock_balancesheet a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
 -- update stock_cashflow a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
-select * from wealth_details a where a.ticker = 'IDFCFIRSTB';
+select * from wealth_details a where a.ticker = 'KPITTECH';
 -- update wealth_details a set a.ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
 select * from stock_universe a where ticker in ('IDFCFIRSTB','BAJAJCON');
 -- BAJAJCORP to BAJAJCON and 'Bajaj Corp' to 'Bajaj Consumer'
 -- IDFCBANK to IDFCFIRSTB and 'IDFC Bank' to 'IDFC First Bank'
-select * from stock_cashflow a where ticker = 'BAJFINANCE';
+select * from stock_cashflow a where ticker = 'KPITTECH';
 
 -- Stock Split, Bonus
 SELECT date, close_price from nse_price_history a where a.nse_ticker = 'WIPRO' and date <= '2019-03-06' order by date desc; 
 -- update nse_price_history a set close_price = close_price * (3/4) where a.nse_ticker = 'WIPRO' and date < '2019-03-06';
 
+-- update HDFC Bank PB
+select * from daily_data_s a where a.name = 'HDFC Bank' and date BETWEEN '2019-04-20' and '2019-07-01' order by date desc;
+update daily_data_s a set pb_ttm = (cmp/548) where a.name = 'HDFC Bank' and date BETWEEN '2019-04-20' and '2019-07-01'; -- TODO: update second date
+update daily_data_s a set pb_ttm = (cmp/522) where a.name = 'HDFC Bank' and date BETWEEN '2019-01-19' and '2019-04-19'; -- TODO: update second date
+update daily_data_s a set pb_ttm = (cmp/507) where a.name = 'HDFC Bank' and date BETWEEN '2018-10-20' and '2019-01-18'; -- TODO: update second date
+update daily_data_s a set pb_ttm = (cmp/409) where a.name = 'HDFC Bank' and date BETWEEN '2018-07-21' and '2018-10-19'; -- TODO: update second date
+update daily_data_s a set pb_ttm = (cmp/405) where a.name = 'HDFC Bank' and date BETWEEN '2018-04-21' and '2018-07-20'; -- TODO: update second date
+-- 
