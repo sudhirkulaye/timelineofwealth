@@ -15,9 +15,15 @@ BEGIN
       -- ('SENSEX:IND','NIFTY:IND','NBEES:IN','JBEES:IN','BSE500:IND','BSE200:IND','BSE100:IND','BBEES:IN')
       ORDER BY market_cap desc;
 
+      SET @rowcount = 0;
+      UPDATE daily_data_s  a SET a.rank = (@rowcount:=@rowcount+1)
+      WHERE a.date = date1
+      -- AND a.ticker_b NOT IN ('NIFTY:IND', 'SENSEX:IND','CFIN:IND', 'NBEES:IN','JBEES:IN')
+      -- ('SENSEX:IND','NIFTY:IND','NBEES:IN','JBEES:IN','BSE500:IND','BSE200:IND','BSE100:IND','BBEES:IN')
+      ORDER BY market_cap desc;
+
       SET date1 = date1 - INTERVAL 1 DAY;
 
-      -- TODO update screener stock rank too
    END WHILE;
    commit;
-END;
+END

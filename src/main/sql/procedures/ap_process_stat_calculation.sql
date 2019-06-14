@@ -31,12 +31,12 @@ BEGIN
   SET var_date_5years_before    = date_sub(var_date_today, INTERVAL 60 MONTH);
   SET var_date_10years_before    = date_sub(var_date_today, INTERVAL 120 MONTH);
 
-  -- set market cap ranks
-  CALL ap_set_market_cap_rank(var_date_today, var_date_last_trading_day);
+  -- set market cap ranks (NOTE: NO need now daily_data_b is now not available)
+  -- CALL ap_set_market_cap_rank(var_date_today, var_date_last_trading_day);
   -- Update rank and marketcap data in stock universe
-  UPDATE stock_universe a, daily_data_b b
-  SET a.marketcap = b.market_cap, a.marketcap_rank = market_cap_rank, a.pe_ttm = b.current_pe
-  WHERE a.ticker2 = b.ticker_b
+  UPDATE stock_universe a, daily_data_s b
+  SET a.marketcap = b.market_cap, a.marketcap_rank = rank, a.pe_ttm = b.pe_ttm
+  WHERE a.ticker5 = b.name
   AND b.date = var_date_today;
 
   -- Find any new Stock Entry

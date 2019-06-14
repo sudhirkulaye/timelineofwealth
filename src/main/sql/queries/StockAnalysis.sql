@@ -15,7 +15,7 @@ where date BETWEEN '2018-01-01' and (select date_today from setup_dates) and a.n
 -- IN ('DLF', 'Oberoi Realty', 'Godrej Propert.', 'Prestige Estates', 
 -- IN ('CRISIL', 'CARE Ratings')
 -- 
-SELECT * from stock_universe a where a.is_nse200 = 1;
+SELECT * from stock_universe a where a.is_nse500 = 1 or a.is_bse500 = 1;
 -- stock price movements
 SELECT a.* from stock_price_movement a order by ticker;
 -- 
@@ -41,3 +41,5 @@ debt_to_equity, debt_3years_back  from daily_data_s a where date =  (select date
 
 -- trading data
 select date, close_price from nse_price_history a where a.nse_ticker = 'BAJAJ-AUTO' order by date desc; 
+
+select  ticker_b, date, current_pe, price_book from daily_data_b a where ticker_b = 'IIB:IN' order by date desc;

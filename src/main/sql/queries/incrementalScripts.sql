@@ -68,10 +68,11 @@ select * from member;
 
 select * from member a where last_name like 'V%';
 select * from sip a where a.memberid in (1007, 1015, 1058) order by memberid, scheme_name;
+select * from stock_universe; 
 
-select * from wealth_details a where a.memberid in (1016, 1059, 1060) order by memberid, name;
+select * from wealth_details a where a.memberid in (1022) order by asset_classid, memberid, name;
 SELECT * FROM wealth_asset_allocation_history a WHERE a.memberid in (1016, 1059, 1060) and date = '2019-02-21' order by date desc, memberid, asset_class_group;
-
+update wealth_details a, stock_universe b Set a.asset_classid = b.asset_classid, a.subindustryid = b.subindustryid where a.ticker = b.ticker; 
 -- Query to count Direct & Regular MF Exposures
 select sum(market_value), count(market_value) from wealth_details a  where a.memberid in (1007, 1015, 1058) and short_name like '%-%Dir%-%' order by memberid, name;
 select sum(market_value), count(market_value) from wealth_details a  where a.memberid in (1007, 1015, 1058) and short_name like '%-%Reg%-%' order by memberid, name;
@@ -85,8 +86,11 @@ order by memberid, asset_class_group, name;
 
 select * from mutual_fund_stats a where a.scheme_code in (101002,103155,102920,103215,105989,103360,103155,103174,103174,112323,100471,102000,109445,108909,103504,103504,103504,101922,100520,100520,103151,107578,111381,105989,105989,103360,103155,102920,105989);
 
-
 select distinct(portfoliono) from wealth_details a where a.short_name like '%-Reg-%' and a.memberid in (1007, 1015, 1058) order by memberid, name;
 select * from mutual_fund_house;
 
 SELECT * from wealth_details a where a.memberid in (1002, 1018) and asset_classid in ('201010','202010');
+
+select memberid, sum(market_value) from wealth_details w group by memberid order by memberid, buy_date, ticker;
+select * from wealth_details w /*where memberid = 1011 and ticker = 'AUROPHARMA'*/ order by memberid, buy_date, ticker
+

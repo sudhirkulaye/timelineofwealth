@@ -59,7 +59,11 @@ CREATE TABLE member (
   PRIMARY KEY (memberid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Members - Account Members - Institutional Investor and Retail Investors including earning members and dependents';
 
-select * from member a order by a.memberid desc;
+SELECT 
+    *
+FROM
+    member a
+ORDER BY a.memberid DESC;
 
 -- Drop table user_members;
 CREATE table user_members (
@@ -360,6 +364,7 @@ create table nse_price_history (
   isin_code varchar(20) COLLATE utf8_unicode_ci DEFAULT '' COMMENT 'ISIN Code ',
   PRIMARY KEY (nse_ticker,date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='NSE Daily Price History';
+ALTER TABLE nse_price_history ADD INDEX index_nse_price_history_date (date);
 
 select * from nse_price_history a where a.date = (select max(date) from nse_price_history);
 
@@ -382,7 +387,7 @@ create table bse_price_history (
   date date NOT NULL COMMENT 'trading date',
   PRIMARY KEY (bse_ticker,date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='BSE Daily Price History';
-
+ALTER TABLE bse_price_history ADD INDEX index_bse_price_history_date (date);
 SELECT * from bse_price_history a where a.date = (select max(date) from bse_price_history);
 
 SET SQL_SAFE_UPDATES = 0;
@@ -394,7 +399,7 @@ create table mutual_fund_nav_history (
   nav decimal(20,3) DEFAULT '0.000' COMMENT 'Mutual Fund NAV',
   PRIMARY KEY (scheme_code,date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='BSE Daily Price History';
-
+ALTER TABLE mutual_fund_nav_history ADD INDEX index_mutual_fund_nav_history_date (date);
 
 -- drop table timelineofwealth.daily_data_b;
 CREATE TABLE daily_data_b (
@@ -438,6 +443,7 @@ CREATE TABLE daily_data_b (
   KEY idx_daily_data_b_ticker_b (ticker_b),
   KEY idx_daily_data_b_date (date)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Securities - Daily Data obtained from Bloomberg Portfolio';
+ALTER TABLE daily_data_b ADD INDEX index_daily_data_b_date (date);
 
 select count(1) from daily_data_b;
 -- truncate table daily_data_b;
@@ -575,6 +581,7 @@ CREATE TABLE daily_data_s (
   PRIMARY KEY (date,name),
   KEY name (name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Securities - Daily Data obtained from Screener Watchlist';
+ALTER TABLE daily_data_s ADD INDEX index_daily_data_s_date (date);
 
 select count(1) from daily_data_s a where date = (select date_today from setup_dates);
 
@@ -723,8 +730,9 @@ create table stock_pnl (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Annual P&L Results';
 
 select count(1), year(date) from stock_pnl a group by year(date) order by date desc; 
-select * from stock_pnl a where ticker in ('INFY', 'TCS') and date > '2009-03-31' and sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
-select distinct ticker from stock_pnl a where date = '2017-12-31';
+select * from stock_pnl a where ticker in ('MAHLOG','NETWORK18','DIXON') and date > '2009-03-31' and sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
+select * from stock_pnl a where ticker like 'NETWORK%' and date = '2017-12-31';
+-- update stock_pnl a SET ticker = 'BAJFINANCE_1' where a.ticker = 'BAJFINANCE' and cons_standalone = 'C'; 
 
 -- drop table stock_quarter;
 create table stock_quarter (
@@ -747,7 +755,9 @@ create table stock_quarter (
 
 select count(1), year(date) from stock_quarter a group by year(date) order by date desc; 
 select * from stock_quarter a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
-select * from stock_quarter a where a.ticker in ('ACC','COROMANDEL', 'IBULISL', 'ISEC', 'LUXIND', 'STRTECH', 'TATAGLOBAL', 'HEXAWARE', 'IBREALEST','IBULHSGFIN', 'M&MFIN', 'ULTRACEMCO', 'TATAELXSI') and date = '2019-03-31';
+select * from stock_quarter a where a.ticker in ('SUNDARMFIN') and date = '2019-03-31';
+-- update stock_quarter a set a.ticker = 'BAJFINANCE_1' where a.ticker = 'BAJFINANCE' and cons_standalone = 'C'; 
+
 -- pending results
 SELECT b.ticker from daily_data_s a, stock_universe b where a.name = b.ticker5 and a.last_result_date = '201812' and date = '2019-02-01' and b.ticker not in (select distinct ticker from stock_quarter a where date = '2018-12-31');
 
@@ -783,6 +793,7 @@ create table stock_balancesheet (
 
 select count(1), year(date) from stock_balancesheet a group by year(date) order by date desc; 
 select count(1) from stock_balancesheet a where a.ticker = 'PGHH' and 1=2;
+select * from stock_balancesheet a where ticker = 'KPITTECH' and equity_share_capital = 0; 
 
 -- drop table stock_cashflow;
 create table stock_cashflow (
@@ -798,6 +809,7 @@ create table stock_cashflow (
 
 select count(1), year(date) from stock_cashflow a group by year(date) order by date desc; 
 select count(1) from stock_cashflow a where a.ticker = 'PGHH' and 1=2;
+SELECT * from stock_cashflow a where a.ticker = 'KPITTECH'; 
 
 -- drop table stock_price_movement;
 CREATE TABLE stock_price_movement (
@@ -839,3 +851,236 @@ SELECT * from stock_price_movement_history WHERE ticker like 'TCS%' order by dat
 SELECT * from stock_price_movement_history WHERE date = '2019-05-06' order by ticker, date desc;
 SELECT * from stock_price_movement order by ticker;
    
+-- DROP table portfolio;
+CREATE TABLE portfolio (
+  memberid int(11) NOT NULL COMMENT 'PK member i.e. client ID unique Auto Generated',
+  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
+  status varchar(20) COLLATE utf8_unicode_ci DEFAULT 'Active' COMMENT 'Active, Inactive, Closed',
+  description varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Description of the portfolio',
+  start_date date DEFAULT NULL COMMENT 'Portfolio Start Date',
+  end_date date DEFAULT NULL COMMENT 'Portfolio Expected End Date',
+  compositeid int(3) NOT NULL COMMENT 'Composite id',
+  value decimal(20,3) DEFAULT NULL COMMENT 'Market value of the portfolio',
+  PRIMARY KEY (memberid,portfolioid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Portfolio Description';
+
+select * from portfolio;
+
+-- DROP table composite;
+CREATE TABLE composite (
+  compositeid int(3) NOT NULL COMMENT 'PK Composite id',
+  name varchar(20) COLLATE utf8_unicode_ci COMMENT 'Composite Name',
+  description varchar(200) COLLATE utf8_unicode_ci COMMENT 'Composite Description',
+  benchmarkid varchar(30) COLLATE utf8_unicode_ci COMMENT 'Benchmark ticker',
+  PRIMARY KEY (compositeid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Composite - Portfolio Strategies';
+
+select * from composite; 
+
+-- DROP table composite_retruns
+
+-- DROP table mosl_code;
+CREATE TABLE mosl_code (
+  memberid int(11) NOT NULL COMMENT 'PK member i.e. client ID unique Auto Generated',
+  moslcode varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK MOSL CODE',
+  PRIMARY KEY (memberid, moslcode)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='MOSL Code And MemberID Cross Reference';
+select * from mosl_code;
+
+-- DROP table portfolio_cashflow;
+CREATE TABLE portfolio_cashflow (
+  memberid int(11) NOT NULL COMMENT 'PK member i.e. client ID unique Auto Generated',
+  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
+  date date NOT NULL COMMENT 'Date on which major cash inflow or outflow happens',
+  cashflow decimal(20,3) NOT NULL COMMENT 'Amount of cash inflow (negative) or outflow (outflow) happens',
+  PRIMARY KEY (memberid, portfolioid, date),
+  KEY c_portfolio_cashflow_portfolioid (portfolioid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Cashflow';
+
+select * from portfolio_cashflow;
+
+-- DROP table portfolio_holdings;
+CREATE TABLE portfolio_holdings (
+  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
+  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
+  buy_date date NOT NULL COMMENT 'Security Buy Date',
+  ticker varchar(30) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Usually NSE Code, BSE Code in case there is ''&'' in NSE Code or stock is only listed on BSE',
+  name varchar(1000) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Security Name',
+  short_name varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Security Name - Short',
+  asset_classid int(6) NOT NULL COMMENT 'Asset Class ID',
+  subindustryid int(8) DEFAULT '0' COMMENT 'Sub Industry ID',
+  quantity decimal(20,3) DEFAULT NULL COMMENT 'Security Quantity',
+  rate decimal(20,3) DEFAULT NULL COMMENT 'Security Buy Rate per Quantity',
+  brokerage decimal(20,2) DEFAULT NULL COMMENT 'Security Total Brokerage',
+  tax decimal(20,2) DEFAULT NULL COMMENT 'Security Total Tax',
+  total_cost decimal(20,3) DEFAULT NULL COMMENT 'Security Total Cost (Buy Rate*Quantity) + Brokerage + Tax',
+  net_rate decimal(20,3) DEFAULT NULL COMMENT 'Security effective cost per quantity i.e. Total Cost/Quantity',
+  cmp decimal(20,3) DEFAULT NULL COMMENT 'Security Current Market Price',
+  market_value decimal(20,3) DEFAULT NULL COMMENT 'Investment market value (CMP*Quanity)',
+  holding_period decimal(7,3) DEFAULT NULL COMMENT 'Security holding period in years i.e. Buy date to till date ',
+  net_profit decimal(20,3) DEFAULT NULL COMMENT 'Unrealized Net Profit = Market Value - Total Cost',
+  absolute_return decimal(20,3) DEFAULT NULL COMMENT 'Unrealized absolute return',
+  annualized_return decimal(20,3) DEFAULT NULL COMMENT 'Unrealized annualized return',
+  maturity_value decimal(20,3) DEFAULT NULL COMMENT 'Security Maturity Value especially for FDs',
+  maturity_date date DEFAULT '1900-01-01' COMMENT 'Security Maturity Value especially for FDs',
+  last_valuation_date date DEFAULT '1900-01-01' COMMENT 'Last Valution Date',
+  PRIMARY KEY (memberid, portfolioid, buy_date, ticker)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+SELECT * from portfolio_holdings;
+
+-- DROP table portfolio_value_history;
+CREATE TABLE portfolio_value_history (
+  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
+  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
+  date date NOT NULL COMMENT 'Date ',
+  value decimal(20,3) DEFAULT NULL COMMENT 'Portfolio market value related to date',
+  PRIMARY KEY (memberid, portfolioid, date)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Historical Values';
+
+SELECT * from portfolio_value_history;
+
+-- DROP table portfolio_historical_holdings;
+CREATE TABLE portfolio_historical_holdings (
+  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
+  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
+  buy_date date NOT NULL COMMENT 'Security Buy Date',
+  ticker varchar(30) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Usually NSE Code, BSE Code in case there is ''&'' in NSE Code or stock is only listed on BSE',
+  name varchar(1000) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Security Name',
+  short_name varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Security Name - Short',
+  asset_classid int(6) NOT NULL COMMENT 'Asset Class ID',
+  subindustryid int(8) DEFAULT '0' COMMENT 'Sub Industry ID',
+  quantity decimal(20,3) DEFAULT NULL COMMENT 'Security Quantity',
+  rate decimal(20,3) DEFAULT NULL COMMENT 'Security Buy Rate per Quantity',
+  brokerage decimal(20,2) DEFAULT NULL COMMENT 'Security Total Brokerage',
+  tax decimal(20,2) DEFAULT NULL COMMENT 'Security Total Tax',
+  total_cost decimal(20,3) DEFAULT NULL COMMENT 'Security Total Cost (Buy Rate*Quantity) + Brokerage + Tax',
+  net_rate decimal(20,3) DEFAULT NULL COMMENT 'Security effective cost per quantity i.e. Total Cost/Quantity',
+  sell_date date NOT NULL COMMENT 'Security Sell Date',
+  sell_rate decimal(20,3) DEFAULT NULL COMMENT 'Security Sell Rate per Quantity',
+  brokerage_sell decimal(12,2) DEFAULT NULL COMMENT 'Brokerage for sell',
+  tax_sell decimal(12,2) DEFAULT NULL COMMENT 'Tax for sell',
+  net_sell decimal(20,3) DEFAULT NULL COMMENT 'Security Total Sell (Sell Rate*Quantity) - Brokerage - Tax',
+  net_sell_rate decimal(20,3) DEFAULT NULL COMMENT 'Security effective sell per quantity i.e. Net Sell/Quantity',
+  holding_period decimal(7,3) DEFAULT NULL COMMENT 'Security holding period in years i.e. Buy date to till date ',
+  net_profit decimal(20,3) DEFAULT NULL COMMENT 'Unrealized Net Profit = Market Value - Total Cost',
+  absolute_return decimal(20,3) DEFAULT NULL COMMENT 'Unrealized absolute return',
+  annualized_return decimal(20,3) DEFAULT NULL COMMENT 'Unrealized annualized return',
+  fin_year varchar(9) COLLATE utf8_unicode_ci NOT NULL COMMENT 'FIN Year when security was sold',
+  PRIMARY KEY (memberid,portfolioid,buy_date,ticker,sell_date)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Historical Holdings';
+
+SELECT * FROM portfolio_historical_holdings; 
+
+-- DROP table portfolio_asset_allocation;
+CREATE TABLE portfolio_asset_allocation (
+  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
+  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
+  date date NOT NULL COMMENT 'PK Date of asset allocation',
+  asset_class_group varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Group for Asset classes',
+  value decimal(20,3) DEFAULT NULL COMMENT 'Market Value of Asset sub class',
+  value_percent decimal(7,3) DEFAULT NULL COMMENT '%(Market Value) of Asset class',
+  PRIMARY KEY (memberid,portfolioid,date,asset_class_group)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Daily Asset Allocation ';
+
+SELECT * from portfolio_asset_allocation; 
+
+-- DROP table portfolio_benchmark_returns_calculation_support;
+CREATE TABLE portfolio_benchmark_returns_calculation_support (
+  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
+  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
+  date date NOT NULL COMMENT 'Date either cashflow date or end month',
+  cashflow decimal(20,3) DEFAULT NULL COMMENT 'Cashflow amount Cash-in is negative, Cash-out is positive',
+  benchmarkid int(3) NOT NULL COMMENT 'PK Benchmark ID',
+  value decimal(20,3) DEFAULT NULL COMMENT 'Benchmark value',
+  units decimal(20,3) DEFAULT NULL COMMENT 'Benchmark units',
+  total_units decimal(20,3) DEFAULT NULL COMMENT 'Benchmark Total Units',
+  total_value decimal(20,3) DEFAULT NULL COMMENT 'Benchmark Total Value',
+  PRIMARY KEY (memberid,portfolioid,benchmarkid,date)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - TWRR Calculation support data';
+
+SELECT * FROM portfolio_benchmark_returns_calculation_support;
+
+-- DROP table portfolio_twrr_monthly;
+CREATE TABLE portfolio_twrr_monthly (
+  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
+  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
+  returns_year int(4) NOT NULL COMMENT 'PK Year of returns',
+  returns_calendar_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR for calendar year',
+  returns_fin_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR for FIN year',
+  returns_mar_ending_quarter decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Jan to Mar',
+  returns_jun_ending_quarter decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Apr to Jun',
+  returns_sep_ending_quarter decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Jul to Sep',
+  returns_dec_ending_quarter decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Oct to Dec',
+  returns_jan decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Jan',
+  returns_feb decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Feb',
+  returns_mar decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Mar',
+  returns_apr decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Apr',
+  returns_may decimal(20,4) DEFAULT NULL COMMENT 'TWRR for May',
+  returns_jun decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Jun',
+  returns_jul decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Jul',
+  returns_aug decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Aug',
+  returns_sep decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Sep',
+  returns_oct decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Oct',
+  returns_nov decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Nov',
+  returns_dec decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Dec',
+  PRIMARY KEY (memberid,portfolioid,returns_year)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - TWRR (Time Weighted Rate of Returns) monthwise ';
+
+SELECT * from portfolio_twrr_monthly; 
+
+-- DROP table portfolio_twrr_summary;
+CREATE TABLE portfolio_twrr_summary (
+  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
+  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
+  benchmarkid int(3) NOT NULL DEFAULT '0' COMMENT 'Benchmark ID for comparision, 0 for portfolio',
+  returns_date date DEFAULT NULL COMMENT 'Returns as of',
+  returns_twrr_since_current_month decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns from current month',
+  returns_twrr_since_current_quarter decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns from current quarter',
+  returns_twrr_since_fin_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since current fin year',
+  returns_twrr_ytd decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since Jan 1st',
+  returns_twrr_one_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since one year',
+  returns_twrr_since_inception decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since inception',
+  PRIMARY KEY (memberid,portfolioid,benchmarkid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - TWRR (Time Weighted Rate of Returns) Summary';
+
+SELECT * FROM portfolio_twrr_summary; 
+
+-- DROP table portfolio_irr_returns_summary;
+CREATE TABLE portfolio_irr_returns_summary (
+  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
+  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
+  benchmarkid int(3) NOT NULL DEFAULT '0' COMMENT 'Benchmark ID for comparision, 0 for portfolio',
+  date date DEFAULT NULL COMMENT 'Returns as of',
+  since_current_month decimal(20,4) DEFAULT NULL COMMENT 'IRR Returns from current month',
+  since_current_quarter decimal(20,4) DEFAULT NULL COMMENT 'IRR Returns from current quarter',
+  since_fin_year decimal(20,4) DEFAULT NULL COMMENT 'IRR Returns since current fin year',
+  return_ytd decimal(10,3) DEFAULT NULL COMMENT 'IRR Returns YTD',
+  return_1Y decimal(10,3) DEFAULT NULL COMMENT 'IRR Returns 1 Year',
+  since_inception decimal(20,4) DEFAULT NULL COMMENT 'IRR Returns since inception',
+  PRIMARY KEY (memberid,portfolioid,benchmarkid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - IRR (Internal Rate of Returns) or Money Weighted Rate or Returns Summary';
+
+SELECT * FROM portfolio_irr_returns_summary;
+
+-- DROP table portfolio_returns_calculation_support; 
+CREATE TABLE portfolio_returns_calculation_support (
+  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
+  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
+  date date NOT NULL COMMENT 'Date either cashflow date or end month',
+  cashflow decimal(20,3) DEFAULT NULL COMMENT 'Cashflow amount Cash-in is negative, Cash-out is positive',
+  value decimal(20,3) DEFAULT NULL COMMENT 'Market Value of the portfolio',
+  PRIMARY KEY (memberid,portfolioid,date)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Time Weighted Returns calculaiton support data';
+
+SELECT * FROM portfolio_returns_calculation_support;
+
+-- DROP table temp_irr_calculation;
+CREATE TABLE temp_irr_calculation (
+  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
+  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
+  date date NOT NULL COMMENT 'Date either cashflow date or end month',
+  cashflow decimal(20,3) DEFAULT NULL COMMENT 'Cashflow amount Cash-in is negative, Cash-out is positive',
+  value decimal(20,3) DEFAULT NULL COMMENT 'Market Value of the portfolio',
+  PRIMARY KEY (memberid,portfolioid,date)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Temp - For Irr Calculation';
