@@ -10,10 +10,10 @@ import java.sql.Date;
 import java.util.List;
 
 @RepositoryRestResource
-@EnableCaching
+//@EnableCaching
 public interface SetupDatesRepository  extends JpaRepository<SetupDates, Date> {
 
-    @Cacheable("SetupDates")
+    //@Cacheable("SetupDates")
     public List<SetupDates> findAll();
 
 }

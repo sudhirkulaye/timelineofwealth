@@ -43,7 +43,7 @@ Call ap_process_stock_returns_history();
 select * from log_table;
 truncate table log_table;
 */
--- find new stocks or modified stocks -- last count 64 on 26th Nov 2018
+-- find new stocks or modified stocks -- last count 64 on 26th Nov 2018, 2 new stocks in Jan-2019
 SELECT count(1), listing_date from stock_universe a group by a.listing_date order by a.listing_date desc; -- WHERE listing_date; > '2018-11-26';
 select * from stock_universe a where listing_date >= '2019-01-01'; 
 
@@ -174,8 +174,15 @@ select * from stock_universe a where ticker in ('IDFCFIRSTB','BAJAJCON');
 select * from stock_cashflow a where ticker = 'KPITTECH';
 
 -- Stock Split, Bonus
-SELECT date, close_price from nse_price_history a where a.nse_ticker = 'WIPRO' and date <= '2019-03-06' order by date desc; 
+SELECT date, close_price from nse_price_history a where a.nse_ticker = 'BIOCON' and date <= '2019-06-12' order by date desc;
+SELECT * from wealth_details a where ticker = 'SYNGENE';
+SELECT * from portfolio_holdings a where ticker = 'SYNGENE';
 -- update nse_price_history a set close_price = close_price * (3/4) where a.nse_ticker = 'WIPRO' and date < '2019-03-06';
+-- update nse_price_history a set close_price = close_price * (5/6) where a.nse_ticker = 'TTKPRESTIG' and date < '2019-05-15';
+-- update nse_price_history a set close_price = close_price * (	1/2	) where a.nse_ticker = 'BIOCON' and date < '2019-06-12' ;
+-- update nse_price_history a set close_price = close_price * (	1/2	) where a.nse_ticker = 'SYNGENE' and date < '2019-06-11' ;
+
+
 
 -- update HDFC Bank PB
 select * from daily_data_s a where a.name = 'HDFC Bank' and date BETWEEN '2019-04-20' and '2019-07-01' order by date desc;
