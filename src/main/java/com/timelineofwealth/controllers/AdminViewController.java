@@ -44,6 +44,7 @@ public class AdminViewController {
     private static final Logger logger = LoggerFactory.getLogger(AdminViewController.class);
     private java.sql.Date dateToday;
     public static final String AP_PROCESS_EOD = "ap_process_eod";
+    public static final String AP_PROCESS_MOSL_TRANSACTIONS = "ap_process_mosl_transactions";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -85,6 +86,12 @@ public class AdminViewController {
         this.dailyDataSRepository = dailyDataSRepository;
     }
     @Autowired
+    MOSLTransactionRepository moslTransactionRepository;
+    @Autowired
+    public void setMoslTransactionRepository(MOSLTransactionRepository moslTransactionRepository){
+        this.moslTransactionRepository = moslTransactionRepository;
+    }
+    @Autowired
     public AdminViewController(Environment environment){}
 
     @RequestMapping(value = "/admin/uploadnsedailypricedata")
@@ -100,7 +107,7 @@ public class AdminViewController {
     public String uploadNseDailyPriceDataStatus (Model model, @RequestParam("file") MultipartFile file){
         if (file.isEmpty()) {
             model.addAttribute("message", "Please select a file to upload");
-            return "redirect:admin/uploadnsedailypricedata";
+            return "admin/uploadnsedailypricedata";
         }
         try {
             File csvFile = new File(file.getOriginalFilename());
@@ -280,7 +287,7 @@ public class AdminViewController {
     public String uploadBseDailyPriceDataStatus (Model model, @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             model.addAttribute("message", "Please select a file to upload");
-            return "redirect:admin/uploadbsedailypricedata";
+            return "admin/uploadbsedailypricedata";
         }
         try {
             File csvFile = new File(file.getOriginalFilename());
@@ -379,7 +386,7 @@ public class AdminViewController {
     public String uploadMfNavDataStatus (Model model, @RequestParam("file") MultipartFile file){
         if (file.isEmpty()) {
             model.addAttribute("message", "Please select a file to upload");
-            return "redirect:admin/uploadmfnavdata";
+            return "admin/uploadmfnavdata";
         }
         try {
             File csvFile = new File(file.getOriginalFilename());
@@ -503,7 +510,7 @@ public class AdminViewController {
     public String uploadDailyDataSStatus (Model model, @RequestParam("file") MultipartFile file){
         if (file.isEmpty()) {
             model.addAttribute("message", "Please select a file to upload");
-            return "redirect:admin/uploaddailydatas";
+            return "admin/uploaddailydatas";
         }
         try {
             List<DailyDataS> dailyDataSList = new ArrayList<>();
@@ -561,6 +568,98 @@ public class AdminViewController {
             e.printStackTrace();
         }
         return "admin/uploaddailydatas";
+    }
+
+    @RequestMapping(value = "/admin/uploadmosltxn")
+    public String uploadMOSLTxn(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "TimelineOfWealth");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "admin/uploadmosltxn";
+    }
+
+    @RequestMapping(value=("/admin/uploadmosltxnstatus"),headers=("content-type=multipart/*"),method= RequestMethod.POST)
+    public String uploadMOSLTxnStatus (Model model, @RequestParam("file") MultipartFile file){
+        if (file.isEmpty()) {
+            model.addAttribute("message", "Please select a file to upload");
+            return "admin/uploadmosltxn";
+        }
+        try {
+            List<MOSLTransaction> moslTransactions = new ArrayList<>();
+            XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+            XSSFSheet worksheet = workbook.getSheetAt(0);
+
+            for(int i=1;i<worksheet.getPhysicalNumberOfRows() ;i++) {
+                MOSLTransaction moslTransaction = new MOSLTransaction();
+
+                XSSFRow row = worksheet.getRow(i);
+                moslTransaction.setKey(new MOSLTransaction.MOSLTransactionKey());
+                String moslCode = (String) row.getCell(0).getStringCellValue();
+                if (moslCode.equalsIgnoreCase("H20488")){ // hardcoded for time being account that I am not handling
+                    continue;
+                }
+                if(moslCode.equalsIgnoreCase("Total")){
+                    break;
+                }
+                moslTransaction.getKey().setMoslCode(moslCode);
+                moslTransaction.setExchange((String) row.getCell(1).getStringCellValue());
+                String dateString = (String)row.getCell(2).getStringCellValue();
+                SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy");
+                java.sql.Date date = null;
+                try {
+                    date = new java.sql.Date(format.parse(dateString).getTime());
+                } catch (ParseException e) {
+                    //e.printStackTrace();
+                }
+                moslTransaction.getKey().setDate(date);
+                String scriptName = (String) row.getCell(3).getStringCellValue();
+                moslTransaction.getKey().setScriptName(scriptName);
+                String sellBuy = (String) row.getCell(4).getStringCellValue().trim();
+                moslTransaction.getKey().setSellBuy(sellBuy);
+                moslTransaction.setQuantity(new BigDecimal(row.getCell(5).getStringCellValue()));
+                moslTransaction.setRate(new BigDecimal(row.getCell(6).getStringCellValue()));
+                moslTransaction.setAmount(new BigDecimal(row.getCell(7).getStringCellValue()));
+                moslTransaction.setBrokerage(new BigDecimal(row.getCell(8).getStringCellValue()));
+                moslTransaction.setTxnCharges(new BigDecimal(row.getCell(9).getStringCellValue()));
+                moslTransaction.setServiceTax(new BigDecimal(row.getCell(10).getStringCellValue()));
+                moslTransaction.setStampDuty(new BigDecimal(row.getCell(11).getStringCellValue()));
+                moslTransaction.setSttCtt(new BigDecimal(row.getCell(12).getStringCellValue()));
+                moslTransaction.setNetRate(new BigDecimal(row.getCell(13).getStringCellValue()));
+                moslTransaction.setNetAmount(new BigDecimal(row.getCell(14).getStringCellValue()));
+                String orderNo = (String) row.getCell(15).getStringCellValue();
+                moslTransaction.getKey().setOrderNo(orderNo);
+                String tradeNO = (String) row.getCell(16).getStringCellValue();
+                moslTransaction.getKey().setTradeNo(tradeNO);
+                moslTransaction.setIsProcessed("N");
+                int portfolioid = 1;
+                try {
+                    portfolioid = Double.valueOf(row.getCell(17).getNumericCellValue()).intValue();
+                } catch (Exception e){
+                    portfolioid = 1;
+                }
+                moslTransaction.getKey().setPortfolioid(portfolioid);
+
+                int count = moslTransactionRepository.countByKeyMoslCodeAndKeyDateAndKeyScriptNameAndKeySellBuyAndKeyOrderNoAndKeyTradeNoAndKeyPortfolioid(moslCode, date, scriptName, sellBuy, orderNo, tradeNO, portfolioid);
+                if (count == 0) {
+                    moslTransactions.add(moslTransaction);
+                }
+            }
+            //moslTransactions.sort(Comparator.comparing(MOSLTransaction::getMarketCap).reversed());
+            moslTransactionRepository.save(moslTransactions);
+
+            StoredProcedureQuery storedProcedure = entityManager.createStoredProcedureQuery(AP_PROCESS_MOSL_TRANSACTIONS);
+            boolean result = storedProcedure.execute();
+            if (!result) {
+                model.addAttribute("message", "Successfully uploaded transactions");
+            } else {
+                model.addAttribute("message", "Failed to upload transactions successfully. Check log_table.");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "admin/uploadmosltxn";
     }
 
     @RequestMapping(value = "/admin/eodprocs")

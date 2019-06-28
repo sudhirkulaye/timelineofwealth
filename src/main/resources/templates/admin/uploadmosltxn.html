@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: common-header" />
-<body class="nav-md footer_fixed">
+<body class="nav-md" ng-app="" ng-controller="">
 <div class="container body">
     <div class="main_container">
         <!-- sidebar menu -->
-        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <div th:replace="fragments/adminsidebarmenu :: common-adminsidebarmenu" />
         <!-- /sidebar menu -->
 
         <!-- top navigation -->
@@ -14,29 +14,28 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-            <div class="">
-                <div class="page-title">
-                    <div class="title_left">
-                        <h3>Upload EOD Stock Prices</h3>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
-
-                <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <div class="x_panel">
-                            <div class="x_title">
-                                <h2>Upload Daily Stock Prices</h2>
-                                <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <br />
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h1>Upload MOSL Transaction</h1>
+                            <p />Upload MOSL Transaction
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div th:if="${message}">
+                                <h4 th:text="${message}"/>
                             </div>
-                            <div class="x_content">
-                                <br />
-                                <br />
+                            <div  class="col-md-6 col-xs-12">
+                                <form method="POST" action="/admin/uploadmosltxnstatus" enctype="multipart/form-data" >
+                                    <input class="form-control" type="file" name="file" /><br/><br/>
+                                    <input class="btn btn-lg btn-success btn-block" type="submit" value="Submit" />
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
         <!-- /page content -->

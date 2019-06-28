@@ -127,7 +127,7 @@ CREATE table liability (
   last_emi_month Varchar(2) NOT NULL COMMENT 'Last EMI month',
   last_emi_year varchar(4) NOT NULL COMMENT 'Last EMI year',
   remaining_emis int(3) NOT NULL COMMENT 'Remaining months',
-  interest_rate decimal(4,2) NOT NULL COMMENT 'Interest Rate',
+  interest_rate decimal(7,4) NOT NULL COMMENT 'Interest Rate',
   pv_outstanding_emis decimal(20,3) NOT NULL COMMENT 'PV of outstanding emis',
   active_status VARCHAR(10) NOT NULL DEFAULT 'Active' COMMENT 'Current Active Status: Active or Fully Paid',
   date_last_update date NOT NULL COMMENT 'Date when record last updated',
@@ -265,9 +265,14 @@ CREATE TABLE stock_universe (
   KEY ticker5 (ticker5),
   KEY ticker2 (ticker2)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Securities - Company universe composed of NIFTY50, NIFTY JR, NIFTY100/BSE100, NIFTY200/BSE200, NIFTY500/BSE500 and other small stocks tracked by brokerage houses';
+ALTER TABLE stock_universe ADD INDEX index_stock_universe_ticker (ticker);
+ALTER TABLE stock_universe ADD INDEX index_stock_universe_ticker2 (ticker2);
+ALTER TABLE stock_universe ADD INDEX index_stock_universe_ticker3 (ticker3);
+ALTER TABLE stock_universe ADD INDEX index_stock_universe_ticker5 (ticker5);
 
 select * from stock_universe a where a.is_nse500 = 1;
 select * from stock_universe order by asset_classid, marketcap desc, ticker;
+
 
 
 -- drop table sip;
@@ -297,18 +302,18 @@ CREATE TABLE wealth_details (
   short_name varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Security Name - Short',
   asset_classid int(6) NOT NULL COMMENT 'Asset Class ID',
   subindustryid int(8) DEFAULT 0 COMMENT 'Sub Industry ID',
-  quantity decimal(20,3) DEFAULT NULL COMMENT 'Security Quantity',
-  rate decimal(20,3) DEFAULT NULL COMMENT 'Security Buy Rate per Quantity',
-  brokerage decimal(20,2) DEFAULT NULL COMMENT 'Security Total Brokerage',
-  tax decimal(20,2) DEFAULT NULL COMMENT 'Security Total Tax',
+  quantity decimal(20,4) DEFAULT NULL COMMENT 'Security Quantity',
+  rate decimal(20,4) DEFAULT NULL COMMENT 'Security Buy Rate per Quantity',
+  brokerage decimal(20,3) DEFAULT NULL COMMENT 'Security Total Brokerage',
+  tax decimal(20,3) DEFAULT NULL COMMENT 'Security Total Tax',
   total_cost decimal(20,3) DEFAULT NULL COMMENT 'Security Total Cost (Buy Rate*Quantity) + Brokerage + Tax',
-  net_rate decimal(20,3) DEFAULT NULL COMMENT 'Security effective cost per quantity i.e. Total Cost/Quantity',
-  cmp decimal(20,3) DEFAULT NULL COMMENT 'Security Current Market Price',
+  net_rate decimal(20,4) DEFAULT NULL COMMENT 'Security effective cost per quantity i.e. Total Cost/Quantity',
+  cmp decimal(20,4) DEFAULT NULL COMMENT 'Security Current Market Price',
   market_value decimal(20,3) DEFAULT NULL COMMENT 'Investment market value (CMP*Quanity)',
   holding_period decimal(7,3) DEFAULT NULL COMMENT 'Security holding period in years i.e. Buy date to till date ',
   net_profit decimal(20,3) DEFAULT NULL COMMENT 'Unrealized Net Profit = Market Value - Total Cost',
-  absolute_return decimal(20,3) DEFAULT NULL COMMENT 'Unrealized absolute return',
-  annualized_return decimal(20,3) DEFAULT NULL COMMENT 'Unrealized annualized return',
+  absolute_return decimal(10,4) DEFAULT NULL COMMENT 'Unrealized absolute return',
+  annualized_return decimal(10,4) DEFAULT NULL COMMENT 'Unrealized annualized return',
   maturity_value decimal(20,3) DEFAULT NULL COMMENT 'Security Maturity Value especially for FDs',
   maturity_date date DEFAULT '1900-01-01' COMMENT 'Security Maturity Value especially for FDs',
   last_valuation_date date DEFAULT '1900-01-01' COMMENT 'Last Valution Date',
@@ -396,7 +401,7 @@ Commit;
 create table mutual_fund_nav_history (
   scheme_code int(15) NOT NULL COMMENT 'PK Mutual Fund Scheme Code Unique',
   date date NOT NULL COMMENT 'PK Mutual Fund NAV Date',
-  nav decimal(20,3) DEFAULT '0.000' COMMENT 'Mutual Fund NAV',
+  nav decimal(20,4) DEFAULT '0.000' COMMENT 'Mutual Fund NAV',
   PRIMARY KEY (scheme_code,date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='BSE Daily Price History';
 ALTER TABLE mutual_fund_nav_history ADD INDEX index_mutual_fund_nav_history_date (date);
@@ -464,9 +469,9 @@ CREATE TABLE index_valuation (
   date date NOT NULL COMMENT 'PK Index valuation date',
   pe decimal(10,3) DEFAULT NULL COMMENT 'Index PE Ratio',
   pb decimal(10,3) DEFAULT NULL COMMENT 'Index PB Ratio',
-  div_yield decimal(10,2) DEFAULT NULL COMMENT 'Index Div Yield Ratio',
-  value decimal(10,2) DEFAULT NULL COMMENT 'Index value',
-  turnover decimal(20,2) DEFAULT NULL COMMENT 'Index turnover in Rs',
+  div_yield decimal(10,4) DEFAULT NULL COMMENT 'Index Div Yield Ratio',
+  value decimal(10,3) DEFAULT NULL COMMENT 'Index value',
+  turnover decimal(20,3) DEFAULT NULL COMMENT 'Index turnover in Rs',
   implied_earnings decimal(10,3) DEFAULT NULL COMMENT 'Index implied earnings Index Value/index PE',
   PRIMARY KEY (ticker,date)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Valutation - Index Valuation Data';
@@ -488,7 +493,7 @@ CREATE TABLE wealth_asset_allocation_history (
   date date NOT NULL COMMENT 'PK Date of asset allocation',
   asset_class_group varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Group for Asset classes',
   value decimal(20,3) DEFAULT NULL COMMENT 'Market Value by Asset class group',
-  value_percent decimal(7,3) DEFAULT NULL COMMENT '%(Market Value) of Asset class',
+  value_percent decimal(7,4) DEFAULT NULL COMMENT '%(Market Value) of Asset class',
   PRIMARY KEY (memberid,date,asset_class_group)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Wealth Asset Allocation History ';
 
@@ -500,7 +505,7 @@ CREATE TABLE stock_split_probability (
   date date NOT NULL COMMENT 'PK Index valuation date',
   close_price decimal(20,3) DEFAULT NULL COMMENT 'Close price today',
   previous_close_price decimal(20,3) DEFAULT NULL COMMENT 'Close price last trading session',
-  day_percent_change decimal(7,3) DEFAULT NULL COMMENT '%(Market Value) of Asset class',
+  day_percent_change decimal(7,4) DEFAULT NULL COMMENT '%(Market Value) of Asset class',
   is_processed varchar(3) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'NO' COMMENT 'Status is processed? YES/No',
   note varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT 'Status is processed? YES/No',
   PRIMARY KEY (ticker,date)
@@ -550,31 +555,31 @@ CREATE TABLE daily_data_s (
   cmp decimal(10,3) DEFAULT '0.000',
   market_cap decimal(20,3) DEFAULT '0.000',
   last_result_date int(11) DEFAULT '0',
-  net_profit decimal(20,2) DEFAULT '0.00',
-  sales decimal(20,2) DEFAULT '0.00',
-  yoy_quarterly_sales_growth decimal(10,2) DEFAULT '0.00',
-  yoy_quarterly_profit_growth decimal(10,2) DEFAULT '0.00',
-  qoq_sales_growth decimal(10,2) DEFAULT '0.00',
-  qoq_profit_growth decimal(10,2) DEFAULT '0.00',
-  opm_latest_quarter decimal(10,2) DEFAULT '0.00',
-  opm_last_year decimal(10,2) DEFAULT '0.00',
-  npm_latest_quarter decimal(10,2) DEFAULT '0.00',
-  npm_last_year decimal(10,2) DEFAULT '0.00',
-  profit_growth_3years decimal(10,2) DEFAULT '0.00',
-  sales_growth_3years decimal(10,2) DEFAULT '0.00',
-  pe_ttm decimal(10,2) DEFAULT '0.00',
-  historical_pe_3years decimal(10,2) DEFAULT '0.00',
-  peg_ratio decimal(10,2) DEFAULT '0.00',
-  pb_ttm decimal(10,2) DEFAULT '0.00',
-  ev_to_ebit decimal(10,2) DEFAULT '0.00',
-  dividend_payout decimal(10,2) DEFAULT '0.00',
-  roe decimal(10,2) DEFAULT '0.00',
-  avg_roe_3years decimal(10,2) DEFAULT '0.00',
-  debt decimal(20,2) DEFAULT '0.00',
-  debt_to_equity decimal(10,2) DEFAULT '0.00',
-  debt_3years_back decimal(20,2) DEFAULT '0.00',
-  mcap_to_netprofit decimal(10,2) DEFAULT '0.00',
-  mcap_to_sales decimal(10,2) DEFAULT '0.00',
+  net_profit decimal(20,3) DEFAULT '0.00',
+  sales decimal(20,3) DEFAULT '0.00',
+  yoy_quarterly_sales_growth decimal(10,4) DEFAULT '0.00',
+  yoy_quarterly_profit_growth decimal(10,4) DEFAULT '0.00',
+  qoq_sales_growth decimal(10,4) DEFAULT '0.00',
+  qoq_profit_growth decimal(10,4) DEFAULT '0.00',
+  opm_latest_quarter decimal(10,4) DEFAULT '0.00',
+  opm_last_year decimal(10,4) DEFAULT '0.00',
+  npm_latest_quarter decimal(10,4) DEFAULT '0.00',
+  npm_last_year decimal(10,4) DEFAULT '0.00',
+  profit_growth_3years decimal(10,4) DEFAULT '0.00',
+  sales_growth_3years decimal(10,4) DEFAULT '0.00',
+  pe_ttm decimal(10,3) DEFAULT '0.00',
+  historical_pe_3years decimal(10,3) DEFAULT '0.00',
+  peg_ratio decimal(10,3) DEFAULT '0.00',
+  pb_ttm decimal(10,3) DEFAULT '0.00',
+  ev_to_ebit decimal(10,3) DEFAULT '0.00',
+  dividend_payout decimal(10,4) DEFAULT '0.00',
+  roe decimal(10,4) DEFAULT '0.00',
+  avg_roe_3years decimal(10,4) DEFAULT '0.00',
+  debt decimal(20,3) DEFAULT '0.00',
+  debt_to_equity decimal(10,3) DEFAULT '0.00',
+  debt_3years_back decimal(20,3) DEFAULT '0.00',
+  mcap_to_netprofit decimal(10,3) DEFAULT '0.00',
+  mcap_to_sales decimal(10,3) DEFAULT '0.00',
   sector varchar(50) CHARACTER SET latin1 DEFAULT 'NA',
   industry varchar(100) CHARACTER SET latin1 DEFAULT 'NA',
   sub_industry varchar(100) CHARACTER SET latin1 DEFAULT 'NA',
@@ -588,55 +593,55 @@ select count(1) from daily_data_s a where date = (select date_today from setup_d
 -- drop table index_statistics; 
 CREATE TABLE index_statistics (
   ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Index ticker',
-  mean_returns_1yr decimal(10,3) DEFAULT NULL COMMENT 'Avg returns 1 yerar',
-  median_returns_1yr decimal(10,3) DEFAULT NULL COMMENT 'Median returns 1 yerar',
-  mean_returns_3yr decimal(10,3) DEFAULT NULL COMMENT 'Avg returns 3 yerars',
-  median_returns_3yr decimal(10,3) DEFAULT NULL COMMENT 'Median returns 3 yerars',
-  mean_returns_5yr decimal(10,3) DEFAULT NULL COMMENT 'Avg returns 5 yerars',
-  median_returns_5yr decimal(10,3) DEFAULT NULL COMMENT 'Median returns 5 yerars',
-  mean_returns_10yr decimal(10,3) DEFAULT NULL COMMENT 'Avg returns 10 yerars',
-  median_returns_10yr decimal(10,3) DEFAULT NULL COMMENT 'Median returns 10 yerars',
-  minimum_returns_1yr decimal(10,3) DEFAULT NULL COMMENT 'Minimum returns 1 yerar',
+  mean_returns_1yr decimal(10,4) DEFAULT NULL COMMENT 'Avg returns 1 yerar',
+  median_returns_1yr decimal(10,4) DEFAULT NULL COMMENT 'Median returns 1 yerar',
+  mean_returns_3yr decimal(10,4) DEFAULT NULL COMMENT 'Avg returns 3 yerars',
+  median_returns_3yr decimal(10,4) DEFAULT NULL COMMENT 'Median returns 3 yerars',
+  mean_returns_5yr decimal(10,4) DEFAULT NULL COMMENT 'Avg returns 5 yerars',
+  median_returns_5yr decimal(10,4) DEFAULT NULL COMMENT 'Median returns 5 yerars',
+  mean_returns_10yr decimal(10,4) DEFAULT NULL COMMENT 'Avg returns 10 yerars',
+  median_returns_10yr decimal(10,4) DEFAULT NULL COMMENT 'Median returns 10 yerars',
+  minimum_returns_1yr decimal(10,4) DEFAULT NULL COMMENT 'Minimum returns 1 yerar',
   minimum_returns_1yr_duration varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Duration of Minimum returns 1 yerar',
-  maximum_returns_1yr decimal(10,3) DEFAULT NULL COMMENT 'Maximum returns 1 yerar',
+  maximum_returns_1yr decimal(10,4) DEFAULT NULL COMMENT 'Maximum returns 1 yerar',
   maximum_returns_1yr_duration varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Duration of Maximum returns 1 yerar',
-  minimum_returns_3yr decimal(10,3) DEFAULT NULL COMMENT 'Minimum returns 3 yerars',
+  minimum_returns_3yr decimal(10,4) DEFAULT NULL COMMENT 'Minimum returns 3 yerars',
   minimum_returns_3yr_duration varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Duration of Minimum returns 3 yerars',
-  maximum_returns_3yr decimal(10,3) DEFAULT NULL COMMENT 'Maximum returns 3 yerars',
+  maximum_returns_3yr decimal(10,4) DEFAULT NULL COMMENT 'Maximum returns 3 yerars',
   maximum_returns_3yr_duration varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Duration of Maximum returns 3 yerars',
-  minimum_returns_5yr decimal(10,3) DEFAULT NULL COMMENT 'Minimum returns 5 yerars',
+  minimum_returns_5yr decimal(10,4) DEFAULT NULL COMMENT 'Minimum returns 5 yerars',
   minimum_returns_5yr_duration varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Duration of Minimum returns 5 yerars',
-  maximum_returns_5yr decimal(10,3) DEFAULT NULL COMMENT 'Maximum returns 5 yerars',
+  maximum_returns_5yr decimal(10,4) DEFAULT NULL COMMENT 'Maximum returns 5 yerars',
   maximum_returns_5yr_duration varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Duration of Maximum returns 5 yerars',
-  minimum_returns_10yr decimal(10,3) DEFAULT NULL COMMENT 'Minimum returns 10 yerars',
+  minimum_returns_10yr decimal(10,4) DEFAULT NULL COMMENT 'Minimum returns 10 yerars',
   minimum_returns_10yr_duration varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Duration of Minimum returns 10 yerars',
-  maximum_returns_10yr decimal(10,3) DEFAULT NULL COMMENT 'Maximum returns 10 yerars', 
+  maximum_returns_10yr decimal(10,4) DEFAULT NULL COMMENT 'Maximum returns 10 yerars', 
   maximum_returns_10yr_duration varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Duration of Maximum returns 10 yerars',
-  standard_deviation_1yr decimal(10,3) DEFAULT NULL COMMENT 'Standard Deviation 1 year',
-  standard_deviation_3yr decimal(10,3) DEFAULT NULL COMMENT 'Standard Deviation 3 years',
-  standard_deviation_5yr decimal(10,3) DEFAULT NULL COMMENT 'Standard Deviation 5 years',
-  standard_deviation_10yr decimal(10,3) DEFAULT NULL COMMENT 'Standard Deviation 10 years',
-  mean_pe_1yr decimal(10,3) DEFAULT NULL COMMENT 'Avg PE 1 yerar',
-  median_pe_1yr decimal(10,3) DEFAULT NULL COMMENT 'Median PE 1 yerar',
-  minimum_pe_1yr decimal(10,3) DEFAULT NULL COMMENT 'Minimum PE 1 yerar',
-  maximum_pe_1yr decimal(10,3) DEFAULT NULL COMMENT 'Maximum PE 1 yerar',
-  mean_pe_3yr decimal(10,3) DEFAULT NULL COMMENT 'Avg PE 3 yerars',
-  median_pe_3yr decimal(10,3) DEFAULT NULL COMMENT 'Median PE 3 yerars',
-  minimum_pe_3yr decimal(10,3) DEFAULT NULL COMMENT 'Minimum PE 3 yerars',
-  maximum_pe_3yr decimal(10,3) DEFAULT NULL COMMENT 'Maximum PE 3 yerars',
-  mean_pe_5yr decimal(10,3) DEFAULT NULL COMMENT 'Avg PE 5 yerars',
-  median_pe_5yr decimal(10,3) DEFAULT NULL COMMENT 'Median PE 5 yerars',
-  minimum_pe_5yr decimal(10,3) DEFAULT NULL COMMENT 'Minimum PE 5 yerars',
-  maximum_pe_5yr decimal(10,3) DEFAULT NULL COMMENT 'Maximum PE 5 yerars',
-  mean_pe_10yr decimal(10,3) DEFAULT NULL COMMENT 'Avg PE 10 yerars',
-  median_pe_10yr decimal(10,3) DEFAULT NULL COMMENT 'Median PE 10 yerars',
-  minimum_pe_10yr decimal(10,3) DEFAULT NULL COMMENT 'Minimum PE 10 yerars',
-  maximum_pe_10yr decimal(10,3) DEFAULT NULL COMMENT 'Maximum PE 10 yerars',
-  mean_pe decimal(10,3) DEFAULT NULL COMMENT 'Avg PE all yerars',
-  median_pe decimal(10,3) DEFAULT NULL COMMENT 'Median PE all yerars',
-  minimum_pe decimal(10,3) DEFAULT NULL COMMENT 'Minimum PE all yerars',
-  maximum_pe decimal(10,3) DEFAULT NULL COMMENT 'Maximum PE all yerars',
-  current_pe decimal(10,3) DEFAULT NULL COMMENT 'Current PE',
+  standard_deviation_1yr decimal(10,4) DEFAULT NULL COMMENT 'Standard Deviation 1 year',
+  standard_deviation_3yr decimal(10,4) DEFAULT NULL COMMENT 'Standard Deviation 3 years',
+  standard_deviation_5yr decimal(10,4) DEFAULT NULL COMMENT 'Standard Deviation 5 years',
+  standard_deviation_10yr decimal(10,4) DEFAULT NULL COMMENT 'Standard Deviation 10 years',
+  mean_pe_1yr decimal(10,4) DEFAULT NULL COMMENT 'Avg PE 1 yerar',
+  median_pe_1yr decimal(10,4) DEFAULT NULL COMMENT 'Median PE 1 yerar',
+  minimum_pe_1yr decimal(10,4) DEFAULT NULL COMMENT 'Minimum PE 1 yerar',
+  maximum_pe_1yr decimal(10,4) DEFAULT NULL COMMENT 'Maximum PE 1 yerar',
+  mean_pe_3yr decimal(10,4) DEFAULT NULL COMMENT 'Avg PE 3 yerars',
+  median_pe_3yr decimal(10,4) DEFAULT NULL COMMENT 'Median PE 3 yerars',
+  minimum_pe_3yr decimal(10,4) DEFAULT NULL COMMENT 'Minimum PE 3 yerars',
+  maximum_pe_3yr decimal(10,4) DEFAULT NULL COMMENT 'Maximum PE 3 yerars',
+  mean_pe_5yr decimal(10,4) DEFAULT NULL COMMENT 'Avg PE 5 yerars',
+  median_pe_5yr decimal(10,4) DEFAULT NULL COMMENT 'Median PE 5 yerars',
+  minimum_pe_5yr decimal(10,4) DEFAULT NULL COMMENT 'Minimum PE 5 yerars',
+  maximum_pe_5yr decimal(10,4) DEFAULT NULL COMMENT 'Maximum PE 5 yerars',
+  mean_pe_10yr decimal(10,4) DEFAULT NULL COMMENT 'Avg PE 10 yerars',
+  median_pe_10yr decimal(10,4) DEFAULT NULL COMMENT 'Median PE 10 yerars',
+  minimum_pe_10yr decimal(10,4) DEFAULT NULL COMMENT 'Minimum PE 10 yerars',
+  maximum_pe_10yr decimal(10,4) DEFAULT NULL COMMENT 'Maximum PE 10 yerars',
+  mean_pe decimal(10,4) DEFAULT NULL COMMENT 'Avg PE all yerars',
+  median_pe decimal(10,4) DEFAULT NULL COMMENT 'Median PE all yerars',
+  minimum_pe decimal(10,4) DEFAULT NULL COMMENT 'Minimum PE all yerars',
+  maximum_pe decimal(10,4) DEFAULT NULL COMMENT 'Maximum PE all yerars',
+  current_pe decimal(10,4) DEFAULT NULL COMMENT 'Current PE',
   last_updated date DEFAULT NULL COMMENT 'Last Updated',
   PRIMARY KEY (ticker)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Statistics - Index Statistic Data';
@@ -650,21 +655,21 @@ CREATE TABLE mutual_fund_stats (
   scheme_type varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'MF Type',
   scheme_index varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'MF Benchmark Index',
   scheme_investment_style varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'MF Investment Style',
-  total_returns_y0 DECIMAL(10,3) NOT NULL COMMENT 'Current Year Returns (YTD)',
-  total_returns_y1 DECIMAL(10,3) NOT NULL COMMENT '1 Year before Returns',
-  total_returns_y2 DECIMAL(10,3) NOT NULL COMMENT '2 Year before Returns',
-  total_returns_y3 DECIMAL(10,3) NOT NULL COMMENT '3 Year before Returns',
-  total_returns_y4 DECIMAL(10,3) NOT NULL COMMENT '4 Year before Returns',
-  total_returns_y5 DECIMAL(10,3) NOT NULL COMMENT '5 Year before Returns',
-  total_returns_y6 DECIMAL(10,3) NOT NULL COMMENT '6 Year before Returns',
-  total_returns_y7 DECIMAL(10,3) NOT NULL COMMENT '7 Year before Returns',
-  total_returns_y8 DECIMAL(10,3) NOT NULL COMMENT '8 Year before Returns',
-  total_returns_y9 DECIMAL(10,3) NOT NULL COMMENT '9 Year before Returns',
-  total_returns_y10 DECIMAL(10,3) NOT NULL COMMENT '10 Year before Returns',
-  trailing_return_1yr DECIMAL(10,3) NOT NULL COMMENT '1 Year Trailing Returns',
-  trailing_return_3yr DECIMAL(10,3) NOT NULL COMMENT '3 Years Trailing Returns',
-  trailing_return_5yr DECIMAL(10,3) NOT NULL COMMENT '5 Years Trailing Returns',
-  trailing_return_10yr DECIMAL(10,3) NOT NULL COMMENT '10 Years Trailing Returns',
+  total_returns_y0 DECIMAL(10,4) NOT NULL COMMENT 'Current Year Returns (YTD)',
+  total_returns_y1 DECIMAL(10,4) NOT NULL COMMENT '1 Year before Returns',
+  total_returns_y2 DECIMAL(10,4) NOT NULL COMMENT '2 Year before Returns',
+  total_returns_y3 DECIMAL(10,4) NOT NULL COMMENT '3 Year before Returns',
+  total_returns_y4 DECIMAL(10,4) NOT NULL COMMENT '4 Year before Returns',
+  total_returns_y5 DECIMAL(10,4) NOT NULL COMMENT '5 Year before Returns',
+  total_returns_y6 DECIMAL(10,4) NOT NULL COMMENT '6 Year before Returns',
+  total_returns_y7 DECIMAL(10,4) NOT NULL COMMENT '7 Year before Returns',
+  total_returns_y8 DECIMAL(10,4) NOT NULL COMMENT '8 Year before Returns',
+  total_returns_y9 DECIMAL(10,4) NOT NULL COMMENT '9 Year before Returns',
+  total_returns_y10 DECIMAL(10,4) NOT NULL COMMENT '10 Year before Returns',
+  trailing_return_1yr DECIMAL(10,4) NOT NULL COMMENT '1 Year Trailing Returns',
+  trailing_return_3yr DECIMAL(10,4) NOT NULL COMMENT '3 Years Trailing Returns',
+  trailing_return_5yr DECIMAL(10,4) NOT NULL COMMENT '5 Years Trailing Returns',
+  trailing_return_10yr DECIMAL(10,4) NOT NULL COMMENT '10 Years Trailing Returns',
   quartile_rank_y1 INT(1) NOT NULL COMMENT 'Quartile Rank for 1 Year before Returns',
   quartile_rank_y2 INT(1) NOT NULL COMMENT 'Quartile Rank for 2 Year before Returns',
   quartile_rank_y3 INT(1) NOT NULL COMMENT 'Quartile Rank for 3 Year before Returns',
@@ -679,13 +684,13 @@ CREATE TABLE mutual_fund_stats (
   quartile_rank_3yr INT(1) NOT NULL COMMENT 'Quartile Rank for 3 Years Trailing Returns',
   quartile_rank_5yr INT(1) NOT NULL COMMENT 'Quartile Rank for 5 Years Trailing Returns',
   quartile_rank_10yr INT(1) NOT NULL COMMENT 'Quartile Rank for 10 Years Trailing Returns',
-  sector_basic_materials DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector basic materials',
-  sector_consumer_cyclical DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector consumer cyclical',
-  sector_finacial_services DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector finacial services',
-  sector_industrial DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector industrial',
-  sector_technology DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector technology',
-  sector_consumer_defensive DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector consumer defensive',
-  sector_healthcare DECIMAL(10,3) NOT NULL COMMENT 'Exposure to sector healthcare',
+  sector_basic_materials DECIMAL(10,4) NOT NULL COMMENT 'Exposure to sector basic materials',
+  sector_consumer_cyclical DECIMAL(10,4) NOT NULL COMMENT 'Exposure to sector consumer cyclical',
+  sector_finacial_services DECIMAL(10,4) NOT NULL COMMENT 'Exposure to sector finacial services',
+  sector_industrial DECIMAL(10,4) NOT NULL COMMENT 'Exposure to sector industrial',
+  sector_technology DECIMAL(10,4) NOT NULL COMMENT 'Exposure to sector technology',
+  sector_consumer_defensive DECIMAL(10,4) NOT NULL COMMENT 'Exposure to sector consumer defensive',
+  sector_healthcare DECIMAL(10,4) NOT NULL COMMENT 'Exposure to sector healthcare',
   stock_1 varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT '1st Preferred Stock',
   stock_2 varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT '2nd Preferred Stock',
   stock_3 varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT '3rd Preferred Stock',
@@ -722,15 +727,15 @@ create table stock_pnl (
   price DECIMAL(10,3) NOT NULL COMMENT 'Share Price',
   dummy1 DECIMAL(10,3) NOT NULL COMMENT 'dummy1',
   ratios DECIMAL(10,3) NOT NULL COMMENT 'Ratios',
-  dividend_payout DECIMAL(10,3) NOT NULL COMMENT 'Dividend Payout',
-  opm DECIMAL(10,3) NOT NULL COMMENT 'Operating Profit Margine',
-  npm DECIMAL(10,3) NOT NULL COMMENT 'Net Profit Margine',
-  re DECIMAL(10,3) NOT NULL COMMENT 'Return on Equity',
+  dividend_payout DECIMAL(10,4) NOT NULL COMMENT 'Dividend Payout',
+  opm DECIMAL(10,4) NOT NULL COMMENT 'Operating Profit Margine',
+  npm DECIMAL(10,4) NOT NULL COMMENT 'Net Profit Margine',
+  re DECIMAL(10,4) NOT NULL COMMENT 'Return on Equity',
   PRIMARY KEY (ticker, cons_standalone, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Annual P&L Results';
 
 select count(1), year(date) from stock_pnl a group by year(date) order by date desc; 
-select * from stock_pnl a where ticker in ('MAHLOG','NETWORK18','DIXON') and date > '2009-03-31' and sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
+select * from stock_pnl a where ticker in ('SANFOI') and date > '2009-03-31' and sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
 select * from stock_pnl a where ticker like 'NETWORK%' and date = '2017-12-31';
 -- update stock_pnl a SET ticker = 'BAJFINANCE_1' where a.ticker = 'BAJFINANCE' and cons_standalone = 'C'; 
 
@@ -749,7 +754,7 @@ create table stock_quarter (
   tax DECIMAL(20,3) NOT NULL COMMENT 'Annual tax',
   net_profit DECIMAL(20,3) NOT NULL COMMENT 'Annual net Profit',
   dummy1 DECIMAL(10,3) NOT NULL COMMENT 'dummy1',
-  opm DECIMAL(10,3) NOT NULL COMMENT 'Operating Profit Margine',
+  opm DECIMAL(10,4) NOT NULL COMMENT 'Operating Profit Margine',
   PRIMARY KEY (ticker, cons_standalone, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Quarter P&L Results';
 
@@ -784,10 +789,10 @@ create table stock_balancesheet (
   inventory DECIMAL(20,3) NOT NULL COMMENT 'Inventory',
   dummy2 DECIMAL(20,3) NOT NULL COMMENT 'Dummy2',
   debtor_days DECIMAL(20,3) NOT NULL COMMENT 'Debtor days',
-  inventory_turnover DECIMAL(20,3) NOT NULL COMMENT 'Inventory turnover',
+  inventory_turnover DECIMAL(10,4) NOT NULL COMMENT 'Inventory turnover',
   dummy3 DECIMAL(20,3) NOT NULL COMMENT 'Dummy3',
-  return_on_equity DECIMAL(20,3) NOT NULL COMMENT 'Return on equity',
-  return_on_capital_emp DECIMAL(20,3) NOT NULL COMMENT 'Return on capital employed',
+  return_on_equity DECIMAL(10,4) NOT NULL COMMENT 'Return on equity',
+  return_on_capital_emp DECIMAL(10,4) NOT NULL COMMENT 'Return on capital employed',
   PRIMARY KEY (ticker, cons_standalone, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Balancesheet';
 
@@ -818,21 +823,21 @@ CREATE TABLE stock_price_movement (
   52w_min decimal(20,3) DEFAULT NULL COMMENT '52-Week Min Price',
   52w_max decimal(20,3) DEFAULT NULL COMMENT '52-Week Max Price',
   up_52w_min decimal(10,3) DEFAULT NULL COMMENT 'Up from 52-Week Min Price',
-  down_52w_max decimal(10,3) DEFAULT NULL COMMENT 'Down from 52-Week Max Price',
-  return_1D decimal(10,3) DEFAULT NULL COMMENT '1 Day Returns',
-  return_1W decimal(10,3) DEFAULT NULL COMMENT '1 Week Returns',
-  return_2W decimal(10,3) DEFAULT NULL COMMENT '2 Weeks Returns',
-  return_1M decimal(10,3) DEFAULT NULL COMMENT '1 Month Returns',
-  return_2M decimal(10,3) DEFAULT NULL COMMENT '2 Months Returns',
-  return_3M decimal(10,3) DEFAULT NULL COMMENT '3 Months Returns',
-  return_6M decimal(10,3) DEFAULT NULL COMMENT '6 Months Returns',
-  return_9M decimal(10,3) DEFAULT NULL COMMENT '9 Months Returns',
-  return_1Y decimal(10,3) DEFAULT NULL COMMENT '1 Year Returns',
-  return_2Y decimal(10,3) DEFAULT NULL COMMENT '2 Years Returns',
-  return_3Y decimal(10,3) DEFAULT NULL COMMENT '3 Years Returns',
-  return_5Y decimal(10,3) DEFAULT NULL COMMENT '5 Years Returns',
-  return_10Y decimal(10,3) DEFAULT NULL COMMENT '10 Years Returns',
-  return_YTD decimal(10,3) DEFAULT NULL COMMENT 'YTD Returns',
+  down_52w_max decimal(10,4) DEFAULT NULL COMMENT 'Down from 52-Week Max Price',
+  return_1D decimal(10,4) DEFAULT NULL COMMENT '1 Day Returns',
+  return_1W decimal(10,4) DEFAULT NULL COMMENT '1 Week Returns',
+  return_2W decimal(10,4) DEFAULT NULL COMMENT '2 Weeks Returns',
+  return_1M decimal(10,4) DEFAULT NULL COMMENT '1 Month Returns',
+  return_2M decimal(10,4) DEFAULT NULL COMMENT '2 Months Returns',
+  return_3M decimal(10,4) DEFAULT NULL COMMENT '3 Months Returns',
+  return_6M decimal(10,4) DEFAULT NULL COMMENT '6 Months Returns',
+  return_9M decimal(10,4) DEFAULT NULL COMMENT '9 Months Returns',
+  return_1Y decimal(10,4) DEFAULT NULL COMMENT '1 Year Returns',
+  return_2Y decimal(10,4) DEFAULT NULL COMMENT '2 Years Returns',
+  return_3Y decimal(10,4) DEFAULT NULL COMMENT '3 Years Returns',
+  return_5Y decimal(10,4) DEFAULT NULL COMMENT '5 Years Returns',
+  return_10Y decimal(10,4) DEFAULT NULL COMMENT '10 Years Returns',
+  return_YTD decimal(10,4) DEFAULT NULL COMMENT 'YTD Returns',
   PRIMARY KEY (ticker)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Price Movement';
 
@@ -840,16 +845,29 @@ CREATE TABLE stock_price_movement (
 CREATE TABLE stock_price_movement_history (
   date date NOT NULL COMMENT 'PK Date',
   ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Index ticker',
-  return_1D decimal(10,3) DEFAULT NULL COMMENT '1 Day Returns',
-  return_1W decimal(10,3) DEFAULT NULL COMMENT '1 Week Returns',
-  return_2W decimal(10,3) DEFAULT NULL COMMENT '2 Weeks Returns',
-  return_1M decimal(10,3) DEFAULT NULL COMMENT '1 Month Returns',
+  return_1D decimal(10,4) DEFAULT NULL COMMENT '1 Day Returns',
+  return_1W decimal(10,4) DEFAULT NULL COMMENT '1 Week Returns',
+  return_2W decimal(10,4) DEFAULT NULL COMMENT '2 Weeks Returns',
+  return_1M decimal(10,4) DEFAULT NULL COMMENT '1 Month Returns',
   PRIMARY KEY (date, ticker)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Price Movement History';
 -- TRUNCATE stock_price_movement_history
 SELECT * from stock_price_movement_history WHERE ticker like 'TCS%' order by date desc;
 SELECT * from stock_price_movement_history WHERE date = '2019-05-06' order by ticker, date desc;
 SELECT * from stock_price_movement order by ticker;
+
+-- DROP table composite;
+CREATE TABLE composite (
+  compositeid int(3) NOT NULL COMMENT 'PK Composite id',
+  name varchar(20) COLLATE utf8_unicode_ci COMMENT 'Composite Name',
+  description varchar(200) COLLATE utf8_unicode_ci COMMENT 'Composite Description',
+  min_size DECIMAL(20, 3) NOT NULL COMMENT 'Minimum Portfolio Size',
+  benchmarkid varchar(30) COLLATE utf8_unicode_ci COMMENT 'Benchmark ticker',
+  asset_classid int(6) NULL DEFAULT 0 COMMENT 'Asset Class ID',
+  PRIMARY KEY (compositeid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Composite - Portfolio Strategies';
+
+select * from composite; 
    
 -- DROP table portfolio;
 CREATE TABLE portfolio (
@@ -860,32 +878,28 @@ CREATE TABLE portfolio (
   start_date date DEFAULT NULL COMMENT 'Portfolio Start Date',
   end_date date DEFAULT NULL COMMENT 'Portfolio Expected End Date',
   compositeid int(3) NOT NULL COMMENT 'Composite id',
-  value decimal(20,3) DEFAULT NULL COMMENT 'Market value of the portfolio',
+  net_investment DECIMAL(20,3) NULL DEFAULT 0 COMMENT 'Net Cash-inflow',
+  market_value decimal(20,3) NULL DEFAULT 0  COMMENT 'Market value of the portfolio',
+  holding_period decimal(7,3) DEFAULT 0 COMMENT 'Holding period in years i.e. Start date to till date ',
+  net_profit decimal(20,3) DEFAULT NULL COMMENT 'Unrealized Net Profit = Market Value - Net Investment',
+  absolute_return DECIMAL(20,4) NULL DEFAULT 0 COMMENT 'Absolute Returns',
+  annualized_return DECIMAL(20,4) NULL DEFAULT 0 COMMENT 'Annualized Returns',
   PRIMARY KEY (memberid,portfolioid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Portfolio Description';
 
-select * from portfolio;
-
--- DROP table composite;
-CREATE TABLE composite (
-  compositeid int(3) NOT NULL COMMENT 'PK Composite id',
-  name varchar(20) COLLATE utf8_unicode_ci COMMENT 'Composite Name',
-  description varchar(200) COLLATE utf8_unicode_ci COMMENT 'Composite Description',
-  benchmarkid varchar(30) COLLATE utf8_unicode_ci COMMENT 'Benchmark ticker',
-  PRIMARY KEY (compositeid)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Composite - Portfolio Strategies';
-
-select * from composite; 
+SELECT * from portfolio;
+select b.first_name, a.* from portfolio a, member b where a.memberid = b.memberid;
+select compositeid, count(1) from portfolio a GROUP BY compositeid;
 
 -- DROP table composite_retruns
 
 -- DROP table mosl_code;
-CREATE TABLE mosl_code (
+CREATE TABLE moslcode_memberid (
   memberid int(11) NOT NULL COMMENT 'PK member i.e. client ID unique Auto Generated',
   moslcode varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK MOSL CODE',
   PRIMARY KEY (memberid, moslcode)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='MOSL Code And MemberID Cross Reference';
-select * from mosl_code;
+select * from moslcode_memberid;
 
 -- DROP table portfolio_cashflow;
 CREATE TABLE portfolio_cashflow (
@@ -893,8 +907,7 @@ CREATE TABLE portfolio_cashflow (
   portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
   date date NOT NULL COMMENT 'Date on which major cash inflow or outflow happens',
   cashflow decimal(20,3) NOT NULL COMMENT 'Amount of cash inflow (negative) or outflow (outflow) happens',
-  PRIMARY KEY (memberid, portfolioid, date),
-  KEY c_portfolio_cashflow_portfolioid (portfolioid)
+  PRIMARY KEY (memberid, portfolioid, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Cashflow';
 
 select * from portfolio_cashflow;
@@ -909,25 +922,25 @@ CREATE TABLE portfolio_holdings (
   short_name varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Security Name - Short',
   asset_classid int(6) NOT NULL COMMENT 'Asset Class ID',
   subindustryid int(8) DEFAULT '0' COMMENT 'Sub Industry ID',
-  quantity decimal(20,3) DEFAULT NULL COMMENT 'Security Quantity',
-  rate decimal(20,3) DEFAULT NULL COMMENT 'Security Buy Rate per Quantity',
-  brokerage decimal(20,2) DEFAULT NULL COMMENT 'Security Total Brokerage',
-  tax decimal(20,2) DEFAULT NULL COMMENT 'Security Total Tax',
+  quantity decimal(20,4) DEFAULT NULL COMMENT 'Security Quantity',
+  rate decimal(20,4) DEFAULT NULL COMMENT 'Security Buy Rate per Quantity',
+  brokerage decimal(20,3) DEFAULT NULL COMMENT 'Security Total Brokerage',
+  tax decimal(20,3) DEFAULT NULL COMMENT 'Security Total Tax',
   total_cost decimal(20,3) DEFAULT NULL COMMENT 'Security Total Cost (Buy Rate*Quantity) + Brokerage + Tax',
-  net_rate decimal(20,3) DEFAULT NULL COMMENT 'Security effective cost per quantity i.e. Total Cost/Quantity',
-  cmp decimal(20,3) DEFAULT NULL COMMENT 'Security Current Market Price',
+  net_rate decimal(20,4) DEFAULT NULL COMMENT 'Security effective cost per quantity i.e. Total Cost/Quantity',
+  cmp decimal(20,4) DEFAULT NULL COMMENT 'Security Current Market Price',
   market_value decimal(20,3) DEFAULT NULL COMMENT 'Investment market value (CMP*Quanity)',
   holding_period decimal(7,3) DEFAULT NULL COMMENT 'Security holding period in years i.e. Buy date to till date ',
   net_profit decimal(20,3) DEFAULT NULL COMMENT 'Unrealized Net Profit = Market Value - Total Cost',
-  absolute_return decimal(20,3) DEFAULT NULL COMMENT 'Unrealized absolute return',
-  annualized_return decimal(20,3) DEFAULT NULL COMMENT 'Unrealized annualized return',
+  absolute_return decimal(10,4) DEFAULT NULL COMMENT 'Unrealized absolute return',
+  annualized_return decimal(10,4) DEFAULT NULL COMMENT 'Unrealized annualized return',
   maturity_value decimal(20,3) DEFAULT NULL COMMENT 'Security Maturity Value especially for FDs',
   maturity_date date DEFAULT '1900-01-01' COMMENT 'Security Maturity Value especially for FDs',
   last_valuation_date date DEFAULT '1900-01-01' COMMENT 'Last Valution Date',
   PRIMARY KEY (memberid, portfolioid, buy_date, ticker)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-SELECT * from portfolio_holdings;
+SELECT * from portfolio_holdings a where a.memberid = 1026;
 
 -- DROP table portfolio_value_history;
 CREATE TABLE portfolio_value_history (
@@ -950,27 +963,56 @@ CREATE TABLE portfolio_historical_holdings (
   short_name varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Security Name - Short',
   asset_classid int(6) NOT NULL COMMENT 'Asset Class ID',
   subindustryid int(8) DEFAULT '0' COMMENT 'Sub Industry ID',
-  quantity decimal(20,3) DEFAULT NULL COMMENT 'Security Quantity',
-  rate decimal(20,3) DEFAULT NULL COMMENT 'Security Buy Rate per Quantity',
-  brokerage decimal(20,2) DEFAULT NULL COMMENT 'Security Total Brokerage',
-  tax decimal(20,2) DEFAULT NULL COMMENT 'Security Total Tax',
+  quantity decimal(20,4) DEFAULT NULL COMMENT 'Security Quantity',
+  rate decimal(20,4) DEFAULT NULL COMMENT 'Security Buy Rate per Quantity',
+  brokerage decimal(20,3) DEFAULT NULL COMMENT 'Security Total Brokerage',
+  tax decimal(20,3) DEFAULT NULL COMMENT 'Security Total Tax',
   total_cost decimal(20,3) DEFAULT NULL COMMENT 'Security Total Cost (Buy Rate*Quantity) + Brokerage + Tax',
-  net_rate decimal(20,3) DEFAULT NULL COMMENT 'Security effective cost per quantity i.e. Total Cost/Quantity',
+  net_rate decimal(20,4) DEFAULT NULL COMMENT 'Security effective cost per quantity i.e. Total Cost/Quantity',
   sell_date date NOT NULL COMMENT 'Security Sell Date',
-  sell_rate decimal(20,3) DEFAULT NULL COMMENT 'Security Sell Rate per Quantity',
-  brokerage_sell decimal(12,2) DEFAULT NULL COMMENT 'Brokerage for sell',
-  tax_sell decimal(12,2) DEFAULT NULL COMMENT 'Tax for sell',
+  sell_rate decimal(20,4) DEFAULT NULL COMMENT 'Security Sell Rate per Quantity',
+  brokerage_sell decimal(20,3) DEFAULT NULL COMMENT 'Brokerage for sell',
+  tax_sell decimal(20,3) DEFAULT NULL COMMENT 'Tax for sell',
   net_sell decimal(20,3) DEFAULT NULL COMMENT 'Security Total Sell (Sell Rate*Quantity) - Brokerage - Tax',
-  net_sell_rate decimal(20,3) DEFAULT NULL COMMENT 'Security effective sell per quantity i.e. Net Sell/Quantity',
+  net_sell_rate decimal(20,4) DEFAULT NULL COMMENT 'Security effective sell per quantity i.e. Net Sell/Quantity',
   holding_period decimal(7,3) DEFAULT NULL COMMENT 'Security holding period in years i.e. Buy date to till date ',
   net_profit decimal(20,3) DEFAULT NULL COMMENT 'Unrealized Net Profit = Market Value - Total Cost',
-  absolute_return decimal(20,3) DEFAULT NULL COMMENT 'Unrealized absolute return',
-  annualized_return decimal(20,3) DEFAULT NULL COMMENT 'Unrealized annualized return',
+  absolute_return decimal(20,4) DEFAULT NULL COMMENT 'Unrealized absolute return',
+  annualized_return decimal(20,4) DEFAULT NULL COMMENT 'Unrealized annualized return',
   fin_year varchar(9) COLLATE utf8_unicode_ci NOT NULL COMMENT 'FIN Year when security was sold',
   PRIMARY KEY (memberid,portfolioid,buy_date,ticker,sell_date)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Historical Holdings';
 
 SELECT * FROM portfolio_historical_holdings; 
+
+-- DROP TABLE mosl_transaction;
+CREATE TABLE mosl_transaction (
+  moslcode varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK MOSL Client Code',
+  exchange varchar(10) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Exchange',
+  date date NOT NULL COMMENT 'Transaction Date',
+  script_name varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Script Name',
+  sell_buy varchar(6) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Sell Buy',
+  quantity decimal(20,3) DEFAULT '0' COMMENT 'Quantity',
+  rate decimal(20,4) DEFAULT '0' COMMENT 'Buy Rate',
+  amount decimal(20,3) DEFAULT '0' COMMENT 'Amount = quantity x rate',
+  brokerage decimal(20,3) DEFAULT '0' COMMENT 'Brokerage',
+  txn_charges decimal(20,3) DEFAULT '0' COMMENT 'Transaction Charges',
+  service_tax decimal(20,3) DEFAULT '0' COMMENT 'Service Charges',
+  stamp_duty decimal(20,3) DEFAULT '0' COMMENT 'Stamp Duty Charges',
+  stt_ctt decimal(20,3) DEFAULT '0' COMMENT 'STT CTT Charges',
+  net_rate decimal(20,4) DEFAULT '0' COMMENT 'Net Rate',
+  net_amount decimal(20,3) DEFAULT '0' COMMENT 'Net Amount',
+  order_no varchar(30) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Order No.',
+  trade_no varchar(30) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Trade No',
+  is_processed varchar(1) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT 'N' NULL COMMENT 'Y/N for is Processed',
+  PRIMARY KEY (mosl_code, date, scrip_name, sell_buy, order_no, trade_no)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='MOSL Transactions';
+ALTER TABLE mosl_transaction ADD INDEX index_mosl_transaction_date (date);
+ALTER TABLE mosl_transaction ADD INDEX index_mosl_transaction_moslcode (moslcode); 
+ALTER TABLE mosl_transaction ADD INDEX index_mosl_transaction_script_name (script_name);
+
+SELECT * from mosl_transaction where 1=2; 
+-- UPDATE mosl_transaction a set is_processed = 'N';
 
 -- DROP table portfolio_asset_allocation;
 CREATE TABLE portfolio_asset_allocation (
@@ -979,7 +1021,7 @@ CREATE TABLE portfolio_asset_allocation (
   date date NOT NULL COMMENT 'PK Date of asset allocation',
   asset_class_group varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Group for Asset classes',
   value decimal(20,3) DEFAULT NULL COMMENT 'Market Value of Asset sub class',
-  value_percent decimal(7,3) DEFAULT NULL COMMENT '%(Market Value) of Asset class',
+  value_percent decimal(7,4) DEFAULT NULL COMMENT '%(Market Value) of Asset class',
   PRIMARY KEY (memberid,portfolioid,date,asset_class_group)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Daily Asset Allocation ';
 
@@ -993,8 +1035,8 @@ CREATE TABLE portfolio_benchmark_returns_calculation_support (
   cashflow decimal(20,3) DEFAULT NULL COMMENT 'Cashflow amount Cash-in is negative, Cash-out is positive',
   benchmarkid int(3) NOT NULL COMMENT 'PK Benchmark ID',
   value decimal(20,3) DEFAULT NULL COMMENT 'Benchmark value',
-  units decimal(20,3) DEFAULT NULL COMMENT 'Benchmark units',
-  total_units decimal(20,3) DEFAULT NULL COMMENT 'Benchmark Total Units',
+  units decimal(20,4) DEFAULT NULL COMMENT 'Benchmark units',
+  total_units decimal(20,4) DEFAULT NULL COMMENT 'Benchmark Total Units',
   total_value decimal(20,3) DEFAULT NULL COMMENT 'Benchmark Total Value',
   PRIMARY KEY (memberid,portfolioid,benchmarkid,date)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - TWRR Calculation support data';
@@ -1055,8 +1097,8 @@ CREATE TABLE portfolio_irr_returns_summary (
   since_current_month decimal(20,4) DEFAULT NULL COMMENT 'IRR Returns from current month',
   since_current_quarter decimal(20,4) DEFAULT NULL COMMENT 'IRR Returns from current quarter',
   since_fin_year decimal(20,4) DEFAULT NULL COMMENT 'IRR Returns since current fin year',
-  return_ytd decimal(10,3) DEFAULT NULL COMMENT 'IRR Returns YTD',
-  return_1Y decimal(10,3) DEFAULT NULL COMMENT 'IRR Returns 1 Year',
+  return_ytd decimal(10,4) DEFAULT NULL COMMENT 'IRR Returns YTD',
+  return_1Y decimal(10,4) DEFAULT NULL COMMENT 'IRR Returns 1 Year',
   since_inception decimal(20,4) DEFAULT NULL COMMENT 'IRR Returns since inception',
   PRIMARY KEY (memberid,portfolioid,benchmarkid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - IRR (Internal Rate of Returns) or Money Weighted Rate or Returns Summary';
@@ -1084,3 +1126,6 @@ CREATE TABLE temp_irr_calculation (
   value decimal(20,3) DEFAULT NULL COMMENT 'Market Value of the portfolio',
   PRIMARY KEY (memberid,portfolioid,date)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Temp - For Irr Calculation';
+
+
+

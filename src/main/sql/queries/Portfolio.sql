@@ -1,15 +1,21 @@
 SET SQL_SAFE_UPDATES = 0;
 Commit;
-
+select * from asset_classification;
 select * from composite; 
-
 select * from mosl_code;
-
 select * from portfolio a order by a.memberid, a.portfolioid;
-
-select * from portfolio_cashflow;
-
-SELECT * FROM portfolio_holdings a order by a.memberid, a.portfolioid, a.ticker;
+select * from portfolio_cashflow where memberid in (1026) order by portfolioid, date desc;
+SELECT * from wealth_details a where memberid in (1000, 1011) order by a.memberid, a.asset_classid, a.ticker, a.buy_date;
+SELECT * FROM portfolio_holdings a  /*WHERE memberid = 1026*/ order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+SELECT a.memberid, a.portfolioid, a.short_name, sum(a.quantity), sum(a.total_cost), sum(a.market_value), sum(a.net_profit), sum(a.market_value)/max(b.market_value) FROM portfolio_holdings a, portfolio b WHERE a.portfolioid = b.portfolioid and a.memberid = b.memberid AND a.memberid in (1000, 10011) GROUP BY a.memberid, a.portfolioid, a.ticker ORDER BY memberid, portfolioid,sum(a.market_value) desc; 
+-- update portfolio_holdings set buy_date = (select date_today from setup_dates) where ticker = 'MOSL_CASH';
+-- UPDATE portfolio_holdings a, stock_universe b SET a.asset_classid = b.asset_classid, a.name = b.name, a.short_name = b.short_name, a.subindustryid = b.subindustryid WHERE a.ticker = b.ticker;
+-- UPDATE portfolio_historical_holdings a, stock_universe b SET a.asset_classid = b.asset_classid, a.name = b.name, a.short_name = b.short_name, a.subindustryid = b.subindustryid WHERE a.ticker = b.ticker;
+-- UPDATE portfolio_holdings a SET total_cost = (quantity * rate) + brokerage + tax, net_rate = total_cost/quantity, market_value = cmp * quantity, net_profit = market_value - total_cost, holding_period = ROUND((DATEDIFF((SELECT date_today FROM setup_dates), buy_date) / 365.25), 2), absolute_return = round((market_value / total_cost) - 1, 4), annualized_return = round(pow((absolute_return + 1), (1 / holding_period)) - 1, 4);
+-- UPDATE portfolio_historical_holdings a SET total_cost = (quantity * rate) + brokerage + tax, net_rate = total_cost/quantity, net_sell = (quantity *sell_rate) - brokerage_sell - tax_sell, net_sell_rate = net_sell/quantity, net_profit = net_sell - total_cost, holding_period = ROUND((DATEDIFF(sell_date, buy_date) / 365.25), 2), absolute_return = round((net_sell / total_cost) - 1, 4), annualized_return = round(pow((absolute_return + 1), (1 / holding_period)) - 1, 4);
+-- truncate table portfolio_holdings;
+SELECT a.memberid, a.portfolioid, sum(market_value) from portfolio_holdings a group by a.memberid, a.portfolioid order by a.memberid, a.portfolioid;
+SELECT a.memberid, a.portfolioid, b.asset_class_group, sum(a.market_value) from portfolio_holdings a, asset_classification b where a.asset_classid = b.classid GROUP BY a.memberid, a.portfolioid, b.asset_class_group order by a.memberid, a.portfolioid, asset_class_group;
 
 SET SQL_SAFE_UPDATES = 0;
 Commit;
@@ -19,3 +25,27 @@ UPDATE portfolio_holdings a, nse_price_history b SET a.cmp = b.close_price WHERE
 UPDATE portfolio_holdings a, bse_price_history b SET a.cmp = b.close_price WHERE  a.ticker = b.bse_ticker AND b.date = (select date_today from setup_dates);
 update portfolio_holdings a set total_cost = ((quantity * rate) + brokerage + tax), net_rate = round((total_cost/quantity),2), market_value = (cmp * quantity), net_profit = (market_value - total_cost), holding_period = ROUND((DATEDIFF((select date_today from setup_dates), buy_date) / 365.25), 2),absolute_return = round((market_value / total_cost) - 1, 2),annualized_return = round(pow((absolute_return + 1), (1 / holding_period)) - 1, 2);
 commit;
+
+-- ap_process_mosl_transactions to be called after uploading transactions
+-- call ap_process_mosl_transactions();
+select * from log_table order by TIMESTAMP desc;
+truncate log_table; 
+-- DELETE from mosl_transaction where moslcode = 'H20488';
+select * from mosl_transaction where date > '2019-06-24' and is_processed = 'N' order by date;
+SELECT * FROM stock_universe a WHERE ticker in ('TVSMOTOR','');
+select * from portfolio_holdings a where a.memberid = 1060 order by asset_classid, ticker, buy_date;
+select * from portfolio_historical_holdings a where a.memberid = 1010 order by sell_date, ticker;
+-- DELETE from portfolio_holdings where memberid = 1026;
+-- DELETE from portfolio_historical_holdings where memberid = 1026;
+-- UPDATE mosl_transaction set is_processed = 'N' where moslcode = 'H22295';
+-- DELETE from mosl_transaction where moslcode = 'H22295';
+select * from moslcode_memberid a where moslcode = 'H22295';
+
+SELECT * from portfolio_value_history a where a. memberid = 1026 and a.date = (select date_today from setup_dates) order by memberid, portfolioid, date; 
+select * from portfolio_irr_summary a where a. memberid = 1026;
+select * from portfolio_twrr_monthly a where a. memberid = 1026;
+SELECT * from portfolio_twrr_summary a where a. memberid = 1026;
+select * from portfolio_asset_allocation a where a. memberid = 1026;
+select * from mutual_fund_stats;
+SELECT * from stock_price_movement;
+
