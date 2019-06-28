@@ -35,7 +35,7 @@ SELECT count(1) from sip a where a.scheme_name like '%-%Reg%-%' and a.memberid i
 -- Query for MF Analysis
 select a.memberid Member, b.asset_class_group AssetClass, if(locate('-Reg', short_name) > 0, 'Regular', 'Direct') RegDir, if(locate('-G', short_name) > 0, 'Growth', 'Dividend') GrowthDiv, short_name ShortName, portfoliono FolioNO, a.quantity units, buy_date, round(total_cost), round(market_value, 0) MktValue, net_profit, absolute_return, annualized_return, if(sipid > 0, 'Yes', '') Sip, if(datediff(now(),buy_date)/365 > 1, 'All', '-') Units, a.ticker schemeCode 
 from wealth_details a, asset_classification b 
-where a.memberid in (1003, 1019) and 
+where a.memberid in (1016, 1059, 1060) and 
 a.asset_classid = b.classid and
 (a.asset_classid in (201020, 202020, 203040, 301010, 301020) or (a.asset_classid > 401010 and a.asset_classid < 405040))
 order by memberid, asset_class_group, name;

@@ -128,4 +128,14 @@ public class UserViewController {
         return "user/wealthhistory";
     }
 
+    @RequestMapping(value = "/user/portfolioholdings", method = RequestMethod.GET)
+    public String portfolioHoldings(Model model, @AuthenticationPrincipal UserDetails userDetails){
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "TimelineOfWealth- Wealth History");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/portfolioholdings";
+    }
+
 }

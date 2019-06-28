@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="HoldingsManagement" ng-controller="HoldingsController">
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/user/holdings.js" th:src="@{/custom/user/holdings.js}"></script>
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/usersidebarmenu :: common-usersidebarmenu" />
+
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/usertopnavigation :: common-usertopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <br />
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h1>Portfolio Holdings </h1>
+                            <p />PMS managed by Timelineofwealth
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <font color="green"><strong><h2>Portfolios : </h2> </strong> </font>
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><strong>Member</strong></th>
+                                        <th><strong>#Portfolio</strong></th>
+                                        <th><strong>Inception Date</strong></th>
+                                        <th><strong>Description</strong></th>
+                                        <th><strong>Net Investment</strong></th>
+                                        <th><strong>Market Value</strong></th>
+                                        <th><strong>Net Profit</strong></th>
+                                        <th><strong>Abs. Returns%</strong></th>
+                                        <th><strong>IRR Returns%</strong></th>
+                                        <td></td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="portfolio in portfolios">
+                                            <td>{{ (members | filter : { 'memberid' : portfolio.key.memberid })[0].firstName }}</td>
+                                            <td>{{portfolio.key.portfolioid}}</td>
+                                            <td>{{portfolio.startDate}}</td>
+                                            <td>{{portfolio.description}}</td>
+                                            <td>{{portfolio.netInvestment | currency:"&#8377;":0}}</td>
+                                            <td>{{portfolio.marketValue | currency:"&#8377;":0}}</td>
+                                            <td>{{portfolio.netProfit | currency:"&#8377;":0}}</td>
+                                            <td>{{portfolio.absoluteReturn}}%</td>
+                                            <td>{{portfolio.annualizedReturn}}%</td>
+                                            <td><button type="button" ng-click="setFilter(portfolio.key.memberid, portfolio.key.portfolioid)" class="btn btn-success  pull-right btn-xs">Show Details</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="x_content">
+                            <lebel class="pull-left" >&nbsp;&nbsp;&nbsp; Show &nbsp;&nbsp;&nbsp; </lebel>
+                            <lebel class="pull-left" > <input type="radio" checked="" value="returns" id="optionsRadios1" name="optionsRadios" ng-click="showView('Consolidated')" /> Consolidated View &nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios2" name="optionsRadios" ng-click="showView('Individual')" /> Individual Trades &nbsp;&nbsp;&nbsp;</lebel>
+                        </div>
+                        <div class="x_content" ng-hide="hideConsolidated">
+                            <font color="green"><strong><h2>Consolidated View </h2> </strong> </font>
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><strong>Member</strong></th>
+                                        <th><strong>#Portfolio</strong></th>
+                                        <th><strong>Name</strong></th>
+                                        <th><strong>Quantity</strong></th>
+                                        <th><strong>Purchase Cost</strong></th>
+                                        <th><strong>Market Value</strong></th>
+                                        <th><strong>Net Profit</strong></th>
+                                        <th><strong>Weight%</strong></th>
+                                        <td></td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="consolidatedHolding in consolidatedHoldings | filter:filterConsolidatedByMemberidAndPortfolioid">
+                                        <td>{{ (members | filter : { 'memberid' : consolidatedHolding.memberid })[0].firstName }}</td>
+                                        <td>{{consolidatedHolding.portfolioid}}</td>
+                                        <td>{{consolidatedHolding.name}}</td>
+                                        <td>{{consolidatedHolding.quantity}}</td>
+                                        <td>{{consolidatedHolding.totalCost | currency:"&#8377;":0}}</td>
+                                        <td>{{consolidatedHolding.marketValue | currency:"&#8377;":0}}</td>
+                                        <td>{{consolidatedHolding.netProfit | currency:"&#8377;":0}}</td>
+                                        <td>{{consolidatedHolding.weight | number:2}}%</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="x_content" ng-hide="!hideConsolidated">
+                            <font color="green"><strong><h2>Individual Trades </h2> </strong> </font>
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><strong>Member</strong></th>
+                                        <th><strong>#Portfolio</strong></th>
+                                        <th><strong>Purchase Dt.</strong></th>
+                                        <th><strong>Name</strong></th>
+                                        <th><strong>Quantity</strong></th>
+                                        <th><strong>Net Cost</strong></th>
+                                        <th><strong>Market Value</strong></th>
+                                        <th><strong>Net Profit</strong></th>
+                                        <th><strong>Abs. Return%</strong></th>
+                                        <th><strong>Annualized Return%</strong></th>
+                                        <td></td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="individualHolding in individualHoldings | filter:filterIndividualByMemberidAndPortfolioid">
+                                        <td>{{ (members | filter : { 'memberid' : individualHolding.key.memberid })[0].firstName }}</td>
+                                        <td>{{individualHolding.key.portfolioid}}</td>
+                                        <td>{{individualHolding.key.buyDate}}</td>
+                                        <td>{{individualHolding.shortName}}</td>
+                                        <td>{{individualHolding.quantity}}</td>
+                                        <td>{{individualHolding.totalCost | currency:"&#8377;":0}}</td>
+                                        <td>{{individualHolding.marketValue | currency:"&#8377;":0}}</td>
+                                        <td>{{individualHolding.netProfit | currency:"&#8377;":0}}</td>
+                                        <td>{{(individualHolding.absoluteReturn)*100 | number:2}}%</td>
+                                        <td>{{(individualHolding.annualizedReturn)*100 | number:2}}%</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>
