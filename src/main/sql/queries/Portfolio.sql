@@ -1,13 +1,26 @@
 SET SQL_SAFE_UPDATES = 0;
 Commit;
 select * from asset_classification;
-select * from composite; 
-select * from mosl_code;
-select * from portfolio a order by a.memberid, a.portfolioid;
-select * from portfolio_cashflow where memberid in (1026) order by portfolioid, date desc;
-SELECT * from wealth_details a where memberid in (1000, 1011) order by a.memberid, a.asset_classid, a.ticker, a.buy_date;
-SELECT * FROM portfolio_holdings a  /*WHERE memberid = 1026*/ order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
-SELECT a.memberid, a.portfolioid, a.short_name, sum(a.quantity), sum(a.total_cost), sum(a.market_value), sum(a.net_profit), sum(a.market_value)/max(b.market_value) FROM portfolio_holdings a, portfolio b WHERE a.portfolioid = b.portfolioid and a.memberid = b.memberid AND a.memberid in (1000, 10011) GROUP BY a.memberid, a.portfolioid, a.ticker ORDER BY memberid, portfolioid,sum(a.market_value) desc; 
+select * from composite; -- 5 composites
+select * from portfolio a order by a.memberid, a.portfolioid; -- total 21 portfolios 
+select compositeid, count(1) from portfolio a group by compositeid order by a.memberid, a.portfolioid; -- (composite 1: 11, 2: 10)
+select * from portfolio_cashflow where memberid in (1000) order by portfolioid, date desc;
+select * from portfolio_value_history a where memberid in (1000);
+-- All portfolio holdings
+SELECT * FROM portfolio_holdings a  /*WHERE memberid = 1000*/ order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+-- query to find wt of each security to compare with model portfolio
+SELECT c.moslcode, d.first_name, d.last_name, a.memberid, a.portfolioid, 
+a.short_name, sum(a.quantity), sum(a.total_cost), sum(a.market_value), sum(a.net_profit), 
+sum(a.market_value)/avg(b.market_value), avg(b.market_value)
+FROM portfolio_holdings a, portfolio b, moslcode_memberid c, member d
+WHERE a.portfolioid = b.portfolioid 
+and a.memberid = b.memberid 
+and a.memberid = c.memberid
+and c.moslcode != 'H20613'
+and a.memberid = d.memberid
+and b.compositeid = 1 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
+GROUP BY a.memberid, a.portfolioid, a.ticker 
+ORDER BY memberid, portfolioid,sum(a.market_value) desc; 
 -- update portfolio_holdings set buy_date = (select date_today from setup_dates) where ticker = 'MOSL_CASH';
 -- UPDATE portfolio_holdings a, stock_universe b SET a.asset_classid = b.asset_classid, a.name = b.name, a.short_name = b.short_name, a.subindustryid = b.subindustryid WHERE a.ticker = b.ticker;
 -- UPDATE portfolio_historical_holdings a, stock_universe b SET a.asset_classid = b.asset_classid, a.name = b.name, a.short_name = b.short_name, a.subindustryid = b.subindustryid WHERE a.ticker = b.ticker;
@@ -49,3 +62,25 @@ select * from portfolio_asset_allocation a where a. memberid = 1026;
 select * from mutual_fund_stats;
 SELECT * from stock_price_movement;
 
+UPDATE portfolio_historical_holdings SET fin_year = 'FY2020' WHERE sell_date >= '2019-04-01';
+UPDATE portfolio_historical_holdings SET fin_year = 'FY2019' WHERE sell_date >= '2018-04-01' AND sell_date < '2019-04-01';
+SELECT memberid, portfolioid, fin_year, sum(net_profit) from portfolio_historical_holdings a where holding_period >= 1 group by memberid, portfolioid, fin_year ORDER BY memberid, portfolioid, fin_year desc;
+SELECT memberid, portfolioid, fin_year, sum(net_profit) from portfolio_historical_holdings a where holding_period < 1 group by memberid, portfolioid, fin_year ORDER BY memberid, portfolioid, fin_year desc;
+
+SELECT * FROM setup_dates;
+select month('2019-04-01');
+select year('2019-04-01');
+
+select a.memberid, a.portfolioid, a.ticker, sum(a.quantity), avg(d.latest_price), sum(a.market_value), avg(b.value), round((avg(0.15*b.value) - sum(a.market_value))/(avg(d.latest_price)), 2) 
+from portfolio_holdings a, portfolio_value_history b, portfolio c, stock_universe d
+where a.ticker = 'BRITANNIA' 
+and a.portfolioid = b.portfolioid 
+and a.memberid = b.memberid 
+and a.memberid = c.memberid
+and b.portfolioid = c.portfolioid
+and a.ticker = d.ticker
+and b.date = '2019-06-28'
+and c.compositeid = 2
+group by a.memberid, a.portfolioid, a.ticker;
+
+SELECT * from wealth_details a where memberid in (1000, 1011) order by a.memberid, a.asset_classid, a.ticker, a.buy_date;

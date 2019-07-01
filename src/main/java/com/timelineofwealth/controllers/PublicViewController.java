@@ -39,7 +39,7 @@ public class PublicViewController {
     public String  login(Model model, String error, String logout){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Login");
         if (error != null)
             model.addAttribute("error", "Your username and password is invalid.");
 
@@ -68,7 +68,7 @@ public class PublicViewController {
     public String services(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Services");
         return "public/services";
     }
 
@@ -76,7 +76,7 @@ public class PublicViewController {
     public String contactus(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Contact Us");
         return "public/contactus";
     }
 
@@ -92,7 +92,7 @@ public class PublicViewController {
     public String ethicalStandards(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Ethical Standards");
         return "public/ethicalstandards";
     }
 
@@ -125,7 +125,7 @@ public class PublicViewController {
     public String mutualFundTypes(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Types of Mutual Funds");
         return "public/mftypes";
     }
 
@@ -133,7 +133,7 @@ public class PublicViewController {
     public String mutualFundList(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Performance of Mutual Funds");
         return "public/mflist";
     }
 
@@ -141,7 +141,7 @@ public class PublicViewController {
     public String indexStats(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "NIFTY-50 Index Statistics");
         return "public/indexstats";
     }
 
@@ -149,7 +149,7 @@ public class PublicViewController {
     public String stockList(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Valuation Matrix of NSE-BSE 500");
         return "public/stocklist";
     }
 
@@ -157,7 +157,7 @@ public class PublicViewController {
     public String stockAnalysis(@PathVariable("ticker") String ticker, Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Fundamental Analysis of "+ CommonService.getStockDetails(ticker).getName());
         model.addAttribute("ticker", ticker);
         return "public/stockanalysis";
     }
@@ -166,7 +166,7 @@ public class PublicViewController {
     public String indianEconomy(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Indian Economic Indicators");
         return "public/indianeconomy";
     }
 
@@ -174,7 +174,7 @@ public class PublicViewController {
     public String retirementFundCalculation(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Retirement Fund Calculation");
         return "public/retirementfundcalculation";
     }
 
@@ -182,7 +182,7 @@ public class PublicViewController {
     public String midAndSmallCapIndexStats(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "BSE-MidCap and BSE-SmallCap Statistics");
         return "public/midandsmallcapindexstats";
     }
 }

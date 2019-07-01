@@ -9,7 +9,7 @@
 <!-- Bootstrap -->
 <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
 <!-- custom angular script -->
-<script type="text/javascript" src="../../static/custom/user/holdings.js" th:src="@{/custom/user/holdings.js}"></script>
+<script type="text/javascript" src="../../static/custom/user/portfolioholdings.js" th:src="@{/custom/user/portfolioholdings.js}"></script>
 <div class="container body">
     <div class="main_container">
         <!-- sidebar menu -->
@@ -28,12 +28,12 @@
                     <br />
                     <div class="x_panel">
                         <div class="x_title">
-                            <h1>Portfolio Holdings </h1>
+                            <h1><font color="green">Portfolio Holdings </font></h1>
                             <p />PMS managed by Timelineofwealth
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <font color="green"><strong><h2>Portfolios : </h2> </strong> </font>
+                            <h2><font color="green"><strong>Portfolios :  </strong> </font></h2>
                             <div class="clearfix"></div>
                             <div class="table-responsive">
                                 <table class="table table-hover">
@@ -74,7 +74,7 @@
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios2" name="optionsRadios" ng-click="showView('Individual')" /> Individual Trades &nbsp;&nbsp;&nbsp;</lebel>
                         </div>
                         <div class="x_content" ng-hide="hideConsolidated">
-                            <font color="green"><strong><h2>Consolidated View </h2> </strong> </font>
+                            <h2><font color="green"><strong>Consolidated View  </strong> </font></h2>
                             <div class="clearfix"></div>
                             <div class="table-responsive">
                                 <table class="table table-hover">
@@ -88,7 +88,6 @@
                                         <th><strong>Market Value</strong></th>
                                         <th><strong>Net Profit</strong></th>
                                         <th><strong>Weight%</strong></th>
-                                        <td></td>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -107,7 +106,7 @@
                             </div>
                         </div>
                         <div class="x_content" ng-hide="!hideConsolidated">
-                            <font color="green"><strong><h2>Individual Trades </h2> </strong> </font>
+                            <h2><font color="green"><strong>Individual Trades  </strong> </font></h2>
                             <div class="clearfix"></div>
                             <div class="table-responsive">
                                 <table class="table table-hover">
@@ -123,7 +122,6 @@
                                         <th><strong>Net Profit</strong></th>
                                         <th><strong>Abs. Return%</strong></th>
                                         <th><strong>Annualized Return%</strong></th>
-                                        <td></td>
                                     </tr>
                                     </thead>
                                     <tbody>

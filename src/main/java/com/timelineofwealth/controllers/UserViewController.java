@@ -33,7 +33,7 @@ public class UserViewController {
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth-Members");
+        model.addAttribute("title", "Members");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/members";
     }
@@ -43,7 +43,7 @@ public class UserViewController {
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth-Income Expense");
+        model.addAttribute("title", "Income Expense");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/incexpsavings";
     }
@@ -53,7 +53,7 @@ public class UserViewController {
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth-Liability");
+        model.addAttribute("title", "Liability");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/liabilities";
     }
@@ -63,7 +63,7 @@ public class UserViewController {
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth-Insurances");
+        model.addAttribute("title", "Insurances");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/insurances";
     }
@@ -73,7 +73,7 @@ public class UserViewController {
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth- Liquidity Needs");
+        model.addAttribute("title", "Liquidity Needs");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/liquidities";
     }
@@ -83,7 +83,7 @@ public class UserViewController {
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth- Regular Investments");
+        model.addAttribute("title", "Recurring Investments");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/sip";
     }
@@ -93,12 +93,12 @@ public class UserViewController {
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth- Buy Transaction");
+        model.addAttribute("title", "Audit Assets");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/addassets";
     }
 
-    @RequestMapping(value = "/user/sellassets", method = RequestMethod.GET)
+    /*@RequestMapping(value = "/user/sellassets", method = RequestMethod.GET)
     public String sellTxn(Model model, @AuthenticationPrincipal UserDetails userDetails){
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
@@ -106,14 +106,14 @@ public class UserViewController {
         model.addAttribute("title", "TimelineOfWealth- Sell Transaction");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/sellassets";
-    }
+    }*/
 
     @RequestMapping(value = "/user/wealthdistribution", method = RequestMethod.GET)
     public String wealthDistribution(Model model, @AuthenticationPrincipal UserDetails userDetails){
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth- Wealth Distribution");
+        model.addAttribute("title", "Wealth Distribution");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/wealthdistribution";
     }
@@ -123,7 +123,7 @@ public class UserViewController {
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth- Wealth History");
+        model.addAttribute("title", "Wealth History");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/wealthhistory";
     }
@@ -133,9 +133,29 @@ public class UserViewController {
 
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "TimelineOfWealth- Wealth History");
+        model.addAttribute("title", "Portfolion Current Holdings");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
         return "user/portfolioholdings";
+    }
+
+    @RequestMapping(value = "/user/portfoliohistoricalholdings", method = RequestMethod.GET)
+    public String portfolioHistoricalHoldings(Model model, @AuthenticationPrincipal UserDetails userDetails){
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Portfolio Historical Holdings");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/portfoliohistoricalholdings";
+    }
+
+    @RequestMapping(value = "/user/portfoliocashflows", method = RequestMethod.GET)
+    public String portfolioCashflows(Model model, @AuthenticationPrincipal UserDetails userDetails){
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Portfolio Cashflows");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/portfoliocashflows";
     }
 
 }

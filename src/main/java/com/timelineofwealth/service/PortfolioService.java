@@ -1,9 +1,10 @@
 package com.timelineofwealth.service;
 
 import com.timelineofwealth.dto.ConsolidatedPortfolioHoldings;
-import com.timelineofwealth.entities.Member;
-import com.timelineofwealth.entities.Portfolio;
-import com.timelineofwealth.entities.PortfolioHoldings;
+import com.timelineofwealth.dto.FinYearProfit;
+import com.timelineofwealth.entities.*;
+import com.timelineofwealth.repositories.PortfolioCashflowRepository;
+import com.timelineofwealth.repositories.PortfolioHistoricalHoldingsRepository;
 import com.timelineofwealth.repositories.PortfolioHoldingsRepository;
 import com.timelineofwealth.repositories.PortfolioRepository;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service("PortfolioService")
@@ -30,6 +32,18 @@ public class PortfolioService {
     @Autowired
     public void setPortfolioHoldingsRepository(PortfolioHoldingsRepository portfolioHoldingsRepository){
         PortfolioService.portfolioHoldingsRepository = portfolioHoldingsRepository;
+    }
+    @Autowired
+    private static PortfolioHistoricalHoldingsRepository portfolioHistoricalHoldingsRepository;
+    @Autowired
+    public void setPortfolioHistoricalHoldingsRepository(PortfolioHistoricalHoldingsRepository portfolioHistoricalHoldingsRepository){
+        PortfolioService.portfolioHistoricalHoldingsRepository = portfolioHistoricalHoldingsRepository;
+    }
+    @Autowired
+    private static PortfolioCashflowRepository portfolioCashflowRepository;
+    @Autowired
+    public void setPortfolioCashflowRepository(PortfolioCashflowRepository portfolioCashflowRepository){
+        PortfolioService.portfolioCashflowRepository = portfolioCashflowRepository;
     }
 
     public static List<Portfolio> getPortfolios(String email){
@@ -86,4 +100,65 @@ public class PortfolioService {
         return consolidatedPortfolioHoldings;
     }
 
+    public static List<PortfolioHistoricalHoldings> getPortfolioHistoricalHoldings(String email){
+        logger.debug(String.format("In PortfolioService.getPortfolioHistoricalHoldings: Email %s", email));
+
+        List<PortfolioHistoricalHoldings> portfolioHistoricalHoldings;
+        List<Member> members = MemberService.getUserMembers(email);
+        List<Long> membersIds = new ArrayList<>();
+        for (Member member : members ){
+            membersIds.add(new Long(member.getMemberid()));
+        }
+        portfolioHistoricalHoldings = portfolioHistoricalHoldingsRepository.findAllByKeyMemberidInOrderByKeyMemberidAscKeyPortfolioidAscKeySellDateDesc(membersIds);
+
+        return portfolioHistoricalHoldings;
+    }
+
+    public static List<FinYearProfit> getFinYearProfit(String email){
+        logger.debug(String.format("In PortfolioService.getConsolidatedPortfolioHoldings: Email %s", email));
+
+        List<FinYearProfit> finYearProfits = new ArrayList<>();
+        List<Member> members = MemberService.getUserMembers(email);
+        List<Long> membersIds = new ArrayList<>();
+        for (Member member : members ){
+            membersIds.add(new Long(member.getMemberid()));
+        }
+        List<Object[]> objects = portfolioHistoricalHoldingsRepository.getLongTermProfit(membersIds);
+        for(Object[] object : objects) {
+            FinYearProfit finYearProfit = new FinYearProfit();
+            finYearProfit.setMemberid(Integer.parseInt(""+ (int)object[0]));
+            finYearProfit.setPortfolioid((int) object[1]);
+            finYearProfit.setFinYear((String) object[2]);
+            finYearProfit.setNetProfit((BigDecimal) object[3]);
+            finYearProfit.setLongShortTerm("Long Term");
+            finYearProfits.add(finYearProfit);
+        }
+        List<Object[]> objects1 = portfolioHistoricalHoldingsRepository.getShortTermProfit(membersIds);
+        for(Object[] object : objects1) {
+            FinYearProfit finYearProfit = new FinYearProfit();
+            finYearProfit.setMemberid(Integer.parseInt(""+ (int)object[0]));
+            finYearProfit.setPortfolioid((int) object[1]);
+            finYearProfit.setFinYear((String) object[2]);
+            finYearProfit.setNetProfit((BigDecimal) object[3]);
+            finYearProfit.setLongShortTerm("Short Term");
+            finYearProfits.add(finYearProfit);
+        }
+        finYearProfits.sort(Comparator.comparing(FinYearProfit::getFinYear).reversed());
+        return finYearProfits;
+    }
+
+    //
+    public static List<PortfolioCashflow> getPortfolioCashflows(String email){
+        logger.debug(String.format("In PortfolioService.getPortfolioHistoricalHoldings: Email %s", email));
+
+        List<PortfolioCashflow> portfolioCashflows;
+        List<Member> members = MemberService.getUserMembers(email);
+        List<Long> membersIds = new ArrayList<>();
+        for (Member member : members ){
+            membersIds.add(new Long(member.getMemberid()));
+        }
+        portfolioCashflows = portfolioCashflowRepository.findAllByKeyMemberidInOrderByKeyMemberidAscKeyPortfolioidAscKeyDateDesc(membersIds);
+
+        return portfolioCashflows;
+    }
 }

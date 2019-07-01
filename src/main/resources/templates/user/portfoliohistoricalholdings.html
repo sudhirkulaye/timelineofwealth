@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="HistoricalHoldingsManagement" ng-controller="HistoricalHoldingsController">
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/user/portfoliohistoricalholdings.js" th:src="@{/custom/user/portfoliohistoricalholdings.js}"></script>
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/usersidebarmenu :: common-usersidebarmenu" />
+
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/usertopnavigation :: common-usertopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <br />
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h1><font color="green">Portfolio Historical Holdings </font></h1>
+                            <p />Realized Profit and Loss per Trade
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <h2><font color="green"><strong>Portfolios : </strong> </font></h2>
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><strong>Member</strong></th>
+                                        <th><strong>#Portfolio</strong></th>
+                                        <th><strong>Inception Date</strong></th>
+                                        <th><strong>Description</strong></th>
+                                        <th><strong>Net Investment</strong></th>
+                                        <th><strong>Market Value</strong></th>
+                                        <th><strong>Net Profit</strong></th>
+                                        <th><strong>Abs. Returns%</strong></th>
+                                        <th><strong>IRR Returns%</strong></th>
+                                        <td></td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="portfolio in portfolios">
+                                        <td>{{ (members | filter : { 'memberid' : portfolio.key.memberid })[0].firstName }}</td>
+                                        <td>{{portfolio.key.portfolioid}}</td>
+                                        <td>{{portfolio.startDate}}</td>
+                                        <td>{{portfolio.description}}</td>
+                                        <td>{{portfolio.netInvestment | currency:"&#8377;":0}}</td>
+                                        <td>{{portfolio.marketValue | currency:"&#8377;":0}}</td>
+                                        <td>{{portfolio.netProfit | currency:"&#8377;":0}}</td>
+                                        <td>{{portfolio.absoluteReturn}}%</td>
+                                        <td>{{portfolio.annualizedReturn}}%</td>
+                                        <td><button type="button" ng-click="setFilter(portfolio.key.memberid, portfolio.key.portfolioid)" class="btn btn-success  btn-xs">Show Details</button></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="x_content">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Member/Folio</th>
+                                        <th>Financial Year</th>
+                                        <th>Long/Short Term</th>
+                                        <th>Net Profit/Loss</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="finYearProfit in finYearProfits | filter:filterFinYearProfitByMemberidAndPortfolioid">
+                                        <td>{{ (members | filter : { 'memberid' : finYearProfit.memberid })[0].firstName }}/{{finYearProfit.portfolioid}}</td>
+                                        <td>{{finYearProfit.finYear}}</td>
+                                        <td>{{finYearProfit.longShortTerm}}</td>
+                                        <td>{{finYearProfit.netProfit}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="x_content">
+                            <h2><font color="green"><strong>Realized Profit and Loss  </strong> </font></h2>
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><strong>Member/Folio</strong></th>
+                                        <th><strong>Buy Dt.</strong></th>
+                                        <th><strong>Name</strong></th>
+                                        <th><strong>Qt.</strong></th>
+                                        <th><strong>Net Cost</strong></th>
+                                        <th><strong>Sell Dt.</strong></th>
+                                        <th><strong>Net Sell</strong></th>
+                                        <th><strong>Profit</strong></th>
+                                        <th><strong>Abs. Ret.%</strong></th>
+                                        <th><strong>Annualized Ret.%</strong></th>
+                                        <th><strong>Holding(Yr)</strong></th>
+                                        <th><strong>FIN-Year</strong></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="historicalHolding in historicalHoldings | filter:filterHistoricalByMemberidAndPortfolioid">
+                                        <td>{{ (members | filter : { 'memberid' : historicalHolding.key.memberid })[0].firstName }}/{{historicalHolding.key.portfolioid}}</td>
+                                        <td>{{historicalHolding.key.buyDate}}</td>
+                                        <td>{{historicalHolding.shortName}}</td>
+                                        <td>{{historicalHolding.quantity}}</td>
+                                        <td>{{historicalHolding.totalCost | currency:"&#8377;":0}}</td>
+                                        <td>{{historicalHolding.key.sellDate}}</td>
+                                        <td>{{historicalHolding.netSell | currency:"&#8377;":0}}</td>
+                                        <td>{{historicalHolding.netProfit | currency:"&#8377;":0}}</td>
+                                        <td>{{(historicalHolding.absoluteReturn)*100 | number:2}}%</td>
+                                        <td>{{(historicalHolding.annualizedReturn)*100 | number:2}}%</td>
+                                        <td>{{(historicalHolding.holdingPeriod) | number:2}}</td>
+                                        <td>{{(historicalHolding.finYear)}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>
