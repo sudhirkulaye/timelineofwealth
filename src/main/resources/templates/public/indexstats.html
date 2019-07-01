@@ -56,11 +56,11 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
                         <div class="x_title">
-                            <h1>Index Statistics</h1>
+                            <font color="green"><strong><h1>Index Statistics</h1></strong></font>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <h1>NIFTY50 Returns Statistics </h1><h2>over last 18 Years (Last updated: {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE) </h2>
+                            <font color="green"><strong><h2>NIFTY-50 Historical Return </h2></strong></font><p>Over last 18 Years (Last updated: {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE) </p>
                             <table class="table">
                                 <thead>
                                 <tr>
@@ -69,7 +69,7 @@
                                     <th>Median Returns</th>
                                     <th>Minimum Returns</th>
                                     <th>Maximum Returns</th>
-                                    <th>Standard Deviation</th>
+                                    <th>Standard Deviation <p /><small>(Risk in terms of volatility)</small></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -108,6 +108,8 @@
                                 </tbody>
                             </table>
                             <p />
+                            <font color="green"><strong><h2>NIFTY-50 Trailing Price to Earnings Ratio</h2></strong></font>
+                            <p>Historical Valuation, how expensive the Index is? High PE ratio --> Expensive or High expectations of future earning growth</p>
                             <table class="table">
                                 <thead>
                                 <tr>
@@ -157,7 +159,8 @@
                                 </tbody>
                             </table>
                             <div class="x_content">
-                                <h1><strong>NIFTY50 Historical Trailing PE: </strong></h1> <p /><h2>Current PE {{indexConsolidatedStatistics[0].currentPe}} (Last updated: {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE) </h2>
+                                <font color="green"><strong><h2>Graphical View: NIFTY-50 Historical Trailing PE </h2></strong></font>
+                                <p />Current PE {{indexConsolidatedStatistics[0].currentPe}} (Last updated: {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE)
                                 <br />
                                 <strong>Note:</strong> A market is always forward-looking. So, Forward PE is more appropriate for analysis. However, it is subjective and also not available publicly. (There is consensus forward PE published by some firms, but publicly not available. Moreover, even the methodology of deriving forward PE is also not available.)
                                 <br />
@@ -173,15 +176,15 @@
                                         chart-data="chartData" chart-dataset-override="chartDatasetOverride" chart-labels="labelsDates"  chart-series="chartSeries"></canvas>
                                 <br /><br />
                             </div>
-                            <h1><strong>Conclusions from Statistical Data: </strong></h1> <p />
-                            <h2>
-                                Equity Market Returns are more volatile (riskier) for the shorter period. Standard Deviation, a measure of risk is the highest for 1-year returns and lowest for 10-year yields. In simple term longer the period you hold equity class is better.<p />
-                                <strong>There is also one consideration to this simplistic assumption of long-term holding.</strong> Equity returns underperformed significantly even for more extended periods, e.g. five years returns during period Nov-07 to Nov-12 are -1.17% and 10 Years returns for period Dec-07 to Dec-17 are 5.21% which is below Fixed Income Class.<p />
-                                There are Black Swan events, which significantly destroy wealth. These events are challenging to predict but may cause a significant impact on your retirement fund/overall wealth. <p />
-                                Proper Asset Allocation is the key. There are smart and intelligent people who pragmatically and proactively make changes to the portfolio so that will have less impact on wealth. <p />
-                                We Encourage you to pay Fund/Wealth Management Fee to your money manager/asset management firm for this pragmatic decision of asset allocation. <p />
-                                Moreover, pay direct fee separately for valuable small services they provide you, rather than they getting paid through hidden commission which ultimately a root cause of miss-selling financial products.
-                            </h2>
+                            <!--<h1><strong>Conclusions from Statistical Data: </strong></h1> <p />-->
+                            <!--<h2>-->
+                                <!--Equity Market Returns are more volatile (riskier) for the shorter period. Standard Deviation, a measure of risk is the highest for 1-year returns and lowest for 10-year yields. In simple term longer the period you hold equity class is better.<p />-->
+                                <!--<strong>There is also one consideration to this simplistic assumption of long-term holding.</strong> Equity returns underperformed significantly even for more extended periods, e.g. five years returns during period Nov-07 to Nov-12 are -1.17% and 10 Years returns for period Dec-07 to Dec-17 are 5.21% which is below Fixed Income Class.<p />-->
+                                <!--There are Black Swan events, which significantly destroy wealth. These events are challenging to predict but may cause a significant impact on your retirement fund/overall wealth. <p />-->
+                                <!--Proper Asset Allocation is the key. There are smart and intelligent people who pragmatically and proactively make changes to the portfolio so that will have less impact on wealth. <p />-->
+                                <!--We Encourage you to pay Fund/Wealth Management Fee to your money manager/asset management firm for this pragmatic decision of asset allocation. <p />-->
+                                <!--Moreover, pay direct fee separately for valuable small services they provide you, rather than they getting paid through hidden commission which ultimately a root cause of miss-selling financial products.-->
+                            <!--</h2>-->
                         </div>
                     </div>
                 </div>

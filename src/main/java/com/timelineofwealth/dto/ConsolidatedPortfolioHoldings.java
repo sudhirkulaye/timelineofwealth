@@ -1,8 +1,9 @@
 package com.timelineofwealth.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ConsolidatedPortfolioHoldings {
+public class ConsolidatedPortfolioHoldings implements Serializable {
     private long memberid;
     private int portfolioid;
     private String name;

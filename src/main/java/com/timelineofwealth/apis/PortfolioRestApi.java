@@ -2,9 +2,8 @@ package com.timelineofwealth.apis;
 
 
 import com.timelineofwealth.dto.ConsolidatedPortfolioHoldings;
-import com.timelineofwealth.entities.Portfolio;
-import com.timelineofwealth.entities.PortfolioHoldings;
-import com.timelineofwealth.entities.User;
+import com.timelineofwealth.dto.FinYearProfit;
+import com.timelineofwealth.entities.*;
 import com.timelineofwealth.service.CommonService;
 import com.timelineofwealth.service.PortfolioService;
 import org.slf4j.Logger;
@@ -51,6 +50,36 @@ public class PortfolioRestApi {
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = CommonService.getLoggedInUser(userDetails);
         return PortfolioService.getConsolidatedPortfolioHoldings(user.getEmail());
+    }
+
+    @RequestMapping(value = "/getportfoliohistoricalholdings", method = RequestMethod.GET)
+    public List<PortfolioHistoricalHoldings> getPortfolioHistoricalHoldings() {
+        logger.debug(String.format("Call user/api/getportfoliohistoricalholdings/"));
+
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        return PortfolioService.getPortfolioHistoricalHoldings(user.getEmail());
+    }
+
+    @RequestMapping(value = "/getfinyearprofit", method = RequestMethod.GET)
+    public List<FinYearProfit> getFinYearProfit() {
+        logger.debug(String.format("Call user/api/getfinyearprofit/"));
+
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        return PortfolioService.getFinYearProfit(user.getEmail());
+    }
+
+    @RequestMapping(value = "/getportfoliocashflows", method = RequestMethod.GET)
+    public List<PortfolioCashflow> getPortfolioCashflows() {
+        logger.debug(String.format("Call user/api/getportfolioCashflows/"));
+
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        return PortfolioService.getPortfolioCashflows(user.getEmail());
     }
 
 }
