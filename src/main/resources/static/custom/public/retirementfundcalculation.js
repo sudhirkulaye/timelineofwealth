@@ -9,19 +9,19 @@ module.controller('RetirementFundCalculationController', function($scope, $http)
     $scope.fundRequired = spendingAtRetirement / (($scope.returnsAssumed/100) - ($scope.inflationAssumed/100));
 
     spendingAtRetirement =  $scope.spendingNeedAssumed * (Math.pow(1.03,($scope.yearsToRetire+1)));
-    $scope.minFundRequired = spendingAtRetirement / (0.105 - 0.03);
+    $scope.minFundRequired = spendingAtRetirement / (0.15 - 0.03);
 
     spendingAtRetirement =  $scope.spendingNeedAssumed * (Math.pow(1.06,($scope.yearsToRetire+1)));
-    $scope.maxFundRequired = spendingAtRetirement / (0.08 - 0.06);
+    $scope.maxFundRequired = spendingAtRetirement / (0.07 - 0.06);
 
     $scope.getRetirementFundAmount = function() {
         spendingAtRetirement =  $scope.spendingNeedAssumed * (Math.pow(( 1 + ( $scope.inflationAssumed / 100)),($scope.yearsToRetire+1)));
         $scope.fundRequired = spendingAtRetirement / (($scope.returnsAssumed/100) - ($scope.inflationAssumed/100));
 
         spendingAtRetirement =  $scope.spendingNeedAssumed * (Math.pow(1.03,($scope.yearsToRetire+1)));
-        $scope.minFundRequired = spendingAtRetirement / (0.105 - 0.03);
+        $scope.minFundRequired = spendingAtRetirement / (0.15 - 0.03);
 
         spendingAtRetirement =  $scope.spendingNeedAssumed * (Math.pow(1.06,($scope.yearsToRetire+1)));
-        $scope.maxFundRequired = spendingAtRetirement / (0.08 - 0.06);
+        $scope.maxFundRequired = spendingAtRetirement / (0.07 - 0.06);
     }
 });

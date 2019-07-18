@@ -551,6 +551,16 @@ public class AdminViewController {
                 dailyDataS.setDebt(new BigDecimal(row.getCell(26).getNumericCellValue()));
                 dailyDataS.setDebtToEquity(new BigDecimal(row.getCell(27).getNumericCellValue()));
                 dailyDataS.setDebt3yearsback(new BigDecimal(row.getCell(28).getNumericCellValue()));
+                try{
+                    dailyDataS.setRoce(new BigDecimal(row.getCell(29).getNumericCellValue()));
+                } catch (Exception e) {
+                    dailyDataS.setRoce(new BigDecimal(0));
+                }
+                try{
+                    dailyDataS.setAvgRoce3years(new BigDecimal(row.getCell(30).getNumericCellValue()));
+                } catch (Exception e) {
+                    dailyDataS.setAvgRoce3years(new BigDecimal(0));
+                }
                 dailyDataS.setMcapToNetprofit(new BigDecimal(0));
                 dailyDataS.setMcapToSales(new BigDecimal(0));
                 dailyDataS.setSector("");
@@ -609,24 +619,77 @@ public class AdminViewController {
                 java.sql.Date date = null;
                 try {
                     date = new java.sql.Date(format.parse(dateString).getTime());
+                    if (date == null && dateString != null){
+                        format = new SimpleDateFormat("yyyy-mm-dd");
+                        date = new java.sql.Date(format.parse(dateString).getTime());
+                    }
                 } catch (ParseException e) {
-                    //e.printStackTrace();
+                    try{
+                        if (date == null && dateString != null){
+                            format = new SimpleDateFormat("yyyy-mm-dd");
+                            date = new java.sql.Date(format.parse(dateString).getTime());
+                        }
+                    } catch (ParseException e1) {
+                        if (date == null)
+                            continue;
+                    }
                 }
+
                 moslTransaction.getKey().setDate(date);
                 String scriptName = (String) row.getCell(3).getStringCellValue();
                 moslTransaction.getKey().setScriptName(scriptName);
                 String sellBuy = (String) row.getCell(4).getStringCellValue().trim();
                 moslTransaction.getKey().setSellBuy(sellBuy);
-                moslTransaction.setQuantity(new BigDecimal(row.getCell(5).getStringCellValue()));
-                moslTransaction.setRate(new BigDecimal(row.getCell(6).getStringCellValue()));
-                moslTransaction.setAmount(new BigDecimal(row.getCell(7).getStringCellValue()));
-                moslTransaction.setBrokerage(new BigDecimal(row.getCell(8).getStringCellValue()));
-                moslTransaction.setTxnCharges(new BigDecimal(row.getCell(9).getStringCellValue()));
-                moslTransaction.setServiceTax(new BigDecimal(row.getCell(10).getStringCellValue()));
-                moslTransaction.setStampDuty(new BigDecimal(row.getCell(11).getStringCellValue()));
-                moslTransaction.setSttCtt(new BigDecimal(row.getCell(12).getStringCellValue()));
-                moslTransaction.setNetRate(new BigDecimal(row.getCell(13).getStringCellValue()));
-                moslTransaction.setNetAmount(new BigDecimal(row.getCell(14).getStringCellValue()));
+                try{
+                    moslTransaction.setQuantity(new BigDecimal(row.getCell(5).getStringCellValue()));
+                } catch (Exception e) {
+                    moslTransaction.setQuantity(new BigDecimal(row.getCell(5).getNumericCellValue()));
+                }
+                try{
+                    moslTransaction.setRate(new BigDecimal(row.getCell(6).getStringCellValue()));
+                } catch (Exception e) {
+                    moslTransaction.setRate(new BigDecimal(row.getCell(6).getNumericCellValue()));
+                }
+                try{
+                    moslTransaction.setAmount(new BigDecimal(row.getCell(7).getStringCellValue()));
+                } catch (Exception e) {
+                    moslTransaction.setAmount(new BigDecimal(row.getCell(7).getNumericCellValue()));
+                }
+                try{
+                    moslTransaction.setBrokerage(new BigDecimal(row.getCell(8).getStringCellValue()));
+                } catch (Exception e) {
+                    moslTransaction.setBrokerage(new BigDecimal(row.getCell(8).getNumericCellValue()));
+                }
+                try{
+                    moslTransaction.setTxnCharges(new BigDecimal(row.getCell(9).getStringCellValue()));
+                } catch (Exception e) {
+                    moslTransaction.setTxnCharges(new BigDecimal(row.getCell(9).getNumericCellValue()));
+                }
+                try{
+                    moslTransaction.setServiceTax(new BigDecimal(row.getCell(10).getStringCellValue()));
+                } catch (Exception e) {
+                    moslTransaction.setServiceTax(new BigDecimal(row.getCell(10).getNumericCellValue()));
+                }
+                try{
+                    moslTransaction.setStampDuty(new BigDecimal(row.getCell(11).getStringCellValue()));
+                } catch (Exception e) {
+                    moslTransaction.setStampDuty(new BigDecimal(row.getCell(11).getNumericCellValue()));
+                }
+                try{
+                    moslTransaction.setSttCtt(new BigDecimal(row.getCell(12).getStringCellValue()));
+                } catch (Exception e) {
+                    moslTransaction.setSttCtt(new BigDecimal(row.getCell(12).getNumericCellValue()));
+                }
+                try{
+                    moslTransaction.setNetRate(new BigDecimal(row.getCell(13).getStringCellValue()));
+                } catch (Exception e) {
+                    moslTransaction.setNetRate(new BigDecimal(row.getCell(13).getNumericCellValue()));
+                }
+                try{
+                    moslTransaction.setNetAmount(new BigDecimal(row.getCell(14).getStringCellValue()));
+                } catch (Exception e) {
+                    moslTransaction.setNetAmount(new BigDecimal(row.getCell(14).getNumericCellValue()));
+                }
                 String orderNo = (String) row.getCell(15).getStringCellValue();
                 moslTransaction.getKey().setOrderNo(orderNo);
                 String tradeNO = (String) row.getCell(16).getStringCellValue();
@@ -693,7 +756,7 @@ public class AdminViewController {
     }
 
     @RequestMapping(value=("/admin/eodprocsstatus"),method=RequestMethod.POST)
-    public String processDailyDataStatus(Model model, @RequestParam("confirmation") String confirmation){
+    public String eodProcsStatus(Model model, @RequestParam("confirmation") String confirmation){
         if (confirmation.equalsIgnoreCase("yes")) {
             StoredProcedureQuery storedProcedure = entityManager.createStoredProcedureQuery(AP_PROCESS_EOD);
             boolean result = storedProcedure.execute();

@@ -4,8 +4,8 @@ select * from asset_classification;
 select * from composite; -- 5 composites
 select * from portfolio a order by a.memberid, a.portfolioid; -- total 21 portfolios 
 select compositeid, count(1) from portfolio a group by compositeid order by a.memberid, a.portfolioid; -- (composite 1: 11, 2: 10)
-select * from portfolio_cashflow where memberid in (1000) order by portfolioid, date desc;
-select * from portfolio_value_history a where memberid in (1000);
+select * from portfolio_cashflow where memberid in (1026) order by portfolioid, date desc;
+select * from portfolio_value_history a where memberid in (1026) order by date desc;
 -- All portfolio holdings
 SELECT * FROM portfolio_holdings a  /*WHERE memberid = 1000*/ order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
 -- query to find wt of each security to compare with model portfolio
@@ -41,24 +41,32 @@ commit;
 
 -- ap_process_mosl_transactions to be called after uploading transactions
 -- call ap_process_mosl_transactions();
-select * from log_table order by TIMESTAMP desc;
+select * from log_table;
 truncate log_table; 
 -- DELETE from mosl_transaction where moslcode = 'H20488';
-select * from mosl_transaction where date > '2019-06-24' and is_processed = 'N' order by date;
-SELECT * FROM stock_universe a WHERE ticker in ('TVSMOTOR','');
+select * from mosl_transaction where date > '2019-07-07' and is_processed = 'N' order by date;
+SELECT * FROM stock_universe a WHERE ticker in ('YESBANK','');
 select * from portfolio_holdings a where a.memberid = 1060 order by asset_classid, ticker, buy_date;
 select * from portfolio_historical_holdings a where a.memberid = 1010 order by sell_date, ticker;
+select b.moslcode, a.memberid, a.portfolioid, a.ticker, a.total_cost, a.cmp, a.market_value, b.net_amount 
+from portfolio_holdings a, moslcode_memberid c, mosl_transaction b
+WHERE a.memberid = c.memberid and a.portfolioid = b.portfolioid and b.moslcode = c.moslcode 
+and b.script_name = 'MOSL_CASH' and a.ticker = 'MOSL_CASH' and b.is_processed = 'N';
 -- DELETE from portfolio_holdings where memberid = 1026;
 -- DELETE from portfolio_historical_holdings where memberid = 1026;
 -- UPDATE mosl_transaction set is_processed = 'N' where moslcode = 'H22295';
 -- DELETE from mosl_transaction where moslcode = 'H22295';
 select * from moslcode_memberid a where moslcode = 'H22295';
-
-SELECT * from portfolio_value_history a where a. memberid = 1026 and a.date = (select date_today from setup_dates) order by memberid, portfolioid, date; 
-select * from portfolio_irr_summary a where a. memberid = 1026;
-select * from portfolio_twrr_monthly a where a. memberid = 1026;
-SELECT * from portfolio_twrr_summary a where a. memberid = 1026;
-select * from portfolio_asset_allocation a where a. memberid = 1026;
+SELECT * from portfolio a where a. memberid = 1026 and portfolioid = 1;
+select * from portfolio_cashflow a where a. memberid = 1026 and portfolioid = 1;
+select * from portfolio_holdings a where a. memberid = 1026 and portfolioid = 1 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+SELECT * from portfolio_value_history a where a. memberid = 1026 and a.date >= (select date_today from setup_dates) order by memberid, portfolioid, date; 
+select * from portfolio_irr_summary a where a. memberid = 1026 and portfolioid = 1;
+select * from temp_irr_calculation a where a. memberid = 1026 and portfolioid = 1;
+SELECT * from portfolio_returns_calculation_support a where a. memberid = 1026 and portfolioid = 1;
+select * from portfolio_twrr_monthly a where a. memberid = 1026 and portfolioid = 1;
+SELECT * from portfolio_twrr_summary a where a. memberid = 1026 and portfolioid = 1;
+select * from portfolio_asset_allocation a where a. memberid = 1026 and portfolioid = 1;
 select * from mutual_fund_stats;
 SELECT * from stock_price_movement;
 
@@ -84,3 +92,4 @@ and c.compositeid = 2
 group by a.memberid, a.portfolioid, a.ticker;
 
 SELECT * from wealth_details a where memberid in (1000, 1011) order by a.memberid, a.asset_classid, a.ticker, a.buy_date;
+
