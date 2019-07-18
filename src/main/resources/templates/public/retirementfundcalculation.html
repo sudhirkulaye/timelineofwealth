@@ -50,7 +50,7 @@
                             <h2>
                                 We have assumed Risk Tolerance as below average (post-retirement lifestyle stage). So, there are restrictions on maximum returns likely to be earned on the Retirement Fund. Assumed Asset Allocation could be: 30-50% Real Estate, 25-35% Diversified Equity, 25-35% Fixed Income and 5-7% Cash.
                                 <p />
-                                Long Term  Returns on Investment (after tax) Min-Max Range = 8.00% to 10.50%
+                                Long Term  Returns on Investment (after tax) Min-Max Range = 7.00% to 15.00%
                                 <p />
                                 Inflation Min-Max Range = 3.00% to 6.00%
                                 <p />
@@ -63,14 +63,14 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-6 col-sm-6 col-xs-12">Assumed Returns on Assets(%)<span class="required">*</span></label>
                                         <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" ng-change="getRetirementFundAmount()" required="required" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" min="8.00" max="10.50" step="0.10" value="8.50" ng-model="returnsAssumed" />
+                                            <input type="number" class="form-control" ng-change="getRetirementFundAmount()" required="required" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" min="7.00" max="15.00" step="0.10" value="8.50" ng-model="returnsAssumed" /> (Min 7.0, Max 15.0)
                                             <!--<input class="knob" data-width="100" data-height="120" data-angleOffset="-125" data-angleArc="250" data-fgColor="#34495E" data-rotation="clockwise" value="8.5" />-->
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-md-6 col-sm-6 col-xs-12">Assumed Inflation(%)<span class="required">*</span></label>
                                         <div class="col-md-6 col-sm-6 col-xs-12" vertical-align="middle">
-                                            <input type="number" class="form-control" ng-change="getRetirementFundAmount()" required="required" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" min="3.00" max="6.00" step="0.10" value="4.50" ng-model="inflationAssumed" />
+                                            <input type="number" class="form-control" ng-change="getRetirementFundAmount()" required="required" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" min="3.00" max="6.00" step="0.10" value="4.50" ng-model="inflationAssumed" /> (Min 3.0, Max 6.0)
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -86,48 +86,48 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Amount Retired</label>
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Amount Required For Retirement</label>
                                         <strong>{{fundRequired | number:2}} Lakhs </strong> Assuming inputs given
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Minimum Amount Retired</label>
-                                        <strong>{{minFundRequired | number:2}} Lakhs </strong> Assuming Max Returns(10.5%) &amp; Min Inflation(3%)
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Minimum Amount Required For Retirement</label>
+                                        <strong>{{minFundRequired | number:2}} Lakhs </strong> Assuming Max Returns(15%) &amp; Min Inflation(3%)
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Maximum Amount Retired</label>
-                                        <strong>{{maxFundRequired | number:2}} Lakhs </strong> Assuming Min Returns(8%) &amp; Max Inflation(6%)
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-12">Maximum Amount Required For Retirement</label>
+                                        <strong>{{maxFundRequired | number:2}} Lakhs </strong> Assuming Min Returns(7%) &amp; Max Inflation(6%)
                                     </div>
                                 </form>
                             </div>
                         </div>
-                        <div class="x_content">
-                            <div  class="col-md-12 col-xs-12">
-                                <h2>
-                                    <font color="green"><strong>There are two ways to find Core Capital (i.e., capital required for lifestyle spending)</strong></font>
-                                    <p />
-                                    In the <strong>First Method</strong>, we find out future spending need, let say for the n-th year, as follows:
-                                    <p />
-                                    <blockquote>  Spending Need at y0 x (1 + Risk Free Rate)^n </blockquote>
-                                    <p />
-                                    Then multiply the above number by n-th year actuarial assumption (i.e., a probability of survival of couple/individual at the n-th year, this changes for a race, sex, geographical location, so on)
-                                    <p />
-                                    Like this, we can calculate the spending requirement for all future years.
-                                    <p />
-                                    Then Core Capital Requirement is:
-                                    <p />
-                                    <blockquote>Sum of Present Values (discounted at Risk-Free Rate) of all future spending requirements.</blockquote>
-                                    <p />
-                                    We don't need to assume inflation in this method. (As it cancels out whiling computing spending need at the n-th year and then discounting it back to PV)
-                                    <p />
-                                    The <strong>Second Method</strong> is simple but comes with assumptions of required return on assets and inflation.
-                                    <p />
-                                    This method is indeed easy but with two significant assumptions. Moreover, if assumption goes wrong, our calculation may go wrong.
-                                    <p />
-                                    Funding Required =
-                                    <blockquote>[ Last Year Spending Amount x ( 1 + Inflation%)^(1 + years to retire) ] / [ Assumed Returns on Assets% - Inflation% ]</blockquote>
-                                </h2>
-                            </div>
-                        </div>
+                        <!--<div class="x_content">-->
+                            <!--<div  class="col-md-12 col-xs-12">-->
+                                <!--<h2>-->
+                                    <!--<font color="green"><strong>There are two ways to find Core Capital (i.e., capital required for lifestyle spending)</strong></font>-->
+                                    <!--<p />-->
+                                    <!--In the <strong>First Method</strong>, we find out future spending need, let say for the n-th year, as follows:-->
+                                    <!--<p />-->
+                                    <!--<blockquote>  Spending Need at y0 x (1 + Spending Growth Rate)^n </blockquote>-->
+                                    <!--<p />-->
+                                    <!--Then multiply the above number by n-th year actuarial assumption (i.e., a probability of survival of couple/individual at the n-th year, this changes for a race, sex, geographical location, so on)-->
+                                    <!--<p />-->
+                                    <!--Like this, we can calculate the spending requirement for all future years.-->
+                                    <!--<p />-->
+                                    <!--Then Core Capital Requirement is:-->
+                                    <!--<p />-->
+                                    <!--<blockquote>Sum of Present Values (discounted at Risk-Free Rate) of all future spending requirements.</blockquote>-->
+                                    <!--<p />-->
+                                    <!--We don't need to assume inflation in this method. (As it cancels out whiling computing spending need at the n-th year and then discounting it back to PV)-->
+                                    <!--<p />-->
+                                    <!--The <strong>Second Method</strong> is simple but comes with assumptions of required return on assets and inflation.-->
+                                    <!--<p />-->
+                                    <!--This method is indeed easy but with two significant assumptions. Moreover, if assumption goes wrong, our calculation may go wrong.-->
+                                    <!--<p />-->
+                                    <!--Funding Required =-->
+                                    <!--<blockquote>[ Last Year Spending Amount x ( 1 + Inflation%)^(1 + years to retire) ] / [ Assumed Returns on Assets% - Inflation% ]</blockquote>-->
+                                <!--</h2>-->
+                            <!--</div>-->
+                        <!--</div>-->
                     </div>
                 </div>
             </div>

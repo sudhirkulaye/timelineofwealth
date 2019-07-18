@@ -43,3 +43,9 @@ debt_to_equity, debt_3years_back  from daily_data_s a where date =  (select date
 select date, close_price from nse_price_history a where a.nse_ticker = 'BAJAJ-AUTO' order by date desc; 
 
 select  ticker_b, date, current_pe, price_book from daily_data_b a where ticker_b = 'IIB:IN' order by date desc;
+
+-- 
+select ticker, cons_standalone, date, sales, operating_profit, net_profit, opm 
+from stock_quarter a where a.ticker = 'M&M' order by a.cons_standalone, a.date  desc; 
+
+select * from stock_quarter a where a.ticker = 'M&M' order by a.cons_standalone, a.date  desc; 

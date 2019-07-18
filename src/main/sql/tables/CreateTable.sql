@@ -573,7 +573,9 @@ CREATE TABLE daily_data_s (
   pb_ttm decimal(10,3) DEFAULT '0.00',
   ev_to_ebit decimal(10,3) DEFAULT '0.00',
   dividend_payout decimal(10,4) DEFAULT '0.00',
+  roce decimal(10,4) DEFAULT '0.00',
   roe decimal(10,4) DEFAULT '0.00',
+  avg_roce_3years decimal(10,4) DEFAULT '0.00',
   avg_roe_3years decimal(10,4) DEFAULT '0.00',
   debt decimal(20,3) DEFAULT '0.00',
   debt_to_equity decimal(10,3) DEFAULT '0.00',
@@ -760,7 +762,7 @@ create table stock_quarter (
 
 select count(1), year(date) from stock_quarter a group by year(date) order by date desc; 
 select * from stock_quarter a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
-select * from stock_quarter a where a.ticker in ('SUNDARMFIN') and date = '2019-03-31';
+select * from stock_quarter a where a.ticker in ('M&M') and date = '2019-03-31';
 -- update stock_quarter a set a.ticker = 'BAJFINANCE_1' where a.ticker = 'BAJFINANCE' and cons_standalone = 'C'; 
 
 -- pending results

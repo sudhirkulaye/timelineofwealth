@@ -145,11 +145,13 @@ commit;
 -- new quarter results
 SELECT b.ticker from daily_data_s a, stock_universe b 
 where a.name = b.ticker5 and 
-a.last_result_date = '201903' and 
+a.last_result_date = '201906' and 
 date = (select max(date) from daily_data_s a) and 
-b.ticker not in (select distinct ticker from stock_quarter a where date = '2019-03-31');
+b.ticker not in (select distinct ticker from stock_quarter a where date = '2019-06-30');
 -- new annual p&L 
 select distinct ticker, max(date) from stock_pnl a where month(date) != 3 group by ticker having max(date) not in ('2018-12-31', '2019-03-31', '2018-06-30') ORDER BY max(date) desc;
+SELECT ticker, cons_standalone, max(date) from stock_pnl a group by ticker, cons_standalone 
+having max(date) < '2018-01-01' order by max(date) desc, ticker;
 
 -- Change of ticker
 select distinct(name) from daily_data_s a where a.date = (select max(date) from daily_data_s) and a.name not in (select ticker5 from stock_universe) order by rank; 

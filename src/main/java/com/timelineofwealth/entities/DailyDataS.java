@@ -76,8 +76,12 @@ public class DailyDataS implements Serializable{
     private BigDecimal evToEbit;
     @Column(name = "dividend_payout")
     private BigDecimal dividendPayout;
+    @Column(name = "roce")
+    private BigDecimal roce;
     @Column(name = "roe")
     private BigDecimal roe;
+    @Column(name = "avg_roce_3years")
+    private BigDecimal avgRoce3years;
     @Column(name = "avg_roe_3years")
     private BigDecimal avgRoe3years;
     @Column(name = "debt")
@@ -258,11 +262,25 @@ public class DailyDataS implements Serializable{
         this.dividendPayout = dividendPayout;
     }
 
+    public BigDecimal getRoce() {
+        return roce;
+    }
+    public void setRoce(BigDecimal roce) {
+        this.roce = roce;
+    }
+
     public BigDecimal getRoe() {
         return roe;
     }
     public void setRoe(BigDecimal roe) {
         this.roe = roe;
+    }
+
+    public BigDecimal getAvgRoce3years() {
+        return avgRoce3years;
+    }
+    public void setAvgRoce3years(BigDecimal avgRoce3years) {
+        this.avgRoce3years = avgRoce3years;
     }
 
     public BigDecimal getAvgRoe3years() {
@@ -327,4 +345,5 @@ public class DailyDataS implements Serializable{
     public void setSubIndustry(String subIndustry) {
         this.subIndustry = subIndustry;
     }
+
 }

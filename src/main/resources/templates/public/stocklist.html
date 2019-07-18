@@ -99,20 +99,22 @@
                                     <th ng-click="sortData('sectorNameDisplay')" ng-hide="flagBasicInfo">Sector<i ng-class="getSortClass('sectorNameDisplay')" /></th>
                                     <th ng-click="sortData('industryNameDisplay')" ng-hide="flagBasicInfo">Industry<i ng-class="getSortClass('industryNameDisplay')" /></th>
                                     <th ng-click="sortData('subIndustryNameDisplay')" >Sub-Industry<i ng-class="getSortClass('subIndustryNameDisplay')" /></th>
-                                    <th ng-click="sortData('dailyDataS.marketCap')" ng-hide="flagBasicInfo">Market Cap (Cr)<i ng-class="getSortClass('dailyDataS.marketCap')" /></th>
+                                    <th ng-click="sortData('dailyDataS.marketCap')" ng-hide="flagBasicInfo">MCap<i ng-class="getSortClass('dailyDataS.marketCap')" /></th>
                                     <th ng-click="sortData('dailyDataS.rank')" >MCap Rank<i ng-class="getSortClass('dailyDataS.rank')" /></th>
                                     <th ng-click="sortData('dailyDataS.lastResultDate')" ng-hide="flagFundamentalInfo">Last Result<i ng-class="getSortClass('dailyDataS.lastResultDate')" /></th>
-                                    <th ng-click="sortData('dailyDataS.sales')" ng-hide="flagFundamentalInfo">TTM Sales(Cr)<i ng-class="getSortClass('dailyDataS.sales')" /></th>
-                                    <th ng-click="sortData('dailyDataS.netProfit')" ng-hide="flagFundamentalInfo">TTM Profit(Cr)<i ng-class="getSortClass('dailyDataS.netProfit')" /></th>
+                                    <th ng-click="sortData('dailyDataS.sales')" ng-hide="flagFundamentalInfo">TTM Sales<i ng-class="getSortClass('dailyDataS.sales')" /></th>
+                                    <th ng-click="sortData('dailyDataS.netProfit')" ng-hide="flagFundamentalInfo">TTM Profit<i ng-class="getSortClass('dailyDataS.netProfit')" /></th>
                                     <th ng-click="sortData('dailyDataS.opmLatestQuarter')" ng-hide="flagFundamentalInfo">OPM Latest<i ng-class="getSortClass('dailyDataS.opmLatestQuarter')" /></th>
                                     <th ng-click="sortData('dailyDataS.npmLatestQuarter')" ng-hide="flagFundamentalInfo">NPM Latest<i ng-class="getSortClass('dailyDataS.npmLatestQuarter')" /></th>
                                     <th ng-click="sortData('dailyDataS.opmLastYear')" ng-hide="flagFundamentalInfo">OPM Last Yr<i ng-class="getSortClass('dailyDataS.opmLastYear')" /></th>
                                     <th ng-click="sortData('dailyDataS.npmLastYear')" ng-hide="flagFundamentalInfo">NPM Last Yr<i ng-class="getSortClass('dailyDataS.npmLastYear')" /></th>
-                                    <th ng-click="sortData('dailyDataS.debt')" ng-hide="flagCapitalStructureInfo">Debt (Cr)<i ng-class="getSortClass('dailyDataS.debt')" /></th>
-                                    <th ng-click="sortData('dailyDataS.debt3yearsback')" ng-hide="flagCapitalStructureInfo">Debt 3 Yrs Before (Cr)<i ng-class="getSortClass('dailyDataS.debt3yearsback')" /></th>
-                                    <th ng-click="sortData('dailyDataS.debtToEquity')" ng-hide="flagCapitalStructureInfo">Debt/Equity<i ng-class="getSortClass('dailyDataS.debtToEquity')" /></th>
+                                    <th ng-click="sortData('dailyDataS.debt')" ng-hide="flagCapitalStructureInfo">Debt<i ng-class="getSortClass('dailyDataS.debt')" /></th>
+                                    <th ng-click="sortData('dailyDataS.debt3yearsback')" ng-hide="flagCapitalStructureInfo">Debt(3Yrs)<i ng-class="getSortClass('dailyDataS.debt3yearsback')" /></th>
+                                    <th ng-click="sortData('dailyDataS.debtToEquity')" ng-hide="flagCapitalStructureInfo">Dt/Eq<i ng-class="getSortClass('dailyDataS.debtToEquity')" /></th>
+                                    <th ng-click="sortData('dailyDataS.roce')" ng-hide="flagCapitalStructureInfo">ROCE<i ng-class="getSortClass('dailyDataS.roce')" /></th>
+                                    <th ng-click="sortData('dailyDataS.avgRoce3years')" ng-hide="flagCapitalStructureInfo">ROCE(3Yrs)<i ng-class="getSortClass('dailyDataS.avgRoce3years')" /></th>
                                     <th ng-click="sortData('dailyDataS.roe')" ng-hide="flagCapitalStructureInfo">ROE<i ng-class="getSortClass('dailyDataS.roe')" /></th>
-                                    <th ng-click="sortData('dailyDataS.avgRoe3years')" ng-hide="flagCapitalStructureInfo">ROE (3Yrs Before)<i ng-class="getSortClass('dailyDataS.avgRoe3years')" /></th>
+                                    <th ng-click="sortData('dailyDataS.avgRoe3years')" ng-hide="flagCapitalStructureInfo">ROE(3Yrs)<i ng-class="getSortClass('dailyDataS.avgRoe3years')" /></th>
                                     <!--<th ng-click="sortData('dailyDataS.mcapToSales')" ng-hide="flagCapitalStructureInfo">MCap/Sales<i ng-class="getSortClass('dailyDataS.mcapToSales')" /></th>-->
                                     <!--<th ng-click="sortData('dailyDataS.mcapToNetprofit')" ng-hide="flagCapitalStructureInfo">MCap/Profit<i ng-class="getSortClass('dailyDataS.mcapToNetprofit')" /></th>-->
                                     <th ng-click="sortData('dailyDataS.yoyQuarterlySalesGrowth')" ng-hide="flagValuations">Latest Sales-G<i ng-class="getSortClass('dailyDataS.yoyQuarterlySalesGrowth')" /></th>
@@ -163,6 +165,8 @@
                                     <td ng-hide="flagCapitalStructureInfo">{{stock.dailyDataS.debt | currency:"&#8377;":0}}</td>
                                     <td ng-hide="flagCapitalStructureInfo">{{stock.dailyDataS.debt3yearsback | currency:"&#8377;":0}}</td>
                                     <td ng-hide="flagCapitalStructureInfo">{{stock.dailyDataS.debtToEquity}}</td>
+                                    <td ng-hide="flagCapitalStructureInfo">{{stock.dailyDataS.roce}}%</td>
+                                    <td ng-hide="flagCapitalStructureInfo">{{stock.dailyDataS.avgRoce3years}}%</td>
                                     <td ng-hide="flagCapitalStructureInfo">{{stock.dailyDataS.roe}}%</td>
                                     <td ng-hide="flagCapitalStructureInfo">{{stock.dailyDataS.avgRoe3years}}%</td>
                                     <!--<td ng-hide="flagCapitalStructureInfo">{{stock.dailyDataS.mcapToSales}}</td>-->
