@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="ReturnsManagement" ng-controller="ReturnsController">
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/user/portfolioreturns.js" th:src="@{/custom/user/portfolioreturns.js}"></script>
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/usersidebarmenu :: common-usersidebarmenu" />
+
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/usertopnavigation :: common-usertopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <br />
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h1><font color="green">Portfolio Returns </font></h1>
+                            <p />Time Weighted Rate of Returns (Calculated on Month End and On Cashflow day - Net of Fees, Expenses)
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <h2><font color="green"><strong>Portfolios : </strong> </font></h2>
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><strong>Member</strong></th>
+                                        <th><strong>#Portfolio</strong></th>
+                                        <th><strong>Inception Date</strong></th>
+                                        <th><strong>Description</strong></th>
+                                        <th><strong>Net Investment</strong></th>
+                                        <th><strong>Market Value</strong></th>
+                                        <th><strong>Net Profit</strong></th>
+                                        <th><strong>Abs. Returns%</strong></th>
+                                        <th><strong>TWRR Returns%</strong></th>
+                                        <td></td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="portfolio in portfolios">
+                                        <td>{{ (members | filter : { 'memberid' : portfolio.key.memberid })[0].firstName }}</td>
+                                        <td>{{portfolio.key.portfolioid}}</td>
+                                        <td>{{portfolio.startDate}}</td>
+                                        <td>{{portfolio.description}}</td>
+                                        <td>{{portfolio.netInvestment | currency:"&#8377;":0}}</td>
+                                        <td>{{portfolio.marketValue | currency:"&#8377;":0}}</td>
+                                        <td>{{portfolio.netProfit | currency:"&#8377;":0}}</td>
+                                        <td>{{portfolio.absoluteReturn*100 | number:2}}%</td>
+                                        <td>{{portfolio.annualizedReturn*100 | number:2}}%</td>
+                                        <td><button type="button" ng-click="setFilter(portfolio.key.memberid, portfolio.key.portfolioid)" class="btn btn-success  pull-right btn-xs">Show Details</button></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="x_content">
+                            <h2><font color="green"><strong>Trailing Time Weighted Rate of Returns* </strong> </font></h2>
+                            <p />*Returns for less than one year are stated in absolute term. Returns for more than 1 year are annualized.
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><strong>Folio/Benchmark</strong></th>
+                                        <th><strong>As of Date</strong></th>
+                                        <th><strong>Current Month</strong></th>
+                                        <th><strong>Current Quarter</strong></th>
+                                        <th><strong>Current Fin Yr</strong></th>
+                                        <th><strong>YTD</strong></th>
+                                        <th><strong>1 Yr</strong></th>
+                                        <th><strong>Inception</strong></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="portfolioTwrrSummary in portfolioTwrrSummaries | filter:filterTwrrSummaryByMemberidAndPortfolioid">
+                                        <td>{{ (members | filter : { 'memberid' : portfolioTwrrSummary.key.memberid })[0].firstName }}/{{portfolioTwrrSummary.key.portfolioid}}/{{portfolioTwrrSummary.key.benchmarkid}}</td>
+                                        <td>{{portfolioTwrrSummary.returnsDate}}</td>
+                                        <td>{{portfolioTwrrSummary.returnsTwrrSinceCurrentMonth*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrSummary.returnsTwrrSinceCurrentQuarter*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrSummary.returnsTwrrSinceFinYear*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrSummary.returnsTwrrYtd*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrSummary.returnsTwrrOneYear*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrSummary.returnsTwrrSinceInception*100 | number:2}}%</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="x_content">
+                            <h2><font color="green"><strong>Month Wise Time Weighted Rate of Returns# </strong> </font></h2>
+                            <p />#March End Quarter Returns = (1 + Jan%)(1 + Feb%)(1 + Mar%) - 1, Calender Yr. Returns = (1 + Q1)(1 + Q2)(1 + Q3)(1 + Q4) - 1
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><strong>Folio</strong></th>
+                                        <th><strong>Year</strong></th>
+                                        <th><strong>Jan</strong></th>
+                                        <th><strong>Feb</strong></th>
+                                        <th><strong>Mar</strong></th>
+                                        <th style="background-color:#f5f5f5"><strong>Mar-Q</strong></th>
+                                        <th><strong>Apr</strong></th>
+                                        <th><strong>May</strong></th>
+                                        <th><strong>Jun</strong></th>
+                                        <th style="background-color:#f5f5f5"><strong>Jun-Q</strong></th>
+                                        <th><strong>Jul</strong></th>
+                                        <th><strong>Aug</strong></th>
+                                        <th><strong>Sep</strong></th>
+                                        <th style="background-color:#f5f5f5"><strong>Sep-Q</strong></th>
+                                        <th><strong>Oct</strong></th>
+                                        <th><strong>Nov</strong></th>
+                                        <th><strong>Dec</strong></th>
+                                        <th style="background-color:#f5f5f5"><strong>Dec-Q</strong></th>
+                                        <th style="background-color:#f5f5f5"><strong>Annual</strong></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="portfolioTwrrMonthly in portfolioTwrrMonthlies | filter:filterTwrrMonthlyByMemberidAndPortfolioid">
+                                        <td>{{ (members | filter : { 'memberid' : portfolioTwrrMonthly.key.memberid })[0].firstName }}/{{portfolioTwrrMonthly.key.portfolioid}}</td>
+                                        <td>{{portfolioTwrrMonthly.key.returnsYear}}</td>
+                                        <td>{{portfolioTwrrMonthly.returnsJan*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrMonthly.returnsFeb*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrMonthly.returnsMar*100 | number:2}}%</td>
+                                        <td style="background-color:#f5f5f5">{{portfolioTwrrMonthly.returnsMarEndingQuarter*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrMonthly.returnsApr*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrMonthly.returnsMay*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrMonthly.returnsJun*100 | number:2}}%</td>
+                                        <td style="background-color:#f5f5f5">{{portfolioTwrrMonthly.returnsJunEndingQuarter*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrMonthly.returnsJul*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrMonthly.returnsAug*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrMonthly.returnsSep*100 | number:2}}%</td>
+                                        <td style="background-color:#f5f5f5">{{portfolioTwrrMonthly.returnsMarEndingQuarter*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrMonthly.returnsJan*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrMonthly.returnsFeb*100 | number:2}}%</td>
+                                        <td>{{portfolioTwrrMonthly.returnsMar*100 | number:2}}%</td>
+                                        <td style="background-color:#f5f5f5">{{portfolioTwrrMonthly.returnsMarEndingQuarter*100 | number:2}}%</td>
+                                        <td style="background-color:#f5f5f5">{{portfolioTwrrMonthly.returnsCalendarYear*100 | number:2}}%</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>

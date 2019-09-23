@@ -269,11 +269,11 @@ ALTER TABLE stock_universe ADD INDEX index_stock_universe_ticker (ticker);
 ALTER TABLE stock_universe ADD INDEX index_stock_universe_ticker2 (ticker2);
 ALTER TABLE stock_universe ADD INDEX index_stock_universe_ticker3 (ticker3);
 ALTER TABLE stock_universe ADD INDEX index_stock_universe_ticker5 (ticker5);
+ALTER TABLE stock_universe ADD INDEX index_stock_universe_is_bse500 (is_bse500);
+ALTER TABLE stock_universe ADD INDEX index_stock_universe_is_nse500 (is_nse500);
 
 select * from stock_universe a where a.is_nse500 = 1;
 select * from stock_universe order by asset_classid, marketcap desc, ticker;
-
-
 
 -- drop table sip;
 create table sip (
@@ -290,7 +290,7 @@ create table sip (
   is_active varchar(3) COLLATE utf8_unicode_ci DEFAULT 'Yes' COMMENT 'Is Active: Yes/No',
   PRIMARY KEY (memberid, sipid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='SIP Details';
-
+ALTER TABLE sip ADD INDEX index_sip_memberid (memberid);
 select * from sip;
 
 -- drop table wealth_details;
@@ -321,6 +321,7 @@ CREATE TABLE wealth_details (
   portfoliono VARCHAR(45) NULL DEFAULT '0' COMMENT 'Portfolio Number in case of Mutual Fund',
   PRIMARY KEY (memberid,ticker,buy_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Members current wealth Wealth at transaction level';
+ALTER TABLE wealth_details ADD INDEX index_wealth_details_memberid (memberid);
 
 select * from wealth_details a  where a.memberid in (1002) order by a.memberid, a.asset_classid, a.ticker, a.buy_date;
 update wealth_details a, stock_universe b set a.asset_classid = b.asset_classid where a.ticker = b.ticker;
@@ -370,6 +371,7 @@ create table nse_price_history (
   PRIMARY KEY (nse_ticker,date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='NSE Daily Price History';
 ALTER TABLE nse_price_history ADD INDEX index_nse_price_history_date (date);
+ALTER TABLE nse_price_history ADD INDEX index_nse_price_history_nse_ticker (nse_ticker);
 
 select * from nse_price_history a where a.date = (select max(date) from nse_price_history);
 
@@ -393,6 +395,8 @@ create table bse_price_history (
   PRIMARY KEY (bse_ticker,date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='BSE Daily Price History';
 ALTER TABLE bse_price_history ADD INDEX index_bse_price_history_date (date);
+ALTER TABLE bse_price_history ADD INDEX index_bse_price_history_bse_ticker (bse_ticker);
+
 SELECT * from bse_price_history a where a.date = (select max(date) from bse_price_history);
 
 SET SQL_SAFE_UPDATES = 0;
@@ -405,6 +409,7 @@ create table mutual_fund_nav_history (
   PRIMARY KEY (scheme_code,date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='BSE Daily Price History';
 ALTER TABLE mutual_fund_nav_history ADD INDEX index_mutual_fund_nav_history_date (date);
+ALTER TABLE mutual_fund_nav_history ADD INDEX index_mutual_fund_nav_history_scheme_code (scheme_code);
 
 -- drop table timelineofwealth.daily_data_b;
 CREATE TABLE daily_data_b (
@@ -475,6 +480,8 @@ CREATE TABLE index_valuation (
   implied_earnings decimal(10,3) DEFAULT NULL COMMENT 'Index implied earnings Index Value/index PE',
   PRIMARY KEY (ticker,date)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Valutation - Index Valuation Data';
+ALTER TABLE index_valuation ADD INDEX index_index_valuation_ticker (ticker);
+ALTER TABLE index_valuation ADD INDEX index_index_valuation_date (date);
 
 select * from index_valuation;
 
@@ -484,6 +491,8 @@ CREATE TABLE wealth_history (
   value decimal(20,3) DEFAULT NULL COMMENT 'Portfolio market value related to date',
   PRIMARY KEY (memberid,date)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Historical Wealth Values';
+ALTER TABLE wealth_history ADD INDEX index_wealth_history_memberid (memberid);
+ALTER TABLE wealth_history ADD INDEX index_wealth_history_date (date);
 
 select * from wealth_history a where a.memberid in (1000,1011) order by date;
 
@@ -496,6 +505,8 @@ CREATE TABLE wealth_asset_allocation_history (
   value_percent decimal(7,4) DEFAULT NULL COMMENT '%(Market Value) of Asset class',
   PRIMARY KEY (memberid,date,asset_class_group)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Wealth Asset Allocation History ';
+ALTER TABLE wealth_asset_allocation_history ADD INDEX index_wealth_asset_allocation_history_memberid (memberid);
+ALTER TABLE wealth_asset_allocation_history ADD INDEX index_wealth_asset_allocation_history_date (date);
 
 select * from wealth_asset_allocation_history a where a.date = (select date_today from setup_dates) order by memberid, asset_class_group;
 
@@ -525,6 +536,8 @@ CREATE TABLE sip_process_log (
   units_before_addition decimal(20,3)  NOT NULL COMMENT 'SIP Units before addition',
   PRIMARY KEY (memberid,sipid)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='SIP Process Log ';
+ALTER TABLE sip_process_log ADD INDEX index_sip_process_log_memberid (memberid);
+
 
 -- DROP table sip_process_msg_log;
 CREATE TABLE sip_process_msg_log (
@@ -536,6 +549,8 @@ CREATE TABLE sip_process_msg_log (
   message varchar(50) COLLATE utf8_unicode_ci NOT NULL  COMMENT 'Message Type',
   PRIMARY KEY (date,memberid,sipid,scheme_code)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='SIP Process Erro Log ';
+ALTER TABLE sip_process_msg_log ADD INDEX index_sip_process_msg_log_memberid (memberid);
+ALTER TABLE sip_process_msg_log ADD INDEX index_sip_process_msg_log_date (date);
 
 -- Drop table adviser_user_mapping
 CREATE TABLE adviser_user_mapping (
@@ -589,6 +604,7 @@ CREATE TABLE daily_data_s (
   KEY name (name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Securities - Daily Data obtained from Screener Watchlist';
 ALTER TABLE daily_data_s ADD INDEX index_daily_data_s_date (date);
+ALTER TABLE daily_data_s ADD INDEX index_daily_data_s_name (name);
 
 select count(1) from daily_data_s a where date = (select date_today from setup_dates);
 
@@ -735,9 +751,11 @@ create table stock_pnl (
   re DECIMAL(10,4) NOT NULL COMMENT 'Return on Equity',
   PRIMARY KEY (ticker, cons_standalone, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Annual P&L Results';
+ALTER TABLE stock_pnl ADD INDEX index_stock_pnl_ticker (ticker);
+ALTER TABLE stock_pnl ADD INDEX index_stock_pnl_date (date);
 
 select count(1), year(date) from stock_pnl a group by year(date) order by date desc; 
-select * from stock_pnl a where ticker in ('SANFOI') and date > '2009-03-31' and sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
+select * from stock_pnl a where ticker in ('HDFC') and date >= '2019-03-31' and sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
 select * from stock_pnl a where ticker like 'NETWORK%' and date = '2017-12-31';
 -- update stock_pnl a SET ticker = 'BAJFINANCE_1' where a.ticker = 'BAJFINANCE' and cons_standalone = 'C'; 
 
@@ -759,10 +777,12 @@ create table stock_quarter (
   opm DECIMAL(10,4) NOT NULL COMMENT 'Operating Profit Margine',
   PRIMARY KEY (ticker, cons_standalone, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Quarter P&L Results';
+ALTER TABLE stock_quarter ADD INDEX index_stock_quarter_ticker (ticker);
+ALTER TABLE stock_quarter ADD INDEX index_stock_quarter_date (date);
 
 select count(1), year(date) from stock_quarter a group by year(date) order by date desc; 
 select * from stock_quarter a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
-select * from stock_quarter a where a.ticker in ('M&M') and date = '2019-03-31';
+select * from stock_quarter a where a.ticker in ('HDFC') and date = '0000-00-00';
 -- update stock_quarter a set a.ticker = 'BAJFINANCE_1' where a.ticker = 'BAJFINANCE' and cons_standalone = 'C'; 
 
 -- pending results
@@ -797,10 +817,12 @@ create table stock_balancesheet (
   return_on_capital_emp DECIMAL(10,4) NOT NULL COMMENT 'Return on capital employed',
   PRIMARY KEY (ticker, cons_standalone, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Balancesheet';
+ALTER TABLE stock_balancesheet ADD INDEX index_stock_balancesheet_ticker (ticker);
+ALTER TABLE stock_balancesheet ADD INDEX index_stock_balancesheetr_date (date);
 
 select count(1), year(date) from stock_balancesheet a group by year(date) order by date desc; 
-select count(1) from stock_balancesheet a where a.ticker = 'PGHH' and 1=2;
-select * from stock_balancesheet a where ticker = 'KPITTECH' and equity_share_capital = 0; 
+select * from stock_balancesheet a where a.ticker = 'HDFC' and 1=2;
+select * from stock_balancesheet a where ticker = 'CENTRUM' and equity_share_capital = 0; 
 
 -- drop table stock_cashflow;
 create table stock_cashflow (
@@ -813,10 +835,12 @@ create table stock_cashflow (
   net_cashflow DECIMAL(20,3) NOT NULL COMMENT 'Net Cashflow',
   PRIMARY KEY (ticker, cons_standalone, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Cashflow';
+ALTER TABLE stock_cashflow ADD INDEX index_stock_cashflow_ticker (ticker);
+ALTER TABLE stock_cashflow ADD INDEX index_stock_cashflow_date (date);
 
 select count(1), year(date) from stock_cashflow a group by year(date) order by date desc; 
-select count(1) from stock_cashflow a where a.ticker = 'PGHH' and 1=2;
-SELECT * from stock_cashflow a where a.ticker = 'KPITTECH'; 
+select count(1) from stock_cashflow a where a.ticker = 'TCS' and 1=2;
+SELECT * from stock_cashflow a where a.ticker = 'CENTRUM' and 1=2; 
 
 -- drop table stock_price_movement;
 CREATE TABLE stock_price_movement (
@@ -842,6 +866,7 @@ CREATE TABLE stock_price_movement (
   return_YTD decimal(10,4) DEFAULT NULL COMMENT 'YTD Returns',
   PRIMARY KEY (ticker)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Price Movement';
+ALTER TABLE stock_price_movement ADD INDEX index_stock_price_movement_ticker (ticker);
 
 -- drop table stock_price_movement_history;
 CREATE TABLE stock_price_movement_history (
@@ -853,6 +878,9 @@ CREATE TABLE stock_price_movement_history (
   return_1M decimal(10,4) DEFAULT NULL COMMENT '1 Month Returns',
   PRIMARY KEY (date, ticker)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Price Movement History';
+ALTER TABLE stock_price_movement_history ADD INDEX index_stock_price_movement_history_ticker (ticker);
+ALTER TABLE stock_price_movement_history ADD INDEX index_stock_price_movement_history_date (date);
+
 -- TRUNCATE stock_price_movement_history
 SELECT * from stock_price_movement_history WHERE ticker like 'TCS%' order by date desc;
 SELECT * from stock_price_movement_history WHERE date = '2019-05-06' order by ticker, date desc;
@@ -888,6 +916,7 @@ CREATE TABLE portfolio (
   annualized_return DECIMAL(20,4) NULL DEFAULT 0 COMMENT 'Annualized Returns',
   PRIMARY KEY (memberid,portfolioid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Portfolio Description';
+ALTER TABLE portfolio ADD INDEX index_portfolio_memberid (memberid);
 
 SELECT * from portfolio;
 select b.first_name, a.* from portfolio a, member b where a.memberid = b.memberid;
@@ -909,9 +938,11 @@ CREATE TABLE portfolio_cashflow (
   portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
   date date NOT NULL COMMENT 'Date on which major cash inflow or outflow happens',
   cashflow decimal(20,3) NOT NULL COMMENT 'Amount of cash inflow (negative) or outflow (outflow) happens',
+  description varchar(500) COLLATE utf8_unicode_ci NULL DEFAULT '' COMMENT 'Cashflow Description',
   PRIMARY KEY (memberid, portfolioid, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Cashflow';
-
+ALTER TABLE portfolio_cashflow ADD INDEX index_portfolio_cashflow_memberid (memberid);
+ALTER TABLE portfolio_cashflow ADD INDEX index_portfolio_cashflow_date (date);
 select * from portfolio_cashflow;
 
 -- DROP table portfolio_holdings;
@@ -941,6 +972,7 @@ CREATE TABLE portfolio_holdings (
   last_valuation_date date DEFAULT '1900-01-01' COMMENT 'Last Valution Date',
   PRIMARY KEY (memberid, portfolioid, buy_date, ticker)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+ALTER TABLE portfolio_holdings ADD INDEX index_portfolio_holdings_memberid (memberid);
 
 SELECT * from portfolio_holdings a where a.memberid = 1026;
 
@@ -952,6 +984,8 @@ CREATE TABLE portfolio_value_history (
   value decimal(20,3) DEFAULT NULL COMMENT 'Portfolio market value related to date',
   PRIMARY KEY (memberid, portfolioid, date)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Historical Values';
+ALTER TABLE portfolio_value_history ADD INDEX index_portfolio_value_history_memberid (memberid);
+ALTER TABLE portfolio_value_history ADD INDEX index_portfolio_value_history_date (date);
 
 SELECT * from portfolio_value_history;
 
@@ -984,6 +1018,8 @@ CREATE TABLE portfolio_historical_holdings (
   fin_year varchar(9) COLLATE utf8_unicode_ci NOT NULL COMMENT 'FIN Year when security was sold',
   PRIMARY KEY (memberid,portfolioid,buy_date,ticker,sell_date)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Historical Holdings';
+ALTER TABLE portfolio_historical_holdings ADD INDEX index_portfolio_historical_holdings_memberid (memberid);
+
 
 SELECT * FROM portfolio_historical_holdings; 
 
@@ -1026,24 +1062,23 @@ CREATE TABLE portfolio_asset_allocation (
   value_percent decimal(7,4) DEFAULT NULL COMMENT '%(Market Value) of Asset class',
   PRIMARY KEY (memberid,portfolioid,date,asset_class_group)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Daily Asset Allocation ';
+ALTER TABLE portfolio_asset_allocation ADD INDEX index_portfolio_asset_allocation_memberid (memberid);
+ALTER TABLE portfolio_asset_allocation ADD INDEX index_portfolio_asset_allocation_date (date);
 
 SELECT * from portfolio_asset_allocation; 
 
--- DROP table portfolio_benchmark_returns_calculation_support;
-CREATE TABLE portfolio_benchmark_returns_calculation_support (
+-- DROP table portfolio_returns_calculation_support; 
+CREATE TABLE portfolio_returns_calculation_support (
   memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
   portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
   date date NOT NULL COMMENT 'Date either cashflow date or end month',
   cashflow decimal(20,3) DEFAULT NULL COMMENT 'Cashflow amount Cash-in is negative, Cash-out is positive',
-  benchmarkid int(3) NOT NULL COMMENT 'PK Benchmark ID',
-  value decimal(20,3) DEFAULT NULL COMMENT 'Benchmark value',
-  units decimal(20,4) DEFAULT NULL COMMENT 'Benchmark units',
-  total_units decimal(20,4) DEFAULT NULL COMMENT 'Benchmark Total Units',
-  total_value decimal(20,3) DEFAULT NULL COMMENT 'Benchmark Total Value',
-  PRIMARY KEY (memberid,portfolioid,benchmarkid,date)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - TWRR Calculation support data';
+  value decimal(20,3) DEFAULT NULL COMMENT 'Market Value of the portfolio',
+  PRIMARY KEY (memberid,portfolioid,date)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Time Weighted Returns calculaiton support data';
+ALTER TABLE portfolio_returns_calculation_support ADD INDEX index_portfolio_returns_calculation_support_memberid (memberid);
 
-SELECT * FROM portfolio_benchmark_returns_calculation_support;
+SELECT * FROM portfolio_returns_calculation_support;
 
 -- DROP table portfolio_twrr_monthly;
 CREATE TABLE portfolio_twrr_monthly (
@@ -1070,6 +1105,7 @@ CREATE TABLE portfolio_twrr_monthly (
   returns_dec decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Dec',
   PRIMARY KEY (memberid,portfolioid,returns_year)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - TWRR (Time Weighted Rate of Returns) monthwise ';
+ALTER TABLE portfolio_twrr_monthly ADD INDEX index_portfolio_twrr_monthly_memberid (memberid);
 
 SELECT * from portfolio_twrr_monthly; 
 
@@ -1083,51 +1119,54 @@ CREATE TABLE portfolio_twrr_summary (
   returns_twrr_since_current_quarter decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns from current quarter',
   returns_twrr_since_fin_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since current fin year',
   returns_twrr_ytd decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since Jan 1st',
+  returns_twrr_three_months decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since three months',
+  returns_twrr_half_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since six months',
   returns_twrr_one_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since one year',
+  returns_twrr_two_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since two year',
+  returns_twrr_three_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since three year',
+  returns_twrr_five_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since five year',
+  returns_twrr_ten_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since ten year',
   returns_twrr_since_inception decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since inception',
   PRIMARY KEY (memberid,portfolioid,benchmarkid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - TWRR (Time Weighted Rate of Returns) Summary';
+ALTER TABLE portfolio_twrr_summary ADD INDEX index_portfolio_twrr_summary_memberid (memberid);
 
 SELECT * FROM portfolio_twrr_summary; 
 
--- DROP table portfolio_irr_returns_summary;
-CREATE TABLE portfolio_irr_returns_summary (
-  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
-  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
-  benchmarkid int(3) NOT NULL DEFAULT '0' COMMENT 'Benchmark ID for comparision, 0 for portfolio',
-  date date DEFAULT NULL COMMENT 'Returns as of',
-  since_current_month decimal(20,4) DEFAULT NULL COMMENT 'IRR Returns from current month',
-  since_current_quarter decimal(20,4) DEFAULT NULL COMMENT 'IRR Returns from current quarter',
-  since_fin_year decimal(20,4) DEFAULT NULL COMMENT 'IRR Returns since current fin year',
-  return_ytd decimal(10,4) DEFAULT NULL COMMENT 'IRR Returns YTD',
-  return_1Y decimal(10,4) DEFAULT NULL COMMENT 'IRR Returns 1 Year',
-  since_inception decimal(20,4) DEFAULT NULL COMMENT 'IRR Returns since inception',
-  PRIMARY KEY (memberid,portfolioid,benchmarkid)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - IRR (Internal Rate of Returns) or Money Weighted Rate or Returns Summary';
+CREATE TABLE benchmark (
+  benchmarkid int(3) NOT NULL COMMENT 'PK Benchmark ID',
+  benchmark_name varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Benchmark Name',
+  benchmark_description varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'benchmark Description',
+  PRIMARY KEY (benchmark_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio Benchmarks - Custom Benchmarks';
+SELECT * FROM benchmark; 
 
-SELECT * FROM portfolio_irr_returns_summary;
 
--- DROP table portfolio_returns_calculation_support; 
-CREATE TABLE portfolio_returns_calculation_support (
-  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
-  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
-  date date NOT NULL COMMENT 'Date either cashflow date or end month',
-  cashflow decimal(20,3) DEFAULT NULL COMMENT 'Cashflow amount Cash-in is negative, Cash-out is positive',
-  value decimal(20,3) DEFAULT NULL COMMENT 'Market Value of the portfolio',
-  PRIMARY KEY (memberid,portfolioid,date)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Time Weighted Returns calculaiton support data';
-
-SELECT * FROM portfolio_returns_calculation_support;
-
--- DROP table temp_irr_calculation;
-CREATE TABLE temp_irr_calculation (
-  memberid int(11) NOT NULL COMMENT 'PK member ID unique Auto Generated',
-  portfolioid int(3) NOT NULL COMMENT 'PK Portfolio No unique',
-  date date NOT NULL COMMENT 'Date either cashflow date or end month',
-  cashflow decimal(20,3) DEFAULT NULL COMMENT 'Cashflow amount Cash-in is negative, Cash-out is positive',
-  value decimal(20,3) DEFAULT NULL COMMENT 'Market Value of the portfolio',
-  PRIMARY KEY (memberid,portfolioid,date)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Temp - For Irr Calculation';
+-- DROP TABLE benchmark_twrr_monthly;
+CREATE TABLE benchmark_twrr_monthly (
+  benchmarkid int(3) NOT NULL DEFAULT '0' COMMENT 'Benchmark ID',
+  returns_year int(4) NOT NULL COMMENT 'PK Year of returns',
+  returns_calendar_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR for calendar year',
+  returns_fin_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR for FIN year',
+  returns_mar_ending_quarter decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Jan to Mar',
+  returns_jun_ending_quarter decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Apr to Jun',
+  returns_sep_ending_quarter decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Jul to Sep',
+  returns_dec_ending_quarter decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Oct to Dec',
+  returns_jan decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Jan',
+  returns_feb decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Feb',
+  returns_mar decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Mar',
+  returns_apr decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Apr',
+  returns_may decimal(20,4) DEFAULT NULL COMMENT 'TWRR for May',
+  returns_jun decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Jun',
+  returns_jul decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Jul',
+  returns_aug decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Aug',
+  returns_sep decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Sep',
+  returns_oct decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Oct',
+  returns_nov decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Nov',
+  returns_dec decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Dec',
+  PRIMARY KEY (memberid,portfolioid,benchmarkid,returns_year)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - Benchmark TWRR (Time Weighted Rate of Returns) monthwise ';
+ALTER TABLE portfolio_benchmark_twrr_monthly ADD INDEX index_portfolio_benchmark_twrr_monthly_memberid (memberid);
 
 
 

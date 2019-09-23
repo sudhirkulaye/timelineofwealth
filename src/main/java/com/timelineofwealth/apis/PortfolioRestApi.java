@@ -82,4 +82,23 @@ public class PortfolioRestApi {
         return PortfolioService.getPortfolioCashflows(user.getEmail());
     }
 
+    @RequestMapping(value = "/getportfoliotwrrsummary", method = RequestMethod.GET)
+    public List<PortfolioTwrrSummary> getPortfolioTwrrSummary() {
+        logger.debug(String.format("Call user/api/getportfoliotwrrsummary/"));
+
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        return PortfolioService.getPortfolioTwrrSummary(user.getEmail());
+    }
+
+    @RequestMapping(value = "/getportfoliotwrrmonthly", method = RequestMethod.GET)
+    public List<PortfolioTwrrMonthly> getPortfolioTwrrMonthly() {
+        logger.debug(String.format("Call user/api/getportfoliotwrrmonthly/"));
+
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        return PortfolioService.getPortfolioTwrrMonthly(user.getEmail());
+    }
 }

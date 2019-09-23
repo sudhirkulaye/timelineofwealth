@@ -48,4 +48,6 @@ select  ticker_b, date, current_pe, price_book from daily_data_b a where ticker_
 select ticker, cons_standalone, date, sales, operating_profit, net_profit, opm 
 from stock_quarter a where a.ticker = 'M&M' order by a.cons_standalone, a.date  desc; 
 
-select * from stock_quarter a where a.ticker = 'M&M' order by a.cons_standalone, a.date  desc; 
+select * from stock_quarter a where a.ticker = 'MARUTI' order by a.cons_standalone, a.date  desc; 
+SELECT * from stock_pnl a where a.ticker = 'MARUTI' order by a.cons_standalone, a.date  desc; 
+SELECT * from stock_balancesheet a where a.ticker = 'MARUTI' order by a.date  desc, a.cons_standalone; 

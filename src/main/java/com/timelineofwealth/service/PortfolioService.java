@@ -3,10 +3,7 @@ package com.timelineofwealth.service;
 import com.timelineofwealth.dto.ConsolidatedPortfolioHoldings;
 import com.timelineofwealth.dto.FinYearProfit;
 import com.timelineofwealth.entities.*;
-import com.timelineofwealth.repositories.PortfolioCashflowRepository;
-import com.timelineofwealth.repositories.PortfolioHistoricalHoldingsRepository;
-import com.timelineofwealth.repositories.PortfolioHoldingsRepository;
-import com.timelineofwealth.repositories.PortfolioRepository;
+import com.timelineofwealth.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +41,18 @@ public class PortfolioService {
     @Autowired
     public void setPortfolioCashflowRepository(PortfolioCashflowRepository portfolioCashflowRepository){
         PortfolioService.portfolioCashflowRepository = portfolioCashflowRepository;
+    }
+    @Autowired
+    private static PortfolioTwrrMonthlyRepository portfolioTwrrMonthlyRepository;
+    @Autowired
+    public void setPortfolioTwrrMonthlyRepository(PortfolioTwrrMonthlyRepository portfolioTwrrMonthlyRepository) {
+        PortfolioService.portfolioTwrrMonthlyRepository = portfolioTwrrMonthlyRepository;
+    }
+    @Autowired
+    private static PortfolioTwrrSummaryRepository portfolioTwrrSummaryRepository;
+    @Autowired
+    public void setPortfolioTwrrSummaryRepository(PortfolioTwrrSummaryRepository portfolioTwrrSummaryRepository){
+        PortfolioService.portfolioTwrrSummaryRepository = portfolioTwrrSummaryRepository;
     }
 
     public static List<Portfolio> getPortfolios(String email){
@@ -115,7 +124,7 @@ public class PortfolioService {
     }
 
     public static List<FinYearProfit> getFinYearProfit(String email){
-        logger.debug(String.format("In PortfolioService.getConsolidatedPortfolioHoldings: Email %s", email));
+        logger.debug(String.format("In PortfolioService.getFinYearProfit: Email %s", email));
 
         List<FinYearProfit> finYearProfits = new ArrayList<>();
         List<Member> members = MemberService.getUserMembers(email);
@@ -149,7 +158,7 @@ public class PortfolioService {
 
     //
     public static List<PortfolioCashflow> getPortfolioCashflows(String email){
-        logger.debug(String.format("In PortfolioService.getPortfolioHistoricalHoldings: Email %s", email));
+        logger.debug(String.format("In PortfolioService.getPortfolioCashflows: Email %s", email));
 
         List<PortfolioCashflow> portfolioCashflows;
         List<Member> members = MemberService.getUserMembers(email);
@@ -160,5 +169,33 @@ public class PortfolioService {
         portfolioCashflows = portfolioCashflowRepository.findAllByKeyMemberidInOrderByKeyMemberidAscKeyPortfolioidAscKeyDateDesc(membersIds);
 
         return portfolioCashflows;
+    }
+
+    public static List<PortfolioTwrrSummary> getPortfolioTwrrSummary(String email) {
+        logger.debug(String.format("In PortfolioService.getPortfolioTwrrSummary: Email %s", email));
+
+        List<PortfolioTwrrSummary> portfolioTwrrSummaries;
+        List<Member> members = MemberService.getUserMembers(email);
+        List<Long> membersIds = new ArrayList<>();
+        for (Member member : members ){
+            membersIds.add(new Long(member.getMemberid()));
+        }
+        portfolioTwrrSummaries = portfolioTwrrSummaryRepository.findAllByKeyMemberidInOrderByKeyMemberidAscKeyPortfolioidAscKeyBenchmarkidAsc(membersIds);
+
+        return portfolioTwrrSummaries;
+    }
+
+    public static List<PortfolioTwrrMonthly> getPortfolioTwrrMonthly(String email) {
+        logger.debug(String.format("In PortfolioService.getPortfolioTwrrMonthly: Email %s", email));
+
+        List<PortfolioTwrrMonthly> portfolioTwrrMonthlies;
+        List<Member> members = MemberService.getUserMembers(email);
+        List<Long> membersIds = new ArrayList<>();
+        for (Member member : members ){
+            membersIds.add(new Long(member.getMemberid()));
+        }
+        portfolioTwrrMonthlies = portfolioTwrrMonthlyRepository.findAllByKeyMemberidInOrderByKeyMemberidAscKeyPortfolioidAscKeyReturnsYearDesc(membersIds);
+
+        return portfolioTwrrMonthlies;
     }
 }
