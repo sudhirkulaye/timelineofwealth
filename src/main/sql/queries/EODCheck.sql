@@ -26,10 +26,10 @@ truncate table log_table;
 
 select * from setup_dates;
 select count(1), date from wealth_history
-where date = (select date_today from setup_dates)
+where date >= (select date_start_current_month from setup_dates)
 group by date order by date desc;
 SELECT count(1), date from wealth_asset_allocation_history
-where date = (select date_today from setup_dates)
+where date >= (select date_start_current_month from setup_dates)
 group by date order by date desc;
 
 -- call ap_set_market_cap_rank('2016-10-21', (select date_today from setup_dates));
@@ -152,7 +152,7 @@ b.ticker not in (select distinct ticker from stock_quarter a where date = '2019-
 select distinct ticker, max(date) from stock_pnl a where month(date) != 3 group by ticker having max(date) not in ('2018-12-31', '2019-03-31', '2018-06-30') ORDER BY max(date) desc;
 SELECT ticker, cons_standalone, max(date) from stock_pnl a group by ticker, cons_standalone 
 having max(date) < '2018-01-01' order by max(date) desc, ticker;
-
+-- update stock_quarter set opm = opm/100 where opm > 1;
 -- Change of ticker
 select distinct(name) from daily_data_s a where a.date = (select max(date) from daily_data_s) and a.name not in (select ticker5 from stock_universe) order by rank; 
 select * from stock_universe a where a.name like 'Techno%'; 
@@ -170,21 +170,33 @@ select * from daily_data_b a where ticker_b = 'IDFCBK:IN';
 -- update stock_cashflow a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
 select * from wealth_details a where a.ticker = 'KPITTECH';
 -- update wealth_details a set a.ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
-select * from stock_universe a where ticker in ('IDFCFIRSTB','BAJAJCON');
+select * from stock_universe a where ticker in ('530643');
 -- BAJAJCORP to BAJAJCON and 'Bajaj Corp' to 'Bajaj Consumer'
 -- IDFCBANK to IDFCFIRSTB and 'IDFC Bank' to 'IDFC First Bank'
 select * from stock_cashflow a where ticker = 'KPITTECH';
 
 -- Stock Split, Bonus
-SELECT date, close_price from nse_price_history a where a.nse_ticker = 'BIOCON' and date <= '2019-06-12' order by date desc;
-SELECT * from wealth_details a where ticker = 'SYNGENE';
-SELECT * from portfolio_holdings a where ticker = 'SYNGENE';
--- update nse_price_history a set close_price = close_price * (3/4) where a.nse_ticker = 'WIPRO' and date < '2019-03-06';
--- update nse_price_history a set close_price = close_price * (5/6) where a.nse_ticker = 'TTKPRESTIG' and date < '2019-05-15';
--- update nse_price_history a set close_price = close_price * (	1/2	) where a.nse_ticker = 'BIOCON' and date < '2019-06-12' ;
--- update nse_price_history a set close_price = close_price * (	1/2	) where a.nse_ticker = 'SYNGENE' and date < '2019-06-11' ;
+SELECT date, close_price from nse_price_history a where a.nse_ticker = 'HDFCBANK' and date <= '2019-09-19' order by date desc;
+SELECT date, close_price from bse_price_history a where a.bse_ticker = '509887' and date <= '2019-07-03' order by date desc;
+select * from stock_price_movement_history a where a.ticker = 'HDFCBANK' and date >= '2019-09-19';
+SELECT * from wealth_details a where ticker = 'RELAXO';
+SELECT * from portfolio_holdings a where ticker = 'RELAXO';
+
+/*
+
+update nse_price_history a set close_price = close_price * ( 5 / 10	) where a.nse_ticker = '509887'	 and date < '2019-07-03' ;
+update nse_price_history a set close_price = close_price * ( 2 / 5 ) where a.nse_ticker = 'APCOTEXIND' and date < '2019-07-04' ;
+update nse_price_history a set close_price = close_price * ( 4 / 5 ) where a.nse_ticker = 'ASTRAL' and date < '2019-09-16' ;
+update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'BRIGADE' and date < '2019-08-28' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'HDFCBANK' and date < '2019-09-19' ;
 
 
+
+update wealth_details set quantity = quantity * 2, rate = rate * (1/2), net_rate = net_rate * (1/2) where ticker = 'RELAXO';
+update portfolio_holdings set quantity = quantity * 2, rate = rate * (1/2), net_rate = net_rate * (1/2) where ticker = 'RELAXO';
+
+
+*/
 
 -- update HDFC Bank PB
 select * from daily_data_s a where a.name = 'HDFC Bank' and date BETWEEN '2019-04-20' and '2019-07-01' order by date desc;

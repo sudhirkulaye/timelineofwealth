@@ -44,6 +44,8 @@ public class PortfolioCashflow  implements Serializable {
     private PortfolioCashflowKey key;
     @Column(name = "cashflow")
     private BigDecimal cashflow;
+    @Column(name = "description")
+    private String description;
 
     public PortfolioCashflowKey getKey() {
         return key;
@@ -59,4 +61,10 @@ public class PortfolioCashflow  implements Serializable {
         this.cashflow = cashflow;
     }
 
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

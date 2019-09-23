@@ -158,4 +158,14 @@ public class UserViewController {
         return "user/portfoliocashflows";
     }
 
+    @RequestMapping(value = "/user/portfolioreturns", method = RequestMethod.GET)
+    public String portfolioReturns(Model model, @AuthenticationPrincipal UserDetails userDetails){
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Portfolio Returns");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/portfolioreturns";
+    }
+
 }

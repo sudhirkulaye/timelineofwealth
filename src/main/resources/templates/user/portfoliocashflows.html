@@ -39,29 +39,29 @@
                                 <table class="table table-hover">
                                     <thead>
                                     <tr>
-                                        <th><strong>Member</strong></th>
-                                        <th><strong>#Portfolio</strong></th>
+                                        <th><strong>Member/#Portfolio</strong></th>
+                                        <th><strong>Status</strong></th>
                                         <th><strong>Inception Date</strong></th>
                                         <th><strong>Description</strong></th>
                                         <th><strong>Net Investment</strong></th>
                                         <th><strong>Market Value</strong></th>
                                         <th><strong>Net Profit</strong></th>
                                         <th><strong>Abs. Returns%</strong></th>
-                                        <th><strong>IRR Returns%</strong></th>
+                                        <th><strong>TWRR Returns%</strong></th>
                                         <td></td>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <tr ng-repeat="portfolio in portfolios">
-                                        <td>{{ (members | filter : { 'memberid' : portfolio.key.memberid })[0].firstName }}</td>
-                                        <td>{{portfolio.key.portfolioid}}</td>
+                                        <td>{{ (members | filter : { 'memberid' : portfolio.key.memberid })[0].firstName }}/{{portfolio.key.portfolioid}}</td>
+                                        <td>{{portfolio.status}}</td>
                                         <td>{{portfolio.startDate}}</td>
                                         <td>{{portfolio.description}}</td>
                                         <td>{{portfolio.netInvestment | currency:"&#8377;":0}}</td>
                                         <td>{{portfolio.marketValue | currency:"&#8377;":0}}</td>
                                         <td>{{portfolio.netProfit | currency:"&#8377;":0}}</td>
-                                        <td>{{portfolio.absoluteReturn}}%</td>
-                                        <td>{{portfolio.annualizedReturn}}%</td>
+                                        <td>{{portfolio.absoluteReturn*100 | number:2}}%</td>
+                                        <td>{{portfolio.annualizedReturn*100 | number:2}}%</td>
                                         <td><button type="button" ng-click="setFilter(portfolio.key.memberid, portfolio.key.portfolioid)" class="btn btn-success  pull-right btn-xs">Show Details</button></td>
                                     </tr>
                                     </tbody>
@@ -79,6 +79,7 @@
                                         <th><strong>Member/Folio</strong></th>
                                         <th><strong>Date</strong></th>
                                         <th><strong>Cashflow</strong></th>
+                                        <th><strong>Description</strong></th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -86,6 +87,7 @@
                                         <td>{{ (members | filter : { 'memberid' : portfolioCashflow.key.memberid })[0].firstName }}/{{portfolioCashflow.key.portfolioid}}</td>
                                         <td>{{portfolioCashflow.key.date}}</td>
                                         <td>{{portfolioCashflow.cashflow | currency:"&#8377;":0}}</td>
+                                        <td>{{portfolioCashflow.description}}</td>
                                     </tr>
                                     </tbody>
                                 </table>
