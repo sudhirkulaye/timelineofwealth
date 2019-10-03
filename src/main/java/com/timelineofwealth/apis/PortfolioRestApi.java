@@ -73,7 +73,7 @@ public class PortfolioRestApi {
     }
 
     @RequestMapping(value = "/getportfoliocashflows", method = RequestMethod.GET)
-    public List<PortfolioCashflow> getPortfolioCashflows() {
+    public List<PortfolioReturnsCalculationSupport> getPortfolioCashflows() {
         logger.debug(String.format("Call user/api/getportfolioCashflows/"));
 
         UserDetails userDetails =
