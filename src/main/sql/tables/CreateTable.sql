@@ -1074,6 +1074,7 @@ CREATE TABLE portfolio_returns_calculation_support (
   date date NOT NULL COMMENT 'Date either cashflow date or end month',
   cashflow decimal(20,3) DEFAULT NULL COMMENT 'Cashflow amount Cash-in is negative, Cash-out is positive',
   value decimal(20,3) DEFAULT NULL COMMENT 'Market Value of the portfolio',
+  description varchar(500) COLLATE utf8_unicode_ci NULL DEFAULT '' COMMENT 'Cashflow Description',
   PRIMARY KEY (memberid,portfolioid,date)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Portfolio - Time Weighted Returns calculaiton support data';
 ALTER TABLE portfolio_returns_calculation_support ADD INDEX index_portfolio_returns_calculation_support_memberid (memberid);
@@ -1133,19 +1134,21 @@ ALTER TABLE portfolio_twrr_summary ADD INDEX index_portfolio_twrr_summary_member
 
 SELECT * FROM portfolio_twrr_summary; 
 
+-- DROP Table benchmark;
 CREATE TABLE benchmark (
   benchmarkid int(3) NOT NULL COMMENT 'PK Benchmark ID',
-  benchmark_name varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Benchmark Name',
-  benchmark_description varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'benchmark Description',
-  PRIMARY KEY (benchmark_id)
+  benchmark_name varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Benchmark Name',
+  benchmark_type varchar(30) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Benchmark Description',
+  date_last_returns_process date DEFAULT '2000-01-01' COMMENT 'Benchmark Last Reurns Process Date',
+  is_mutual_fund varchar(3) DEFAULT 'No' COMMENT 'Is a Benchmark Mutual Fund',
+  PRIMARY KEY (benchmarkid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio Benchmarks - Custom Benchmarks';
-SELECT * FROM benchmark; 
-
+SELECT * from benchmark order by benchmark_type, benchmarkid;
 
 -- DROP TABLE benchmark_twrr_monthly;
 CREATE TABLE benchmark_twrr_monthly (
-  benchmarkid int(3) NOT NULL DEFAULT '0' COMMENT 'Benchmark ID',
-  returns_year int(4) NOT NULL COMMENT 'PK Year of returns',
+  benchmarkid int(3) NOT NULL COMMENT 'Benchmark ID',
+  year int(4) NOT NULL COMMENT 'PK Year of returns',
   returns_calendar_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR for calendar year',
   returns_fin_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR for FIN year',
   returns_mar_ending_quarter decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Jan to Mar',
@@ -1164,9 +1167,27 @@ CREATE TABLE benchmark_twrr_monthly (
   returns_oct decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Oct',
   returns_nov decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Nov',
   returns_dec decimal(20,4) DEFAULT NULL COMMENT 'TWRR for Dec',
-  PRIMARY KEY (memberid,portfolioid,benchmarkid,returns_year)
+  PRIMARY KEY (benchmarkid,year)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - Benchmark TWRR (Time Weighted Rate of Returns) monthwise ';
-ALTER TABLE portfolio_benchmark_twrr_monthly ADD INDEX index_portfolio_benchmark_twrr_monthly_memberid (memberid);
+ALTER TABLE benchmark_twrr_monthly ADD INDEX index_benchmark_twrr_monthly_memberid (benchmarkid);
 
-
-
+-- Drop table benchmark_twrr_summary;
+CREATE TABLE benchmark_twrr_summary (
+  benchmarkid int(3) NOT NULL COMMENT 'Benchmark ID',
+  returns_date date DEFAULT NULL COMMENT 'Returns as of',
+  returns_twrr_since_current_month decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns from current month',
+  returns_twrr_since_current_quarter decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns from current quarter',
+  returns_twrr_since_fin_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since current fin year',
+  returns_twrr_ytd decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since Jan 1st',
+  returns_twrr_three_months decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since three months',
+  returns_twrr_half_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since six months',
+  returns_twrr_one_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since one year',
+  returns_twrr_two_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since two year',
+  returns_twrr_three_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since three year',
+  returns_twrr_five_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since five year',
+  returns_twrr_ten_year decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since ten year',
+  returns_twrr_since_inception decimal(20,4) DEFAULT NULL COMMENT 'TWRR Returns since inception',
+  PRIMARY KEY (benchmarkid),
+  KEY index_benchmark_twrr_summary_benchmarkid (benchmarkid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - TWRR (Time Weighted Rate of Returns) Summary';
+SELECT * from benchmark_twrr_summary;

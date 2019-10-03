@@ -168,4 +168,14 @@ public class UserViewController {
         return "user/portfolioreturns";
     }
 
+    @RequestMapping(value = "/user/benchmarkreturns", method = RequestMethod.GET)
+    public String benchmarkReturns(Model model, @AuthenticationPrincipal UserDetails userDetails){
+
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Benchmark Returns");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "user/benchmarkreturns";
+    }
+
 }

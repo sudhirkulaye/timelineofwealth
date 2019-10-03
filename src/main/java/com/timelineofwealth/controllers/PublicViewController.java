@@ -185,4 +185,12 @@ public class PublicViewController {
         model.addAttribute("title", "BSE-MidCap and BSE-SmallCap Statistics");
         return "public/midandsmallcapindexstats";
     }
+
+    @RequestMapping(value = "/public/benchmarkreturns")
+    public String benchmarkReturns(Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Returns Comparision of Benchmarks");
+        return "public/benchmarkreturns";
+    }
 }

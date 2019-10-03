@@ -43,6 +43,12 @@ public class PortfolioService {
         PortfolioService.portfolioCashflowRepository = portfolioCashflowRepository;
     }
     @Autowired
+    private static PortfolioReturnsCalculationSupportRepository portfolioReturnsCalculationSupportRepository;
+    @Autowired
+    public void setPortfolioReturnsCalculationSupportRepository(PortfolioReturnsCalculationSupportRepository portfolioReturnsCalculationSupportRepository){
+        PortfolioService.portfolioReturnsCalculationSupportRepository = portfolioReturnsCalculationSupportRepository;
+    }
+    @Autowired
     private static PortfolioTwrrMonthlyRepository portfolioTwrrMonthlyRepository;
     @Autowired
     public void setPortfolioTwrrMonthlyRepository(PortfolioTwrrMonthlyRepository portfolioTwrrMonthlyRepository) {
@@ -157,16 +163,16 @@ public class PortfolioService {
     }
 
     //
-    public static List<PortfolioCashflow> getPortfolioCashflows(String email){
+    public static List<PortfolioReturnsCalculationSupport> getPortfolioCashflows(String email){
         logger.debug(String.format("In PortfolioService.getPortfolioCashflows: Email %s", email));
 
-        List<PortfolioCashflow> portfolioCashflows;
+        List<PortfolioReturnsCalculationSupport> portfolioCashflows;
         List<Member> members = MemberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
         }
-        portfolioCashflows = portfolioCashflowRepository.findAllByKeyMemberidInOrderByKeyMemberidAscKeyPortfolioidAscKeyDateDesc(membersIds);
+        portfolioCashflows = portfolioReturnsCalculationSupportRepository.findAllByKeyMemberidInOrderByKeyMemberidAscKeyPortfolioidAscKeyDateDesc(membersIds);
 
         return portfolioCashflows;
     }

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="BenchmarkReturnsManagement" ng-controller="BenchmarkReturnsController">
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/public/benchmarkreturns.js" th:src="@{/custom/public/benchmarkreturns.js}"></script>
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/usersidebarmenu :: common-usersidebarmenu" />
+
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/usertopnavigation :: common-usertopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <br />
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h1><font color="green">Benchmark Returns </font></h1>
+                            <p />Time Weighted Rate of Returns (Compounded Monthly returns. Returns more than one year are annualized.)
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <lebel class="pull-left" >&nbsp;&nbsp;&nbsp; Show &nbsp;&nbsp;&nbsp; </lebel>
+                            <lebel class="pull-left" > <input type="radio" checked="" value="returns" id="optionsRadios1" name="optionsRadios" ng-click="showView('Trailing')" /> Trailing Returns &nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios2" name="optionsRadios" ng-click="showView('YearMonthly')" /> Year/Month wise Returns &nbsp;&nbsp;&nbsp;</lebel>
+                        </div>
+                        <div class="x_content" ng-hide="hideTrailing">
+                            <h2><font color="green"><strong>Benchmarks Trailing Time Weighted Rate of Returns* </strong> </font></h2>
+                            <p />*Returns for less than one year are stated in absolute term. Returns for more than 1 year are annualized.
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><strong>Type</strong></th>
+                                        <th><strong>Benchmark</strong></th>
+                                        <!--<th><strong>As of Date</strong></th>-->
+                                        <th><strong>Current Month</strong></th>
+                                        <th><strong>Current Quarter</strong></th>
+                                        <th><strong>3M</strong></th>
+                                        <th><strong>6M</strong></th>
+                                        <th><strong>1Yr</strong></th>
+                                        <th><strong>2Yr</strong></th>
+                                        <th><strong>3Yr</strong></th>
+                                        <th><strong>5Yr</strong></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="benchmarkTwrrSummary in benchmarkTwrrSummaries ">
+                                        <td>{{ benchmarkTwrrSummary.benchmarkType}}</td>
+                                        <td>{{ benchmarkTwrrSummary.benchmarkName}}</td>
+                                        <!--<td>{{portfolioTwrrSummary.returnsDate}}</td>-->
+                                        <td>{{benchmarkTwrrSummary.returnsTwrrSinceCurrentMonth*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrSummary.returnsTwrrSinceCurrentQuarter*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrSummary.returnsTwrrThreeMonths*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrSummary.returnsTwrrHalfYear*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrSummary.returnsTwrrOneYear*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrSummary.returnsTwrrTwoYear*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrSummary.returnsTwrrThreeYear*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrSummary.returnsTwrrFiveYear*100 | number:2}}%</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="x_content" ng-hide="!hideTrailing">
+                            <h2><font color="green"><strong>Benchmarks Month Wise Time Weighted Rate of Returns# </strong> </font></h2>
+                            <p />#March End Quarter Returns = (1 + Jan%)(1 + Feb%)(1 + Mar%) - 1, Calender Yr. Returns = (1 + Q1)(1 + Q2)(1 + Q3)(1 + Q4) - 1
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><strong>Type</strong></th>
+                                        <th><strong>Benchmark</strong></th>
+                                        <th><strong>Year</strong></th>
+                                        <th><strong>Jan</strong></th>
+                                        <th><strong>Feb</strong></th>
+                                        <th><strong>Mar</strong></th>
+                                        <th style="background-color:#f5f5f5"><strong>Mar-Q</strong></th>
+                                        <th><strong>Apr</strong></th>
+                                        <th><strong>May</strong></th>
+                                        <th><strong>Jun</strong></th>
+                                        <th style="background-color:#f5f5f5"><strong>Jun-Q</strong></th>
+                                        <th><strong>Jul</strong></th>
+                                        <th><strong>Aug</strong></th>
+                                        <th><strong>Sep</strong></th>
+                                        <th style="background-color:#f5f5f5"><strong>Sep-Q</strong></th>
+                                        <th><strong>Oct</strong></th>
+                                        <th><strong>Nov</strong></th>
+                                        <th><strong>Dec</strong></th>
+                                        <th style="background-color:#f5f5f5"><strong>Dec-Q</strong></th>
+                                        <th style="background-color:#f5f5f5"><strong>Annual</strong></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="benchmarkTwrrMonthly in benchmarkTwrrMonthlies">
+                                        <td>{{benchmarkTwrrMonthly.benchmarkType}}</td>
+                                        <td>{{benchmarkTwrrMonthly.benchmarkName}}</td>
+                                        <td>{{benchmarkTwrrMonthly.year}}</td>
+                                        <td>{{benchmarkTwrrMonthly.returnsJan*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrMonthly.returnsFeb*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrMonthly.returnsMar*100 | number:2}}%</td>
+                                        <td style="background-color:#f5f5f5">{{benchmarkTwrrMonthly.returnsMarEndingQuarter*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrMonthly.returnsApr*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrMonthly.returnsMay*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrMonthly.returnsJun*100 | number:2}}%</td>
+                                        <td style="background-color:#f5f5f5">{{benchmarkTwrrMonthly.returnsJunEndingQuarter*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrMonthly.returnsJul*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrMonthly.returnsAug*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrMonthly.returnsSep*100 | number:2}}%</td>
+                                        <td style="background-color:#f5f5f5">{{benchmarkTwrrMonthly.returnsSepEndingQuarter*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrMonthly.returnsJan*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrMonthly.returnsFeb*100 | number:2}}%</td>
+                                        <td>{{benchmarkTwrrMonthly.returnsMar*100 | number:2}}%</td>
+                                        <td style="background-color:#f5f5f5">{{benchmarkTwrrMonthly.returnsDecEndingQuarter*100 | number:2}}%</td>
+                                        <td style="background-color:#f5f5f5">{{benchmarkTwrrMonthly.returnsCalendarYear*100 | number:2}}%</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>

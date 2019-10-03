@@ -4,12 +4,12 @@ select * from asset_classification;
 select * from composite; -- 5 composites
 select * from portfolio a order by a.memberid, a.portfolioid; -- total 21 portfolios 
 select compositeid, count(1) from portfolio a group by compositeid order by a.memberid, a.portfolioid; -- (composite 1: 11, 2: 10)
-select * from portfolio_cashflow where memberid in (1026) order by portfolioid, date desc;
-select * from portfolio_value_history a where memberid in (1007) and  date >= '2019-07-15' order by date desc;
+select * from portfolio_cashflow where memberid in (1005) order by portfolioid, date desc;
+select * from portfolio_value_history a where memberid in (1005) and  date >= '2019-06-01' order by date desc;
 
 -- All portfolio holdings
-SELECT * FROM portfolio_holdings a  WHERE memberid = 1005 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
-SELECT * FROM portfolio_historical_holdings a  WHERE memberid = 1001 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+SELECT * FROM portfolio_holdings a  WHERE memberid = 1026 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+SELECT * FROM portfolio_historical_holdings a  WHERE memberid = 1026 order by a.memberid, a.portfolioid, a.sell_date desc, a.asset_classid, a.ticker;
 -- query to find wt of each security to compare with model portfolio
 SELECT c.moslcode, d.first_name, d.last_name, a.memberid, a.portfolioid, 
 a.short_name, sum(a.quantity), sum(a.total_cost), sum(a.market_value), sum(a.net_profit), 
@@ -36,6 +36,42 @@ and a.short_name != 'LIQD BeES ETF'
 and a.sell_date >= '2019-07-01'
 and b.compositeid = 1 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
 ORDER BY memberid, portfolioid, a.sell_date desc; 
+
+-- Portfolio returns
+SELECT  c.moslcode, d.first_name, d.last_name, a.*  
+from portfolio_twrr_summary a, portfolio b, moslcode_memberid c, member d 
+WHERE a.portfolioid = b.portfolioid 
+and a.memberid = b.memberid 
+and a.memberid = c.memberid
+and c.moslcode != 'H20613'
+and a.memberid = d.memberid
+and b.compositeid = 2 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
+ORDER BY a.memberid, a.portfolioid;
+select c.moslcode, d.first_name, d.last_name, a.* 
+from portfolio_twrr_monthly a, portfolio b, moslcode_memberid c, member d
+WHERE a.portfolioid = b.portfolioid 
+and a.memberid = b.memberid 
+and a.memberid = c.memberid
+and c.moslcode != 'H20613'
+and a.memberid = d.memberid
+and b.compositeid = 2 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
+ORDER BY a.memberid, a.portfolioid;
+Select c.moslcode, d.first_name, d.last_name, a.date, a.cashflow, a.value, a.description  
+from portfolio_returns_calculation_support a, portfolio b, moslcode_memberid c, member d
+WHERE a.portfolioid = b.portfolioid 
+and a.memberid = b.memberid 
+and a.memberid = c.memberid
+and c.moslcode != 'H20613'
+and a.memberid = d.memberid
+and b.compositeid = 2 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
+Order By a.memberid, a.portfolioid, a.date DESC;
+
+-- Benchmark returns
+select b.benchmark_type, b.benchmark_name, a.* from benchmark_twrr_summary a, benchmark b
+Where a.benchmarkid = b.benchmarkid order by b.benchmark_type, benchmarkid;
+select b.benchmark_type, b.benchmark_name, a.* from benchmark_twrr_monthly a, benchmark b
+Where a.benchmarkid = b.benchmarkid order by year desc, b.benchmark_type, benchmarkid;
+select * from benchmark;
 
 -- update portfolio_holdings set buy_date = (select date_today from setup_dates) where ticker = 'MOSL_CASH';
 -- UPDATE portfolio_holdings a, stock_universe b SET a.asset_classid = b.asset_classid, a.name = b.name, a.short_name = b.short_name, a.subindustryid = b.subindustryid WHERE a.ticker = b.ticker;

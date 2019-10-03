@@ -1,9 +1,6 @@
 package com.timelineofwealth.apis;
 
-import com.timelineofwealth.dto.MutualFundDTO;
-import com.timelineofwealth.dto.NseBse500;
-import com.timelineofwealth.dto.RecentValuations;
-import com.timelineofwealth.dto.StockValuationHistory;
+import com.timelineofwealth.dto.*;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.service.CommonService;
 import org.slf4j.Logger;
@@ -153,5 +150,19 @@ public class PublicApi {
     public List<IndexStatistics> getMidAndSmallCapIndexStatistics(){
         logger.debug(String.format("Call public/api/getmidandsmallcapindexstatistics"));
         return CommonService.getIndexStatistics("Mid&Small");
+    }
+
+
+    @RequestMapping(value = "/getbenchmarktwrrsummary", method = RequestMethod.GET)
+    public List<BenchmarkTwrrSummaryDTO> getBenchmarkTwrrSummary() {
+        logger.debug(String.format("Call user/api/getbenchmarktwrrsummary/"));
+
+        return CommonService.getBenchmarkTwrrSummary();
+    }
+
+    @RequestMapping(value = "/getbenchmarktwrrmonthly", method = RequestMethod.GET)
+    public List<BenchmarkTwrrMonthlyDTO> getBenchmarkTwrrMonthly() {
+        logger.debug(String.format("Call user/api/getbenchmarktwrrmonthly/"));
+        return CommonService.getBenchmarkTwrrMonthly();
     }
 }

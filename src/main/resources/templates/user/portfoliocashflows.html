@@ -28,7 +28,7 @@
                     <br />
                     <div class="x_panel">
                         <div class="x_title">
-                            <h1><font color="green">Portfolio Cashflows </font></h1>
+                            <h1><font color="green">Portfolio Cashflows & EOM Valuations </font></h1>
                             <p />Negative Cashflow -> Cash in the portflio. Positive Cashflow -> Cash out of the portfolio
                             <div class="clearfix"></div>
                         </div>
@@ -79,6 +79,7 @@
                                         <th><strong>Member/Folio</strong></th>
                                         <th><strong>Date</strong></th>
                                         <th><strong>Cashflow</strong></th>
+                                        <th><strong>Value</strong></th>
                                         <th><strong>Description</strong></th>
                                     </tr>
                                     </thead>
@@ -86,7 +87,8 @@
                                     <tr ng-repeat="portfolioCashflow in portfolioCashflows | filter:filterCashflowsByMemberidAndPortfolioid">
                                         <td>{{ (members | filter : { 'memberid' : portfolioCashflow.key.memberid })[0].firstName }}/{{portfolioCashflow.key.portfolioid}}</td>
                                         <td>{{portfolioCashflow.key.date}}</td>
-                                        <td>{{portfolioCashflow.cashflow | currency:"&#8377;":0}}</td>
+                                        <td>{{portfolioCashflow.cashflow | currency:"&#8377;":0}} </td>
+                                        <td>{{portfolioCashflow.value | currency:"&#8377;":0}}</td>
                                         <td>{{portfolioCashflow.description}}</td>
                                     </tr>
                                     </tbody>

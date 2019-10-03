@@ -1,9 +1,6 @@
 package com.timelineofwealth.service;
 
-import com.timelineofwealth.dto.MutualFundDTO;
-import com.timelineofwealth.dto.NseBse500;
-import com.timelineofwealth.dto.RecentValuations;
-import com.timelineofwealth.dto.StockValuationHistory;
+import com.timelineofwealth.dto.*;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.*;
 import org.slf4j.Logger;
@@ -18,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.cache.annotation.Cacheable;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -133,6 +131,20 @@ public class CommonService {
     @Autowired
     public void setStockPriceMovementHistoryRepository(StockPriceMovementHistoryRepository stockPriceMovementHistoryRepository){
         CommonService.stockPriceMovementHistoryRepository = stockPriceMovementHistoryRepository;
+    }
+
+    @Autowired
+    private static BenchmarkTwrrMonthlyRepository benchmarkTwrrMonthlyRepository;
+    @Autowired
+    public void setBenchmarkTwrrMonthlyRepository(BenchmarkTwrrMonthlyRepository benchmarkTwrrMonthlyRepository){
+        CommonService.benchmarkTwrrMonthlyRepository = benchmarkTwrrMonthlyRepository;
+    }
+
+    @Autowired
+    private static BenchmarkTwrrSummaryRepository benchmarkTwrrSummaryRepository;
+    @Autowired
+    public void setBenchmarkTwrrSummaryRepository(BenchmarkTwrrSummaryRepository benchmarkTwrrSummaryRepository){
+        CommonService.benchmarkTwrrSummaryRepository = benchmarkTwrrSummaryRepository;
     }
 
     private static List<StockUniverse> nseBse500BasicList;
@@ -532,5 +544,154 @@ public class CommonService {
             indexStatistics.addAll(CommonService.indexStatisticsRepository.findOneByTicker("BSESmallCap"));
             return indexStatistics;
         }
+    }
+
+    /**
+     * Get Benchmark Returns
+     */
+    public static List<BenchmarkTwrrMonthlyDTO> getBenchmarkTwrrMonthly() {
+        List<Object[]> objects;
+        List<BenchmarkTwrrMonthlyDTO> dtos = new ArrayList<>();
+        objects = CommonService.benchmarkTwrrMonthlyRepository.findAllBenchmarks();
+        for (Object[] object : objects) {
+            BenchmarkTwrrMonthlyDTO dto = new BenchmarkTwrrMonthlyDTO();
+            dto.setBenchmarkType(""+object[0]);
+            dto.setBenchmarkName(""+object[1]);
+            dto.setBenchmarkid(Long.valueOf(""+object[2]));
+            dto.setYear(Integer.valueOf(""+object[3]));
+            try {
+                dto.setReturnsCalendarYear(BigDecimal.valueOf(Double.valueOf(""+object[4])));
+            } catch (Exception e){
+                dto.setReturnsCalendarYear(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsFinYear(BigDecimal.valueOf(Double.valueOf("" + object[5])));
+            }catch (Exception e){
+                dto.setReturnsFinYear(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsMarEndingQuarter(BigDecimal.valueOf(Double.valueOf(""+object[6])));
+            } catch (Exception e) {
+                dto.setReturnsMarEndingQuarter(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsJunEndingQuarter(BigDecimal.valueOf(Double.valueOf(""+object[7])));
+            } catch (Exception e) {
+                dto.setReturnsJunEndingQuarter(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsSepEndingQuarter(BigDecimal.valueOf(Double.valueOf(""+object[8])));
+            } catch (Exception e) {
+                dto.setReturnsSepEndingQuarter(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsDecEndingQuarter(BigDecimal.valueOf(Double.valueOf(""+object[9])));
+            } catch (Exception e) {
+                dto.setReturnsDecEndingQuarter(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsJan(BigDecimal.valueOf(Double.valueOf(""+object[10])));
+            } catch (Exception e) {
+                dto.setReturnsJan(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsFeb(BigDecimal.valueOf(Double.valueOf(""+object[11])));
+            } catch (Exception e) {
+                dto.setReturnsFeb(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsMar(BigDecimal.valueOf(Double.valueOf(""+object[12])));
+            } catch (Exception e) {
+                dto.setReturnsMar(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsApr(BigDecimal.valueOf(Double.valueOf(""+object[13])));
+            } catch (Exception e) {
+                dto.setReturnsApr(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsMay(BigDecimal.valueOf(Double.valueOf(""+object[14])));
+            } catch (Exception e) {
+                dto.setReturnsMay(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsJun(BigDecimal.valueOf(Double.valueOf(""+object[15])));
+            } catch (Exception e) {
+                dto.setReturnsJun(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsJul(BigDecimal.valueOf(Double.valueOf(""+object[16])));
+            } catch (Exception e) {
+                dto.setReturnsJul(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsAug(BigDecimal.valueOf(Double.valueOf(""+object[17])));
+            } catch (Exception e) {
+                dto.setReturnsAug(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsSep(BigDecimal.valueOf(Double.valueOf(""+object[18])));
+            } catch (Exception e) {
+                dto.setReturnsSep(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsOct(BigDecimal.valueOf(Double.valueOf(""+object[19])));
+            } catch (Exception e) {
+                dto.setReturnsOct(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsNov(BigDecimal.valueOf(Double.valueOf(""+object[20])));
+            } catch (Exception e) {
+                dto.setReturnsNov(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsDec(BigDecimal.valueOf(Double.valueOf(""+object[21])));
+            } catch (Exception e) {
+                dto.setReturnsDec(BigDecimal.valueOf(0));
+            }
+            dtos.add(dto);
+        }
+        return dtos;
+
+    }
+    public static List<BenchmarkTwrrSummaryDTO> getBenchmarkTwrrSummary() {
+        List<Object[]> objects;
+        List<BenchmarkTwrrSummaryDTO> dtos = new ArrayList<>();
+        objects = CommonService.benchmarkTwrrSummaryRepository.findAllBenchmarks();
+        for (Object[] object : objects) {
+            BenchmarkTwrrSummaryDTO dto = new BenchmarkTwrrSummaryDTO();
+            dto.setBenchmarkType(""+object[0]);
+            dto.setBenchmarkName(""+object[1]);
+            dto.setBenchmarkid(Long.valueOf(""+object[2]));
+            dto.setReturnsDate(java.sql.Date.valueOf(""+object[3]));
+            dto.setReturnsTwrrSinceCurrentMonth(BigDecimal.valueOf(Double.valueOf(""+object[4])));
+            dto.setReturnsTwrrSinceCurrentQuarter(BigDecimal.valueOf(Double.valueOf(""+object[5])));
+            dto.setReturnsTwrrSinceFinYear(BigDecimal.valueOf(Double.valueOf(""+object[6])));
+            dto.setReturnsTwrrYtd(BigDecimal.valueOf(Double.valueOf(""+object[7])));
+            dto.setReturnsTwrrThreeMonths(BigDecimal.valueOf(Double.valueOf(""+object[8])));
+            dto.setReturnsTwrrHalfYear(BigDecimal.valueOf(Double.valueOf(""+object[9])));
+            dto.setReturnsTwrrOneYear(BigDecimal.valueOf(Double.valueOf(""+object[10])));
+            dto.setReturnsTwrrTwoYear(BigDecimal.valueOf(Double.valueOf(""+object[11])));
+            try {
+                dto.setReturnsTwrrThreeYear(BigDecimal.valueOf(Double.valueOf("" + object[12])));
+            } catch (Exception e){
+                dto.setReturnsTwrrThreeYear(BigDecimal.valueOf(0));
+            }
+            try {
+                dto.setReturnsTwrrFiveYear(BigDecimal.valueOf(Double.valueOf(""+object[13])));
+            } catch (Exception e) {
+                dto.setReturnsTwrrFiveYear(BigDecimal.valueOf(0));
+            }
+
+            try {
+                dto.setReturnsTwrrTenYear(BigDecimal.valueOf(Double.valueOf(""+object[14])));
+            } catch (Exception e){
+                dto.setReturnsTwrrTenYear(BigDecimal.valueOf(0));
+            }
+            dto.setReturnsTwrrSinceInception(BigDecimal.valueOf(0));
+
+            dtos.add(dto);
+        }
+        return dtos;
     }
 }
