@@ -17,7 +17,7 @@ FROM   portfolio_twrr_monthly a
 WHERE  a.memberid = 1026 AND a.portfolioid = 1;
 
 call ap_process_benchmark_returns();
-select * from benchmark_twrr_summary;
+select * from benchmark_twrr_summary order by benchmarkid;
 SELECT * from benchmark_twrr_monthly order by benchmarkid, year desc;
 SELECT * from index_valuation where ticker = 'NIFTY' ORDER BY date desc;
 select * from mutual_fund_nav_history a WHERE date IN (SELECT max(date) FROM mutual_fund_nav_history WHERE scheme_code = '118525' group by year(date), month(date)) AND scheme_code = '118525' order by date desc;

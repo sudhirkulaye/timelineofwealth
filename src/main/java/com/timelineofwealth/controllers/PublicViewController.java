@@ -80,12 +80,20 @@ public class PublicViewController {
         return "public/contactus";
     }
 
-    @RequestMapping(value = "/public/whatwedo")
-    public String whatWeDo(Model model){
+    @RequestMapping(value = "/public/wealthmanagementapp")
+    public String wealthManagementapp(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Timeline of Wealth");
-        return "public/whatwedo";
+        return "public/wealthmanagementapp";
+    }
+
+    @RequestMapping(value = "/public/pmsapp")
+    public String pmsApp(Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Timeline of Wealth");
+        return "public/pmsApp";
     }
 
     @RequestMapping(value = "/public/ethicalstandards")

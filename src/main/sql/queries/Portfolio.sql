@@ -4,8 +4,8 @@ select * from asset_classification;
 select * from composite; -- 5 composites
 select * from portfolio a order by a.memberid, a.portfolioid; -- total 21 portfolios 
 select compositeid, count(1) from portfolio a group by compositeid order by a.memberid, a.portfolioid; -- (composite 1: 11, 2: 10)
-select * from portfolio_cashflow where memberid in (1005) order by portfolioid, date desc;
-select * from portfolio_value_history a where memberid in (1005) and  date >= '2019-06-01' order by date desc;
+select * from portfolio_cashflow where memberid in (1026) order by portfolioid, date desc;
+select * from portfolio_value_history a where memberid in (1038) and  date >= '2019-10-01' order by date desc;
 
 -- All portfolio holdings
 SELECT * FROM portfolio_holdings a  WHERE memberid = 1026 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
