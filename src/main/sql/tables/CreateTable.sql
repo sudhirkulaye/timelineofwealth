@@ -59,11 +59,7 @@ CREATE TABLE member (
   PRIMARY KEY (memberid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Members - Account Members - Institutional Investor and Retail Investors including earning members and dependents';
 
-SELECT 
-    *
-FROM
-    member a
-ORDER BY a.memberid DESC;
+SELECT * FROM member a ORDER BY a.memberid;
 
 -- Drop table user_members;
 CREATE table user_members (

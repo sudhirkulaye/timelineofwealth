@@ -17,7 +17,7 @@ select count(1), date from daily_data_s
 where date = (select max(date) from daily_data_s)
 group by date order by date desc;
 
-select * from daily_data_b where date = (select date_today from setup_dates) order by market_cap desc;
+select * from daily_data_s where date = (select date_today from setup_dates) order by market_cap desc;
 
 -- proceed EOD
 call ap_update_wealth_data();
@@ -140,7 +140,8 @@ select max(date) from daily_data_s;
 
 select * from index_valuation a where a.date = (select max(date) from index_valuation);
 SELECT * from index_statistics a; 
-
+SELECT DISTINCT ticker from index_valuation a where ticker like '%200';
+UPDATE index_valuation Set ticker = 'NIFTY200' where ticker = 'NIFY200';
 commit;
 -- new quarter results
 SELECT b.ticker from daily_data_s a, stock_universe b 

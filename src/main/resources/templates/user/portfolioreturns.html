@@ -91,7 +91,7 @@
                                     </thead>
                                     <tbody>
                                     <tr ng-repeat="portfolioTwrrSummary in portfolioTwrrSummaries | filter:filterTwrrSummaryByMemberidAndPortfolioid">
-                                        <td>{{ (members | filter : { 'memberid' : portfolioTwrrSummary.key.memberid })[0].firstName }}/{{portfolioTwrrSummary.key.portfolioid}}/{{portfolioTwrrSummary.key.benchmarkid}}</td>
+                                        <td>{{ (members | filter : { 'memberid' : portfolioTwrrSummary.key.memberid })[0].firstName }}/{{portfolioTwrrSummary.key.portfolioid}}</td>
                                         <!--<td>{{portfolioTwrrSummary.returnsDate}}</td>-->
                                         <td>{{portfolioTwrrSummary.returnsTwrrSinceCurrentMonth*100 | number:2}}%</td>
                                         <td>{{portfolioTwrrSummary.returnsTwrrSinceCurrentQuarter*100 | number:2}}%</td>

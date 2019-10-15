@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <font color="green"><strong><h1><strong>Screenshots of Application for PMS </strong></h1></strong></font>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <p><h2>Timeline of wealth provides you a platform (a technology solution) to manage you clients PMS. Create a composite and then link portfolios tracking similar strategy. Portfolio Returns are calculated on monthly and on major cash flow events. Monthly returns are then compounded to find annualized returns. Benchmark returns are also calculated monthly basis and then compounded to find out annualized returns to compare PMS performance with Benchmarks. You may also compare returns with Mutual Funds. Advertise your composite's returns which are calculated as per GIPS standards</h2> </p>
+                            <p /><h2><strong>1. Consolidated Portfolio Holdings</strong>: Consolidated Holdings so that one can find out weights of securities</h2>
+                            <div class="clearfix"></div>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <div class="x_panel">
+                                    <div class="x_content">
+                                        <img src="../../static/images/screenshots/10PMSPortfolioHoldings.jpg" th:src="@{/images/screenshots/10PMSPortfolioHoldings.jpg}" class="col-md-12 col-sm-12 col-xs-12"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <p /><h2><strong>2. Transactions of Portfolio Holdings</strong>: Individual Transactions</h2>
+                            <div class="clearfix"></div>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <div class="x_panel">
+                                    <div class="x_content">
+                                        <img src="../../static/images/screenshots/11PMSPortfolioHoldingsDetails.jpg" th:src="@{/images/screenshots/11PMSPortfolioHoldingsDetails.jpg}" class="col-md-12 col-sm-12 col-xs-12"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <p /><h2><strong>3. Historical Holdings</strong>: Realized gains/losses of the portfolio</h2>
+                            <div class="clearfix"></div>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <div class="x_panel">
+                                    <div class="x_content">
+                                        <img src="../../static/images/screenshots/12PMSPortfolioHistoricalHoldings.jpg" th:src="@{/images/screenshots/12PMSPortfolioHistoricalHoldings.jpg}" class="col-md-12 col-sm-12 col-xs-12"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <p /><h2><strong>4. Cashflows and Month-end Values</strong>: Portfolios Cashflows. This is useful to find out returns recommended by standards</h2>
+                            <div class="clearfix"></div>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <div class="x_panel">
+                                    <div class="x_content">
+                                        <img src="../../static/images/screenshots/13PMSPortfolioCashflows.jpg" th:src="@{/images/screenshots/13PMSPortfolioCashflows.jpg}" class="col-md-12 col-sm-12 col-xs-12"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <p /><h2><strong>5. Portfolio Returns</strong>: Trailing Returns as well as Monthly Returns of each year</h2>
+                            <div class="clearfix"></div>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <div class="x_panel">
+                                    <div class="x_content">
+                                        <img src="../../static/images/screenshots/14PMSPortfolioReturns.jpg" th:src="@{/images/screenshots/14PMSPortfolioReturns.jpg}" class="col-md-12 col-sm-12 col-xs-12"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <p /><h2><strong>6. Benchmark Returns</strong>: Trailing as well as Monthly Returns of each year. Benchmark includes NIFTY-50, NSE200, BSE-MidCap, BSE-SmallCap and Selected Mutual Funds from Large/Multi/Mid and Small Cap category</h2>
+                            <div class="clearfix"></div>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <div class="x_panel">
+                                    <div class="x_content">
+                                        <img src="../../static/images/screenshots/15PMSBenchmarkReturns.jpg" th:src="@{/images/screenshots/15PMSBenchmarkReturns.jpg}" class="col-md-12 col-sm-12 col-xs-12"/>
+                                        <img src="../../static/images/screenshots/16PMSBenchmarkReturns.jpg" th:src="@{/images/screenshots/16PMSBenchmarkReturns.jpg}" class="col-md-12 col-sm-12 col-xs-12"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>&nbsp;</p>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>
