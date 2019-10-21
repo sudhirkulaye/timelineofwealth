@@ -1,15 +1,23 @@
 SET SQL_SAFE_UPDATES = 0;
 Commit;
 select * from asset_classification;
+select * from user a where a.email = 'sudhirkulaye';
+select * from user_members;
+select * from member; 
+select * from adviser_user_mapping;
 select * from composite; -- 5 composites
 select * from portfolio a order by a.memberid, a.portfolioid; -- total 21 portfolios 
 select compositeid, count(1) from portfolio a group by compositeid order by a.memberid, a.portfolioid; -- (composite 1: 11, 2: 10)
-select * from portfolio_cashflow where memberid in (1026) order by portfolioid, date desc;
-select * from portfolio_value_history a where memberid in (1038) and  date >= '2019-10-01' order by date desc;
+select * from portfolio_cashflow where memberid in (1) order by portfolioid, date desc;
+select * from portfolio_value_history a where memberid in (1) and  date >= '2019-10-14' order by date desc;
+select * from portfolio_returns_calculation_support a where memberid in (1);
+select * from portfolio_twrr_summary a where memberid in (1, 1007);
+select * from portfolio_twrr_monthly a where memberid in (1);
+select * from benchmark;
 
 -- All portfolio holdings
-SELECT * FROM portfolio_holdings a  WHERE memberid = 1026 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
-SELECT * FROM portfolio_historical_holdings a  WHERE memberid = 1026 order by a.memberid, a.portfolioid, a.sell_date desc, a.asset_classid, a.ticker;
+SELECT * FROM portfolio_holdings a  WHERE memberid = 1 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+SELECT * FROM portfolio_historical_holdings a  WHERE memberid = 1 order by a.memberid, a.portfolioid, a.sell_date desc, a.asset_classid, a.ticker;
 -- query to find wt of each security to compare with model portfolio
 SELECT c.moslcode, d.first_name, d.last_name, a.memberid, a.portfolioid, 
 a.short_name, sum(a.quantity), sum(a.total_cost), sum(a.market_value), sum(a.net_profit), 

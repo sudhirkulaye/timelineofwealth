@@ -116,25 +116,42 @@ public class GeneratePDFReport {
     public void setBenchmarkTwrrMonthlyRepository(BenchmarkTwrrMonthlyRepository benchmarkTwrrMonthlyRepository){
         GeneratePDFReport.benchmarkTwrrMonthlyRepository = benchmarkTwrrMonthlyRepository;
     }
+    @Autowired
+    private static CompositeRepository compositeRepository;
+    @Autowired
+    public void setCompositeRepository(CompositeRepository compositeRepository){
+        GeneratePDFReport.compositeRepository = compositeRepository;
+    }
 
     private static HeaderFooterPageEvent headerFooterPageEvent = new HeaderFooterPageEvent();
 
-    private static boolean isAuthenticatedRequest(User user, long memberid){
+    private static boolean isAuthenticatedRequest(User loggedInUser, long memberid){
         logger.debug(String.format("In GeneratePDFReport.isAuthenticatedRequest "));
-        UserMembers userMembers = GeneratePDFReport.userMembersRepository.findByMemberid(memberid);
+        // Check for model portfolio
+        UserMembers memberUser = GeneratePDFReport.userMembersRepository.findByMemberid(memberid);
         //Login user wants to generate PDF
-        if(user.getEmail().equals(userMembers.getEmail())) {
+        if(loggedInUser.getEmail().equals(memberUser.getEmail())) {
             return true;
         }
         //Login adviser wants to generate PDF
-        int count = adviserUserMappingRepository.countByKeyAdviseridAndKeyUserid(user.getEmail(), userMembers.getEmail());
+        int count = adviserUserMappingRepository.countByKeyAdviseridAndKeyUserid(loggedInUser.getEmail(), memberUser.getEmail());
         if (count > 0){
             return true;
         }
         return false;
     }
 
-    public static void addFirstPage(Document document, String reportHeader, long memberid) throws Exception{
+    private static boolean isModelPortfolio(User loggedInUser, long memberid){
+        logger.debug(String.format("In GeneratePDFReport.isAuthenticatedRequest "));
+        // Check for model portfolio
+        int count = compositeRepository.countByFundManagerEmailAndAdviserMemberid(loggedInUser.getEmail(), memberid);
+        if (count > 0){
+            return true;
+        }
+        return false;
+    }
+
+    private static void addFirstPage(Document document, String reportHeader, long memberid, boolean isModelPortfolio) throws Exception{
 
         Paragraph paragraph;
         paragraph = new Paragraph("", topicFont);
@@ -181,16 +198,21 @@ public class GeneratePDFReport {
         table.addCell(leftCell);
         table.addCell(rightCell);
 
-        leftCell = new PdfPCell(new Phrase("Client Name: ",paraTextFont));
-        String prefix = " ";
-        if(member.getGender().equalsIgnoreCase("M")){
-            prefix = "Mr. ";
-        } else if (member.getGender().equalsIgnoreCase("F")){
-            prefix = "Ms. ";
+        if(isModelPortfolio == false) {
+            leftCell = new PdfPCell(new Phrase("Client Name: ",paraTextFont));
+            String prefix = " ";
+            if(member.getGender().equalsIgnoreCase("M")){
+                prefix = "Mr. ";
+            } else if (member.getGender().equalsIgnoreCase("F")){
+                prefix = "Ms. ";
+            } else {
+                prefix = "M/s ";
+            }
+            rightCell = new PdfPCell(new Phrase(prefix + member.getFirstName() + " " + member.getLastName(),paraTextFont));
         } else {
-            prefix = "M/s ";
+            leftCell = new PdfPCell(new Phrase("Model Portfolio Performance",paraTextFont));
+            rightCell = new PdfPCell(new Phrase("",paraTextFont));
         }
-        rightCell = new PdfPCell(new Phrase(prefix + member.getFirstName() + " " + member.getLastName(),paraTextFont));
 
         leftCell.setBorder(Rectangle.NO_BORDER);
         leftCell.setBackgroundColor(BaseColor.WHITE);
@@ -236,7 +258,7 @@ public class GeneratePDFReport {
         document.add(paragraph);
     }
 
-    public static void addListOfPMS(Document document, List<Portfolio> portfolios) throws DocumentException{
+    private static void addListOfPMS(Document document, List<Portfolio> portfolios) throws DocumentException{
 
         document.newPage();
         document.add( Chunk.NEWLINE );
@@ -424,7 +446,7 @@ public class GeneratePDFReport {
         document.add(table);
     }
 
-    public static void addPortfolioHoldings(Document document, List<Portfolio> portfolios, List<ConsolidatedPortfolioHoldings> consolidatedPortfolioHoldings) throws DocumentException{
+    private static void addPortfolioHoldings(Document document, List<Portfolio> portfolios, List<ConsolidatedPortfolioHoldings> consolidatedPortfolioHoldings) throws DocumentException{
 
         document.newPage();
         document.add( Chunk.NEWLINE );
@@ -619,7 +641,7 @@ public class GeneratePDFReport {
         }
     }
 
-    public static void addPortfolioCashflows(Document document, List<Portfolio> portfolios, List<PortfolioReturnsCalculationSupport> cashflows) throws DocumentException{
+    private static void addPortfolioCashflows(Document document, List<Portfolio> portfolios, List<PortfolioReturnsCalculationSupport> cashflows) throws DocumentException{
 
         document.newPage();
         document.add( Chunk.NEWLINE );
@@ -770,7 +792,7 @@ public class GeneratePDFReport {
         }
     }
 
-    public static void addPortfolioReturns(Document document, List<Portfolio> portfolios, List<PortfolioTwrrSummary> portfolioTwrrSummaries, List<PortfolioTwrrMonthly> portfolioTwrrMonthlyList) throws DocumentException{
+    private static void addPortfolioReturns(Document document, List<Portfolio> portfolios, List<PortfolioTwrrSummary> portfolioTwrrSummaries, List<PortfolioTwrrMonthly> portfolioTwrrMonthlyList) throws DocumentException{
 
         document.newPage();
         document.add( Chunk.NEWLINE );
@@ -1492,7 +1514,7 @@ public class GeneratePDFReport {
         }
     }
 
-    public static void addBenchmarkReturns(Document document, List<Portfolio> portfolios, List<BenchmarkTwrrSummaryDTO> benchmarkTwrrSummaries, List<BenchmarkTwrrMonthlyDTO> benchmarkTwrrMonthlyList) throws DocumentException{
+    private static void addBenchmarkReturns(Document document, List<Portfolio> portfolios, List<BenchmarkTwrrSummaryDTO> benchmarkTwrrSummaries, List<BenchmarkTwrrMonthlyDTO> benchmarkTwrrMonthlyList) throws DocumentException{
 
         document.newPage();
         document.add( Chunk.NEWLINE );
@@ -1690,10 +1712,14 @@ public class GeneratePDFReport {
     public static boolean generatePMSPDFForMember(User user, long memberid, ServletContext context, HttpServletRequest request, HttpServletResponse response){
         logger.debug(String.format("In GeneratePDFReport.generatePMSPDFForMember "));
         //Authentication for user PDF Generation
-        boolean isAuthenticatedRequest = isAuthenticatedRequest(user, memberid);
-        if (isAuthenticatedRequest == false){
-            logger.error("Not authorized to generate the report for User email %s and memberid %d", user.getEmail(), memberid);
-            throw new InsufficientAuthenticationException("Not authorized to generate the report");
+        boolean isModelPortfolio = isModelPortfolio(user, memberid);
+
+        if (isModelPortfolio == false){
+            boolean isAuthenticatedRequest = isAuthenticatedRequest(user, memberid);
+            if (isAuthenticatedRequest == false){
+                logger.error("Not authorized to generate the report for User email %s and memberid %d", user.getEmail(), memberid);
+                throw new InsufficientAuthenticationException("Not authorized to generate the report");
+            }
         }
 
         List<Long> members = new ArrayList<>();
@@ -1874,7 +1900,7 @@ public class GeneratePDFReport {
             writer.setPageEvent(GeneratePDFReport.headerFooterPageEvent);
             document.open();
 
-            addFirstPage(document,"PMS Performance and Wealth Distribution Summary", memberid);
+            addFirstPage(document,"PMS Performance and Wealth Distribution Summary", memberid, isModelPortfolio);
             addListOfPMS(document, portfolios);
             addPortfolioHoldings(document, portfolios, consolidatedPortfolioHoldings);
             addPortfolioCashflows(document, portfolios, cashflows);

@@ -63,7 +63,7 @@ SET SQL_SAFE_UPDATES = 0;
 Commit;
 
 select * from stock_universe a WHERE is_nse500 = 1 or is_bse500 = 1;
-select * from stock_universe a WHERE a.ticker like '%DVR%';
+select * from stock_universe a WHERE a.ticker like '%TIFIN%';
 -- Reset all flags
 update stock_universe a set a.is_sensex = 0, a.is_nifty50 = 0, a.is_niftyjr = 0, a.is_bse100 = 0, a.is_nse100 = 0, a.is_bse200 = 0, a.is_nse200 = 0, a.is_bse500 = 0, a.is_nse500 = 0;
 select ticker from stock_universe a where is_niftyjr = 1;

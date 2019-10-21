@@ -551,7 +551,7 @@ ALTER TABLE sip_process_msg_log ADD INDEX index_sip_process_msg_log_date (date);
 -- Drop table adviser_user_mapping
 CREATE TABLE adviser_user_mapping (
   adviserid varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Email ID or login ID of adviser',
-  userid varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Email ID or login ID of adviser',
+  userid varchar(100) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Email ID or login ID of user',
   is_adviser_manager varchar(3) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Yes: Will have edit access to edit cliens data NO: can only give opinion',
   PRIMARY KEY (adviserid, userid)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Adviser User Mapping ';
@@ -885,11 +885,15 @@ SELECT * from stock_price_movement order by ticker;
 -- DROP table composite;
 CREATE TABLE composite (
   compositeid int(3) NOT NULL COMMENT 'PK Composite id',
-  name varchar(20) COLLATE utf8_unicode_ci COMMENT 'Composite Name',
-  description varchar(200) COLLATE utf8_unicode_ci COMMENT 'Composite Description',
-  min_size DECIMAL(20, 3) NOT NULL COMMENT 'Minimum Portfolio Size',
-  benchmarkid varchar(30) COLLATE utf8_unicode_ci COMMENT 'Benchmark ticker',
-  asset_classid int(6) NULL DEFAULT 0 COMMENT 'Asset Class ID',
+  name varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Composite Name',
+  description varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Composite Description',
+  min_size decimal(20,3) NOT NULL COMMENT 'Minimum Portfolio Size',
+  benchmarkid int(3) DEFAULT 1 COMMENT 'Benchmark ticker',
+  asset_classid int(6) DEFAULT '0' COMMENT 'Asset Class ID',
+  amc_name varchar(50) COLLATE utf8_unicode_ci DEFAULT '' COMMENT 'Name of the ACM',
+  adviserid varchar(100) COLLATE utf8_unicode_ci DEFAULT '' COMMENT 'Adviser login id mapped in adviser_user_mapping',
+  adviser_memberid int(11) NOT NULL DEFAULT '0' COMMENT 'Dummy memberid linked to model portfolio',
+  portfolioid int(3) NOT NULL DEFAULT '1' COMMENT 'Linked to model portfolio',
   PRIMARY KEY (compositeid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Composite - Portfolio Strategies';
 
@@ -917,8 +921,6 @@ ALTER TABLE portfolio ADD INDEX index_portfolio_memberid (memberid);
 SELECT * from portfolio;
 select b.first_name, a.* from portfolio a, member b where a.memberid = b.memberid;
 select compositeid, count(1) from portfolio a GROUP BY compositeid;
-
--- DROP table composite_retruns
 
 -- DROP table mosl_code;
 CREATE TABLE moslcode_memberid (
@@ -1187,3 +1189,19 @@ CREATE TABLE benchmark_twrr_summary (
   KEY index_benchmark_twrr_summary_benchmarkid (benchmarkid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Portfolio - TWRR (Time Weighted Rate of Returns) Summary';
 SELECT * from benchmark_twrr_summary;
+
+-- DROP TABLE composite_constituents;
+CREATE TABLE composite_constituents (
+  compositeid int(3) NOT NULL COMMENT 'PK Composite id',
+  ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Usually NSE Code, BSE Code in case there is ''&'' in NSE Code or stock is only listed on BSE',
+  name varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Security Name',
+  short_name varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Security Name - Short',
+  asset_classid int(6) NOT NULL COMMENT 'Asset Class ID',
+  subindustryid int(8) DEFAULT '0' COMMENT 'Sub Industry ID',
+  target_weight int(3) DEFAULT '0' COMMENT 'Target Weight',
+  min_weight int(3) DEFAULT '0' COMMENT 'Min. Weight',
+  max_weight int(3) DEFAULT '0' COMMENT 'Min. Weight',
+  PRIMARY KEY (compositeid,ticker)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Composite Details - The Latest Constituents';
+
+select * from composite_constituents a order by a.target_weight desc; 
