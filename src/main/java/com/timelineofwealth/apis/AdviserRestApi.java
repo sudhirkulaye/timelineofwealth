@@ -2,6 +2,8 @@ package com.timelineofwealth.apis;
 
 import com.timelineofwealth.dto.ClientDTO;
 import com.timelineofwealth.dto.ConsolidatedAssetsDTO;
+import com.timelineofwealth.entities.Composite;
+import com.timelineofwealth.entities.CompositeConstituents;
 import com.timelineofwealth.entities.User;
 import com.timelineofwealth.service.AdviserService;
 import com.timelineofwealth.service.CommonService;
@@ -60,45 +62,19 @@ public class AdviserRestApi {
         return AdviserService.getConsolidatedAssets(user.getEmail(),clientemail);
     }
 
-    @RequestMapping(value = "/generatepmspdf/{memberid}", method = RequestMethod.GET)
-    public void generatePmsPdf(@PathVariable long memberid, HttpServletRequest request, HttpServletResponse response) {
-        logger.debug(String.format("/adviser/generatePmsPdf/ %d", memberid));
-        UserDetails userDetails =
-                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+    @RequestMapping(value = "/getcomposites", method = RequestMethod.GET)
+    public List<Composite> getComposites() {
+        logger.debug(String.format("Call adviser/api/getcomposites "));
 
-        boolean isSuccess = GeneratePDFReport.generatePMSPDFForMember(user, memberid, context, request, response);
-        String fullPath = request.getServletContext().getRealPath("/resources/reports/"+memberid+".pdf");
-        String fileName = ""+memberid+".pdf";
-        if(isSuccess){
-            downloadFile(fullPath,response,fileName);
-        }
-
+        return AdviserService.getComposites();
     }
 
-    private void downloadFile(String fullPath, HttpServletResponse response, String fileName) {
-        logger.debug(String.format("Downloading file %s", fileName));
-        File file = new File(fullPath);
-        final int BUFFER_SIZE = 4095;
-        if(file.exists()){
-            try {
-                FileInputStream inputStream = new FileInputStream(file);
-                String mimeType = context.getMimeType(fullPath);
-                response.setContentType(mimeType);
-                response.setHeader("content-disposition","attachment: filename="+fileName);
-                OutputStream outputStream = response.getOutputStream();
-                byte[] buffer = new byte[BUFFER_SIZE];
-                int byteRead = -1;
-                while ((byteRead = inputStream.read()) != -1) {
-                    outputStream.write(buffer, 0, byteRead);
-                }
-                inputStream.close();
-                outputStream.close();
-                file.delete();
-            } catch (Exception e) {
-                logger.debug(String.format("Error in downloading file %s", fileName));
-            }
-        }
+    @RequestMapping(value = "/getcompositedetails", method = RequestMethod.GET)
+    public List<CompositeConstituents> getCompositeDetails() {
+        logger.debug(String.format("Call adviser/api/getcompositedetails "));
+
+        return AdviserService.getCompositeDetails();
     }
+
 
 }

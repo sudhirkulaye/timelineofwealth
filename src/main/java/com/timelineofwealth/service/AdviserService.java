@@ -6,18 +6,14 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.timelineofwealth.dto.ClientDTO;
 import com.timelineofwealth.dto.ConsolidatedAssetsDTO;
-import com.timelineofwealth.entities.AdviserUserMapping;
-import com.timelineofwealth.entities.Member;
-import com.timelineofwealth.entities.Portfolio;
-import com.timelineofwealth.entities.UserMembers;
-import com.timelineofwealth.repositories.AdviserUserMappingRepository;
-import com.timelineofwealth.repositories.MemberRepository;
-import com.timelineofwealth.repositories.PortfolioRepository;
-import com.timelineofwealth.repositories.WealthDetailsRepository;
+import com.timelineofwealth.entities.*;
+import com.timelineofwealth.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletContext;
@@ -54,6 +50,21 @@ public class AdviserService {
     public void setPortfolioRepository(PortfolioRepository portfolioRepository){
         AdviserService.portfolioRepository = portfolioRepository;
     }
+
+    @Autowired
+    private static CompositeRepository compositeRepository;
+    @Autowired
+    public void setCompositeRepository(CompositeRepository compositeRepository){
+        AdviserService.compositeRepository = compositeRepository;
+    }
+
+    @Autowired
+    private static CompositeConstituentsRepository compositeConstituentsRepository;
+    @Autowired
+    public void setCompositeConstituentsRepository(CompositeConstituentsRepository compositeConstituentsRepository){
+        AdviserService.compositeConstituentsRepository = compositeConstituentsRepository;
+    }
+
 
     public static List<ClientDTO> getClients(String email){
         logger.debug(String.format("In AdviserService.getClients: Email %s", email));
@@ -129,6 +140,35 @@ public class AdviserService {
             assets.addAll(WealthDetailsService.getConsolidatedWealthDetailsRecords(client.getKey().getUserid()));
         }
         return assets;
+    }
+
+
+    public static List<Composite> getComposites(){
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+
+        logger.debug(String.format("In AdviserService.getComposites: Adviser Email %s ", user.getEmail()));
+
+        return AdviserService.compositeRepository.findByFundManagerEmail(user.getEmail());
+
+    }
+
+    public static List<CompositeConstituents> getCompositeDetails(){
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+
+        logger.debug(String.format("In AdviserService.getCompositeDetails: Adviser Email %s", user.getEmail()));
+
+        List<CompositeConstituents> compositeConstituents = new ArrayList<>();
+        List<Composite> composites = new ArrayList<>();
+        composites = AdviserService.compositeRepository.findByFundManagerEmail(user.getEmail());
+        List<Long> compositeids = new ArrayList<>();
+        for (Composite composite : composites ){
+            compositeids.add(new Long(composite.getCompositeid()));
+        }
+        return AdviserService.compositeConstituentsRepository.findAllByKeyCompositeidInOrderByTargetWeightDesc(compositeids);
     }
 
 }

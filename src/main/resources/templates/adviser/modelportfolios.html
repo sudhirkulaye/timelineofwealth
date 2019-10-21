@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="ModelPortfoliosManagement" ng-controller="ModelPortfoliosController">
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- ui-bootstrap-tpls.js -->
+<script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
+<!--Angular custom filter (for group by) JS-->
+<script src="../../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/adviser/modelportfolios.js" th:src="@{/custom/adviser/modelportfolios.js}"></script>
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/advisersidebarmenu :: common-advisersidebarmenu" />
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/usertopnavigation :: common-usertopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <br />
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h1>Composites/Model Portfolios</h1>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <h2><font color="green"><strong>Composites :  </strong> </font></h2>
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><strong>#Composite</strong></th>
+                                        <th><strong>#Portfolio</strong></th>
+                                        <th><strong>Name</strong></th>
+                                        <th><strong>Description</strong></th>
+                                        <th><strong>Min Investment</strong></th>
+                                        <th><strong>Benchmark</strong></th>
+                                        <th><strong>Asset Class</strong></th>
+                                        <td></td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="composite in composites">
+                                        <td>{{composite.compositeid}}</td>
+                                        <td>{{composite.portfolioid}}</td>
+                                        <td>{{composite.name}}</td>
+                                        <td>{{composite.description}}</td>
+                                        <td>{{composite.minSize | currency:"&#8377;":0}}</td>
+                                        <td>{{composite.benchmarkid}}</td>
+                                        <td>{{composite.assetClassid}}</td>
+                                        <td><button type="button" ng-click="setFilter(composite.compositeid)" class="btn btn-success  pull-right btn-xs">Show Details</button></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="x_content">
+                            <h2><font color="green"><strong>Composite Constituents  </strong> </font></h2>
+                            <div class="clearfix"></div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><strong>#Folio</strong></th>
+                                        <th><strong>Asset Class</strong></th>
+                                        <th><strong>Sub-industry</strong></th>
+                                        <th><strong>Security</strong></th>
+                                        <th><strong>Target Wt.%</strong></th>
+                                        <th><strong>Min. Wt.%</strong></th>
+                                        <th><strong>Max Wt.%</strong></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="compositeDetail in compositeDetails | filter:filterCompositeConstituents">
+                                        <td>{{compositeDetail.key.compositeid }}</td>
+                                        <td>{{ (assetClasses | filter : { 'classid' : compositeDetail.assetClassid})[0].assetClassGroup }}</td>
+                                        <td>{{(industries | filter : { 'subindustryid' : compositeDetail.subindustryid})[0].sectorNameDisplay}}-{{(industries | filter : { 'subindustryid' : compositeDetail.subindustryid})[0].industryNameDisplay}}</td>
+                                        <td>{{compositeDetail.shortName}}</td>
+                                        <td>{{compositeDetail.targetWeight}}</td>
+                                        <td>{{compositeDetail.minWeight}}</td>
+                                        <td>{{compositeDetail.maxWeight}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>

@@ -399,7 +399,7 @@ public class AdminViewController {
             boolean isHeader = true;
             CSVUtils csvUtils = new CSVUtils();
             List<MutualFundNavHistory> mutualFundNavHistories = new ArrayList<>();
-            int positionOfSchemeCode = 0, positionOfDate = 0, positionOfNav = 0, schemeNamePostion = 0;
+            int positionOfSchemeCode = 0, positionOfDate = 0, positionOfNav = 0, schemeNamePostion = 0, isinPosition = 0, isinReinvestmentPosition = 0;
             while (scanner.hasNext()) {
                 List<String> line = csvUtils.parseLine(scanner.nextLine(),';');
                 if(isHeader){
@@ -419,6 +419,12 @@ public class AdminViewController {
                         if (column.trim().equalsIgnoreCase("Scheme Name")){
                             schemeNamePostion = i;
                         }
+                        if (column.trim().equalsIgnoreCase("ISIN Div Payout/ISIN Growth")){
+                            isinPosition = i;
+                        }
+                        if (column.trim().equalsIgnoreCase("ISIN Div Reinvestment")){
+                            isinReinvestmentPosition = i;
+                        }
                     }
                     continue;
                 }
@@ -428,7 +434,7 @@ public class AdminViewController {
                 Integer code = Integer.parseInt(line.get(positionOfSchemeCode));
                 SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy");
                 java.sql.Date date = null;
-                String isin;
+
                 try {
                     date = new java.sql.Date(format.parse(line.get(positionOfDate)).getTime());
                 } catch (ParseException e) {
@@ -442,6 +448,15 @@ public class AdminViewController {
                     nav = new BigDecimal(0);
                 }
                 String schemeName = line.get(schemeNamePostion);
+                schemeName.trim();
+                String isin = "";
+                if(isinPosition != 0) {
+                    isin = line.get(isinPosition);
+                }
+                String isinReinvestment = "";
+                if(isinReinvestmentPosition != 0) {
+                    isinReinvestment = line.get(isinReinvestmentPosition);
+                }
 
                 MutualFundNavHistory mutualFundNavHistory = new MutualFundNavHistory();
                 mutualFundNavHistory.setKey(new MutualFundNavHistory.MutualFundNavHistoryKey(code, date));
@@ -453,6 +468,8 @@ public class AdminViewController {
                     MutualFundUniverse mutualFundUniverse = new MutualFundUniverse();
                     mutualFundUniverse.setSchemeCode(new Long(code));
                     mutualFundUniverse.setSchemeNameFull(schemeName);
+                    mutualFundUniverse.setIsinDivPayoutIsinGrowth(isin);
+                    mutualFundUniverse.setIsinDivReinvestment(isinReinvestment);
                     mutualFundUniverse.setDateLatestNav(date);
                     mutualFundUniverse.setFundHouse("XXX");
                     mutualFundUniverse.setSchemeNamePart("XXX");
@@ -471,7 +488,19 @@ public class AdminViewController {
                     }
                     mutualFundUniverse.setIsinDivPayoutIsinGrowth("XXX");
                     mutualFundUniverseRepository.save(mutualFundUniverse);
-                }
+                } /*else { //Run this code once in a quarter or month (offline) to update Mutual Fund
+                    MutualFundUniverse existingFund = mutualFundUniverseRepository.findBySchemeCode(new Long(code));
+                    if(!existingFund.getSchemeNameFull().equals(schemeName)
+                            || (existingFund.getIsinDivReinvestment() != null && !existingFund.getIsinDivReinvestment().equals(isinReinvestment))
+                            || (existingFund.getIsinDivPayoutIsinGrowth() != null && !existingFund.getIsinDivPayoutIsinGrowth().equals(isin))) {
+                        existingFund.setSchemeNameFull(schemeName);
+                        existingFund.setIsinDivPayoutIsinGrowth(isin);
+                        existingFund.setIsinDivReinvestment(isinReinvestment);
+                        //String temp = "Updating Fund Full Name "+code+"-Old Name: "+existingFund.getSchemeNameFull()+"; New Name: "+schemeName;
+                        logger.debug(String.format("Name changed for %d", code));
+                        mutualFundUniverseRepository.save(existingFund);
+                    }
+                }*/
             }
             mutualFundNavHistories.sort(Comparator.comparing(l->l.getKey().getSchemeCode()));
             //mutualFundRepository.deleteAllInBatch();
