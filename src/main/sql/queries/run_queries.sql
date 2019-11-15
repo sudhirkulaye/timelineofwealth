@@ -1,7 +1,10 @@
+select * from member a where a.first_name = 'Sindhu';
 SELECT * from mutual_fund_stats a ORDER BY a.scheme_type, a.trailing_return_1yr desc;
 SELECT * FROM stock_price_movement a ORDER BY a.ticker; 
 SELECT * from nse_price_history a where date = '2019-09-19';
 select * from index_valuation a where date = '2019-09-19';
+select * from wealth_details a where memberid in (1000, 1011);
+select * from portfolio_holdings a where memberid = 1000;
 
 call ap_process_portfolio_returns;
 
@@ -73,3 +76,6 @@ select * from nse_price_history a where date = '2019-09-12';
     AND a.moslcode = b.moslcode
     GROUP BY b.memberid, a.moslcode, date, script_name, sell_buy
     ORDER BY date, a.moslcode, sell_buy, order_no, trade_no, script_name;
+    
+select * from daily_data_s a where name = 'Bandhan Bank' and (a.date in ('2019-10-24', '2019-07-19', '2019-05-02', '2019-01-10') or date > '2019-10-24') order by date desc;
+    
