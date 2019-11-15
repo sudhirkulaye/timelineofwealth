@@ -93,7 +93,7 @@ public class PublicViewController {
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Timeline of Wealth");
-        return "public/pmsApp";
+        return "public/pmsapp";
     }
 
     @RequestMapping(value = "/public/ethicalstandards")
