@@ -8,4 +8,5 @@ import java.util.List;
 public interface CompositeConstituentsRepository extends JpaRepository<CompositeConstituents, Long> {
     public List<CompositeConstituents> findAll();
     public List<CompositeConstituents> findAllByKeyCompositeidInOrderByTargetWeightDesc(List<Long> compositeids);
+    public int countByKeyCompositeidAndKeyTicker(long compositeid, String ticker);
 }

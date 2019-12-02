@@ -19,7 +19,7 @@ SELECT prod(returns_calendar_year + 1)
 FROM   portfolio_twrr_monthly a
 WHERE  a.memberid = 1026 AND a.portfolioid = 1;
 
-call ap_process_benchmark_returns();
+call ap_process_benchmark_returns;
 select * from benchmark_twrr_summary order by benchmarkid;
 SELECT * from benchmark_twrr_monthly order by benchmarkid, year desc;
 SELECT * from index_valuation where ticker = 'NIFTY' ORDER BY date desc;
@@ -79,3 +79,20 @@ select * from nse_price_history a where date = '2019-09-12';
     
 select * from daily_data_s a where name = 'Bandhan Bank' and (a.date in ('2019-10-24', '2019-07-19', '2019-05-02', '2019-01-10') or date > '2019-10-24') order by date desc;
     
+select * from daily_data_s a where a.name = 'HDFC Bank' and date IN ('2018-07-23', '2018-04-24' );
+
+SELECT b.memberid, a.moslcode, a.portfolioid, date, script_name, sell_buy, sum(quantity), sum(amount), sum(brokerage), sum(txn_charges), sum(service_tax), sum(stamp_duty), sum(stt_ctt)
+    FROM  mosl_transaction a, moslcode_memberid b
+    WHERE (is_processed = NULL OR is_processed = 'N') 
+    AND a.moslcode = b.moslcode
+    GROUP BY b.memberid, a.moslcode, date, script_name, sell_buy
+    ORDER BY date, a.moslcode, sell_buy, order_no, trade_no, script_name;
+    
+SELECT * from wealth_asset_allocation_history
+where date = (select date_today from setup_dates)
+and memberid in (1000, 1011)
+group by date order by date desc;
+
+select * from daily_data_s a where a.date = '2018-10-26' and a.name = 'ITC';
+
+update composite_constituents a, stock_universe b set a.name = b.name where a.ticker = b.ticker;

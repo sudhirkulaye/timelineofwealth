@@ -171,4 +171,50 @@ public class AdviserService {
         return AdviserService.compositeConstituentsRepository.findAllByKeyCompositeidInOrderByTargetWeightDesc(compositeids);
     }
 
+    public static void updateCompositeDetails(CompositeConstituents editedRecord) {
+        logger.debug(String.format("In AdviserService.updateCompositeDetails: editedRecord.key.compositeid %d - %s", editedRecord.getKey().getCompositeid(), editedRecord.getKey().getTicker()));
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        logger.debug(String.format("In AdviserService.updateCompositeDetails: Email %s", user.getEmail()));
+        int count = AdviserService.compositeRepository.countByFundManagerEmailAndCompositeid(user.getEmail(), editedRecord.getKey().getCompositeid());
+        if(count == 1){
+            AdviserService.compositeConstituentsRepository.save(editedRecord);
+        } else {
+            throw new InsufficientAuthenticationException("User is not authorized");
+        }
+    }
+
+    public static void addCompositeDetails(CompositeConstituents newRecord) {
+        logger.debug(String.format("In AdviserService.addCompositeDetails: newRecord.key.memberid %d - %s", newRecord.getKey().getCompositeid(), newRecord.getKey().getTicker()));
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        logger.debug(String.format("In AdviserService.addCompositeDetails: Email %s", user.getEmail()));
+        int count = AdviserService.compositeRepository.countByFundManagerEmailAndCompositeid(user.getEmail(), newRecord.getKey().getCompositeid());
+        if(count == 1){
+            count = AdviserService.compositeConstituentsRepository.countByKeyCompositeidAndKeyTicker(newRecord.getKey().getCompositeid(), newRecord.getKey().getTicker());
+            logger.debug(String.format("In AdviserService.addCompositeDetails: record count is %d", count));
+            if (count == 0) {
+                AdviserService.compositeConstituentsRepository.save(newRecord);
+            } else {
+                throw new IllegalArgumentException("Record already exists.");
+            }
+        } else {
+            throw new InsufficientAuthenticationException("User is not authorized");
+        }
+    }
+    public static void deleteCompositeDetails(CompositeConstituents deletedRecord){
+        logger.debug(String.format("In AdviserService.deleteCompositeDetails: deletedRecord.shortName %d - %s", deletedRecord.getKey().getCompositeid(), deletedRecord.getKey().getTicker()));
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = CommonService.getLoggedInUser(userDetails);
+        logger.debug(String.format("In AdviserService.deleteWealthDetailsRecord: Email %s", user.getEmail()));
+        int count = AdviserService.compositeRepository.countByFundManagerEmailAndCompositeid(user.getEmail(), deletedRecord.getKey().getCompositeid());
+        if(count == 1){
+            AdviserService.compositeConstituentsRepository.delete(deletedRecord);
+        } else {
+            throw new InsufficientAuthenticationException("User is not authorized");
+        }
+    }
 }

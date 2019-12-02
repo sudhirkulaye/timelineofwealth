@@ -33,6 +33,8 @@ public class CompositeConstituents  implements Serializable {
     private CompositeConstituentsKey key;
     @Column(name = "short_name")
     private String shortName;
+    @Column(name = "name")
+    private String name;
     @Column(name = "asset_classid")
     private long assetClassid;
     @Column(name = "subindustryid")
@@ -56,6 +58,13 @@ public class CompositeConstituents  implements Serializable {
     }
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
     }
 
     public long getAssetClassid() {

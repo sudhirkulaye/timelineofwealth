@@ -113,7 +113,7 @@ public class WealthDetailsService {
         logger.debug(String.format("In WealthDetailsService.addWealthDetailsRecord: Email %s", user.getEmail()));
         if(MemberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
             int count = WealthDetailsService.wealthDetailsRepository.countByKeyMemberidAndKeyBuyDateAndKeyTicker(newRecord.getKey().getMemberid(), newRecord.getKey().getBuyDate(), newRecord.getKey().getTicker());
-            logger.debug(String.format("In LiabilityService.addLiabilityRecord: record count is %d", count));
+            logger.debug(String.format("In WealthDetailsService.addWealthDetailsRecord: record count is %d", count));
             if (count == 0) {
                 WealthDetailsService.wealthDetailsRepository.save(newRecord);
             } else {
