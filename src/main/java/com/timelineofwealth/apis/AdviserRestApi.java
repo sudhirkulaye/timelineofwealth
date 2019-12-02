@@ -76,5 +76,25 @@ public class AdviserRestApi {
         return AdviserService.getCompositeDetails();
     }
 
+    @RequestMapping(value = "/deletecompositedetail", method = RequestMethod.POST)
+    public List<CompositeConstituents> deleteCompositeDetails(@RequestBody CompositeConstituents deleteRecord) {
+        logger.debug(String.format("Call adviser/api/deletecompositedetails " + deleteRecord.getShortName()));
+        AdviserService.deleteCompositeDetails(deleteRecord);
+        return getCompositeDetails();
+    }
+
+    @RequestMapping(value = "/updatewcompositedetail", method = RequestMethod.PUT)
+    public List<CompositeConstituents> updateWealthDetailsRecord(@RequestBody CompositeConstituents editedRecord) {
+        logger.debug("Call user/api/updatecompositedetails/ " + editedRecord.getShortName());
+        AdviserService.updateCompositeDetails(editedRecord);
+        return getCompositeDetails();
+    }
+
+    @RequestMapping(value = "/addcompositedetail", method = RequestMethod.POST)
+    public List<CompositeConstituents> addWealthDetailsRecord(@RequestBody CompositeConstituents newRecord) {
+        logger.debug("Call user/api/addcompositedetail/ " + newRecord.getShortName());
+        AdviserService.addCompositeDetails(newRecord);
+        return getCompositeDetails();
+    }
 
 }

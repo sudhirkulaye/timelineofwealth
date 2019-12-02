@@ -6,6 +6,7 @@ select * from user_members;
 select * from member; 
 select * from adviser_user_mapping;
 select * from composite; -- 5 composites
+select * from composite_constituents; 
 select * from portfolio a order by a.memberid, a.portfolioid; -- total 21 portfolios 
 select compositeid, count(1) from portfolio a group by compositeid order by a.memberid, a.portfolioid; -- (composite 1: 11, 2: 10)
 select * from portfolio_cashflow where memberid in (1000) order by portfolioid, date desc;
@@ -16,8 +17,8 @@ select * from portfolio_twrr_monthly a where memberid in (1);
 select * from benchmark;
 
 -- All portfolio holdings
-SELECT * FROM portfolio_holdings a  WHERE memberid = 1000 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
-SELECT * FROM portfolio_historical_holdings a  WHERE memberid = 1003 order by a.memberid, a.portfolioid, a.sell_date desc, a.asset_classid, a.ticker;
+SELECT * FROM portfolio_holdings a  WHERE memberid = 1001 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+SELECT * FROM portfolio_historical_holdings a  WHERE memberid = 1001 order by a.memberid, a.portfolioid, a.sell_date desc, a.asset_classid, a.ticker;
 -- query to find wt of each security to compare with model portfolio
 SELECT c.moslcode, d.first_name, d.last_name, a.memberid, a.portfolioid, 
 a.short_name, sum(a.quantity), sum(a.total_cost), sum(a.market_value), sum(a.net_profit), 
@@ -104,10 +105,11 @@ commit;
 select * from log_table;
 truncate log_table; 
 -- DELETE from mosl_transaction where moslcode = 'H20488';
-select * from mosl_transaction where date >= '2019-11-01' and script_name = 'MOSL_CASH' and is_processed = 'N' order by date;
+select * from mosl_transaction where date = '2019-11-27' and script_name != 'MOSL_CASH' and is_processed != 'Y' order by date;
 SELECT * FROM stock_universe a WHERE ticker in ('YESBANK','');
-select * from portfolio_holdings a where a.memberid in (1) order by asset_classid, ticker, buy_date;
-select * from portfolio_historical_holdings a where a.memberid in (1026) order by sell_date desc, ticker;
+update mosl_transaction set portfolioid = 1 where date = '2019-11-18';
+select * from portfolio_holdings a where a.memberid in (1000) order by asset_classid, ticker, buy_date;
+select * from portfolio_historical_holdings a where a.memberid in (1) order by sell_date desc, ticker;
 select b.moslcode, a.memberid, a.portfolioid, a.ticker, a.total_cost, a.cmp, a.market_value, b.net_amount 
 from portfolio_holdings a, moslcode_memberid c, mosl_transaction b
 WHERE a.memberid = c.memberid and a.portfolioid = b.portfolioid and b.moslcode = c.moslcode 
@@ -117,10 +119,10 @@ and b.script_name = 'MOSL_CASH' and a.ticker = 'MOSL_CASH' and b.is_processed = 
 -- UPDATE mosl_transaction set is_processed = 'N' where moslcode = 'H22295';
 -- DELETE from mosl_transaction where moslcode = 'H22295';
 select * from moslcode_memberid a where moslcode = 'H22295';
-SELECT * from portfolio a where a. memberid = 1026 and portfolioid = 1;
+SELECT * from portfolio a where a. memberid = 1 and portfolioid = 1;
 select * from portfolio_cashflow a where a. memberid = 1003 and portfolioid = 1;
 select * from portfolio_holdings a where a. memberid = 1 and portfolioid = 2 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
-SELECT * from portfolio_value_history a where a. memberid = 1 and a.date >= '2019-11-01' order by memberid, portfolioid, date desc; 
+SELECT * from portfolio_value_history a where a.date >= '2019-11-18' and a. memberid = 1 order by memberid, portfolioid, date desc; 
 SELECT * from portfolio_returns_calculation_support a where a. memberid = 1026 and portfolioid = 1 ORDER BY a.memberid, a.portfolioid, a.date;
 select * from portfolio_twrr_monthly a where a. memberid = 1026 and portfolioid = 1;
 SELECT * from portfolio_twrr_summary a where a. memberid = 1026 and portfolioid = 1;
