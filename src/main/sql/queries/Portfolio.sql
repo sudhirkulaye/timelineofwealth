@@ -9,7 +9,7 @@ select * from composite; -- 5 composites
 select * from composite_constituents; 
 select * from portfolio a order by a.memberid, a.portfolioid; -- total 21 portfolios 
 select compositeid, count(1) from portfolio a group by compositeid order by a.memberid, a.portfolioid; -- (composite 1: 11, 2: 10)
-select * from portfolio_cashflow where memberid in (1000) order by portfolioid, date desc;
+select * from portfolio_cashflow where memberid in (1001, 1002) order by portfolioid, date desc;
 select * from portfolio_value_history a where memberid in (1000) and  date >= '2019-10-30' order by date desc;
 select * from portfolio_returns_calculation_support a where memberid in (1000);
 select * from portfolio_twrr_summary a where memberid in (1, 1007);

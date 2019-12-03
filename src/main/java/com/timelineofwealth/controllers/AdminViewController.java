@@ -788,6 +788,7 @@ public class AdminViewController {
     public String eodProcsStatus(Model model, @RequestParam("confirmation") String confirmation){
         if (confirmation.equalsIgnoreCase("yes")) {
             StoredProcedureQuery storedProcedure = entityManager.createStoredProcedureQuery(AP_PROCESS_EOD);
+            storedProcedure.setHint("javax.persistence.query.timeout", 1000000); //16.67 mins for timeout
             boolean result = storedProcedure.execute();
             if (!result) {
                 model.addAttribute("message", "Successfully ran EOD procedures");
