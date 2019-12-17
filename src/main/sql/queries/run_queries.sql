@@ -5,7 +5,11 @@ SELECT * from nse_price_history a where date = '2019-09-19';
 select * from index_valuation a where date = '2019-09-19';
 select * from wealth_details a where memberid in (1000, 1011);
 select * from portfolio_holdings a where memberid = 1000;
-
+select * from wealth_details a where memberid in (1007,1015,1058);
+select * from sip a where memberid in (1007,1015,1058);
+select * from mutual_fund_universe a where a.scheme_name_part like 'Franklin India Bluechip%';
+-- 120564 - Aditya Birla Life Equity Fund-Dir-G
+-- 118531 - Franklin India Bluechip Fund-Dir-G
 call ap_process_portfolio_returns;
 
 
