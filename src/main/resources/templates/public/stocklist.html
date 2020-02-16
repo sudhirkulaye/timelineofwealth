@@ -99,6 +99,7 @@
                                     <th ng-click="sortData('sectorNameDisplay')" ng-hide="flagBasicInfo">Sector<i ng-class="getSortClass('sectorNameDisplay')" /></th>
                                     <th ng-click="sortData('industryNameDisplay')" ng-hide="flagBasicInfo">Industry<i ng-class="getSortClass('industryNameDisplay')" /></th>
                                     <th ng-click="sortData('subIndustryNameDisplay')" >Sub-Industry<i ng-class="getSortClass('subIndustryNameDisplay')" /></th>
+                                    <th>Last Price</th>
                                     <th ng-click="sortData('dailyDataS.marketCap')" ng-hide="flagBasicInfo">MCap<i ng-class="getSortClass('dailyDataS.marketCap')" /></th>
                                     <th ng-click="sortData('dailyDataS.rank')" >MCap Rank<i ng-class="getSortClass('dailyDataS.rank')" /></th>
                                     <th ng-click="sortData('dailyDataS.lastResultDate')" ng-hide="flagFundamentalInfo">Last Result<i ng-class="getSortClass('dailyDataS.lastResultDate')" /></th>
@@ -153,6 +154,7 @@
                                     <td ng-hide="flagBasicInfo">{{stock.sectorNameDisplay}}</td>
                                     <td ng-hide="flagBasicInfo">{{stock.industryNameDisplay}}</td>
                                     <td >{{stock.subIndustryNameDisplay}}</td>
+                                    <td >{{stock.latestPrice | number:0}}</td>
                                     <td ng-hide="flagBasicInfo">{{stock.dailyDataS.marketCap | currency:"&#8377;":0}}</td>
                                     <td >{{stock.dailyDataS.rank}}</td>
                                     <td ng-hide="flagFundamentalInfo">{{stock.dailyDataS.lastResultDate}}</td>
