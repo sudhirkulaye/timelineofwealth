@@ -26,7 +26,7 @@ WHERE  a.memberid = 1026 AND a.portfolioid = 1;
 call ap_process_benchmark_returns;
 select * from benchmark_twrr_summary order by benchmarkid;
 SELECT * from benchmark_twrr_monthly order by benchmarkid, year desc;
-SELECT * from index_valuation where ticker = 'NIFTY' ORDER BY date desc;
+SELECT * from index_valuation where date > '2020-01-18' and ticker = 'NIFTY' ORDER BY date desc;
 select * from mutual_fund_nav_history a WHERE date IN (SELECT max(date) FROM mutual_fund_nav_history WHERE scheme_code = '118525' group by year(date), month(date)) AND scheme_code = '118525' order by date desc;
 SELECT date, value FROM index_valuation a WHERE date > '2019-01-01' and date IN (SELECT max(date) FROM index_valuation WHERE ticker = 'NIFTY' group by year(date), month(date)) AND ticker = 'NIFTY' order by date desc;
 select * from benchmark;
@@ -100,3 +100,7 @@ group by date order by date desc;
 select * from daily_data_s a where a.date = '2018-10-26' and a.name = 'ITC';
 
 update composite_constituents a, stock_universe b set a.name = b.name where a.ticker = b.ticker;
+
+select distinct fund_house, count(1) from mutual_fund_universe a group by fund_house order by fund_house, scheme_name_full;
+select * from mutual_fund_universe a order by fund_house, scheme_name_full;
+select * from asset_classification;

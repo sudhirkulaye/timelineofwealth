@@ -146,9 +146,9 @@ commit;
 -- new quarter results
 SELECT b.ticker from daily_data_s a, stock_universe b 
 where a.name = b.ticker5 and 
-a.last_result_date = '201909' and 
+a.last_result_date = '201912' and 
 date = (select max(date) from daily_data_s a) and 
-b.ticker not in (select distinct ticker from stock_quarter a where date = '2019-09-30');
+b.ticker not in (select distinct ticker from stock_quarter a where date = '2019-12-31');
 -- new annual p&L 
 select distinct ticker, max(date) from stock_pnl a where month(date) != 3 group by ticker having max(date) not in ('2018-12-31', '2019-03-31', '2018-06-30') ORDER BY max(date) desc;
 SELECT ticker, cons_standalone, max(date) from stock_pnl a group by ticker, cons_standalone 
@@ -177,9 +177,10 @@ select * from stock_universe a where ticker in ('530643');
 select * from stock_cashflow a where ticker = 'KPITTECH';
 
 -- Stock Split, Bonus
-SELECT date, close_price from nse_price_history a where a.nse_ticker = 'HDFCBANK' and date <= '2019-09-19' order by date desc;
-SELECT date, close_price from bse_price_history a where a.bse_ticker = '509887' and date <= '2019-07-03' order by date desc;
-select * from stock_price_movement_history a where a.ticker = 'HDFCBANK' and date >= '2019-09-19';
+select a.* from stock_split_probability a where a.is_processed != 'YES1' order by date desc;
+SELECT date, close_price, a.* from nse_price_history a where a.nse_ticker = 'RELAXO' and date <= '2019-06-26' order by date desc;
+SELECT date, close_price from bse_price_history a where a.bse_ticker = 'HCLTECH' and date <= '2019-12-05' order by date desc;
+select * from stock_price_movement_history a where a.ticker = 'HCLTECH' and date >= '2019-12-05';
 SELECT * from wealth_details a where ticker = 'RELAXO';
 SELECT * from portfolio_holdings a where ticker = 'RELAXO';
 
@@ -190,7 +191,11 @@ update nse_price_history a set close_price = close_price * ( 2 / 5 ) where a.nse
 update nse_price_history a set close_price = close_price * ( 4 / 5 ) where a.nse_ticker = 'ASTRAL' and date < '2019-09-16' ;
 update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'BRIGADE' and date < '2019-08-28' ;
 update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'HDFCBANK' and date < '2019-09-19' ;
-
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'HCLTECH' and date < '2019-12-05' ;
+update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'BALMLAWRIE' and date < '2019-12-26';
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'AARTIIND' and date < '2019-09-27' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'VINATIORGA' and date < '2020-02-05' ;
+update nse_price_history a set close_price = close_price * ( 1 / 10 ) where a.nse_ticker = 'TRIDENT'  and date < '2019-12-13' ;
 
 
 update wealth_details set quantity = quantity * 2, rate = rate * (1/2), net_rate = net_rate * (1/2) where ticker = 'RELAXO';
