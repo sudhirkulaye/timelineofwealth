@@ -10,6 +10,7 @@ module.controller('StockListController', function($scope, $http, $filter) {
     $scope.flagCapitalStructureInfo = true;
     $scope.flagValuations = true;
     $scope.flagPricePerformance = true;
+    $scope.flagAdditionalInfo = true;
     $scope.flagAnalystsCall = true;
     $scope.reverseSort = false;
 
@@ -129,6 +130,7 @@ module.controller('StockListController', function($scope, $http, $filter) {
             $scope.flagCapitalStructureInfo = true;
             $scope.flagValuations = true;
             $scope.flagPricePerformance = true;
+            $scope.flagAdditionalInfo = true;
             $scope.flagAnalystsCall = true;
         }
         if (selectedOption == "FundamentalInfo") {
@@ -137,6 +139,7 @@ module.controller('StockListController', function($scope, $http, $filter) {
             $scope.flagCapitalStructureInfo = true;
             $scope.flagValuations = true;
             $scope.flagPricePerformance = true;
+            $scope.flagAdditionalInfo = true;
             $scope.flagAnalystsCall = true;
         }
         if (selectedOption == "CapitalStructureInfo") {
@@ -145,6 +148,7 @@ module.controller('StockListController', function($scope, $http, $filter) {
             $scope.flagCapitalStructureInfo = false;
             $scope.flagValuations = true;
             $scope.flagPricePerformance = true;
+            $scope.flagAdditionalInfo = true;
             $scope.flagAnalystsCall = true;
         }
         if (selectedOption == "Valuations") {
@@ -153,6 +157,7 @@ module.controller('StockListController', function($scope, $http, $filter) {
             $scope.flagCapitalStructureInfo = true;
             $scope.flagValuations = false;
             $scope.flagPricePerformance = true;
+            $scope.flagAdditionalInfo = true;
             $scope.flagAnalystsCall = true;
         }
         if (selectedOption == "PricePerformance") {
@@ -161,6 +166,16 @@ module.controller('StockListController', function($scope, $http, $filter) {
             $scope.flagCapitalStructureInfo = true;
             $scope.flagValuations = true;
             $scope.flagPricePerformance = false;
+            $scope.flagAdditionalInfo = true;
+            $scope.flagAnalystsCall = true;
+        }
+        if (selectedOption == "AdditionalInfo") {
+            $scope.flagBasicInfo = true;
+            $scope.flagFundamentalInfo = true;
+            $scope.flagCapitalStructureInfo = true;
+            $scope.flagValuations = true;
+            $scope.flagPricePerformance = true;
+            $scope.flagAdditionalInfo = false;
             $scope.flagAnalystsCall = true;
         }
         if (selectedOption == "AnalystsCall") {
@@ -169,6 +184,7 @@ module.controller('StockListController', function($scope, $http, $filter) {
             $scope.flagCapitalStructureInfo = true;
             $scope.flagValuations = true;
             $scope.flagPricePerformance = true;
+            $scope.flagAdditionalInfo = true;
             $scope.flagAnalystsCall = false;
         }
     }
