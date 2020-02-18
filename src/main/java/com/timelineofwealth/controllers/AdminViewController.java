@@ -590,6 +590,46 @@ public class AdminViewController {
                 } catch (Exception e) {
                     dailyDataS.setAvgRoce3years(new BigDecimal(0));
                 }
+                try{
+                    dailyDataS.setFcfS(new BigDecimal(row.getCell(31).getNumericCellValue()));
+                } catch (Exception e) {
+                    dailyDataS.setFcfS(new BigDecimal(0));
+                }
+                try{
+                    dailyDataS.setSalesGrowth5years(new BigDecimal(row.getCell(32).getNumericCellValue()));
+                } catch (Exception e) {
+                    dailyDataS.setSalesGrowth5years(new BigDecimal(0));
+                }
+                try{
+                    dailyDataS.setSalesGrowth10years(new BigDecimal(row.getCell(33).getNumericCellValue()));
+                } catch (Exception e) {
+                    dailyDataS.setSalesGrowth10years(new BigDecimal(0));
+                }
+                try{
+                    dailyDataS.setNoplat(new BigDecimal(row.getCell(34).getNumericCellValue()));
+                } catch (Exception e) {
+                    dailyDataS.setNoplat(new BigDecimal(0));
+                }
+                try{
+                    dailyDataS.setCapex(new BigDecimal(row.getCell(35).getNumericCellValue()));
+                } catch (Exception e) {
+                    dailyDataS.setCapex(new BigDecimal(0));
+                }
+                try{
+                    dailyDataS.setFcff(new BigDecimal(row.getCell(36).getNumericCellValue()));
+                } catch (Exception e) {
+                    dailyDataS.setFcff(new BigDecimal(0));
+                }
+                try{
+                    dailyDataS.setInvestedCapital(new BigDecimal(row.getCell(37).getNumericCellValue()));
+                } catch (Exception e) {
+                    dailyDataS.setInvestedCapital(new BigDecimal(0));
+                }
+                try{
+                    dailyDataS.setRoic(new BigDecimal(row.getCell(38).getNumericCellValue()));
+                } catch (Exception e) {
+                    dailyDataS.setRoic(new BigDecimal(0));
+                }
                 dailyDataS.setMcapToNetprofit(new BigDecimal(0));
                 dailyDataS.setMcapToSales(new BigDecimal(0));
                 dailyDataS.setSector("");

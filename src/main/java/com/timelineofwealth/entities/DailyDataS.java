@@ -100,6 +100,24 @@ public class DailyDataS implements Serializable{
     private String industry;
     @Column(name = "sub_industry")
     private String subIndustry;
+    // Newly added
+    @Column(name = "fcf_s")
+    private BigDecimal fcfS;
+    @Column(name = "sales_growth_5years")
+    private BigDecimal salesGrowth5years;
+    @Column(name = "sales_growth_10years")
+    private BigDecimal salesGrowth10years;
+    @Column(name = "noplat")
+    private BigDecimal noplat;
+    @Column(name = "capex")
+    private BigDecimal capex;
+    @Column(name = "fcff")
+    private BigDecimal fcff;
+    @Column(name = "invested_capital")
+    private BigDecimal investedCapital;
+    @Column(name = "roic")
+    private BigDecimal roic;
+
 
     public DailyDataSKey getKey() {
         return key;
@@ -344,6 +362,62 @@ public class DailyDataS implements Serializable{
     }
     public void setSubIndustry(String subIndustry) {
         this.subIndustry = subIndustry;
+    }
+
+    public BigDecimal getFcfS() {
+        return fcfS;
+    }
+    public void setFcfS(BigDecimal fcfS) {
+        this.fcfS = fcfS;
+    }
+
+    public BigDecimal getSalesGrowth5years() {
+        return salesGrowth5years;
+    }
+    public void setSalesGrowth5years(BigDecimal salesGrowth5years) {
+        this.salesGrowth5years = salesGrowth5years;
+    }
+
+    public BigDecimal getSalesGrowth10years() {
+        return salesGrowth10years;
+    }
+    public void setSalesGrowth10years(BigDecimal salesGrowth10years) {
+        this.salesGrowth10years = salesGrowth10years;
+    }
+
+    public BigDecimal getNoplat() {
+        return noplat;
+    }
+    public void setNoplat(BigDecimal noplat) {
+        this.noplat = noplat;
+    }
+
+    public BigDecimal getCapex() {
+        return capex;
+    }
+    public void setCapex(BigDecimal capex) {
+        this.capex = capex;
+    }
+
+    public BigDecimal getFcff() {
+        return fcff;
+    }
+    public void setFcff(BigDecimal fcff) {
+        this.fcff = fcff;
+    }
+
+    public BigDecimal getInvestedCapital() {
+        return investedCapital;
+    }
+    public void setInvestedCapital(BigDecimal investedCapital) {
+        this.investedCapital = investedCapital;
+    }
+
+    public BigDecimal getRoic() {
+        return roic;
+    }
+    public void setRoic(BigDecimal roic) {
+        this.roic = roic;
     }
 
 }

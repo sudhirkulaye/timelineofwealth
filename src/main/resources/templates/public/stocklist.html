@@ -77,12 +77,13 @@
                         </div>
                         <div class="x_content">
                             <lebel class="pull-left" >&nbsp;&nbsp;&nbsp; Show &nbsp;&nbsp;&nbsp; </lebel>
-                            <lebel class="pull-left" > <input type="radio" checked="" value="returns" id="optionsRadios1" name="optionsRadios" ng-click="showColumns('BasicInfo')" /> Basic Info &nbsp;&nbsp;&nbsp;</lebel>
-                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios2" name="optionsRadios" ng-click="showColumns('FundamentalInfo')" /> TTM Sales, Profit, Margins &nbsp;&nbsp;&nbsp;</lebel>
-                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios3" name="optionsRadios" ng-click="showColumns('CapitalStructureInfo')" /> Capital Structure &nbsp;&nbsp;&nbsp;</lebel>
-                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios4" name="optionsRadios" ng-click="showColumns('Valuations')" /> Y-o-Y Growth &amp; Valuations &nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" checked="" value="returns" id="optionsRadios1" name="optionsRadios" ng-click="showColumns('BasicInfo')" /> Basic &nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios2" name="optionsRadios" ng-click="showColumns('FundamentalInfo')" /> TTM P&amp;L &nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios3" name="optionsRadios" ng-click="showColumns('CapitalStructureInfo')" /> Capital &nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios4" name="optionsRadios" ng-click="showColumns('Valuations')" /> Growth &amp; Valuations &nbsp;&nbsp;&nbsp;</lebel>
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios5" name="optionsRadios" ng-click="showColumns('PricePerformance')" /> Price Performance &nbsp;&nbsp;&nbsp;</lebel>
-                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios6" name="optionsRadios" ng-click="showColumns('AnalystsCall')" /> Analysts View [Up coming]&nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios6" name="optionsRadios" ng-click="showColumns('AdditionalInfo')" /> Additional &nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios7" name="optionsRadios" ng-click="showColumns('AnalystsCall')" /> Analysts Call [Up coming]&nbsp;&nbsp;&nbsp;</lebel>
                         </div>
                         <div class="x_content">
                             <p>
@@ -143,6 +144,14 @@
                                     <!--<th ng-hide="flagPricePerformance">10Y</th>-->
                                     <!--<th ng-hide="flagPricePerformance">5Years</th>-->
                                     <!--<th ng-hide="flagPricePerformance">10Years</th>-->
+                                    <th ng-click="sortData('dailyDataS.salesGrowth5years')" ng-hide="flagAdditionalInfo">5 Yr Sales-G<i ng-class="getSortClass('dailyDataS.salesGrowth5years')" /></th>
+                                    <th ng-click="sortData('dailyDataS.salesGrowth10years')" ng-hide="flagAdditionalInfo">10 Yr Sales-G<i ng-class="getSortClass('dailyDataS.salesGrowth10years')" /></th>
+                                    <th ng-click="sortData('dailyDataS.noplat')" ng-hide="flagAdditionalInfo">NOPLAT<i ng-class="getSortClass('dailyDataS.noplat')" /></th>
+                                    <th ng-click="sortData('dailyDataS.capex')" ng-hide="flagAdditionalInfo">Capex (Cal.)<i ng-class="getSortClass('dailyDataS.capex')" /></th>
+                                    <th ng-click="sortData('dailyDataS.fcff')" ng-hide="flagAdditionalInfo">FCFF <i ng-class="getSortClass('dailyDataS.fcff')" /></th>
+                                    <th ng-click="sortData('dailyDataS.investedCapital')" ng-hide="flagAdditionalInfo">Invested Cap.<i ng-class="getSortClass('dailyDataS.investedCapital')" /></th>
+                                    <th ng-click="sortData('dailyDataS.roic')" ng-hide="flagAdditionalInfo">RoIC<i ng-class="getSortClass('dailyDataS.roic')" /></th>
+
                                 </tr>
                                 <tbody>
                                 <tr ng-repeat="stock in stocks  | filter:filterByIndex | filter:filterByIndustry | filter:searchStock | orderBy:sortColumn:reverseSort">
@@ -198,6 +207,13 @@
                                     <!--<td ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return10Y | number:2}}%</td>-->
                                     <!--<td ng-hide="flagPricePerformance">-</td>-->
                                     <!--<td ng-hide="flagPricePerformance">-</td>-->
+                                    <td ng-hide="flagAdditionalInfo">{{stock.dailyDataS.salesGrowth5years | number:2}}%</td>
+                                    <td ng-hide="flagAdditionalInfo">{{stock.dailyDataS.salesGrowth10years | number:2}}%</td>
+                                    <td ng-hide="flagAdditionalInfo">{{stock.dailyDataS.noplat | number:0}}</td>
+                                    <td ng-hide="flagAdditionalInfo">{{stock.dailyDataS.capex | number:0}}</td>
+                                    <td ng-hide="flagAdditionalInfo">{{stock.dailyDataS.fcff | number:0}}</td>
+                                    <td ng-hide="flagAdditionalInfo">{{stock.dailyDataS.investedCapital | number:0}}</td>
+                                    <td ng-hide="flagAdditionalInfo">{{stock.dailyDataS.roic | number:2}}%</td>
                                 </tr>
                                 </tbody>
                                 </thead>
