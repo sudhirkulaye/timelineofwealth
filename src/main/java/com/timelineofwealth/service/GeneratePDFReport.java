@@ -1156,7 +1156,7 @@ public class GeneratePDFReport {
                     } else {
                         pdfPCell = new PdfPCell(new Paragraph("" + portfolioTwrrMonthlyListTemp.get(i).getKey().getReturnsYear(), tableBodyFont));
                         pdfPCell.setPaddingLeft(10);
-                        pdfPCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        pdfPCell.setHorizontalAlignment(Element.ALIGN_CENTER);
                         pdfPCell.setVerticalAlignment(Element.ALIGN_CENTER);
                         pdfPCell.setBackgroundColor(tableBodyBaseColorAlt);
                         pdfPCell.setExtraParagraphSpace(5f);
@@ -1418,7 +1418,7 @@ public class GeneratePDFReport {
                     } else {
                         pdfPCell = new PdfPCell(new Paragraph("" + portfolioTwrrMonthlyListTemp.get(i).getKey().getReturnsYear(), tableBodyFont));
                         pdfPCell.setPaddingLeft(10);
-                        pdfPCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        pdfPCell.setHorizontalAlignment(Element.ALIGN_CENTER);
                         pdfPCell.setVerticalAlignment(Element.ALIGN_CENTER);
                         pdfPCell.setBackgroundColor(tableBodyBaseColorAlt);
                         pdfPCell.setExtraParagraphSpace(5f);
@@ -1528,13 +1528,55 @@ public class GeneratePDFReport {
         paragraph.setSpacingAfter(10);
         document.add(paragraph);
 
-        paragraph = new Paragraph("Trailing Returns of Benchmarks", topicFont);
+        paragraph = new Paragraph("Trailing Returns of Large Cap", topicFont);
         paragraph.setAlignment(Element.ALIGN_LEFT);
         paragraph.setIndentationLeft(50);
         paragraph.setIndentationRight(50);
         paragraph.setSpacingAfter(10);
         document.add(paragraph);
 
+
+        addBenchmarkReturnsForTypes(document, benchmarkTwrrSummaries.stream().filter(b -> b.getBenchmarkType().equals("Large Cap")).collect(Collectors.toList()));
+
+        document.newPage();
+        document.add( Chunk.NEWLINE );
+        document.add( Chunk.NEWLINE );
+        paragraph = new Paragraph("Trailing Returns of Multi Cap", topicFont);
+        paragraph.setAlignment(Element.ALIGN_LEFT);
+        paragraph.setIndentationLeft(50);
+        paragraph.setIndentationRight(50);
+        paragraph.setSpacingAfter(10);
+        document.add(paragraph);
+
+        addBenchmarkReturnsForTypes(document, benchmarkTwrrSummaries.stream().filter(b -> b.getBenchmarkType().equals("Multi Cap")).collect(Collectors.toList()));
+
+        document.newPage();
+        document.add( Chunk.NEWLINE );
+        document.add( Chunk.NEWLINE );
+        paragraph = new Paragraph("Trailing Returns of Mid Cap", topicFont);
+        paragraph.setAlignment(Element.ALIGN_LEFT);
+        paragraph.setIndentationLeft(50);
+        paragraph.setIndentationRight(50);
+        paragraph.setSpacingAfter(10);
+        document.add(paragraph);
+
+        addBenchmarkReturnsForTypes(document, benchmarkTwrrSummaries.stream().filter(b -> b.getBenchmarkType().equals("Mid Cap")).collect(Collectors.toList()));
+
+        document.newPage();
+        document.add( Chunk.NEWLINE );
+        document.add( Chunk.NEWLINE );
+        paragraph = new Paragraph("Trailing Returns of Small Cap", topicFont);
+        paragraph.setAlignment(Element.ALIGN_LEFT);
+        paragraph.setIndentationLeft(50);
+        paragraph.setIndentationRight(50);
+        paragraph.setSpacingAfter(10);
+        document.add(paragraph);
+
+        addBenchmarkReturnsForTypes(document, benchmarkTwrrSummaries.stream().filter(b -> b.getBenchmarkType().equals("Small Cap")).collect(Collectors.toList()));
+
+    }
+
+    private static void addBenchmarkReturnsForTypes(Document document, List<BenchmarkTwrrSummaryDTO> benchmarkTwrrSummaries) throws DocumentException{
         PdfPTable table = new PdfPTable(10);
         table.setWidthPercentage(100);
         table.setSpacingBefore(10f);

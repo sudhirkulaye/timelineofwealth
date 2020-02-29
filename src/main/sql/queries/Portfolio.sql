@@ -29,7 +29,7 @@ and a.memberid = b.memberid
 and a.memberid = c.memberid
 and c.moslcode != 'H20613'
 and a.memberid = d.memberid
-and b.compositeid = 3 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
+and b.compositeid = 2 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
 GROUP BY a.memberid, a.portfolioid, a.ticker 
 ORDER BY memberid, portfolioid,sum(a.market_value) desc; 
 -- Realized Profit & Loss
@@ -115,10 +115,10 @@ commit;
 select * from log_table;
 truncate log_table; 
 -- DELETE from mosl_transaction where moslcode = 'H20488';
-select * from mosl_transaction where date >= '2020-02-01' and script_name != 'MOSL_CASH' AND moslcode not in ('-H20404', '-1') and is_processed != 'X' order by date, moslcode;
+select * from mosl_transaction where date >= '2020-02-27' and script_name != 'MOSL_CASH' AND moslcode not in ('-H20404', '-1') and is_processed != 'X' order by date, moslcode;
 SELECT * FROM stock_universe a WHERE ticker in ('YESBANK','');
 update mosl_transaction set portfolioid = 1 where date = '2019-11-18';
-select * from portfolio_holdings a where a.memberid in (1060) order by portfolioid, asset_classid, ticker, buy_date;
+select * from portfolio_holdings a where a.memberid in (1) order by portfolioid, asset_classid, ticker, buy_date;
 select * from portfolio_historical_holdings a where a.memberid in (1) order by sell_date desc, ticker;
 select b.moslcode, a.memberid, a.portfolioid, a.ticker, a.total_cost, a.cmp, a.market_value, b.net_amount 
 from portfolio_holdings a, moslcode_memberid c, mosl_transaction b
@@ -131,8 +131,8 @@ and b.script_name = 'MOSL_CASH' and a.ticker = 'MOSL_CASH' and b.is_processed = 
 select * from moslcode_memberid a where moslcode = 'H22295';
 SELECT * from portfolio a where a. memberid = 1 and portfolioid = 1;
 select * from portfolio_cashflow a where a. memberid = 1003 and portfolioid = 1;
-select * from portfolio_holdings a where a. memberid = 1060 and portfolioid = 1 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
-SELECT * from portfolio_value_history a where a.date >= '2019-12-31' and a.memberid in (1026) order by memberid, portfolioid, date desc; 
+select * from portfolio_holdings a where a. memberid = 1 and portfolioid = 2 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+SELECT * from portfolio_value_history a where a.date >= '2020-02-27' and a.memberid in (1) order by memberid, portfolioid, date desc; 
 SELECT * from portfolio_returns_calculation_support a where a. memberid = 1026 and portfolioid = 1 ORDER BY a.memberid, a.portfolioid, a.date;
 select * from portfolio_twrr_monthly a where a. memberid = 1026 and portfolioid = 1;
 SELECT * from portfolio_twrr_summary a where a. memberid = 1026 and portfolioid = 1;
