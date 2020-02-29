@@ -24,16 +24,18 @@ FROM   portfolio_twrr_monthly a
 WHERE  a.memberid = 1026 AND a.portfolioid = 1;
 
 call ap_process_benchmark_returns;
-select * from benchmark_twrr_summary order by benchmarkid;
-SELECT * from benchmark_twrr_monthly order by benchmarkid, year desc;
+select * from benchmark; 
+select b.benchmark_name, b.benchmark_type, a.* from benchmark_twrr_summary a, benchmark b Where a.benchmarkid = b.benchmarkid order by benchmarkid;
+SELECT b.benchmark_name, b.benchmark_type, a.*  from benchmark_twrr_monthly a, benchmark b Where a.benchmarkid = b.benchmarkid  order by benchmarkid, year desc;
 SELECT * from index_valuation where date > '2020-01-18' and ticker = 'NIFTY' ORDER BY date desc;
-select * from mutual_fund_nav_history a WHERE date IN (SELECT max(date) FROM mutual_fund_nav_history WHERE scheme_code = '118525' group by year(date), month(date)) AND scheme_code = '118525' order by date desc;
+select * from mutual_fund_nav_history a WHERE date IN (SELECT max(date) FROM mutual_fund_nav_history WHERE scheme_code = '118531' group by year(date), month(date)) AND scheme_code = '118531' order by date desc;
+select min(date) from mutual_fund_nav_history a WHERE scheme_code in ('119727');
 SELECT date, value FROM index_valuation a WHERE date > '2019-01-01' and date IN (SELECT max(date) FROM index_valuation WHERE ticker = 'NIFTY' group by year(date), month(date)) AND ticker = 'NIFTY' order by date desc;
 select * from benchmark;
 select * from log_table;
 truncate table log_table;
-select * from portfolio_twrr_monthly a WHERE  a.memberid = 1026 AND a.portfolioid = 1;
-select * from portfolio_twrr_summary a WHERE  a.memberid = 1026 AND a.portfolioid = 1;
+select * from portfolio_twrr_monthly a WHERE  a.memberid = 1 AND a.portfolioid = 2;
+select * from portfolio_twrr_summary a WHERE  a.memberid = 1 AND a.portfolioid = 2;
 select * from portfolio_returns_calculation_support a WHERE  a.memberid = 1026 AND a.portfolioid = 1;
 
 SELECT LAST_DAY('2003-04-01' - INTERVAL 1 MONTH);
