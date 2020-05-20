@@ -25,11 +25,15 @@ WHERE  a.memberid = 1026 AND a.portfolioid = 1;
 
 call ap_process_benchmark_returns;
 select * from benchmark; 
+/* MF Vs Index Vs Portfolio */
 select b.benchmark_name, b.benchmark_type, a.* from benchmark_twrr_summary a, benchmark b Where a.benchmarkid = b.benchmarkid order by benchmarkid;
 SELECT b.benchmark_name, b.benchmark_type, a.*  from benchmark_twrr_monthly a, benchmark b Where a.benchmarkid = b.benchmarkid  order by benchmarkid, year desc;
+select * from portfolio_twrr_monthly a WHERE  a.memberid = 1007 AND a.portfolioid = 1;
+select * from portfolio_twrr_summary a WHERE  a.memberid = 1007 AND a.portfolioid = 1;
+
 SELECT * from index_valuation where date > '2020-01-18' and ticker = 'NIFTY' ORDER BY date desc;
 select * from mutual_fund_nav_history a WHERE date IN (SELECT max(date) FROM mutual_fund_nav_history WHERE scheme_code = '118531' group by year(date), month(date)) AND scheme_code = '118531' order by date desc;
-select min(date) from mutual_fund_nav_history a WHERE scheme_code in ('119727');
+select min(date) from mutual_fund_nav_history a WHERE scheme_code in ('125497');
 SELECT date, value FROM index_valuation a WHERE date > '2019-01-01' and date IN (SELECT max(date) FROM index_valuation WHERE ticker = 'NIFTY' group by year(date), month(date)) AND ticker = 'NIFTY' order by date desc;
 select * from benchmark;
 select * from log_table;
@@ -106,3 +110,29 @@ update composite_constituents a, stock_universe b set a.name = b.name where a.ti
 select distinct fund_house, count(1) from mutual_fund_universe a group by fund_house order by fund_house, scheme_name_full;
 select * from mutual_fund_universe a order by fund_house, scheme_name_full;
 select * from asset_classification;
+
+select * from stock_universe a where ticker like 'RELIANCE%';
+select * from nse_price_history a where nse_ticker like 'DMART%' and date > '2020-04-30' order by date desc;
+select * from bse_price_history a where bse_ticker = '540376' and date > '2020-04-30' order by date desc;
+insert into nse_price_history (
+select 'DMART', 'EQ', open_price, high_price, low_price, close_price, last_price, previous_close_price, total_traded_quantity, total_traded_value, date, total_trades, isin_code 
+from bse_price_history a where bse_ticker = '540376' and date > '2020-04-17');
+select * from stock_price_movement a where ticker = 'DMART';
+
+select if(is_sensex = 1, 'SENSEX', if(is_nifty50 = 1, 'NIFTY', if(is_nse100 = 1 or is_bse100 = 1, 'NSE-BSE100', if(is_nse200 = 1 or is_bse200 = 1, 'NSE-BSE200', 'NSE-BSE500'))) ) index1, 
+b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, a.cmp, a.market_cap, rank, 
+last_result_date, sales, net_profit, (opm_latest_quarter/100), (npm_latest_quarter/100), (opm_last_year/100), (npm_last_year/100),
+debt, debt_3years_back, debt_to_equity, (roce/100), (avg_roce_3years/100), (roe/100), (avg_roe_3years/100), 
+(yoy_quarterly_sales_growth/100), (yoy_quarterly_profit_growth/100), (sales_growth_3years/100), (profit_growth_3years/100), 
+a.pe_ttm, a.pb_ttm, (a.market_cap/sales), 
+(return_1D/100), (return_1W/100), (return_2W/100), (return_1M/100), (return_2M/100), (return_3M/100), (return_6M/100), (return_9M/100), 
+(return_YTD/100), (return_1Y/100), (up_52w_min/100), (down_52w_max/100), (return_2Y/100), (return_3Y/100), 
+(sales_growth_5years/100), (sales_growth_10years/100), noplat, capex, fcff, invested_capital, (roic/100)
+from daily_data_s a, stock_universe b, subindustry c, stock_price_movement d
+where 
+a.date = (select date_today from setup_dates) and 
+a.name = b.ticker5 and 
+b.subindustryid = c.subindustryid and 
+(b.is_bse500 = 1 or b.is_nse500 = 1) and
+b.ticker = d.ticker
+order by a.market_cap desc;

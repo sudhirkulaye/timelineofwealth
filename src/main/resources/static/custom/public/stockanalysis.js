@@ -29,6 +29,11 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
     $scope.recentValuations = [];
     $scope.dataRecentPE = [];
     $scope.dataRecentMCap = []; // Added new variable
+    $scope.chartOptionsMCapAndPrice = {};
+    $scope.chartMCapAndPriceDatasetOverride = [];
+    $scope.chartMCapAndPriceSeries = [];
+    $scope.dataRecentMarketPrice = [];
+    $scope.dataRecentMCapAndPrice = [];
     $scope.dataRecentPB = [];
     $scope.dataRecentEvToEbita = [];
     $scope.labelsRecentPE = [];
@@ -293,6 +298,7 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
         //console.log($scope.stockRecentPE);
         var recentpe = [];
         var recentmcap = [];
+        var recentMarketPrice = [];
         var recentpb = [];
         var recentevtoebita = [];
         var recentpedate = [];
@@ -300,16 +306,41 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
         for (var i = 0; i < $scope.recentValuations.length; i++) {
             recentpe.push($scope.recentValuations[i].pe);
             recentmcap.push($scope.recentValuations[i].marketCap); //populate
+            recentMarketPrice.push($scope.recentValuations[i].marketPrice);
             recentpb.push($scope.recentValuations[i].pb);
             recentevtoebita.push($scope.recentValuations[i].evToEbita);
             recentpedate.push($scope.recentValuations[i].date);
         }
         $scope.dataRecentPE.push(recentpe);
         $scope.dataRecentMCap.push(recentmcap);
+        $scope.dataRecentMarketPrice.push(recentMarketPrice);
+        $scope.dataRecentMCapAndPrice.push(recentmcap);
+        $scope.dataRecentMCapAndPrice.push(recentMarketPrice);
         //console.log($scope.dataRecentMCap);
         $scope.dataRecentPB.push(recentpb);
         $scope.dataRecentEvToEbita.push(recentevtoebita);
         $scope.labelsRecentPE = recentpedate;
+
+        $scope.chartOptionsMCapAndPrice = { scales: {
+                                            yAxes: [
+                                                {
+                                                    id: 'y-axis-1',
+                                                    type: 'linear',
+                                                    display: true,
+                                                    position: 'left'
+                                                },
+                                                {
+                                                    id: 'y-axis-2',
+                                                    type: 'linear',
+                                                    display: true,
+                                                    position: 'right'
+                                                }
+                                            ]
+                                       } };
+        $scope.chartMCapAndPriceDatasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
+        $scope.chartMCapAndPriceSeries = ['Market Cap', 'Price'];
+
+
     }
 
     function populateStockQuarterChart() {
