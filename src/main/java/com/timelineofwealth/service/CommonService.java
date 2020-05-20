@@ -498,6 +498,7 @@ public class CommonService {
             recentPE.setPb(dailyDataS.getPbTtm());
             recentPE.setEvToEbita(dailyDataS.getEvToEbit());
             recentPE.setMarketCap(dailyDataS.getMarketCap());
+            recentPE.setMarketPrice(dailyDataS.getCmp());
             recentPES.add(recentPE);
         }
         // set PB from bloomberg data
