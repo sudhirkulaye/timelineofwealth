@@ -26,10 +26,11 @@ WHERE  a.memberid = 1026 AND a.portfolioid = 1;
 call ap_process_benchmark_returns;
 select * from benchmark; 
 /* MF Vs Index Vs Portfolio */
-select b.benchmark_name, b.benchmark_type, a.* from benchmark_twrr_summary a, benchmark b Where a.benchmarkid = b.benchmarkid order by benchmarkid;
+select b.benchmark_name, b.benchmark_type, a.returns_twrr_since_current_month, a.returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from benchmark_twrr_summary a, benchmark b Where a.benchmarkid = b.benchmarkid order by benchmark_type, a.benchmarkid, a.returns_twrr_one_year;
+select 'Focus-Five', 'Multi-Cap', returns_twrr_since_current_month, returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from portfolio_twrr_summary a WHERE  a.memberid = 1 AND a.portfolioid = 2;
 SELECT b.benchmark_name, b.benchmark_type, a.*  from benchmark_twrr_monthly a, benchmark b Where a.benchmarkid = b.benchmarkid  order by benchmarkid, year desc;
-select * from portfolio_twrr_monthly a WHERE  a.memberid = 1007 AND a.portfolioid = 1;
-select * from portfolio_twrr_summary a WHERE  a.memberid = 1007 AND a.portfolioid = 1;
+select * from portfolio_twrr_summary a WHERE  a.memberid = 1 AND a.portfolioid = 2;
+select * from portfolio_twrr_monthly a WHERE  a.memberid = 1 AND a.portfolioid = 2;
 
 SELECT * from index_valuation where date > '2020-01-18' and ticker = 'NIFTY' ORDER BY date desc;
 select * from mutual_fund_nav_history a WHERE date IN (SELECT max(date) FROM mutual_fund_nav_history WHERE scheme_code = '118531' group by year(date), month(date)) AND scheme_code = '118531' order by date desc;
@@ -38,8 +39,8 @@ SELECT date, value FROM index_valuation a WHERE date > '2019-01-01' and date IN 
 select * from benchmark;
 select * from log_table;
 truncate table log_table;
-select * from portfolio_twrr_monthly a WHERE  a.memberid = 1 AND a.portfolioid = 2;
-select * from portfolio_twrr_summary a WHERE  a.memberid = 1 AND a.portfolioid = 2;
+select * from portfolio_twrr_monthly a WHERE  a.memberid = 1000 AND a.portfolioid = 1;
+select * from portfolio_twrr_summary a WHERE  a.memberid = 1000 AND a.portfolioid = 1;
 select * from portfolio_returns_calculation_support a WHERE  a.memberid = 1026 AND a.portfolioid = 1;
 
 SELECT LAST_DAY('2003-04-01' - INTERVAL 1 MONTH);
@@ -111,13 +112,20 @@ select distinct fund_house, count(1) from mutual_fund_universe a group by fund_h
 select * from mutual_fund_universe a order by fund_house, scheme_name_full;
 select * from asset_classification;
 
-select * from stock_universe a where ticker like 'RELIANCE%';
-select * from nse_price_history a where nse_ticker like 'DMART%' and date > '2020-04-30' order by date desc;
-select * from bse_price_history a where bse_ticker = '540376' and date > '2020-04-30' order by date desc;
+select * from stock_universe a where ticker = 'IIFLWAM';
+select * from nse_price_history a where nse_ticker = 'GUJFLUORO' and date >= '2018-01-01' order by date desc;
+select * from bse_price_history a where bse_ticker = '540376' and date >= '2020-04-30' order by date desc;
 insert into nse_price_history (
 select 'DMART', 'EQ', open_price, high_price, low_price, close_price, last_price, previous_close_price, total_traded_quantity, total_traded_value, date, total_trades, isin_code 
-from bse_price_history a where bse_ticker = '540376' and date > '2020-04-17');
+from bse_price_history a where bse_ticker = '540376' and date > '2020-04-30' and date < '2020-05-27');
 select * from stock_price_movement a where ticker = 'DMART';
+-- update nse_price_history set nse_ticker = 'FLUOROCHEM' where nse_ticker = 'GUJFLUORO';
+
+-- Queries to update Screener Short Name
+select * from stock_universe a where a.ticker5 like 'Himadri%'; -- Bharat Forge, 25101010
+select * from daily_data_s a where date >= '2020-09-01' and name like 'Himadri%' order by date desc; -- , 
+-- update daily_data_s set name = 'Himadri Special' where name = 'Himadri Specialt';
+select count(1), name from daily_data_s a group by name order by count(1); 
 
 select if(is_sensex = 1, 'SENSEX', if(is_nifty50 = 1, 'NIFTY', if(is_nse100 = 1 or is_bse100 = 1, 'NSE-BSE100', if(is_nse200 = 1 or is_bse200 = 1, 'NSE-BSE200', 'NSE-BSE500'))) ) index1, 
 b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, a.cmp, a.market_cap, rank, 
