@@ -138,7 +138,7 @@ select * from daily_data_s where date = (select date_today from setup_dates) and
 select count(1), date from daily_data_s where date >= (select date_last_trading_day from setup_dates)  group by date order by date desc;
 select max(date) from daily_data_s;
 
-select * from index_valuation a where a.date >= (select max(date) from index_valuation); -- '2020-03-20'; -- 
+select * from index_valuation a where a.date >= (select max(date) from index_valuation); -- '2020-05-31';  -- 
 SELECT * from index_statistics a; 
 SELECT DISTINCT ticker from index_valuation a where ticker like '%200';
 UPDATE index_valuation Set ticker = 'NIFTY200' where ticker = 'NIFY200';
@@ -146,9 +146,9 @@ commit;
 -- new quarter results
 SELECT b.ticker from daily_data_s a, stock_universe b 
 where a.name = b.ticker5 and 
-a.last_result_date = '202003' and 
+a.last_result_date = '202006' and 
 date = (select max(date) from daily_data_s a) and 
-b.ticker not in (select distinct ticker from stock_quarter a where date = '2020-03-31');
+b.ticker not in (select distinct ticker from stock_quarter a where date = '2020-06-30');
 -- new annual p&L 
 select distinct ticker, max(date) from stock_pnl a where month(date) != 3 group by ticker having max(date) not in ('2018-12-31', '2019-03-31', '2018-06-30') ORDER BY max(date) desc;
 SELECT ticker, cons_standalone, max(date) from stock_pnl a group by ticker, cons_standalone 
