@@ -8,10 +8,10 @@ select * from adviser_user_mapping;
 select * from composite; -- 5 composites
 select * from composite_constituents; 
 select * from portfolio a order by a.memberid, a.portfolioid; -- total 21 portfolios 
-select * from portfolio_holdings a where memberid in (1000) order by asset_classid, ticker, buy_date;
+select * from portfolio_holdings a where memberid in (1060) order by asset_classid, ticker, buy_date;
 select compositeid, count(1) from portfolio a group by compositeid order by a.compositeid; -- (composite 1: 10, 2: 11)
 select * from portfolio_cashflow where memberid in (1000) order by portfolioid, date desc;
-select * from portfolio_value_history a where memberid in (1000) and  date <= '2020-04-29' order by date desc;
+select * from portfolio_value_history a where memberid in (1007) and  date >= '2019-10-30' order by date desc;
 select * from portfolio_returns_calculation_support a where memberid in (1000);
 select * from portfolio_twrr_summary a where memberid in (1, 1024);
 select * from portfolio_twrr_monthly a where memberid in (1);
@@ -31,7 +31,7 @@ and a.memberid = b.memberid
 and a.memberid = c.memberid
 and c.moslcode != 'H20613'
 and a.memberid = d.memberid
-and b.compositeid = 3 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
+and b.compositeid = 2 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
 GROUP BY a.memberid, a.portfolioid, a.ticker 
 ORDER BY memberid, portfolioid,sum(a.market_value) desc; 
 
@@ -62,8 +62,9 @@ GROUP BY a.memberid, a.portfolioid, a.ticker
 ORDER BY memberid, portfolioid,sum(a.market_value) desc; 
 
 -- Portfolio Vs Benchmark Performance
-select b.benchmark_name, b.benchmark_type, a.returns_twrr_since_current_month, a.returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from benchmark_twrr_summary a, benchmark b Where a.benchmarkid = b.benchmarkid order by benchmark_type, a.benchmarkid, a.returns_twrr_one_year;
-select 'Focus-Five', 'Multi-Cap', returns_twrr_since_current_month, returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from portfolio_twrr_summary a WHERE  a.memberid = 1 AND a.portfolioid = 2;
+select b.benchmark_name, b.benchmark_type, a.returns_twrr_since_current_month, a.returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_ytd, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from benchmark_twrr_summary a, benchmark b Where a.benchmarkid = b.benchmarkid order by benchmark_type, a.benchmarkid, a.returns_twrr_one_year;
+select 'Focus-Five', 'Multi-Cap', returns_twrr_since_current_month, returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_ytd, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from portfolio_twrr_summary a WHERE  a.memberid = 1 AND a.portfolioid = 2;
+select a.memberid /* 'Focus-Five'*/, 'Multi-Cap', returns_twrr_since_current_month, returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_ytd, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from portfolio_twrr_summary a, portfolio b where a.memberid = b.memberid and a.portfolioid = b.portfolioid and b.compositeid = 2 order by  a.memberid;
 
 -- Portfolio returns
 SELECT  c.moslcode, d.first_name, d.last_name, a.*  
@@ -73,7 +74,7 @@ and a.memberid = b.memberid
 and a.memberid = c.memberid
 and c.moslcode != 'H20613'
 and a.memberid = d.memberid
-and b.compositeid = 2 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
+and b.compositeid = 3 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
 ORDER BY a.memberid, a.portfolioid;
 select c.moslcode, d.first_name, d.last_name, a.* 
 from portfolio_twrr_monthly a, portfolio b, moslcode_memberid c, member d
@@ -82,7 +83,7 @@ and a.memberid = b.memberid
 and a.memberid = c.memberid
 and c.moslcode != 'H20613'
 and a.memberid = d.memberid
-and b.compositeid = 1 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
+and b.compositeid = 3 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
 ORDER BY a.memberid, a.portfolioid;
 Select c.moslcode, d.first_name, d.last_name, a.date, a.cashflow, a.value, a.description  
 from portfolio_returns_calculation_support a, portfolio b, moslcode_memberid c, member d
@@ -100,6 +101,21 @@ Where a.benchmarkid = b.benchmarkid order by b.benchmark_type, benchmarkid;
 select b.benchmark_type, b.benchmark_name, a.* from benchmark_twrr_monthly a, benchmark b
 Where a.benchmarkid = b.benchmarkid order by year desc, b.benchmark_type, benchmarkid;
 select * from benchmark;
+
+-- Fee Calculaiton
+select concat(d.first_name, ' ', d.last_name) name, a.memberid, a.portfolioid, a.date, b.date, TIMESTAMPDIFF(MONTH, a.date, b.date) duration, a.value, b.value 
+from portfolio_value_history a, portfolio_value_history b, portfolio c, member d where
+a.memberid = b.memberid and
+b.memberid = c.memberid and
+c.memberid = d.memberid and
+a.portfolioid = b.portfolioid and
+b.portfolioid = c.portfolioid and
+c.status = 'Active' and
+c.compositeid = 1 and -- (1: INTRO, 2: FOCUS-FIVE)
+a.date = '2019-06-28' and -- (Start Date)
+b.date = '2020-12-31' -- (End Date)
+order by memberid, portfolioid;
+
 
 -- update portfolio_holdings set buy_date = (select date_today from setup_dates) where ticker = 'MOSL_CASH';
 -- UPDATE portfolio_holdings a, stock_universe b SET a.asset_classid = b.asset_classid, a.name = b.name, a.short_name = b.short_name, a.subindustryid = b.subindustryid WHERE a.ticker = b.ticker;
@@ -125,7 +141,7 @@ select * from log_table;
 truncate log_table; 
 -- DELETE from mosl_transaction where moslcode = 'H20488';
 select * from mosl_transaction where is_processed = 'N' order by date desc;
-select * from mosl_transaction where /*quantity < 0 and*/ date >= '2020-09-01' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
+select * from mosl_transaction where /*quantity < 0 and*/ date >= '2020-12-01' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
 SELECT * FROM stock_universe a WHERE ticker in ('YESBANK','');
 -- update mosl_transaction set portfolioid = 1 where date = '2019-11-18';
 select * from portfolio_holdings a where a.memberid in (1) order by portfolioid, asset_classid, ticker, buy_date;
@@ -141,7 +157,7 @@ and b.script_name = 'MOSL_CASH' and a.ticker = 'MOSL_CASH' and b.is_processed = 
 select * from moslcode_memberid a where moslcode = 'H22295';
 SELECT * from portfolio a where a. memberid = 1 and portfolioid = 1;
 select * from portfolio_cashflow a where a. memberid = 1003 and portfolioid = 1;
-select * from portfolio_holdings a where a. memberid = 1024 and portfolioid = 1 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+select * from portfolio_holdings a where a. memberid = 1000 and portfolioid = 1 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
 SELECT * from portfolio_value_history a where a.date >= '2020-07-31' and a.memberid in (1,1024) order by memberid, portfolioid, date desc; 
 SELECT * from portfolio_returns_calculation_support a where a. memberid = 1026 and portfolioid = 1 ORDER BY a.memberid, a.portfolioid, a.date;
 select * from portfolio_twrr_monthly a where a.memberid IN (1026, 1, 1003, 1001, 1024);

@@ -21,6 +21,7 @@ select * from daily_data_s where date = (select date_today from setup_dates) ord
 
 -- proceed EOD
 call ap_update_wealth_data();
+call ap_process_eod();
 select * from log_table;
 truncate table log_table;
 
@@ -138,7 +139,7 @@ select * from daily_data_s where date = (select date_today from setup_dates) and
 select count(1), date from daily_data_s where date >= (select date_last_trading_day from setup_dates)  group by date order by date desc;
 select max(date) from daily_data_s;
 
-select * from index_valuation a where a.date >= (select max(date) from index_valuation); -- '2020-05-31';  -- 
+select * from index_valuation a where a.date >= (select max(date) from index_valuation); -- '2020-11-21';  -- 
 SELECT * from index_statistics a; 
 SELECT DISTINCT ticker from index_valuation a where ticker like '%200';
 UPDATE index_valuation Set ticker = 'NIFTY200' where ticker = 'NIFY200';
@@ -146,9 +147,9 @@ commit;
 -- new quarter results
 SELECT b.ticker from daily_data_s a, stock_universe b 
 where a.name = b.ticker5 and 
-a.last_result_date = '202006' and 
+a.last_result_date = '202009' and 
 date = (select max(date) from daily_data_s a) and 
-b.ticker not in (select distinct ticker from stock_quarter a where date = '2020-06-30');
+b.ticker not in (select distinct ticker from stock_quarter a where date = '2020-09-30');
 -- new annual p&L 
 select distinct ticker, max(date) from stock_pnl a where month(date) != 3 group by ticker having max(date) not in ('2018-12-31', '2019-03-31', '2018-06-30') ORDER BY max(date) desc;
 SELECT ticker, cons_standalone, max(date) from stock_pnl a group by ticker, cons_standalone 
@@ -157,7 +158,7 @@ having max(date) < '2018-01-01' order by max(date) desc, ticker;
 -- Change of ticker
 select distinct(name) from daily_data_s a where a.date = (select max(date) from daily_data_s) and a.name not in (select ticker5 from stock_universe) order by rank; 
 select * from stock_universe a where a.name like 'Techno%'; 
-select * from daily_data_s a where a.name like 'IDFC%';
+select * from daily_data_s a where a.name like 'TCS%' and date > '2020-10-01' order by date desc;
 select * from daily_data_b a where ticker_b = 'IDFCBK:IN';
 -- update stock_universe a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
 -- update stock_universe a set ticker5 = 'IDFC First' where ticker = 'IDFCBANK';
@@ -177,30 +178,47 @@ select * from stock_universe a where ticker in ('530643');
 select * from stock_cashflow a where ticker = 'KPITTECH';
 
 -- Stock Split, Bonus
-select a.* from stock_split_probability a where a.is_processed != 'YES1' order by date desc;
-SELECT date, close_price, a.* from nse_price_history a where a.nse_ticker = 'RELAXO' and date <= '2019-06-26' order by date desc;
+select * from stock_split_probability a order by date desc;
+select a.* from stock_split_probability a, stock_universe b where a.ticker = b.ticker and (b.is_nse500 = 1 or b.is_bse500 = 1) and a.is_processed != 'YES' order by date desc;
+-- update stock_split_probability set is_processed = 'YES', note = 'Stock Crashed' where ticker = JETAIRWAYS' and date = '2019-06-18';
+-- update stock_split_probability set is_processed = 'YES', note = 'Bonus 1:1' where ticker = 'ELGIEQUIP' and date = '2020-09-24';
+-- update stock_split_probability set is_processed = 'YES', note = 'Stock Split Ratio 2:10' where ticker = 'LAURUSLABS' and date = '2020-09-29';
+-- update stock_split_probability set is_processed = 'YES', note = 'Right Issue 1:1' where is_processed = 'NO' and ticker = 'M&MFIN' and date = '2020-07-22';
+-- update stock_split_probability set is_processed = 'YES', note = 'No Data Found' where ticker = 'M&MFIN' and date = '2020-08-24';
+-- update stock_split_probability set is_processed = 'YES', note = 'Ignored' where is_processed = 'NO' and ticker not in (select ticker from stock_universe where is_nse500 = 1 or is_bse500 = 1);
+SELECT date, close_price, a.* from nse_price_history a where a.nse_ticker = 'M&MFIN' and date <= '2020-07-22' order by date desc;
 SELECT date, close_price from bse_price_history a where a.bse_ticker = 'HCLTECH' and date <= '2019-12-05' order by date desc;
 select * from stock_price_movement_history a where a.ticker = 'HCLTECH' and date >= '2019-12-05';
 SELECT * from wealth_details a where ticker = 'RELAXO';
 SELECT * from portfolio_holdings a where ticker = 'RELAXO';
 
 /*
-
-update nse_price_history a set close_price = close_price * ( 5 / 10	) where a.nse_ticker = '509887'	 and date < '2019-07-03' ;
-update nse_price_history a set close_price = close_price * ( 2 / 5 ) where a.nse_ticker = 'APCOTEXIND' and date < '2019-07-04' ;
-update nse_price_history a set close_price = close_price * ( 4 / 5 ) where a.nse_ticker = 'ASTRAL' and date < '2019-09-16' ;
-update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'BRIGADE' and date < '2019-08-28' ;
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'HDFCBANK' and date < '2019-09-19' ;
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'HCLTECH' and date < '2019-12-05' ;
-update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'BALMLAWRIE' and date < '2019-12-26';
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'AARTIIND' and date < '2019-09-27' ;
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'VINATIORGA' and date < '2020-02-05' ;
-update nse_price_history a set close_price = close_price * ( 1 / 10 ) where a.nse_ticker = 'TRIDENT'  and date < '2019-12-13' ;
-
-
 update wealth_details set quantity = quantity * 2, rate = rate * (1/2), net_rate = net_rate * (1/2) where ticker = 'RELAXO';
 update portfolio_holdings set quantity = quantity * 2, rate = rate * (1/2), net_rate = net_rate * (1/2) where ticker = 'RELAXO';
 
+-- Copy this below and then replace ticker XXX to right one and replace date and most imp. replace fraction
+update nse_price_history a set close_price = close_price * ( 1 / 1	) where a.nse_ticker = 'XXX'	 and date < 'XXXX-XX-XX' ;
+
+update nse_price_history a set close_price = close_price * ( 2 / 10	) where a.nse_ticker = 'LAURUSLABS'	 and date < '2020-09-29' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2	) where a.nse_ticker = 'ELGIEQUIP'	 and date < '2020-09-24' ;
+update nse_price_history a set close_price = close_price * ( 1 / 10 ) where a.nse_ticker = 'EICHERMOT'  and date < '2020-08-24';
+update nse_price_history a set close_price = close_price * ( 2 / 10 ) where a.nse_ticker = 'IRCON'  and date < '2020-04-03';
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'VINATIORGA' and date < '2020-02-05' ;
+update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'BALMLAWRIE' and date < '2019-12-26';
+update nse_price_history a set close_price = close_price * ( 1 / 10 ) where a.nse_ticker = 'TRIDENT'  and date < '2019-12-13' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'HCLTECH' and date < '2019-12-05' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'AARTIIND' and date < '2019-09-27' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'HDFCBANK' and date < '2019-09-19' ;
+update nse_price_history a set close_price = close_price * ( 4 / 5 ) where a.nse_ticker = 'ASTRAL' and date < '2019-09-16' ;
+update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'BRIGADE' and date < '2019-08-28' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'BHAGERIA'  and date < '2019-07-17';
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'SUMIT'  and date < '2019-07-17';
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'GAIL'  and date < '2019-07-09' ;
+update nse_price_history a set close_price = close_price * ( 2 / 5 ) where a.nse_ticker = 'APCOTEXIND' and date < '2019-07-04' ;
+update bse_price_history a set close_price = close_price * ( 5 / 10 ) where a.bse_ticker = '509887' and date < '2019-07-03' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'AVADHSUGAR'  and date < '2019-06-27';
+update nse_price_history a set close_price = close_price * ( 3 / 5 ) where a.nse_ticker = 'MITTAL'  and date < '2019-06-20' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'CREATIVE'  and date < '2019-06-25' ;
 
 */
 

@@ -4,7 +4,7 @@ SELECT * FROM stock_price_movement a ORDER BY a.ticker;
 SELECT * from nse_price_history a where date = '2019-09-19';
 select * from index_valuation a where date = '2019-09-19';
 select * from wealth_details a where memberid in (1000, 1011);
-select * from portfolio_holdings a where memberid = 1000;
+select * from portfolio_holdings a where memberid = 1008;
 select * from wealth_details a where memberid in (1007,1015,1058);
 select * from sip a where memberid in (1007,1015,1058);
 select * from mutual_fund_universe a where a.scheme_name_part like 'Franklin India Bluechip%';
@@ -62,7 +62,7 @@ SELECT LAST_DAY('2003-04-01' - INTERVAL 1 MONTH);
   AND b.benchmarkid = 0;
   
 SELECT * from portfolio a WHERE  a.memberid = 1000;
-SELECT * from portfolio_holdings a WHERE  a.memberid = 1000 and portfolioid = 2;
+SELECT * from portfolio_holdings a WHERE  a.memberid = 1000 and portfolioid = 1;
 select * from nse_price_history a where date = '2019-09-12';
 
       UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b, portfolio c
@@ -121,10 +121,44 @@ from bse_price_history a where bse_ticker = '540376' and date > '2020-04-30' and
 select * from stock_price_movement a where ticker = 'DMART';
 -- update nse_price_history set nse_ticker = 'FLUOROCHEM' where nse_ticker = 'GUJFLUORO';
 
--- Queries to update Screener Short Name
-select * from stock_universe a where a.ticker5 like 'Himadri%'; -- Bharat Forge, 25101010
-select * from daily_data_s a where date >= '2020-09-01' and name like 'Himadri%' order by date desc; -- , 
--- update daily_data_s set name = 'Himadri Special' where name = 'Himadri Specialt';
+-- Queries to update Screener Short Name (In case of Name Change or ticker Change)
+select * from stock_universe a where a.ticker = 'ADANIGAS' or a.ticker5 = 'Adani Gas'; -- Bharat Forge, 25101010
+select * from daily_data_s a where date >= '2020-01-10' and name like 'Coforge' order by date desc;
+select * from stock_price_movement_history where ticker = 'NIITTECH';
+
+-- update daily_data_s set name = 'Adani Total Gas' where name = 'Adani Gas';
+-- update daily_data_s set name = 'Indus Towers' where name = 'Bharti Infratel';
+-- update daily_data_s set name = 'Coforge' where name = 'NIIT Tech.';
+-- update daily_data_s set name = 'Dhani Services' where name = 'Indiabulls Vent.';
+
+-- update nse_price_history a set nse_ticker = 'INDUSTOWER' where nse_ticker = 'INFRATEL';
+-- update nse_price_history a set nse_ticker = 'COFORGE' where nse_ticker = 'NIITTECH';
+-- update nse_price_history a set nse_ticker = 'DHANI' where nse_ticker = 'IBVENTURES';
+
+-- update stock_price_movement set ticker = 'INDUSTOWER' where ticker = 'INFRATEL';
+-- update stock_price_movement set ticker = 'COFORGE' where ticker = 'NIITTECH';
+-- update stock_price_movement set ticker = 'DHANI' where ticker = 'IBVENTURES' and date < '2020-11-06';
+
+-- update stock_price_movement_history set ticker = 'INDUSTOWER' where ticker = 'INFRATEL';
+-- update stock_price_movement_history set ticker = 'COFORGE' where ticker = 'NIITTECH';
+-- update stock_price_movement_history set ticker = 'DHANI' where ticker = 'IBVENTURES' and date < '2020-11-06';
+
+-- update stock_quarter set ticker = 'INDUSTOWER' where ticker = 'INFRATEL';
+-- update stock_quarter set ticker = 'COFORGE' where ticker = 'NIITTECH';
+-- update stock_quarter set ticker = 'DHANI' where ticker = 'IBVENTURES';
+
+-- update stock_pnl set ticker = 'INDUSTOWER' where ticker = 'INFRATEL';
+-- update stock_pnl set ticker = 'COFORGE' where ticker = 'NIITTECH';
+-- update stock_pnl set ticker = 'DHANI' where ticker = 'IBVENTURES';
+
+-- update stock_cashflow set ticker = 'INDUSTOWER' where ticker = 'INFRATEL';
+-- update stock_cashflow set ticker = 'COFORGE' where ticker = 'NIITTECH';
+-- update stock_cashflow set ticker = 'DHANI' where ticker = 'IBVENTURES';
+
+-- update stock_balancesheet set ticker = 'INDUSTOWER' where ticker = 'INFRATEL';
+-- update stock_balancesheet set ticker = 'COFORGE' where ticker = 'NIITTECH';
+-- update stock_balancesheet set ticker = 'DHANI' where ticker = 'IBVENTURES';
+
 select count(1), name from daily_data_s a group by name order by count(1); 
 
 select if(is_sensex = 1, 'SENSEX', if(is_nifty50 = 1, 'NIFTY', if(is_nse100 = 1 or is_bse100 = 1, 'NSE-BSE100', if(is_nse200 = 1 or is_bse200 = 1, 'NSE-BSE200', 'NSE-BSE500'))) ) index1, 
