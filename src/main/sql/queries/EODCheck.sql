@@ -147,94 +147,12 @@ commit;
 -- new quarter results
 SELECT b.ticker from daily_data_s a, stock_universe b 
 where a.name = b.ticker5 and 
-a.last_result_date = '202009' and 
+a.last_result_date = '202012' and 
 date = (select max(date) from daily_data_s a) and 
-b.ticker not in (select distinct ticker from stock_quarter a where date = '2020-09-30');
+b.ticker not in ('ADANIGAS', 'CENTURYPLY', 'GRSE', 'RVNL', 'STRTECH') and 
+b.ticker not in (select distinct ticker from stock_quarter a where date = '2020-12-31');
 -- new annual p&L 
 select distinct ticker, max(date) from stock_pnl a where month(date) != 3 group by ticker having max(date) not in ('2018-12-31', '2019-03-31', '2018-06-30') ORDER BY max(date) desc;
 SELECT ticker, cons_standalone, max(date) from stock_pnl a group by ticker, cons_standalone 
 having max(date) < '2018-01-01' order by max(date) desc, ticker;
 -- update stock_quarter set opm = opm/100 where opm > 1;
--- Change of ticker
-select distinct(name) from daily_data_s a where a.date = (select max(date) from daily_data_s) and a.name not in (select ticker5 from stock_universe) order by rank; 
-select * from stock_universe a where a.name like 'Techno%'; 
-select * from daily_data_s a where a.name like 'TCS%' and date > '2020-10-01' order by date desc;
-select * from daily_data_b a where ticker_b = 'IDFCBK:IN';
--- update stock_universe a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
--- update stock_universe a set ticker5 = 'IDFC First' where ticker = 'IDFCBANK';
--- update stock_universe a set ticker2 = 'IDFCFB:IN' where ticker = 'IDFCFIRSTB';
--- update daily_data_b a set ticker_b = 'IDFCFB:IN' where ticker_b = 'IDFCBK:IN';
--- update daily_data_s a set a.name = 'Strides Pharma' where a.name = 'Strides Shasun'; 
--- update nse_price_history a set nse_ticker = 'IDFCFIRSTB' where nse_ticker = 'IDFCBANK';
--- update stock_pnl a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
--- update stock_quarter a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
--- update stock_balancesheet a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
--- update stock_cashflow a set ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
-select * from wealth_details a where a.ticker = 'KPITTECH';
--- update wealth_details a set a.ticker = 'IDFCFIRSTB' where ticker = 'IDFCBANK';
-select * from stock_universe a where ticker in ('530643');
--- BAJAJCORP to BAJAJCON and 'Bajaj Corp' to 'Bajaj Consumer'
--- IDFCBANK to IDFCFIRSTB and 'IDFC Bank' to 'IDFC First Bank'
-select * from stock_cashflow a where ticker = 'KPITTECH';
-
--- Stock Split, Bonus
-select * from stock_split_probability a order by date desc;
-select a.* from stock_split_probability a, stock_universe b where a.ticker = b.ticker and (b.is_nse500 = 1 or b.is_bse500 = 1) and a.is_processed != 'YES' order by date desc;
--- update stock_split_probability set is_processed = 'YES', note = 'Stock Crashed' where ticker = JETAIRWAYS' and date = '2019-06-18';
--- update stock_split_probability set is_processed = 'YES', note = 'Bonus 1:1' where ticker = 'ELGIEQUIP' and date = '2020-09-24';
--- update stock_split_probability set is_processed = 'YES', note = 'Stock Split Ratio 2:10' where ticker = 'LAURUSLABS' and date = '2020-09-29';
--- update stock_split_probability set is_processed = 'YES', note = 'Right Issue 1:1' where is_processed = 'NO' and ticker = 'M&MFIN' and date = '2020-07-22';
--- update stock_split_probability set is_processed = 'YES', note = 'No Data Found' where ticker = 'M&MFIN' and date = '2020-08-24';
--- update stock_split_probability set is_processed = 'YES', note = 'Ignored' where is_processed = 'NO' and ticker not in (select ticker from stock_universe where is_nse500 = 1 or is_bse500 = 1);
-SELECT date, close_price, a.* from nse_price_history a where a.nse_ticker = 'M&MFIN' and date <= '2020-07-22' order by date desc;
-SELECT date, close_price from bse_price_history a where a.bse_ticker = 'HCLTECH' and date <= '2019-12-05' order by date desc;
-select * from stock_price_movement_history a where a.ticker = 'HCLTECH' and date >= '2019-12-05';
-SELECT * from wealth_details a where ticker = 'RELAXO';
-SELECT * from portfolio_holdings a where ticker = 'RELAXO';
-
-/*
-update wealth_details set quantity = quantity * 2, rate = rate * (1/2), net_rate = net_rate * (1/2) where ticker = 'RELAXO';
-update portfolio_holdings set quantity = quantity * 2, rate = rate * (1/2), net_rate = net_rate * (1/2) where ticker = 'RELAXO';
-
--- Copy this below and then replace ticker XXX to right one and replace date and most imp. replace fraction
-update nse_price_history a set close_price = close_price * ( 1 / 1	) where a.nse_ticker = 'XXX'	 and date < 'XXXX-XX-XX' ;
-
-update nse_price_history a set close_price = close_price * ( 2 / 10	) where a.nse_ticker = 'LAURUSLABS'	 and date < '2020-09-29' ;
-update nse_price_history a set close_price = close_price * ( 1 / 2	) where a.nse_ticker = 'ELGIEQUIP'	 and date < '2020-09-24' ;
-update nse_price_history a set close_price = close_price * ( 1 / 10 ) where a.nse_ticker = 'EICHERMOT'  and date < '2020-08-24';
-update nse_price_history a set close_price = close_price * ( 2 / 10 ) where a.nse_ticker = 'IRCON'  and date < '2020-04-03';
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'VINATIORGA' and date < '2020-02-05' ;
-update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'BALMLAWRIE' and date < '2019-12-26';
-update nse_price_history a set close_price = close_price * ( 1 / 10 ) where a.nse_ticker = 'TRIDENT'  and date < '2019-12-13' ;
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'HCLTECH' and date < '2019-12-05' ;
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'AARTIIND' and date < '2019-09-27' ;
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'HDFCBANK' and date < '2019-09-19' ;
-update nse_price_history a set close_price = close_price * ( 4 / 5 ) where a.nse_ticker = 'ASTRAL' and date < '2019-09-16' ;
-update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'BRIGADE' and date < '2019-08-28' ;
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'BHAGERIA'  and date < '2019-07-17';
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'SUMIT'  and date < '2019-07-17';
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'GAIL'  and date < '2019-07-09' ;
-update nse_price_history a set close_price = close_price * ( 2 / 5 ) where a.nse_ticker = 'APCOTEXIND' and date < '2019-07-04' ;
-update bse_price_history a set close_price = close_price * ( 5 / 10 ) where a.bse_ticker = '509887' and date < '2019-07-03' ;
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'AVADHSUGAR'  and date < '2019-06-27';
-update nse_price_history a set close_price = close_price * ( 3 / 5 ) where a.nse_ticker = 'MITTAL'  and date < '2019-06-20' ;
-update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'CREATIVE'  and date < '2019-06-25' ;
-
-*/
-
-/* Ticker Change/Name Change */
--- Change ticker and ticker_old
-select * from stock_universe a where ticker like 'CDSL';
-select * from nse_price_history where nse_ticker = 'TATAGLOBAL';
-update nse_price_history set nse_ticker = 'TATACONSUM' where nse_ticker = 'TATAGLOBAL';
-select * from nse_price_history where nse_ticker = 'TATACONSUM';
-
-
--- update HDFC Bank PB
-select * from daily_data_s a where a.name = 'HDFC Bank' and date BETWEEN '2019-04-20' and '2019-07-01' order by date desc;
-update daily_data_s a set pb_ttm = (cmp/548) where a.name = 'HDFC Bank' and date BETWEEN '2019-04-20' and '2019-07-01'; -- TODO: update second date
-update daily_data_s a set pb_ttm = (cmp/522) where a.name = 'HDFC Bank' and date BETWEEN '2019-01-19' and '2019-04-19'; -- TODO: update second date
-update daily_data_s a set pb_ttm = (cmp/507) where a.name = 'HDFC Bank' and date BETWEEN '2018-10-20' and '2019-01-18'; -- TODO: update second date
-update daily_data_s a set pb_ttm = (cmp/409) where a.name = 'HDFC Bank' and date BETWEEN '2018-07-21' and '2018-10-19'; -- TODO: update second date
-update daily_data_s a set pb_ttm = (cmp/405) where a.name = 'HDFC Bank' and date BETWEEN '2018-04-21' and '2018-07-20'; -- TODO: update second date
--- 

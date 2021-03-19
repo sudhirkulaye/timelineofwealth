@@ -24,21 +24,21 @@ select * from adviser_user_mapping;
 -- scrept to create PMS acct
 select * from portfolio a order by a.memberid, a.portfolioid; -- total 21 portfolios 
 INSERT INTO portfolio (memberid, portfolioid, status, description, start_date, end_date, compositeid, net_investment, market_value, holding_period, net_profit, absolute_return, annualized_return) 
-VALUES ('1068', '1', 'Active', 'INTRO', '2020-02-17', '2030-02-17', '1', '5000', '5000', '1', '0', '0', '0');
+VALUES ('1063', '1', 'Active', 'INTRO', '2020-01-22', '2030-01-22', '1', '200000', '200000', '0', '0', '0', '0');
 
-select * from portfolio_cashflow where memberid in (1068) order by portfolioid, date desc;
+select * from portfolio_cashflow where memberid in (1063) order by portfolioid, date desc;
 INSERT INTO portfolio_cashflow (memberid, portfolioid, date, cashflow, description) 
-VALUES ('1068', '1', '2020-02-14', '-5000', 'Initial Cash');
+VALUES ('1063', '1', '2020-02-14', '-200000', 'Initial Cash');
 
-select * from portfolio_value_history a where memberid in (1068) and  date >= '2019-12-01' order by date desc;
+select * from portfolio_value_history a where memberid in (1063) and  date >= '2021-01-01' order by date desc;
 INSERT INTO portfolio_value_history (memberid, portfolioid, date, value) 
-VALUES ('1068', '1', '2020-02-14', '5000');
+VALUES ('1063', '1', '2021-01-22', '200000');
 
-SELECT * FROM portfolio_holdings a  WHERE memberid = 1068 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+SELECT * FROM portfolio_holdings a  WHERE memberid = 1063 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
 INSERT INTO portfolio_holdings (memberid, portfolioid, buy_date, ticker, name, short_name, asset_classid, subindustryid, quantity, rate, brokerage, tax, total_cost, net_rate, cmp, market_value, holding_period, net_profit, absolute_return, annualized_return, maturity_value, maturity_date, last_valuation_date) 
-VALUES ('1068', '1', '2020-02-14', 'MOSL_CASH', 'MOSL Cash', 'MOSL Cash', '101010', '0', '1.0000', '5000', '0', '0', '5000', '5000', '5000', '5000', '0', '0', '0', '0', '0.000', '2000-01-01', '2019-06-21');
+VALUES ('1063', '1', '2020-02-14', 'MOSL_CASH', 'MOSL Cash', 'MOSL Cash', '101010', '0', '1.0000', '200000', '0', '0', '200000', '200000', '200000', '200000', '0', '0', '0', '0', '0.000', '2000-01-01', '2019-06-21');
 
 select * from moslcode_memberid; 
-INSERT INTO moslcode_memberid (memberid, moslcode) VALUES ('1068', 'H23578');
+INSERT INTO moslcode_memberid (memberid, moslcode) VALUES ('1063', 'H0822');
 
 

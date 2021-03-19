@@ -7,11 +7,11 @@ select * from member;
 select * from adviser_user_mapping;
 select * from composite; -- 5 composites
 select * from composite_constituents; 
-select * from portfolio a order by a.memberid, a.portfolioid; -- total 21 portfolios 
-select * from portfolio_holdings a where memberid in (1060) order by asset_classid, ticker, buy_date;
+select * from portfolio a order by start_date desc, a.memberid, a.portfolioid; -- total 23 portfolios 
+select * from portfolio_holdings a where memberid in (1063, 1024) order by asset_classid, ticker, buy_date;
 select compositeid, count(1) from portfolio a group by compositeid order by a.compositeid; -- (composite 1: 10, 2: 11)
-select * from portfolio_cashflow where memberid in (1000) order by portfolioid, date desc;
-select * from portfolio_value_history a where memberid in (1007) and  date >= '2019-10-30' order by date desc;
+select * from portfolio_cashflow where memberid in (1063, 1024) order by portfolioid, date desc;
+select * from portfolio_value_history a where memberid in (1, 1063, 1024) and  date >= '2021-02-25' order by memberid, date desc;
 select * from portfolio_returns_calculation_support a where memberid in (1000);
 select * from portfolio_twrr_summary a where memberid in (1, 1024);
 select * from portfolio_twrr_monthly a where memberid in (1);
@@ -46,8 +46,23 @@ and c.moslcode != 'H20613'
 and a.memberid = d.memberid
 and a.short_name != 'LIQD BeES ETF'
 and a.sell_date >= '2019-07-01'
-and b.compositeid = 2 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
+and b.compositeid = 3 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
 ORDER BY memberid, portfolioid, a.sell_date desc; 
+
+-- stock count match
+select concat(a.memberid, '-', moslcode, '-', first_name, ' ', last_name) name, short_name, sum(quantity) 
+from portfolio_holdings a, member b, moslcode_memberid c
+where a.memberid = b.memberid and
+a.memberid = c.memberid and
+b.memberid = c.memberid and 
+c.moslcode != 'H20613'
+group by a.memberid, name order by a.memberid, short_name;
+
+-- delete holdings of closed account esp. MOSL_CASH
+select * from portfolio_holdings a order by memberid, asset_classid, short_name, buy_date;
+-- delete from portfolio_holdings where memberid in (1009, 1010, 1051);
+-- delete from portfolio_value_history where memberid in (1009, 1010, 1051);
+
 
 -- model portfolio
 SELECT 'NA', 'Model', b.description, a.memberid, a.portfolioid, 
@@ -64,7 +79,7 @@ ORDER BY memberid, portfolioid,sum(a.market_value) desc;
 -- Portfolio Vs Benchmark Performance
 select b.benchmark_name, b.benchmark_type, a.returns_twrr_since_current_month, a.returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_ytd, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from benchmark_twrr_summary a, benchmark b Where a.benchmarkid = b.benchmarkid order by benchmark_type, a.benchmarkid, a.returns_twrr_one_year;
 select 'Focus-Five', 'Multi-Cap', returns_twrr_since_current_month, returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_ytd, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from portfolio_twrr_summary a WHERE  a.memberid = 1 AND a.portfolioid = 2;
-select a.memberid /* 'Focus-Five'*/, 'Multi-Cap', returns_twrr_since_current_month, returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_ytd, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from portfolio_twrr_summary a, portfolio b where a.memberid = b.memberid and a.portfolioid = b.portfolioid and b.compositeid = 2 order by  a.memberid;
+select a.memberid /* 'Focus-Five'*/, 'Multi-Cap', returns_twrr_since_current_month, returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_ytd, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from portfolio_twrr_summary a, portfolio b where a.memberid = b.memberid and a.portfolioid = b.portfolioid and b.compositeid in (2,3) order by  a.memberid;
 
 -- Portfolio returns
 SELECT  c.moslcode, d.first_name, d.last_name, a.*  
@@ -111,7 +126,7 @@ c.memberid = d.memberid and
 a.portfolioid = b.portfolioid and
 b.portfolioid = c.portfolioid and
 c.status = 'Active' and
-c.compositeid = 1 and -- (1: INTRO, 2: FOCUS-FIVE)
+c.compositeid = 2 and -- (1: INTRO, 2: FOCUS-FIVE)
 a.date = '2019-06-28' and -- (Start Date)
 b.date = '2020-12-31' -- (End Date)
 order by memberid, portfolioid;
@@ -141,8 +156,8 @@ select * from log_table;
 truncate log_table; 
 -- DELETE from mosl_transaction where moslcode = 'H20488';
 select * from mosl_transaction where is_processed = 'N' order by date desc;
-select * from mosl_transaction where /*quantity < 0 and*/ date >= '2020-12-01' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
-SELECT * FROM stock_universe a WHERE ticker in ('YESBANK','');
+select * from mosl_transaction where /*quantity < 0 and*/ date >= '2021-03-08' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
+select moslcode, date, script_name, sell_buy, sum(quantity) from mosl_transaction where date = '2021-03-08' group by moslcode, date, script_name, sell_buy order by date desc, moslcode, script_name;
 -- update mosl_transaction set portfolioid = 1 where date = '2019-11-18';
 select * from portfolio_holdings a where a.memberid in (1) order by portfolioid, asset_classid, ticker, buy_date;
 select * from portfolio_historical_holdings a where a.memberid in (1) order by sell_date desc, ticker;
@@ -181,7 +196,7 @@ select year('2019-04-01');
 select classid, asset_class_group from asset_classification a;
 SELECT * from wealth_details a where memberid in (1000) order by a.memberid, a.asset_classid, a.ticker, a.buy_date;
 SELECT * FROM wealth_asset_allocation_history a where a.memberid = 1026 and date = (SELECT min(date) FROM wealth_asset_allocation_history a where a.memberid = 1026);
-select * from portfolio_holdings a where memberid in (1026) order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+select * from portfolio_holdings a where memberid in (1000) order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
 select * from portfolio_historical_holdings a where memberid in (1026) order by a.memberid, a.portfolioid, a.sell_date desc, a.asset_classid, a.ticker, a.buy_date;
 SELECT a.*, b.value from portfolio_cashflow a, portfolio_value_history b 
 where a.memberid in (1026) and a.memberid = b.memberid and a.portfolioid = b.portfolioid and a.date = b.date order by a.date desc;
@@ -189,4 +204,8 @@ SELECT * from portfolio_value_history a where memberid in (1026) and date >= '20
 
 
 select * from mutual_fund_nav_history a WHERE a.date = '2019-08-30' and a.scheme_code in ('120465','119018','120152','118825','129046','119718','118533','119807','120505','129220','130503','118525');
+
+-- update portfolio_holdings set rate = 692156.6, total_cost = 692156.6, net_rate = 692156.6, cmp = 692156.6, market_value = 692156.6, buy_date = (select date_today from setup_dates) where memberid in (1000) and ticker = 'MOSL_CASH';
+-- update portfolio_holdings set rate = -118246, total_cost = -118246, net_rate = -118246, cmp = -118246, market_value = -118246, buy_date = (select date_today from setup_dates) where memberid in (1000) and ticker = 'FutureOptions';
+
 
