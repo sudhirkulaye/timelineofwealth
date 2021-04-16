@@ -112,7 +112,19 @@ select distinct fund_house, count(1) from mutual_fund_universe a group by fund_h
 select * from mutual_fund_universe a order by fund_house, scheme_name_full;
 select * from asset_classification;
 
-select * from stock_universe a where ticker = 'IIFLWAM';
+select asset_classid, min(marketcap), max(marketcap) from stock_universe a group by asset_classid;
+-- update stock_universe a set asset_classid = 406010 where a.is_bse100 = 1 or a.is_nse100 = 1;
+-- update stock_universe a set asset_classid = 406020 where (a.is_bse200 = 1 and a.is_bse100 = 0) or (a.is_nse200 = 1 and a.is_nse100 = 0);
+-- update stock_universe a set asset_classid = 406030 where (a.is_bse500 = 1 and a.is_bse200 = 0) or (a.is_nse500 = 1 and a.is_nse200 = 0);
+-- update stock_universe a set asset_classid = 406040 where asset_classid = 0;
+-- update stock_universe a, daily_data_s b set asset_classid = '406010' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap > 50000;
+-- update stock_universe a, daily_data_s b set asset_classid = '406020' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 50000 and market_cap > 10000;
+-- update stock_universe a, daily_data_s b set asset_classid = '406030' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 10000 and market_cap > 5000;
+-- update stock_universe a, daily_data_s b set asset_classid = '406040' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 5000;
+
+select ticker, b.name, asset_classid, marketcap, market_cap from stock_universe a, daily_data_s b where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 10000 and market_cap > 5000 order by asset_classid, marketcap desc;
+
+select * from stock_universe a where a.is_bse100 = 1 or a.is_nse100 = 1 order by asset_classid, marketcap desc, ticker;
 select * from nse_price_history a where nse_ticker = 'GUJFLUORO' and date >= '2018-01-01' order by date desc;
 select * from bse_price_history a where bse_ticker = '540376' and date >= '2020-04-30' order by date desc;
 insert into nse_price_history (

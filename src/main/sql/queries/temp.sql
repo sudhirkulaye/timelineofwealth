@@ -56,8 +56,8 @@ select count(1) from mutual_fund_nav_history where scheme_code = 118531;  -- 132
 select count(1) from daily_data_s where date >= '2020-10-01';
 select count(1) from nse_price_history where date >= '2021-01-07';
 select count(1) from bse_price_history where date >= '2020-10-01';
-select date, count(1) from mutual_fund_nav_history where date >= '2021-03-01' group by date desc;
-select * from mutual_fund_nav_history where date >= '2020-12-20' ;
+select date, count(1) from mutual_fund_nav_history where date >= '2021-04-01' group by date desc;
+select * from mutual_fund_nav_history where date = '2021-03-24' ;
 
 select * from wealth_details a where a.memberid in (1000, 1011) order by a.asset_classid, a.ticker, a.buy_date;
 call ap_process_eod;
@@ -83,11 +83,21 @@ Affle (India)
 
 */
 
-select count(1), date from daily_data_s where date > '2020-01-01' group by date order by date desc; 
+select count(1), date from daily_data_s where date > '2021-03-22' group by date order by date desc; 
+select count(1), date from nse_price_history where date > '2021-03-22' group by date order by date desc;
+select count(1), date from bse_price_history where date > '2021-03-22' group by date order by date desc;
+select count(1), date from mutual_fund_nav_history where date > '2021-03-22' group by date order by date desc;
 select name from daily_data_s where date = '2020-01-14' and name not in (select name from daily_data_s where date = '2020-01-15');
 select date, count(1) from mutual_fund_nav_history where date >= '2020-12-31' group by date desc;
 select * from mutual_fund_nav_history a where date in ('2021-01-04','2021-01-05','2021-01-07','2021-01-14','2021-01-15');
 
 select * from stock_price_movement_history a where ticker = 'MFSL';
 select * from benchmark_twrr_monthly a where benchmarkid = 'NIFTY';
+
+select nse_ticker, a.date, open_price, high_price, low_price, close_price, b.return_1D, b.return_1W, b.return_2W, b.return_1M 
+from nse_price_history a, stock_price_movement_history b 
+where nse_ticker = b.ticker and
+a.date = b.date and
+a.date between '2020-07-27' and '2020-10-20' and 
+nse_ticker = 'MARICO' order by a.date desc; 
 
