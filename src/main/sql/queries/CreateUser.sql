@@ -42,3 +42,10 @@ select * from moslcode_memberid;
 INSERT INTO moslcode_memberid (memberid, moslcode) VALUES ('1063', 'H0822');
 
 
+select * from portfolio a where memberid in (1051, 1063) order by a.memberid, a.portfolioid;
+select * from portfolio_cashflow where memberid in (1051, 1063) order by date desc;
+select min(date), memberid, portfolioid from portfolio_value_history a where memberid in (1063, 1051) group by memberid, portfolioid order by date desc;
+select * from portfolio_value_history a where memberid in (1051, 1063) order by date;
+select * from moslcode_memberid a where memberid in (1063, 1051); 
+SELECT * FROM portfolio_holdings a  WHERE memberid in (1063, 1051) order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+select * from nse_price_history where nse_ticker = 'TCS' and date between '2021-01-20' and '2021-01-31' order by date desc;

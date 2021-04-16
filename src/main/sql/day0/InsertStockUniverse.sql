@@ -279,11 +279,18 @@ select a.company_ticker, a.company_nse_code, a.company_bse_code, a.company_isin_
 update stock_universe a, stock_universe_subindustry b set a.subindustryid = b.subindustryid where a.ticker = b.ticker;
 
 COMMIT;
-
+/*
 update stock_universe a set asset_classid = 406010 where a.is_bse100 = 1 or a.is_nse100 = 1;
 update stock_universe a set asset_classid = 406020 where (a.is_bse200 = 1 and a.is_bse100 = 0) or (a.is_nse200 = 1 and a.is_nse100 = 0);
 update stock_universe a set asset_classid = 406030 where (a.is_bse500 = 1 and a.is_bse200 = 0) or (a.is_nse500 = 1 and a.is_nse200 = 0);
 update stock_universe a set asset_classid = 406040 where asset_classid = 0;
+*/
+-- new classification Large Cap if MCap >50K, MCap (10K-50K) - Mid Cap, MCap(5K-10K) Small Cap and MCap<5K - MicroCap
+update stock_universe a, daily_data_s b set asset_classid = '406010' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap > 50000;
+update stock_universe a, daily_data_s b set asset_classid = '406020' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 50000 and market_cap > 10000;
+update stock_universe a, daily_data_s b set asset_classid = '406030' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 10000 and market_cap > 5000;
+update stock_universe a, daily_data_s b set asset_classid = '406040' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 5000;
+
 
 select * from stock_universe order by asset_classid, marketcap desc, ticker;
 

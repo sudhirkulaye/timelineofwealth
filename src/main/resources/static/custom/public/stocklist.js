@@ -116,12 +116,25 @@ module.controller('StockListController', function($scope, $http, $filter) {
         if ($scope.industryFilter == undefined || $scope.industryFilter == "") {
             return true;
         } else {
-            if (stock.industryNameDisplay.toLowerCase().indexOf($scope.industryFilter.toLowerCase()) != -1 ) {
+            var right_text = $scope.industryFilter.split('-')[1].toLowerCase();
+            //console.log("right_text ", right_text);
+            if (stock.industryNameDisplay.toLowerCase().indexOf(right_text) != -1 ) {
                 return true;
             }
         }
         return false;
     }
+
+    $scope.filterBySector = function (stock) {
+            if ($scope.sectorFilter == undefined || $scope.sectorFilter == "") {
+                return true;
+            } else {
+                if (stock.sectorNameDisplay.toLowerCase().indexOf($scope.sectorFilter.toLowerCase()) != -1 ) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
     $scope.showColumns = function(selectedOption) {
         if (selectedOption == "BasicInfo") {
