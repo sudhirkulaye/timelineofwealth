@@ -838,7 +838,7 @@ BEGIN
       AND b.year = var_curr_year;
 
       UPDATE benchmark_twrr_summary a, benchmark_twrr_monthly b
-      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_dec_ending_quarter + 1)*(returns_nov + 1)*(returns_dec + 1)) - 1,
+      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_nov + 1)*(returns_dec + 1)) - 1,
              returns_twrr_one_year = ((returns_twrr_ytd + 1)*(returns_dec_ending_quarter + 1)*(returns_sep_ending_quarter + 1)*(returns_jun + 1)*(returns_may + 1)) - 1,
              returns_twrr_two_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1,
              returns_twrr_three_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1,
@@ -908,7 +908,7 @@ BEGIN
       AND b.year = var_curr_year;
 
       UPDATE benchmark_twrr_summary a, benchmark_twrr_monthly b
-      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_dec_ending_quarter + 1)*(returns_dec + 1)) - 1,
+      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_dec + 1)) - 1,
              returns_twrr_one_year = ((returns_twrr_ytd + 1)*(returns_dec_ending_quarter + 1)*(returns_sep_ending_quarter + 1)*(returns_jun + 1)) - 1,
              returns_twrr_two_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1,
              returns_twrr_three_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1,

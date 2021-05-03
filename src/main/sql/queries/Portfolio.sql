@@ -10,7 +10,7 @@ select * from composite_constituents;
 select * from portfolio a order by start_date desc, a.memberid, a.portfolioid; -- total 23 portfolios 
 select * from portfolio_holdings a where memberid in (1063, 1024) order by asset_classid, ticker, buy_date;
 select compositeid, count(1) from portfolio a group by compositeid order by a.compositeid; -- (composite 1: 10, 2: 11)
-select * from portfolio_cashflow where memberid in (1063, 1024) order by portfolioid, date desc;
+select * from portfolio_cashflow where memberid in (1026) order by portfolioid, date desc;
 select * from portfolio_value_history a where memberid in (1, 1063, 1024) and  date >= '2021-02-25' order by memberid, date desc;
 select * from portfolio_returns_calculation_support a where memberid in (1000);
 select * from portfolio_twrr_summary a where memberid in (1, 1024);
@@ -31,9 +31,9 @@ and a.memberid = b.memberid
 and a.memberid = c.memberid
 and c.moslcode != 'H20613'
 and a.memberid = d.memberid
-and b.compositeid = 1 -- change to 1: for INTRO strategy 2: FOCUS-FIVE
+and b.compositeid in (1,2,3) -- change to 1: for INTRO strategy 2: FOCUS-FIVE
 GROUP BY a.memberid, a.portfolioid, a.ticker 
-ORDER BY memberid, portfolioid,sum(a.market_value) desc; 
+ORDER BY b.compositeid, memberid, portfolioid,sum(a.market_value) desc; 
 
 -- Realized Profit & Loss
 SELECT c.moslcode, d.first_name, d.last_name, a.memberid, a.portfolioid, 
@@ -156,11 +156,11 @@ select * from log_table;
 truncate log_table; 
 -- DELETE from mosl_transaction where moslcode = 'H20488';
 select * from mosl_transaction where is_processed = 'N' order by date desc;
-select * from mosl_transaction where /*quantity < 0 and*/ date >= '2021-04-09' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
-select moslcode, date, script_name, sell_buy, sum(quantity) from mosl_transaction where date >= '2021-03-01' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') group by moslcode, date, script_name, sell_buy order by moslcode, date desc, script_name;
+select * from mosl_transaction where /*quantity < 0 and*/ date >= '2021-04-29' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
+select moslcode, date, script_name, sell_buy, sum(quantity) from mosl_transaction where date >= '2021-04-29' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') group by moslcode, date, script_name, sell_buy order by moslcode, date desc, script_name;
 -- update mosl_transaction set portfolioid = 1 where date = '2019-11-18';
-select * from portfolio_holdings a where a.memberid in (1003) order by portfolioid, asset_classid, ticker, buy_date;
-select * from portfolio_historical_holdings a where a.memberid in (1007) order by sell_date desc, ticker;
+select * from portfolio_holdings a where a.memberid in (1) order by portfolioid, asset_classid, ticker, buy_date;
+select * from portfolio_historical_holdings a where a.memberid in (1) order by sell_date desc, ticker;
 select b.moslcode, a.memberid, a.portfolioid, a.ticker, a.total_cost, a.cmp, a.market_value, b.net_amount 
 from portfolio_holdings a, moslcode_memberid c, mosl_transaction b
 WHERE a.memberid = c.memberid and a.portfolioid = b.portfolioid and b.moslcode = c.moslcode 
@@ -171,9 +171,9 @@ and b.script_name = 'MOSL_CASH' and a.ticker = 'MOSL_CASH' and b.is_processed = 
 -- DELETE from mosl_transaction where moslcode = 'H22295';
 select * from moslcode_memberid a where moslcode = 'H22295';
 SELECT * from portfolio a where a. memberid = 1 and portfolioid = 1;
-select * from portfolio_cashflow a where a. memberid = 1003 and portfolioid = 1;
+select * from portfolio_cashflow a where a. memberid = 1026 and portfolioid = 1;
 select * from portfolio_holdings a where a. memberid = 1000 and portfolioid = 1 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
-SELECT * from portfolio_value_history a where a.date >= '2021-03-23' and a.memberid in (1) order by memberid, portfolioid, date desc; 
+SELECT * from portfolio_value_history a where a.date >= '2018-03-30' and a.memberid in (1) order by memberid, portfolioid, date desc; 
 SELECT * from portfolio_returns_calculation_support a where a. memberid = 1026 and portfolioid = 1 ORDER BY a.memberid, a.portfolioid, a.date;
 select * from portfolio_twrr_monthly a where a.memberid IN (1026, 1, 1003, 1001, 1024);
 SELECT * from portfolio_twrr_summary a where a.memberid IN (1026, 1, 1003, 1001, 1024);

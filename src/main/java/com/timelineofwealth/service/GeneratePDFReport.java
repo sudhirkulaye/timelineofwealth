@@ -1338,13 +1338,6 @@ public class GeneratePDFReport {
                         pdfPCell.setBackgroundColor(tableBodyBaseColor);
                         pdfPCell.setExtraParagraphSpace(5f);
                         table.addCell(pdfPCell);
-                        pdfPCell = new PdfPCell(new Paragraph("" + dfForPercent.format(new BigDecimal(portfolioTwrrMonthlyListTemp.get(i).getReturnsJan().floatValue() * 100)), tableBodyFont));
-                        pdfPCell.setPaddingLeft(10);
-                        pdfPCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                        pdfPCell.setVerticalAlignment(Element.ALIGN_CENTER);
-                        pdfPCell.setBackgroundColor(tableBodyBaseColor);
-                        pdfPCell.setExtraParagraphSpace(5f);
-                        table.addCell(pdfPCell);
                         pdfPCell = new PdfPCell(new Paragraph("" + dfForPercent.format(new BigDecimal(portfolioTwrrMonthlyListTemp.get(i).getReturnsFeb().floatValue() * 100)), tableBodyFont));
                         pdfPCell.setPaddingLeft(10);
                         pdfPCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -1360,6 +1353,13 @@ public class GeneratePDFReport {
                         pdfPCell.setExtraParagraphSpace(5f);
                         table.addCell(pdfPCell);
                         pdfPCell = new PdfPCell(new Paragraph("" + dfForPercent.format(new BigDecimal(portfolioTwrrMonthlyListTemp.get(i).getReturnsApr().floatValue() * 100)), tableBodyFont));
+                        pdfPCell.setPaddingLeft(10);
+                        pdfPCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        pdfPCell.setVerticalAlignment(Element.ALIGN_CENTER);
+                        pdfPCell.setBackgroundColor(tableBodyBaseColor);
+                        pdfPCell.setExtraParagraphSpace(5f);
+                        table.addCell(pdfPCell);
+                        pdfPCell = new PdfPCell(new Paragraph("" + dfForPercent.format(new BigDecimal(portfolioTwrrMonthlyListTemp.get(i).getReturnsMay().floatValue() * 100)), tableBodyFont));
                         pdfPCell.setPaddingLeft(10);
                         pdfPCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                         pdfPCell.setVerticalAlignment(Element.ALIGN_CENTER);

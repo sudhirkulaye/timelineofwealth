@@ -95,7 +95,7 @@ BEGIN
 
     -- Insert cashflow data
     INSERT INTO portfolio_returns_calculation_support
-      SELECT   b.memberid, b.portfolioid, b.date date, b.cashflow cashflow, c.value
+      SELECT   b.memberid, b.portfolioid, b.date date, b.cashflow cashflow, c.value, b.description
       FROM     portfolio_cashflow b
                LEFT JOIN portfolio_value_history c
                  ON b.memberid = c.memberid AND b.portfolioid = c.portfolioid AND b.date = c.date
@@ -104,7 +104,7 @@ BEGIN
 
     -- insert end of month data exclude if cash flow is also on end of month
     INSERT INTO portfolio_returns_calculation_support
-      SELECT memberid, portfolioid, date date, 0 cashflow, value
+      SELECT memberid, portfolioid, date date, 0 cashflow, value, 'EOM Value'
       FROM   portfolio_value_history a
       WHERE  a.memberid = var_memberid
       AND a.portfolioid = var_portfolioid
@@ -615,7 +615,14 @@ BEGIN
       AND a.portfolioid = b.portfolioid AND b.portfolioid = c.portfolioid
       AND c.status = 'Active'
       AND c.start_date <= var_date_3_yr_before
-      AND b.returns_year IN ((var_curr_year - 1), (var_curr_year - 2)) ;
+      AND b.returns_year = (var_curr_year - 1);
+      UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b, portfolio c
+      SET    returns_twrr_three_year = ((returns_twrr_three_year + 1)*(returns_calendar_year + 1)) - 1
+      WHERE  a.memberid = b.memberid AND b.memberid = c.memberid
+      AND a.portfolioid = b.portfolioid AND b.portfolioid = c.portfolioid
+      AND c.status = 'Active'
+      AND c.start_date <= var_date_3_yr_before
+      AND b.returns_year = (var_curr_year - 2);
       UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b, portfolio c
       SET    returns_twrr_three_year = ((returns_twrr_three_year + 1)*(returns_dec_ending_quarter + 1)*(returns_sep_ending_quarter + 1)*(returns_jun_ending_quarter + 1)*(returns_mar + 1)) - 1
       WHERE  a.memberid = b.memberid AND b.memberid = c.memberid
@@ -821,6 +828,13 @@ BEGIN
       AND c.start_date <= var_date_5_yr_before
       AND b.returns_year = (var_curr_year - 3);
       UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b, portfolio c
+      SET    returns_twrr_five_year = ((returns_twrr_five_year + 1)*(returns_calendar_year + 1)) - 1
+      WHERE  a.memberid = b.memberid AND b.memberid = c.memberid
+      AND a.portfolioid = b.portfolioid AND b.portfolioid = c.portfolioid
+      AND c.status = 'Active'
+      AND c.start_date <= var_date_5_yr_before
+      AND b.returns_year = (var_curr_year - 4);
+      UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b, portfolio c
       SET    returns_twrr_five_year = ((returns_twrr_five_year + 1)*(returns_dec_ending_quarter + 1)*(returns_sep_ending_quarter + 1)*(returns_jun_ending_quarter + 1)) - 1
       WHERE  a.memberid = b.memberid AND b.memberid = c.memberid
       AND a.portfolioid = b.portfolioid AND b.portfolioid = c.portfolioid
@@ -915,7 +929,7 @@ BEGIN
       AND b.returns_year = var_curr_year;
 
       UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b, portfolio c
-      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_dec_ending_quarter + 1)*(returns_nov + 1)*(returns_dec + 1)) - 1
+      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_nov + 1)*(returns_dec + 1)) - 1
       WHERE  a.memberid = b.memberid AND b.memberid = c.memberid
       AND a.portfolioid = b.portfolioid AND b.portfolioid = c.portfolioid
       AND c.status = 'Active'
@@ -1090,7 +1104,7 @@ BEGIN
       AND b.returns_year = var_curr_year;
 
       UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b, portfolio c
-      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_dec_ending_quarter + 1)*(returns_dec + 1)) - 1
+      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_dec + 1)) - 1
       WHERE  a.memberid = b.memberid AND b.memberid = c.memberid
       AND a.portfolioid = b.portfolioid AND b.portfolioid = c.portfolioid
       AND c.status = 'Active'
