@@ -2,14 +2,17 @@
 select count(1), name from daily_data_s a group by name order by count(1); 
 
 -- Queries to update Screener Short Name (In case of Name Change or ticker Change)
-select * from stock_universe a where a.ticker = 'JUBILANT' or a.ticker5 = 'Chemcon Special.'; -- Bharat Forge, 25101010
-select * from daily_data_s a where date >= '2021-01-01' and name like 'Security & Intel' order by date desc;
+select * from stock_universe a where a.ticker = 'HATSUN' or a.ticker5 = 'Indiamart Inter.'; -- Bharat Forge, 25101010
+select * from daily_data_s a where date >= '2021-04-20' and name like 'Indiamart%' order by date desc;
 select * from stock_price_movement_history where ticker = 'NIITTECH';
 
-
+-- update stock_universe set ticker5 = 'Hatsun Agro' where ticker = 'HATSUN';
+-- update stock_universe set ticker5 = 'Astral', short_name = 'Astral', name = 'Astral Ltd' where ticker = 'ASTRAL';
 -- update stock_universe set ticker5 = 'Jubilant Pharmo', short_name = 'Jubilant Pharmova', name = 'Jubilant Pharmova Ltd' where ticker = 'JUBILANT';
 -- update stock_universe set ticker5 = 'SIS' where ticker = 'SIS' or ticker5 = 'Security & Intel' ;
 
+-- update daily_data_s set name = 'Hatsun Agro' where name = 'Hatsun AgroProd.';
+-- update daily_data_s set name = 'Astral' where name = 'Astral Poly Tech';
 -- update daily_data_s set name = 'Jubilant Pharmo' where name = 'Jubilant Life';
 -- update daily_data_s set name = 'SIS' where name = 'Security & Intel';
 -- update daily_data_s set name = 'Adani Total Gas' where name = 'Adani Gas';

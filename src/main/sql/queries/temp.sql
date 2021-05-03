@@ -35,6 +35,9 @@ select b.benchmark_type, b.benchmark_name, a.* from benchmark_twrr_summary a, be
 
 select * from asset_classification; 
 select * from subindustry;
+select * from stock_universe order by marketcap desc;
+-- update stock_universe set marketcap = 0; 
+-- update stock_universe a, daily_data_s b set a.marketcap = b.market_cap where a.ticker5 = b.name and b.date = (select max(date) from daily_data_s);
 select * from nse_price_history a where date > '2020-09-06' and a.nse_ticker = 'INFY';
 
   UPDATE portfolio_holdings a 
@@ -88,7 +91,7 @@ select count(1), date from nse_price_history where date > '2021-03-22' group by 
 select count(1), date from bse_price_history where date > '2021-03-22' group by date order by date desc;
 select count(1), date from mutual_fund_nav_history where date > '2021-03-22' group by date order by date desc;
 select name from daily_data_s where date = '2020-01-14' and name not in (select name from daily_data_s where date = '2020-01-15');
-select date, count(1) from mutual_fund_nav_history where date >= '2020-12-31' group by date desc;
+select date, count(1) from mutual_fund_nav_history where date >= '2021-03-31' group by date desc;
 select * from mutual_fund_nav_history a where date in ('2021-01-04','2021-01-05','2021-01-07','2021-01-14','2021-01-15');
 
 select * from stock_price_movement_history a where ticker = 'MFSL';
@@ -101,3 +104,27 @@ a.date = b.date and
 a.date between '2020-07-27' and '2020-10-20' and 
 nse_ticker = 'MARICO' order by a.date desc; 
 
+select * from benchmark;
+select * from benchmark_twrr_monthly where benchmarkid = 1;
+select * from portfolio_twrr_monthly where memberid = 1;
+select * from portfolio_twrr_summary where memberid = 1;
+
+select * from mutual_fund_universe a where a.fund_house like 'Parag%' and direct_regular = 'Direct' and dividend_growth = 'Growth';
+
+SELECT memberid, portfolioid, date date, 0 cashflow, value, 'EOM Value'
+      FROM   portfolio_value_history a
+      WHERE  a.memberid = 1
+      AND a.portfolioid = 2
+      AND a.date NOT IN
+					   (SELECT date
+					   FROM   portfolio_cashflow g
+					   WHERE  g.memberid = 1
+					   AND g.portfolioid = 2) -- AND a.date NOT IN (SELECT date_today FROM setup_dates)
+       AND date IN (SELECT   MAX(date)
+					  FROM     portfolio_value_history h
+					  WHERE    h.memberid = 1
+					  AND h.portfolioid = 2
+					  GROUP BY YEAR(date),
+					  MONTH (date));
+                      
+select * from mutual_fund_nav_history a where a.scheme_code = '118825' and date IN ('2021-04-30','2021-03-31','2021-02-26','2021-01-29','2020-12-31','2020-11-27','2020-10-30','2020-09-30','2020-08-31','2020-07-31','2020-06-30','2020-05-29','2020-04-30','2020-03-31','2020-02-28','2020-01-31','2019-12-31','2019-11-29','2019-10-31','2019-09-28','2019-08-30','2019-07-31','2019-06-28') order by date desc;
