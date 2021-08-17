@@ -124,8 +124,8 @@ select asset_classid, min(marketcap), max(marketcap) from stock_universe a group
 
 select ticker, b.name, asset_classid, marketcap, market_cap from stock_universe a, daily_data_s b where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 10000 and market_cap > 5000 order by asset_classid, marketcap desc;
 
-select * from stock_universe a where a.is_bse100 = 1 or a.is_nse100 = 1 order by asset_classid, marketcap desc, ticker;
-select * from nse_price_history a where nse_ticker = 'GUJFLUORO' and date >= '2018-01-01' order by date desc;
+select * from stock_universe a where (a.is_bse500 = 1 or a.is_nse500 = 1) and subindustryid like '40203030%' order by asset_classid, marketcap desc, ticker;
+select * from nse_price_history a where nse_ticker = 'ICICIBANK' and date >= '2021-01-01' order by date desc;
 select * from bse_price_history a where bse_ticker = '540376' and date >= '2020-04-30' order by date desc;
 insert into nse_price_history (
 select 'DMART', 'EQ', open_price, high_price, low_price, close_price, last_price, previous_close_price, total_traded_quantity, total_traded_value, date, total_trades, isin_code 
@@ -142,7 +142,7 @@ debt, debt_3years_back, debt_to_equity, (roce/100), (avg_roce_3years/100), (roe/
 a.pe_ttm, a.pb_ttm, (a.market_cap/sales), 
 (return_1D/100), (return_1W/100), (return_2W/100), (return_1M/100), (return_2M/100), (return_3M/100), (return_6M/100), (return_9M/100), 
 (return_YTD/100), (return_1Y/100), (up_52w_min/100), (down_52w_max/100), (return_2Y/100), (return_3Y/100), 
-(sales_growth_5years/100), (sales_growth_10years/100), noplat, capex, fcff, invested_capital, (roic/100)
+(sales_growth_5years/100), (sales_growth_10years/100), noplat, capex, fcff, invested_capital, (roic/100), 1w_min, 1w_max, 2w_min, 2w_max, 1m_min, 1m_max, 2m_min, 2m_max, 3m_min, 3m_max, 6m_min, 6m_max
 from daily_data_s a, stock_universe b, subindustry c, stock_price_movement d
 where 
 a.date = (select date_today from setup_dates) and 

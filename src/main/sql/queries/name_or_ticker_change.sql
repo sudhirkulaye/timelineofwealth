@@ -2,15 +2,17 @@
 select count(1), name from daily_data_s a group by name order by count(1); 
 
 -- Queries to update Screener Short Name (In case of Name Change or ticker Change)
-select * from stock_universe a where a.ticker = 'HATSUN' or a.ticker5 = 'Indiamart Inter.'; -- Bharat Forge, 25101010
-select * from daily_data_s a where date >= '2021-04-20' and name like 'Indiamart%' order by date desc;
+select * from stock_universe a where a.ticker = 'JUBILANT' or a.ticker5 = 'Indiamart Inter.'; -- Bharat Forge, 25101010
+select * from daily_data_s a where date = '2021-07-01' and name like 'Orient Re%' order by date desc;
 select * from stock_price_movement_history where ticker = 'NIITTECH';
 
+-- update stock_universe set ticker5 = 'RHI Magnestia' where ticker = 'ORIENTREF';
 -- update stock_universe set ticker5 = 'Hatsun Agro' where ticker = 'HATSUN';
 -- update stock_universe set ticker5 = 'Astral', short_name = 'Astral', name = 'Astral Ltd' where ticker = 'ASTRAL';
 -- update stock_universe set ticker5 = 'Jubilant Pharmo', short_name = 'Jubilant Pharmova', name = 'Jubilant Pharmova Ltd' where ticker = 'JUBILANT';
 -- update stock_universe set ticker5 = 'SIS' where ticker = 'SIS' or ticker5 = 'Security & Intel' ;
 
+-- update daily_data_s set name = 'RHI Magnestia' where name = 'Orient Refrac.';
 -- update daily_data_s set name = 'Hatsun Agro' where name = 'Hatsun AgroProd.';
 -- update daily_data_s set name = 'Astral' where name = 'Astral Poly Tech';
 -- update daily_data_s set name = 'Jubilant Pharmo' where name = 'Jubilant Life';
@@ -20,31 +22,40 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update daily_data_s set name = 'Coforge' where name = 'NIIT Tech.';
 -- update daily_data_s set name = 'Dhani Services' where name = 'Indiabulls Vent.';
 
+-- UPDATE stock_universe SET ticker = 'JUBLPHARMA', ticker_old = 'JUBILANT' WHERE (`ticker` = 'JUBILANT');
+
+-- update nse_price_history a set nse_ticker = 'JUBLPHARMA' where nse_ticker = 'JUBILANT';
 -- update nse_price_history a set nse_ticker = 'INDUSTOWER' where nse_ticker = 'INFRATEL';
 -- update nse_price_history a set nse_ticker = 'COFORGE' where nse_ticker = 'NIITTECH';
 -- update nse_price_history a set nse_ticker = 'DHANI' where nse_ticker = 'IBVENTURES';
 -- update nse_price_history a set nse_ticker = 'TATACONSUM' where nse_ticker = 'TATAGLOBAL';
 
+-- update stock_price_movement set ticker = 'JUBLPHARMA' where ticker = 'JUBILANT';
 -- update stock_price_movement set ticker = 'INDUSTOWER' where ticker = 'INFRATEL';
 -- update stock_price_movement set ticker = 'COFORGE' where ticker = 'NIITTECH';
 -- update stock_price_movement set ticker = 'DHANI' where ticker = 'IBVENTURES' and date < '2020-11-06';
 
+-- update stock_price_movement_history set ticker = 'JUBLPHARMA' where ticker = 'JUBILANT';
 -- update stock_price_movement_history set ticker = 'INDUSTOWER' where ticker = 'INFRATEL';
 -- update stock_price_movement_history set ticker = 'COFORGE' where ticker = 'NIITTECH';
 -- update stock_price_movement_history set ticker = 'DHANI' where ticker = 'IBVENTURES' and date < '2020-11-06';
 
+-- update stock_quarter set ticker = 'JUBLPHARMA' where ticker = 'JUBILANT';
 -- update stock_quarter set ticker = 'INDUSTOWER' where ticker = 'INFRATEL';
 -- update stock_quarter set ticker = 'COFORGE' where ticker = 'NIITTECH';
 -- update stock_quarter set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
+-- update stock_pnl set ticker = 'JUBLPHARMA' where ticker = 'JUBILANT';
 -- update stock_pnl set ticker = 'INDUSTOWER' where ticker = 'INFRATEL';
 -- update stock_pnl set ticker = 'COFORGE' where ticker = 'NIITTECH';
 -- update stock_pnl set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
+-- update stock_cashflow set ticker = 'JUBLPHARMA' where ticker = 'JUBILANT';
 -- update stock_cashflow set ticker = 'INDUSTOWER' where ticker = 'INFRATEL';
 -- update stock_cashflow set ticker = 'COFORGE' where ticker = 'NIITTECH';
 -- update stock_cashflow set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
+-- update stock_balancesheet set ticker = 'JUBLPHARMA' where ticker = 'JUBILANT';
 -- update stock_balancesheet set ticker = 'INDUSTOWER' where ticker = 'INFRATEL';
 -- update stock_balancesheet set ticker = 'COFORGE' where ticker = 'NIITTECH';
 -- update stock_balancesheet set ticker = 'DHANI' where ticker = 'IBVENTURES';

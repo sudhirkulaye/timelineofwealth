@@ -27,7 +27,7 @@ update daily_data_s a set pb_ttm = (cmp/405) where a.name = 'HDFC Bank' and date
 -- 
 */
 
-select * from daily_data_s a where date = '2020-04-30' or name = 'Avenue Super.';
+select * from daily_data_s a where date >= '2021-07-29' and name = 'Motil.Oswal.Fin.';
 select * from stock_universe a where bse_industry = 'Other Financial Services' order by marketcap desc;
 select distinct ticker, short_name, asset_classid from wealth_details a where asset_classid > 401010 and asset_classid < 500000 and short_name not like '%FOCUS-FIVE%';
 select * from asset_classification;
@@ -59,7 +59,7 @@ select count(1) from mutual_fund_nav_history where scheme_code = 118531;  -- 132
 select count(1) from daily_data_s where date >= '2020-10-01';
 select count(1) from nse_price_history where date >= '2021-01-07';
 select count(1) from bse_price_history where date >= '2020-10-01';
-select date, count(1) from mutual_fund_nav_history where date >= '2021-04-01' group by date desc;
+select date, count(1) from mutual_fund_nav_history where date >= '2021-06-30' group by date desc;
 select * from mutual_fund_nav_history where date = '2021-03-24' ;
 
 select * from wealth_details a where a.memberid in (1000, 1011) order by a.asset_classid, a.ticker, a.buy_date;
@@ -91,7 +91,7 @@ select count(1), date from nse_price_history where date > '2021-03-22' group by 
 select count(1), date from bse_price_history where date > '2021-03-22' group by date order by date desc;
 select count(1), date from mutual_fund_nav_history where date > '2021-03-22' group by date order by date desc;
 select name from daily_data_s where date = '2020-01-14' and name not in (select name from daily_data_s where date = '2020-01-15');
-select date, count(1) from mutual_fund_nav_history where date >= '2021-03-31' group by date desc;
+select date, count(1) from mutual_fund_nav_history where date >= '2021-06-30' group by date desc;
 select * from mutual_fund_nav_history a where date in ('2021-01-04','2021-01-05','2021-01-07','2021-01-14','2021-01-15');
 
 select * from stock_price_movement_history a where ticker = 'MFSL';
@@ -128,3 +128,6 @@ SELECT memberid, portfolioid, date date, 0 cashflow, value, 'EOM Value'
 					  MONTH (date));
                       
 select * from mutual_fund_nav_history a where a.scheme_code = '118825' and date IN ('2021-04-30','2021-03-31','2021-02-26','2021-01-29','2020-12-31','2020-11-27','2020-10-30','2020-09-30','2020-08-31','2020-07-31','2020-06-30','2020-05-29','2020-04-30','2020-03-31','2020-02-28','2020-01-31','2019-12-31','2019-11-29','2019-10-31','2019-09-28','2019-08-30','2019-07-31','2019-06-28') order by date desc;
+
+
+select * from stock_price_movement;

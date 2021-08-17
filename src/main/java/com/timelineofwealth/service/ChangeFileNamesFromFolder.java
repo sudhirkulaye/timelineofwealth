@@ -6,7 +6,7 @@ import java.io.IOException;
 public class ChangeFileNamesFromFolder {
 
     public static void main(String[] argv) throws IOException {
-        String absolutePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY21Q4";
+        String absolutePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
         File dir = new File(absolutePath);
         renameFile(dir, absolutePath);
         System.out.println("conversion is done");
@@ -24,9 +24,9 @@ public class ChangeFileNamesFromFolder {
         for (File file:filesInDir) {
             if(!file.isDirectory()) {
                 String name = file.getName();
-                String newName = name.replace("2021", "FY21"); // change this line
+                String newName = name.replace("_AXISDIRECT.pdf", "_AXIS.pdf"); // change this line
                 String newPath = absolutePath + "\\" + newName;
-                //file.renameTo(new File(newPath));
+                file.renameTo(new File(newPath));
                 System.out.println(name + " changed to " + newName);
             } else {
                 renameFile(file, file.getAbsolutePath());

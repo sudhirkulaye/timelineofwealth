@@ -2462,6 +2462,11 @@ BEGIN
 
   END CASE;
 
+  UPDATE portfolio_twrr_summary a SET returns_twrr_two_year = POWER((1 +  returns_twrr_two_year), 0.5) - 1 WHERE returns_twrr_two_year <> 0;
+  UPDATE portfolio_twrr_summary a SET returns_twrr_three_year = POWER((1 +  returns_twrr_three_year), (1/3)) - 1 WHERE returns_twrr_three_year <> 0;
+  UPDATE portfolio_twrr_summary a SET returns_twrr_five_year = POWER((1 +  returns_twrr_five_year), 0.2) - 1 WHERE returns_twrr_five_year <> 0;
+  UPDATE portfolio_twrr_summary a SET returns_twrr_ten_year = POWER((1 +  returns_twrr_ten_year), 0.1) - 1 WHERE returns_twrr_ten_year <> 0;
+
   IF (MONTH(var_date_today) > 3)
   THEN
     UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b
