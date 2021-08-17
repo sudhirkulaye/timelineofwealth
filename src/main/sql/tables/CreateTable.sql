@@ -860,6 +860,18 @@ CREATE TABLE stock_price_movement (
   return_5Y decimal(10,4) DEFAULT NULL COMMENT '5 Years Returns',
   return_10Y decimal(10,4) DEFAULT NULL COMMENT '10 Years Returns',
   return_YTD decimal(10,4) DEFAULT NULL COMMENT 'YTD Returns',
+  1w_min decimal(20,3) NULL DEFAULT 0 COMMENT '1 Week Min Price',
+  1w_max decimal(20,3) NULL DEFAULT 0 COMMENT '1 Week Max Price',
+  2w_min decimal(20,3) NULL DEFAULT 0 COMMENT '2 Week Min Price',
+  2w_max decimal(20,3) NULL DEFAULT 0 COMMENT '2 Week Max Price',
+  1m_min decimal(20,3) NULL DEFAULT 0 COMMENT '1 Month Min Price',
+  1m_max decimal(20,3) NULL DEFAULT 0 COMMENT '1 Month Max Price',
+  2m_min decimal(20,3) NULL DEFAULT 0 COMMENT '2 Month Min Price',
+  2m_max decimal(20,3) NULL DEFAULT 0 COMMENT '2 Month Max Price',
+  3m_min decimal(20,3) NULL DEFAULT 0 COMMENT '3 Month Min Price',
+  3m_max decimal(20,3) NULL DEFAULT 0 COMMENT '3 Month Max Price',
+  6m_min decimal(20,3) NULL DEFAULT 0 COMMENT '6 Month Min Price',
+  6m_max decimal(20,3) NULL DEFAULT 0 COMMENT '6 Month Max Price',
   PRIMARY KEY (ticker)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Price Movement';
 ALTER TABLE stock_price_movement ADD INDEX index_stock_price_movement_ticker (ticker);

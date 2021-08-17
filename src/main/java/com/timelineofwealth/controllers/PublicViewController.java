@@ -201,4 +201,31 @@ public class PublicViewController {
         model.addAttribute("title", "Returns Comparision of Benchmarks");
         return "public/benchmarkreturns";
     }
+
+    @RequestMapping(value = "/public/bankanalysis1")
+    public String bankAnalysis1(Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Banking Stocks Analysis - Large Cap");
+        return "public/bankanalysis1";
+    }
+
+    @RequestMapping(value = "/public/bankanalysis2")
+    public String bankAnalysis2(Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Banking Stocks Analysis - Mid Cap");
+        return "public/bankanalysis2";
+    }
+
+    @RequestMapping(value = "/public/bankanalysis3")
+    public String bankAnalysis3(Model model){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Banking Stocks Analysis - Small Cap");
+        return "public/bankanalysis3";
+    }
+
+
+
 }

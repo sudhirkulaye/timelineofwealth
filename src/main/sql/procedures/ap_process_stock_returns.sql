@@ -3,7 +3,9 @@ CREATE PROCEDURE ap_process_stock_returns()
 BEGIN
 
   DECLARE var_finished, var_count INT DEFAULT 0;
-  DECLARE var_price_today, var_price_history, var_52w_min, var_52w_max DECIMAL(20,3);
+  DECLARE var_price_today, var_price_history, var_52w_min, var_52w_max,
+		  var_price_1w_min, var_price_1w_max, var_price_2w_min, var_price_2w_max, var_price_1m_min, var_price_1m_max,
+		  var_price_2m_min, var_price_2m_max, var_price_3m_min, var_price_3m_max, var_price_6m_min, var_price_6m_max DECIMAL(20,3);
   DECLARE var_date_today, var_date_last_trading_day, var_date_current_year_start,
 		  var_date_1_w_before, var_date_2_w_before, var_date_1_mt_before,
           var_date_2_mt_before, var_date_3_mt_before, var_date_6_mt_before, var_date_9_mt_before,
@@ -38,7 +40,9 @@ BEGIN
   SET CMP = 0, 52w_min = 0, 52w_max = 0, up_52w_min = 0, down_52w_max = 0,
       return_1D = 0, return_1W = 0, return_2W = 0, return_1M = 0, return_2M = 0,
       return_3M = 0, return_6M = 0, return_9M = 0, return_1Y = 0, return_2Y = 0,
-      return_3Y = 0, return_5Y = 0, return_10Y = 0, return_YTD = 0;
+      return_3Y = 0, return_5Y = 0, return_10Y = 0, return_YTD = 0,
+      1w_min = 0, 1w_max = 0, 2w_min = 0, 2w_max = 0, 1m_min = 0, 1m_max = 0,
+      2m_min = 0, 1m_max = 0, 3m_min = 0, 3m_max = 0, 6m_min = 0, 6m_max = 0;
 
   SET var_date_1_w_before = date_sub(var_date_today, INTERVAL 7 DAY);
   SET var_date_2_w_before = date_sub(var_date_today, INTERVAL 14 DAY);
@@ -94,6 +98,79 @@ BEGIN
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
 			date = var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_1w_min
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_1_w_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_1w_max
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_1_w_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_2w_min
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_2_w_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_2w_max
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_2_w_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_1m_min
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_1_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_1m_max
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_1_mt_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_2m_min
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_2_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_2m_max
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_2_mt_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_3m_min
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_3_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_3m_max
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_3_mt_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_6m_min
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_6_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_6m_max
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_6_mt_before and var_date_today;
+
         END IF;
     ELSE
 		SELECT count(1)
@@ -108,11 +185,89 @@ BEGIN
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
 			date = var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_1w_min
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_1_w_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_1w_max
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_1_w_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_2w_min
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_2_w_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_2w_max
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_2_w_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_1m_min
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_1_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_1m_max
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_1_mt_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_2m_min
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_2_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_2m_max
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_2_mt_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_3m_min
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_3_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_3m_max
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_3_mt_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_6m_min
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_6_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_6m_max
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_6_mt_before and var_date_today;
+
         END IF;
     END IF;
 
     UPDATE stock_price_movement
-    SET CMP = var_price_today
+    SET CMP = var_price_today, 1w_min = var_price_1w_min, 1w_max = var_price_1w_max,
+    2w_min = var_price_2w_min, 2w_max = var_price_2w_max,
+    1m_min = var_price_1m_min, 1m_max = var_price_1m_max,
+    2m_min = var_price_2m_min, 2m_max = var_price_2m_max,
+    3m_min = var_price_3m_min, 3m_max = var_price_3m_max,
+    6m_min = var_price_6m_min, 6m_max = var_price_6m_max
     WHERE ticker = var_ticker;
 
     SET var_price_history = 0;
