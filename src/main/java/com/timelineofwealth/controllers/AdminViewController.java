@@ -186,7 +186,8 @@ public class AdminViewController {
                 String series = line.get(seriesPosition);
                 if(!(series.equalsIgnoreCase("EQ") ||
                         series.equalsIgnoreCase("BM") ||
-                        series.equalsIgnoreCase("SM"))){
+                        series.equalsIgnoreCase("SM") ||
+                        series.equalsIgnoreCase("BE"))){
                     continue;
                 }
                 SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy");
