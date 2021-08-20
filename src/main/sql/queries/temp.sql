@@ -68,6 +68,12 @@ select * from log_table;
 truncate table log_table;
 select date, count(1) from index_valuation a where date > '2020-12-18' group by date order by date desc;
 
+-- Query to insert into nse_price_history from bse_price_history
+Insert into nse_price_history 
+(select 'PNBHOUSING', 'EQ', open_price, high_price, low_price, close_price, last_price, previous_close_price, total_traded_quantity, total_traded_value, date, total_trades, isin_code 
+from bse_price_history 
+where bse_ticker = '540173' and date > (select max(date) from nse_price_history where nse_ticker = 'PNBHOUSING'));
+
 -- new IPO
 /*
 Mrs. Bectors Food

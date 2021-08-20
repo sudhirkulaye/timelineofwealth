@@ -104,7 +104,7 @@ where date = (select date_today from setup_dates)
 and memberid in (1000, 1011)
 group by date order by date desc;
 
-select * from daily_data_s a where a.date = '2018-10-26' and a.name = 'ITC';
+select * from daily_data_s a where a.date >= '2020-01-01' and a.name = 'Cams Services' order by date; 
 
 update composite_constituents a, stock_universe b set a.name = b.name where a.ticker = b.ticker;
 
@@ -123,7 +123,8 @@ select asset_classid, min(marketcap), max(marketcap) from stock_universe a group
 -- update stock_universe a, daily_data_s b set asset_classid = '406040' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 5000;
 
 select ticker, b.name, asset_classid, marketcap, market_cap from stock_universe a, daily_data_s b where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 10000 and market_cap > 5000 order by asset_classid, marketcap desc;
-
+-- Newly added IPOs
+select * from stock_universe a where ticker5 in ('Home First Finan', 'Rolex Rings', 'Sona BLW Precis.', 'Macrotech Devel.', 'Glenmark Life', 'Rossari Biotech', 'Mrs Bectors', 'Zomato Ltd', 'Laxmi Organic', 'Anupam Rasayan', 'UTI AMC', 'Mazagon Dock', 'Happiest Minds', 'Route Mobile', 'Tatva Chintan', 'Nazara Technolo.', 'Craftsman Auto', 'Devyani Intl.', 'Burger King', 'Barbeque-Nation', 'Angel Broking', 'Neogen Chemicals', 'Indiamart Inter.', 'Cams Services', 'Indigo Paints', 'Gland Pharma', 'Chemcon Special.','Embassy Off.REIT');
 select * from stock_universe a where (a.is_bse500 = 1 or a.is_nse500 = 1) and subindustryid like '40203030%' order by asset_classid, marketcap desc, ticker;
 select * from nse_price_history a where nse_ticker = 'ICICIBANK' and date >= '2021-01-01' order by date desc;
 select * from bse_price_history a where bse_ticker = '540376' and date >= '2020-04-30' order by date desc;
