@@ -11,7 +11,7 @@ public interface PortfolioHoldingsRepository  extends JpaRepository<PortfolioHol
 
     public List<PortfolioHoldings> findAllByKeyMemberidInOrderByKeyMemberidAscKeyPortfolioidAscAssetClassidAscShortNameAscKeyBuyDateDesc(List<Long> memberids);
     @Query(value="SELECT a.memberid, a.portfolioid, a.short_name, sum(a.quantity), sum(a.total_cost), " +
-            "sum(a.market_value), sum(a.net_profit), (sum(a.market_value)/max(b.market_value)*100) " +
+            "sum(a.market_value), sum(a.net_profit), (sum(a.market_value)/max(b.market_value)*100), ((sum(a.net_profit)/sum(a.total_cost))*100) " +
             "FROM portfolio_holdings a, portfolio b " +
             "WHERE a.portfolioid = b.portfolioid " +
             "AND a.memberid = b.memberid " +

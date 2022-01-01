@@ -6,10 +6,9 @@ import java.io.IOException;
 public class CreateFolderStructureForIndustry {
     public static void main(String[] argv) throws IOException {
         String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY21Q4";
-        String destinationPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY22Q1";
+        String destinationPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY22Q2";
 
         File sourceDirectory = new File(sourcePath);
-
 
         File[] directoriesInSourceDirectory = sourceDirectory.listFiles();
         for (File directory:directoriesInSourceDirectory){

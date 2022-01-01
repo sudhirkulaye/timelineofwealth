@@ -210,8 +210,8 @@ public class GeneratePDFReport {
             }
             rightCell = new PdfPCell(new Phrase(prefix + member.getFirstName() + " " + member.getLastName(),paraTextFont));
         } else {
-            leftCell = new PdfPCell(new Phrase("Model Portfolio Performance",paraTextFont));
-            rightCell = new PdfPCell(new Phrase("",paraTextFont));
+            leftCell = new PdfPCell(new Phrase("Fund Manager",paraTextFont));
+            rightCell = new PdfPCell(new Phrase("Mr. Sudhir Kulaye, CFA",paraTextFont));
         }
 
         leftCell.setBorder(Rectangle.NO_BORDER);
@@ -277,10 +277,10 @@ public class GeneratePDFReport {
         table.setSpacingBefore(10f);
         table.setSpacingAfter(10f);
 
-        float[] columnWidth = {1f, 3f, 4f, 3f, 3f, 2f, 2f};
+        float[] columnWidth = {2f, 3f, 4f, 3f, 3f, 2f, 2f};
         table.setWidths(columnWidth);
 
-        PdfPCell headerCell = new PdfPCell(new Paragraph("ID", tableHeaderFont));
+        PdfPCell headerCell = new PdfPCell(new Paragraph("Folio ID", tableHeaderFont));
         headerCell.setPaddingLeft(10);
         headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         headerCell.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -465,15 +465,15 @@ public class GeneratePDFReport {
             List<ConsolidatedPortfolioHoldings> folioHoldings = consolidatedPortfolioHoldings.stream()
                     .filter(p -> p.getPortfolioid() == portfolioid).collect(Collectors.toList());
 
-            PdfPTable table = new PdfPTable(7);
+            PdfPTable table = new PdfPTable(8);
             table.setWidthPercentage(100);
             table.setSpacingBefore(10f);
             table.setSpacingAfter(10f);
 
-            float[] columnWidth = {1f, 4f, 2f, 3f, 3f, 3f, 2f};
+            float[] columnWidth = {2f, 5f, 2f, 3f, 3f, 3f, 2f, 2f};
             table.setWidths(columnWidth);
 
-            PdfPCell headerCell = new PdfPCell(new Paragraph("ID", tableHeaderFont));
+            PdfPCell headerCell = new PdfPCell(new Paragraph("Folio ID", tableHeaderFont));
             headerCell.setPaddingLeft(10);
             headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
             headerCell.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -514,6 +514,14 @@ public class GeneratePDFReport {
             table.addCell(headerCell);
 
             headerCell = new PdfPCell(new Paragraph("Net Profit", tableHeaderFont));
+            headerCell.setPaddingLeft(10);
+            headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            headerCell.setVerticalAlignment(Element.ALIGN_CENTER);
+            headerCell.setBackgroundColor(tableHeaderBaseColor);
+            headerCell.setExtraParagraphSpace(5f);
+            table.addCell(headerCell);
+
+            headerCell = new PdfPCell(new Paragraph("Return", tableHeaderFont));
             headerCell.setPaddingLeft(10);
             headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
             headerCell.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -576,6 +584,13 @@ public class GeneratePDFReport {
                         pdfPCell.setBackgroundColor(tableBodyBaseColor);
                         pdfPCell.setExtraParagraphSpace(5f);
                         table.addCell(pdfPCell);
+                        pdfPCell = new PdfPCell(new Paragraph(""+ dfForPercent.format(new BigDecimal(folioHoldings.get(i).getAbsoluteReturn().floatValue()))+"%", tableBodyFont));
+                        pdfPCell.setPaddingLeft(10);
+                        pdfPCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        pdfPCell.setVerticalAlignment(Element.ALIGN_CENTER);
+                        pdfPCell.setBackgroundColor(tableBodyBaseColor);
+                        pdfPCell.setExtraParagraphSpace(5f);
+                        table.addCell(pdfPCell);
                         pdfPCell = new PdfPCell(new Paragraph(""+ dfForPercent.format(new BigDecimal(folioHoldings.get(i).getWeight().floatValue()))+"%", tableBodyFont));
                         pdfPCell.setPaddingLeft(10);
                         pdfPCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -620,6 +635,13 @@ public class GeneratePDFReport {
                         pdfPCell.setExtraParagraphSpace(5f);
                         table.addCell(pdfPCell);
                         pdfPCell = new PdfPCell(new Paragraph(""+ dfForAmt.format(folioHoldings.get(i).getNetProfit()), tableBodyFont));
+                        pdfPCell.setPaddingLeft(10);
+                        pdfPCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        pdfPCell.setVerticalAlignment(Element.ALIGN_CENTER);
+                        pdfPCell.setBackgroundColor(tableBodyBaseColorAlt);
+                        pdfPCell.setExtraParagraphSpace(5f);
+                        table.addCell(pdfPCell);
+                        pdfPCell = new PdfPCell(new Paragraph(""+ dfForPercent.format(new BigDecimal(folioHoldings.get(i).getAbsoluteReturn().floatValue()))+"%", tableBodyFont));
                         pdfPCell.setPaddingLeft(10);
                         pdfPCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                         pdfPCell.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -1783,6 +1805,7 @@ public class GeneratePDFReport {
             holding.setMarketValue((BigDecimal) object[5]);
             holding.setNetProfit((BigDecimal) object[6]);
             holding.setWeight((BigDecimal) object[7]);
+            holding.setAbsoluteReturn((BigDecimal) object[8]);
             consolidatedPortfolioHoldings.add(holding);
         }
         List<PortfolioReturnsCalculationSupport> cashflows = portfolioReturnsCalculationSupportRepository.findAllByKeyMemberidInOrderByKeyMemberidAscKeyPortfolioidAscKeyDateDesc(members);
@@ -1942,7 +1965,7 @@ public class GeneratePDFReport {
             writer.setPageEvent(GeneratePDFReport.headerFooterPageEvent);
             document.open();
 
-            addFirstPage(document,"PMS Performance and Wealth Distribution Summary", memberid, isModelPortfolio);
+            addFirstPage(document,"PMS Performance", memberid, isModelPortfolio);
             addListOfPMS(document, portfolios);
             addPortfolioHoldings(document, portfolios, consolidatedPortfolioHoldings);
             addPortfolioCashflows(document, portfolios, cashflows);

@@ -95,10 +95,10 @@ Affle (India)
 select count(1), date from daily_data_s where date > '2021-03-22' group by date order by date desc; 
 select count(1), date from nse_price_history where date > '2021-03-22' group by date order by date desc;
 select count(1), date from bse_price_history where date > '2021-03-22' group by date order by date desc;
-select count(1), date from mutual_fund_nav_history where date > '2021-03-22' group by date order by date desc;
+select count(1), date from mutual_fund_nav_history where date >= '2021-01-01' group by date order by date desc;
 select name from daily_data_s where date = '2020-01-14' and name not in (select name from daily_data_s where date = '2020-01-15');
-select date, count(1) from mutual_fund_nav_history where date >= '2021-06-30' group by date desc;
-select * from mutual_fund_nav_history a where date in ('2021-01-04','2021-01-05','2021-01-07','2021-01-14','2021-01-15');
+select date, count(1) from mutual_fund_nav_history where date >= '2020-12-30' group by date desc;
+select * from mutual_fund_nav_history a where date in ('2021-08-30','2021-02-22');
 
 select * from stock_price_movement_history a where ticker = 'MFSL';
 select * from benchmark_twrr_monthly a where benchmarkid = 'NIFTY';
@@ -135,5 +135,14 @@ SELECT memberid, portfolioid, date date, 0 cashflow, value, 'EOM Value'
                       
 select * from mutual_fund_nav_history a where a.scheme_code = '118825' and date IN ('2021-04-30','2021-03-31','2021-02-26','2021-01-29','2020-12-31','2020-11-27','2020-10-30','2020-09-30','2020-08-31','2020-07-31','2020-06-30','2020-05-29','2020-04-30','2020-03-31','2020-02-28','2020-01-31','2019-12-31','2019-11-29','2019-10-31','2019-09-28','2019-08-30','2019-07-31','2019-06-28') order by date desc;
 
+select * from subindustry; 
+select * from stock_price_movement; 
+select * from stock_universe a where (ticker <> nse_code and ticker <> bse_code) or ticker in ('NIFTYBEE', 'JUNIORBEE');
+call ap_process_stock_returns;
+select * from nse_price_history a where nse_ticker in ( 'ANGELONE', 'ANGELBRKG' ) order by date desc;
+select * from stock_price_movement a where ticker = 'ANGELONE';
+update stock_universe a set short_name = 'Borosil Renewables', name = 'Borosil Renewables Ltd', subindustryid = '20104010' where ticker = 'BORORENEW';
+update stock_universe a set is_nse500 = 1 where ticker in ('FIEMIND', 'BORORENEW');
 
-select * from stock_price_movement;
+select * from index_valuation a where a.ticker = 'NIFTY200' and date >= '2021-11-01' order by date desc; 
+select * from daily_data_s a where date = '2021-11-01' and name = 'KPIT Technologi.';
