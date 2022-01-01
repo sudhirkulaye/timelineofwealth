@@ -12,6 +12,7 @@ public class ConsolidatedPortfolioHoldings implements Serializable {
     private BigDecimal marketValue;
     private BigDecimal netProfit;
     private BigDecimal weight;
+    private BigDecimal absoluteReturn;
 
     public long getMemberid() {
         return memberid;
@@ -67,5 +68,12 @@ public class ConsolidatedPortfolioHoldings implements Serializable {
     }
     public void setWeight(BigDecimal weight) {
         this.weight = weight;
+    }
+
+    public BigDecimal getAbsoluteReturn() {
+        return absoluteReturn;
+    }
+    public void setAbsoluteReturn(BigDecimal absoluteReturn) {
+        this.absoluteReturn = absoluteReturn;
     }
 }

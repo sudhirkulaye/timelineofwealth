@@ -8,6 +8,7 @@ select a.* from stock_split_probability a, stock_universe b where a.ticker = b.t
 -- FOr 1:2 Bonus update price as 2/3 and so on (i.e. Newly Issued Bonus Stocks / (sum of newly issued stocks + original stocks)
 -- For 2:10 Stock Split update price as (New FV/Old FV) i.e. (2/10) or (1/5)
 
+-- update stock_split_probability set is_processed = 'YES', note = 'Bonus 2:1' where ticker = 'IEX' and date = '2021-12-03';
 -- update stock_split_probability set is_processed = 'YES', note = 'Bonus 1:1' where ticker = 'AARTIIND' and date = '2021-06-22';
 -- update stock_split_probability set is_processed = 'YES', note = 'Bonus 1:2' where ticker = 'VBL' and date = '2021-06-10';
 -- update stock_split_probability set is_processed = 'YES', note = 'Bonus 1:1' where ticker = 'REDINGTON' and date = '2021-08-18';
@@ -28,7 +29,7 @@ select a.* from stock_split_probability a, stock_universe b where a.ticker = b.t
 -- update rest of the stocks as ignored
 -- update stock_split_probability set is_processed = 'YES', note = 'Ignored' where is_processed = 'NO' and ticker not in (select ticker from stock_universe where is_nse500 = 1 or is_bse500 = 1);
 
-SELECT date, close_price, a.* from nse_price_history a where a.nse_ticker = 'VALIANTORG' and date <= '2020-12-24' order by date desc;
+SELECT date, close_price, a.* from nse_price_history a where a.nse_ticker = 'IEX' and date <= '2021-12-03' order by date desc;
 SELECT date, close_price from bse_price_history a where a.bse_ticker = '000000' and date <= '2019-12-05' order by date desc;
 select * from stock_price_movement_history a where a.ticker = 'VBL' and date >= '2021-06-10';
 SELECT * from wealth_details a where ticker = 'DIXON';
@@ -43,6 +44,7 @@ update portfolio_holdings set quantity = quantity * 2, rate = rate * (1/2), net_
 -- Copy this below and then replace ticker XXX to right one and replace date and most imp. replace fraction
 update nse_price_history a set close_price = close_price * ( 1 / 1	) where a.nse_ticker = 'XXX' and date < 'XXXX-XX-XX' ;
 
+update nse_price_history a set close_price = close_price * ( 1 / 3	) where a.nse_ticker = 'IEX' and date < '2021-12-03' ;
 update nse_price_history a set close_price = close_price * ( 1 / 2	) where a.nse_ticker = 'INFIBEAM' and date < '2021-03-18' ;
 update nse_price_history a set close_price = close_price * ( 1 / 2	) where a.nse_ticker = 'KNRCON' and date < '2021-02-03' ;
 update nse_price_history a set close_price = close_price * ( 1 / 2	) where a.nse_ticker = 'VALIANTORG' and date < '2020-12-24' ;

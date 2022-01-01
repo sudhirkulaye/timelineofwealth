@@ -88,7 +88,7 @@
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios3" name="optionsRadios" ng-click="showColumns('CapitalStructureInfo')" /> Capital &nbsp;&nbsp;&nbsp;</lebel>
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios4" name="optionsRadios" ng-click="showColumns('Valuations')" /> Growth &amp; Valuations &nbsp;&nbsp;&nbsp;</lebel>
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios5" name="optionsRadios" ng-click="showColumns('PricePerformance')" /> Price Performance &nbsp;&nbsp;&nbsp;</lebel>
-                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios6" name="optionsRadios" ng-click="showColumns('AdditionalInfo')" /> Additional &nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios6" name="optionsRadios" ng-click="showColumns('AdditionalInfo')" /> Additional (K Cr) &nbsp;&nbsp;&nbsp;</lebel>
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios7" name="optionsRadios" ng-click="showColumns('AnalystsCall')" /> Analysts Call [Up coming]&nbsp;&nbsp;&nbsp;</lebel>
                         </div>
                         <div class="x_content">
@@ -150,13 +150,16 @@
                                     <!--<th ng-hide="flagPricePerformance">10Y</th>-->
                                     <!--<th ng-hide="flagPricePerformance">5Years</th>-->
                                     <!--<th ng-hide="flagPricePerformance">10Years</th>-->
-                                    <th ng-click="sortData('dailyDataS.salesGrowth5years')" ng-hide="flagAdditionalInfo">5 Yr Sales-G<i ng-class="getSortClass('dailyDataS.salesGrowth5years')" /></th>
-                                    <th ng-click="sortData('dailyDataS.salesGrowth10years')" ng-hide="flagAdditionalInfo">10 Yr Sales-G<i ng-class="getSortClass('dailyDataS.salesGrowth10years')" /></th>
+                                    <th ng-click="sortData('dailyDataS.sales')" ng-hide="flagAdditionalInfo">Sales<i ng-class="getSortClass('dailyDataS.noplat')" /></th>
+                                    <th ng-click="sortData('dailyDataS.salesGrowth5years')" ng-hide="flagAdditionalInfo">5Y g%<i ng-class="getSortClass('dailyDataS.salesGrowth5years')" /></th>
+                                    <th ng-click="sortData('dailyDataS.salesGrowth10years')" ng-hide="flagAdditionalInfo">10Y g%<i ng-class="getSortClass('dailyDataS.salesGrowth10years')" /></th>
+                                    <th ng-click="sortData('dailyDataS.opmLastYear')" ng-hide="flagAdditionalInfo">OPM%<i ng-class="getSortClass('dailyDataS.opmLastYear')" /></th>
                                     <th ng-click="sortData('dailyDataS.noplat')" ng-hide="flagAdditionalInfo">NOPLAT<i ng-class="getSortClass('dailyDataS.noplat')" /></th>
-                                    <th ng-click="sortData('dailyDataS.capex')" ng-hide="flagAdditionalInfo">Capex (Cal.)<i ng-class="getSortClass('dailyDataS.capex')" /></th>
-                                    <th ng-click="sortData('dailyDataS.fcff')" ng-hide="flagAdditionalInfo">FCFF <i ng-class="getSortClass('dailyDataS.fcff')" /></th>
-                                    <th ng-click="sortData('dailyDataS.investedCapital')" ng-hide="flagAdditionalInfo">Invested Cap.<i ng-class="getSortClass('dailyDataS.investedCapital')" /></th>
-                                    <th ng-click="sortData('dailyDataS.roic')" ng-hide="flagAdditionalInfo">RoIC<i ng-class="getSortClass('dailyDataS.roic')" /></th>
+                                    <th ng-click="sortData('dailyDataS.netProfit')" ng-hide="flagAdditionalInfo">Profit<i ng-class="getSortClass('dailyDataS.netProfit')" /></th>
+                                    <th ng-click="sortData('dailyDataS.capex')" ng-hide="flagAdditionalInfo">Cal. Capex<i ng-class="getSortClass('dailyDataS.capex')" /></th>
+                                    <th ng-click="sortData('dailyDataS.fcff')" ng-hide="flagAdditionalInfo">FCFF<i ng-class="getSortClass('dailyDataS.fcff')" /></th>
+                                    <th ng-click="sortData('dailyDataS.investedCapital')" ng-hide="flagAdditionalInfo">InvtCap.<i ng-class="getSortClass('dailyDataS.investedCapital')" /></th>
+                                    <th ng-click="sortData('dailyDataS.roic')" ng-hide="flagAdditionalInfo">RoIC%<i ng-class="getSortClass('dailyDataS.roic')" /></th>
 
                                 </tr>
                                 <tbody>
@@ -214,12 +217,15 @@
                                     <!--<td ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return10Y | number:2}}%</td>-->
                                     <!--<td ng-hide="flagPricePerformance">-</td>-->
                                     <!--<td ng-hide="flagPricePerformance">-</td>-->
+                                    <td align='right' ng-hide="flagAdditionalInfo">{{(stock.dailyDataS.sales/1000) | number:1}}</td>
                                     <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.salesGrowth5years | number:2}}%</td>
                                     <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.salesGrowth10years | number:2}}%</td>
-                                    <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.noplat | number:0}}</td>
-                                    <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.capex | number:0}}</td>
-                                    <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.fcff | number:0}}</td>
-                                    <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.investedCapital | number:0}}</td>
+                                    <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.opmLastYear | number:2}}%</td>
+                                    <td align='right' ng-hide="flagAdditionalInfo">{{(stock.dailyDataS.noplat/1000) | number:1}}</td>
+                                    <td align='right' ng-hide="flagAdditionalInfo">{{(stock.dailyDataS.netProfit/1000) | number:1}}</td>
+                                    <td align='right' ng-hide="flagAdditionalInfo">{{(stock.dailyDataS.capex/1000) | number:0}}</td>
+                                    <td align='right' ng-hide="flagAdditionalInfo">{{(stock.dailyDataS.fcff/1000) | number:0}}</td>
+                                    <td align='right' ng-hide="flagAdditionalInfo">{{(stock.dailyDataS.investedCapital/1000) | number:0}}</td>
                                     <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.roic | number:2}}%</td>
                                 </tr>
                                 </tbody>

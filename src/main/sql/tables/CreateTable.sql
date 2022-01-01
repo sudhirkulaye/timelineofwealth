@@ -742,16 +742,45 @@ create table stock_pnl (
   dummy1 DECIMAL(10,3) NOT NULL COMMENT 'dummy1',
   ratios DECIMAL(10,3) NOT NULL COMMENT 'Ratios',
   dividend_payout DECIMAL(10,4) NOT NULL COMMENT 'Dividend Payout',
-  opm DECIMAL(10,4) NOT NULL COMMENT 'Operating Profit Margine',
-  npm DECIMAL(10,4) NOT NULL COMMENT 'Net Profit Margine',
+  opm DECIMAL(10,4) NOT NULL COMMENT 'Operating Profit Margin',
+  npm DECIMAL(10,4) NOT NULL COMMENT 'Net Profit Margin',
   re DECIMAL(10,4) NOT NULL COMMENT 'Return on Equity',
+  tax_rate decimal(10,4) DEFAULT '0.0000' COMMENT 'Tax Rate',
+  sales_g decimal(10,4) DEFAULT '0.0000' COMMENT 'YoY Sales growth',
+  ebitda_g decimal(10,4) DEFAULT '0.0000' COMMENT 'YoY EBITDA growth',
+  pat_g decimal(10,4) DEFAULT '0.0000' COMMENT 'YoY PAT growth',
+  non_op_inc_g decimal(10,4) DEFAULT '0.0000' COMMENT 'YoY Non Operating Income growth',
+  debt_to_capital decimal(10,4) DEFAULT '0.0000' COMMENT 'Debt To Capital',
+  ppe_to_sales decimal(10,4) DEFAULT '0.0000' COMMENT 'Net PPE to Sales',
+  dep_to_ppe decimal(10,4) DEFAULT '0.0000' COMMENT 'Depreciation to Net PPE',
+  non_op_inc_to_invst decimal(10,4) DEFAULT '0.0000' COMMENT 'Non Operating Income to Investment',
+  noplat decimal(20,3) DEFAULT '0.000' COMMENT 'Net Operating profit less Adjusted Tax',
+  capex decimal(20,3) DEFAULT '0.000' COMMENT 'Capex',
+  fcff decimal(20,3) DEFAULT '0.000' COMMENT 'Free Cash Flow to the Firm',
+  sales_g_3yr decimal(10,4) DEFAULT '0.0000' COMMENT '3 Years Sales growth',
+  sales_g_5yr decimal(10,4) DEFAULT '0.0000' COMMENT '5 Years Sales growth',
+  sales_g_10yr decimal(10,4) DEFAULT '0.0000' COMMENT '10 Years Sales growth',
+  avg_opm_3yr decimal(10,4) DEFAULT '0.0000' COMMENT '3 Years Avg. OPM',
+  avg_opm_5yr decimal(10,4) DEFAULT '0.0000' COMMENT '5 Years Avg. OPM',
+  avg_opm_10yr decimal(10,4) DEFAULT '0.0000' COMMENT '10 Years Avg. OPM',
+  avg_opm decimal(10,4) DEFAULT '0.0000' COMMENT 'Long Term Avg. OPM',
+  opm_min decimal(10,4) DEFAULT '0.0000' COMMENT 'Min. OPM',
+  opm_max decimal(10,4) DEFAULT '0.0000' COMMENT 'Max. OPM',
+  avg_roic_3yr decimal(10,4) DEFAULT '0.0000' COMMENT '3 Years Avg. ROIC',
+  avg_roic_5yr decimal(10,4) DEFAULT '0.0000' COMMENT '5 Years Avg. ROIC',
+  avg_roic_10yr decimal(10,4) DEFAULT '0.0000' COMMENT '3 Years Avg. ROIC',
+  avg_roic decimal(10,4) DEFAULT '0.0000' COMMENT 'Long Term Avg. ROIC',
+  roic_min decimal(10,4) DEFAULT '0.0000' COMMENT 'Min. ROIC',
+  roic_max decimal(10,4) DEFAULT '0.0000' COMMENT 'Max. ROIC',
+  avg_ppe_to_sales decimal(10,4) DEFAULT '0.0000' COMMENT 'Avg. Net PPE to Sales',
+  avg_dep_to_ppe decimal(10,4) DEFAULT '0.0000' COMMENT 'Avg. Depreciation to Net PPE',
   PRIMARY KEY (ticker, cons_standalone, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Annual P&L Results';
 ALTER TABLE stock_pnl ADD INDEX index_stock_pnl_ticker (ticker);
 ALTER TABLE stock_pnl ADD INDEX index_stock_pnl_date (date);
 
 select count(1), year(date) from stock_pnl a group by year(date) order by date desc; 
-select * from stock_pnl a where ticker in ('HDFC') and date >= '2019-03-31' and sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
+select * from stock_pnl a where ticker in ('TCS') and date >= '2019-03-31' and sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
 select * from stock_pnl a where ticker like 'NETWORK%' and date = '2017-12-31';
 -- update stock_pnl a SET ticker = 'BAJFINANCE_1' where a.ticker = 'BAJFINANCE' and cons_standalone = 'C'; 
 
@@ -770,7 +799,18 @@ create table stock_quarter (
   tax DECIMAL(20,3) NOT NULL COMMENT 'Annual tax',
   net_profit DECIMAL(20,3) NOT NULL COMMENT 'Annual net Profit',
   dummy1 DECIMAL(10,3) NOT NULL COMMENT 'dummy1',
-  opm DECIMAL(10,4) NOT NULL COMMENT 'Operating Profit Margine',
+  opm DECIMAL(10,4) NOT NULL COMMENT 'Operating Profit Margin',
+  noplat decimal(20,3) DEFAULT '0.000' COMMENT 'Net Operating Profit Less Adjusted For Tax',
+  ttm_sales decimal(20,3) DEFAULT '0.000' COMMENT 'TTM Sales',
+  ttm_ebitda decimal(20,3) DEFAULT '0.000' COMMENT 'TTM EBITDA',
+  ttm_noplat decimal(20,3) DEFAULT '0.000' COMMENT 'TTM NOPLAT',
+  ttm_opm decimal(10,4) DEFAULT '0.0000' COMMENT 'Operating Margin i.e. EBITDA% based on TTM',
+  sales_g decimal(10,4) DEFAULT '0.0000' COMMENT 'YoY Sales growth ',
+  ttm_sales_g decimal(10,4) DEFAULT '0.0000' COMMENT 'YoY TTM Sales growth',
+  ebitda_g decimal(10,4) DEFAULT '0.0000' COMMENT 'YoY EBITDA growth',
+  ttm_ebitda_g decimal(10,4) DEFAULT '0.0000' COMMENT 'YoY ebitda growth based on TTM ebitda',
+  mcap decimal(20,3) DEFAULT '0.000' COMMENT 'Market Cap on the result day',
+  price decimal(20,3) DEFAULT '0.000' COMMENT 'Stock price on the result day',
   PRIMARY KEY (ticker, cons_standalone, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Quarter P&L Results';
 ALTER TABLE stock_quarter ADD INDEX index_stock_quarter_ticker (ticker);
@@ -778,9 +818,9 @@ ALTER TABLE stock_quarter ADD INDEX index_stock_quarter_date (date);
 
 select count(1), year(date) from stock_quarter a group by year(date) order by date desc; 
 select * from stock_quarter a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
-select * from stock_quarter a where a.ticker in ('HDFC') and date = '0000-00-00';
+select * from stock_quarter a where a.ticker in ('TCS') and date >= '2019-03-31';
 -- update stock_quarter a set a.ticker = 'BAJFINANCE_1' where a.ticker = 'BAJFINANCE' and cons_standalone = 'C'; 
-
+select * from stock_quarter a where date = '2021-09-30';
 -- pending results
 SELECT b.ticker from daily_data_s a, stock_universe b where a.name = b.ticker5 and a.last_result_date = '201812' and date = '2019-02-01' and b.ticker not in (select distinct ticker from stock_quarter a where date = '2018-12-31');
 

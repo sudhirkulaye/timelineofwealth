@@ -21,6 +21,11 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
     $scope.stockPnlDataOverride = [];
     $scope.chartOptionsStockPnl = {};
 
+    $scope.stockMargin = [];
+    $scope.labelsYearsStockMargin = [];
+    $scope.stockMarginDataOverride = [];
+    $scope.chartOptionsStockMargin = {};
+
     $scope.stockValuation = [];
     $scope.labelsYearsStockValuation = [];
     $scope.stockValuationDataOverride = [];
@@ -53,6 +58,19 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
     $scope.median2W = 0.00;
     $scope.mean1M = 0.00;
     $scope.median1M = 0.00;
+
+    $scope.salesGrowth3Yr = 0.00;
+    $scope.salesGrowth5Yr = 0.00;
+    $scope.salesGrowth10Yr = 0.00;
+    $scope.operatingProfitGrowth3Yr = 0.00;
+    $scope.operatingProfitGrowth3Yr = 0.00;
+    $scope.operatingProfitGrowth3Yr = 0.00;
+    $scope.opm3Yr = 0.00;
+    $scope.opm5Yr = 0.00;
+    $scope.opm10Yr = 0.00;
+    $scope.roic3Yr = 0.00;
+    $scope.roic5Yr = 0.00;
+    $scope.roic10Yr = 0.00;
 
     showRecords();
 
@@ -127,60 +145,91 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
 
         var years = [];
         var sales = [];
-        var netProfit = [];
-        var opm = [];
-        var npm = [];
+        var operatingProfit = [];
+        var salesGrowth = [];
+        var operatingProfitGrowth = [];
+        var margin = [];
         var pe = [];
+        var i = Object.keys(map).length;
 
         for(var yr in map){
+           i = i - 1;
+           if (i > 10) {
+             continue;
+           }
            years.push(yr);
            //console.log(yr);
            sales.push(Math.round(map[yr][0].sales*100)/100);
            //console.log(map[yr][0].sales);
-           netProfit.push(Math.round(map[yr][0].netProfit*100)/100);
-           opm.push(Math.round(map[yr][0].opm*100)/100);
-           npm.push(Math.round(map[yr][0].npm*100)/100);
+           operatingProfit.push(Math.round(map[yr][0].operatingProfit*100)/100);
+//           salesGrowth.push(Math.round(map[yr][0].salesG*100)/100);
+//           operatingProfitGrowth.push(Math.round(map[yr][0].ebitdaG*100)/100);
+           salesGrowth.push(Number(Math.round(map[yr][0].salesG*100 * 100)/100 || 1));
+           operatingProfitGrowth.push(Number(Math.round(map[yr][0].ebitdaG*100 * 100)/100 || 1));
            pe.push(Math.round(map[yr][0].pe*100)/100);
+           $scope.salesGrowth3Yr = map[yr][0].salesG3yr;
+           $scope.salesGrowth5Yr = map[yr][0].salesG5yr;
+           $scope.salesGrowth10Yr = map[yr][0].salesG10yr;
+           $scope.operatingProfitGrowth3Yr = map[yr][0].ebitdaG3yr;
+           $scope.operatingProfitGrowth5Yr = map[yr][0].ebitdaG5yr;
+           $scope.operatingProfitGrowth10Yr = map[yr][0].ebitdaG10yr;
+           $scope.opm3Yr = map[yr][0].avgOpm3yr;
+           $scope.opm5Yr = map[yr][0].avgOpm5yr;
+           $scope.opm10Yr = map[yr][0].avgOpm10yr;
+           $scope.roic3Yr = map[yr][0].avgRoic3yr;
+           $scope.roic5Yr = map[yr][0].avgRoic5yr;
+           $scope.roic10Yr = map[yr][0].avgRoic10yr;
+
+           margin.push(Number(Math.round(map[yr][0].opm*100 * 100)/100 || 1));
+
         }
 
         var reverseSortedStockQuarter = $filter('orderBy')($scope.stockQuarterOriginal,'key.date',true);
         var map1 = $filter('groupBy')(reverseSortedStockQuarter, 'key.date');
-        var i = 0;
+        i = 0;
         var ttmSales = Number(0.00||0);
-        var ttmNetProfit = Number(0.00||0);
-        var ttmOpm = Number(0.00||0);
-        var ttmNpm = Number(0.00||0);
+        var ttmOperatingProfit = Number(0.00||0);
+        var ttmSalesGrowth = Number(0.00||0);
+        var ttmOperatingProfitGrowth = Number(0.00||0);
 
         for(var yr in map1){
            i = i + 1;
-           if (i > 4) {
+           if (i > 1) {
              break;
            }
-           ttmSales = ttmSales + Number(map1[yr][0].sales || 0);
-           ttmNetProfit = ttmNetProfit + Number(map1[yr][0].netProfit || 0);
-           ttmOpm = ttmOpm + Number(map1[yr][0].opm || 0);
-           computedNpm = (Number(map1[yr][0].netProfit || 0)/Number(map1[yr][0].sales || 0));
-           computedNpm = Math.round(computedNpm * 100)/100;
-           ttmNpm = ttmNpm + computedNpm;
+           ttmSales = Number(map1[yr][0].ttmSales || 0);
+           ttmOperatingProfit = Number(map1[yr][0].ttmEbitda || 0);
+//           ttmSalesGrowth = ttmSalesGrowth + Number(map1[yr][0].ttmSalesG || 0);
+//           ttmOperatingProfitGrowth = ttmOperatingProfitGrowth + Number(map1[yr][0].ttmEbitdaG || 0);
+           ttmSalesGrowth = Number(Math.round(map1[yr][0].ttmSalesG*100 * 100) / 100 || 1);
+           ttmOperatingProfitGrowth = Number(Math.round(map1[yr][0].ttmEbitdaG*100 * 100) / 100 || 1);
+//           computedNpm = (Number(map1[yr][0].netProfit || 0)/Number(map1[yr][0].sales || 0));
+//           computedNpm = Math.round(computedNpm * 100)/100;
+//           ttmNpm = ttmNpm + computedNpm;
+           margin.push(Number(Math.round(map1[yr][0].ttmOpm*100 * 100)/100 || 1));
         }
-        ttmOpm = ttmOpm/4;
-        ttmNpm = ttmNpm/4;
-        ttmOpm = Math.round(ttmOpm*100)/100;
-        ttmNpm = Math.round(ttmNpm*100)/100;
+//        ttmOpm = ttmOperatingProfit/ttmSales;
+//        ttmNpm = ttmNpm/4;
+//        ttmOpm = Math.round(ttmOpm*100)/100;
+//        ttmNpm = Math.round(ttmNpm*100)/100;
 
         //years.push($filter('date')(new Date(), 'yyyy-MM-dd'));
         years.push("TTM");
         sales.push(Math.round(ttmSales*100)/100);
-        netProfit.push(Math.round(ttmNetProfit*100)/100);
-        opm.push(ttmOpm);
-        npm.push(ttmNpm);
+        operatingProfit.push(Math.round(ttmOperatingProfit*100)/100);
+        salesGrowth.push(ttmSalesGrowth);
+        operatingProfitGrowth.push(ttmOperatingProfitGrowth);
 
         $scope.labelsYearsStockPnl = years;
         $scope.stockPnl = [];
         $scope.stockPnl.push(sales);
-        $scope.stockPnl.push(netProfit);
-        $scope.stockPnl.push(opm);
-        $scope.stockPnl.push(npm);
+        $scope.stockPnl.push(operatingProfit);
+        $scope.stockPnl.push(salesGrowth);
+        $scope.stockPnl.push(operatingProfitGrowth);
+
+        $scope.labelsYearsStockMargin = years;
+        $scope.stockMargin = [];
+        $scope.stockMargin.push(margin);
 
         $scope.labelsYearsStockValuation = years;
         $scope.stockValuation = [];
@@ -213,17 +262,17 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 type: 'bar'
               },
               {
-                label: "Net Profit",
+                label: "Operating Profit",
                 yAxisID: 'y-axis-1',
                 type: 'bar'
               },
               {
-                label: "OPM",
+                label: "Sales g%",
                 yAxisID: 'y-axis-2',
                 type: 'line'
               },
               {
-                label: "NPM",
+                label: "Op. Profit g%",
                 yAxisID: 'y-axis-2',
                 type: 'line'
               },
@@ -353,29 +402,35 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
 
         var years = [];
         var sales = [];
-        var netProfit = [];
-        var opm = [];
-        var npm = [];
-        var computedNpm = 0.00;
+        var operatingProfit = [];
+        var salesGrowth = [];
+        var operatingProfitGrowth = [];
+//        var computedNpm = 0.00;
+        var i = Object.keys(map).length;
 
         for(var yr in map){
+           i = i - 1;
+           if (i > 10) {
+             continue;
+           }
            years.push(yr);
            //console.log(yr);
            sales.push(map[yr][0].sales);
            //console.log(map[yr][0].sales);
-           netProfit.push(map[yr][0].netProfit);
-           opm.push(map[yr][0].opm);
-           computedNpm = (map[yr][0].netProfit/map[yr][0].sales);
-           computedNpm = Math.round(computedNpm * 100)/100;
-           npm.push(computedNpm);
+           operatingProfit.push(map[yr][0].operatingProfit);
+           salesGrowth.push(Number(Math.round(map[yr][0].salesG*100 * 100)/100 || 1));
+           operatingProfitGrowth.push(Number(Math.round(map[yr][0].ebitdaG*100 * 100)/100 || 1));
+//           computedNpm = (map[yr][0].netProfit/map[yr][0].sales);
+//           computedNpm = Math.round(computedNpm * 100)/100;
+//           npm.push(computedNpm);
         }
 
         $scope.labelsYearsStockQuarter = years;
         $scope.stockQuarter = [];
         $scope.stockQuarter.push(sales);
-        $scope.stockQuarter.push(netProfit);
-        $scope.stockQuarter.push(opm);
-        $scope.stockQuarter.push(npm);
+        $scope.stockQuarter.push(operatingProfit);
+        $scope.stockQuarter.push(salesGrowth);
+        $scope.stockQuarter.push(operatingProfitGrowth);
 
         $scope.chartOptionsStockQuarter = { scales: {
                                             yAxes: [
@@ -402,17 +457,17 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 type: 'bar'
               },
               {
-                label: "Net Profit",
+                label: "Operating Profit",
                 yAxisID: 'y-axis-1',
                 type: 'bar'
               },
               {
-                label: "OPM",
+                label: "Sales g%",
                 yAxisID: 'y-axis-2',
                 type: 'line'
               },
               {
-                label: "NPM",
+                label: "Op. Profit g%",
                 yAxisID: 'y-axis-2',
                 type: 'line'
               },

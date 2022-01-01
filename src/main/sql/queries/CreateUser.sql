@@ -38,7 +38,7 @@ SELECT * FROM portfolio_holdings a  WHERE memberid = 1063 order by a.memberid, a
 INSERT INTO portfolio_holdings (memberid, portfolioid, buy_date, ticker, name, short_name, asset_classid, subindustryid, quantity, rate, brokerage, tax, total_cost, net_rate, cmp, market_value, holding_period, net_profit, absolute_return, annualized_return, maturity_value, maturity_date, last_valuation_date) 
 VALUES ('1063', '1', '2020-02-14', 'MOSL_CASH', 'MOSL Cash', 'MOSL Cash', '101010', '0', '1.0000', '200000', '0', '0', '200000', '200000', '200000', '200000', '0', '0', '0', '0', '0.000', '2000-01-01', '2019-06-21');
 
-select * from moslcode_memberid; 
+select * from moslcode_memberid where memberid = 1063; 
 INSERT INTO moslcode_memberid (memberid, moslcode) VALUES ('1063', 'H0822');
 
 

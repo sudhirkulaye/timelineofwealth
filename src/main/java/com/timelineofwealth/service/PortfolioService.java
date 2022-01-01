@@ -109,6 +109,7 @@ public class PortfolioService {
             holding.setMarketValue((BigDecimal) object[5]);
             holding.setNetProfit((BigDecimal) object[6]);
             holding.setWeight((BigDecimal) object[7]);
+            holding.setAbsoluteReturn((BigDecimal) object[8]);
             consolidatedPortfolioHoldings.add(holding);
         }
 

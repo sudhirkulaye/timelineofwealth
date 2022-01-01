@@ -62,11 +62,28 @@ public class StockQuarter implements Serializable {
     private BigDecimal dummy1;
     @Column(name = "opm")
     private BigDecimal opm;
+    @Column(name = "noplat")
+    private BigDecimal noplat;
+    @Column(name = "ttm_sales")
+    private BigDecimal ttmSales;
+    @Column(name = "ttm_ebitda")
+    private BigDecimal ttmEbitda;
+    @Column(name = "ttm_noplat")
+    private BigDecimal ttmNoplat;
+    @Column(name = "ttm_opm")
+    private BigDecimal ttmOpm;
+    @Column(name = "sales_g")
+    private BigDecimal salesG;
+    @Column(name = "ttm_sales_g")
+    private BigDecimal ttmSalesG;
+    @Column(name = "ebitda_g")
+    private BigDecimal ebitdaG;
+    @Column(name = "ttm_ebitda_g")
+    private BigDecimal ttmEbitdaG;
 
     public StockQuarterKey getKey() {
         return key;
     }
-
     public void setKey(StockQuarterKey key) {
         this.key = key;
     }
@@ -74,7 +91,6 @@ public class StockQuarter implements Serializable {
     public BigDecimal getSales() {
         return sales;
     }
-
     public void setSales(BigDecimal sales) {
         this.sales = sales;
     }
@@ -82,7 +98,6 @@ public class StockQuarter implements Serializable {
     public BigDecimal getExpenses() {
         return expenses;
     }
-
     public void setExpenses(BigDecimal expenses) {
         this.expenses = expenses;
     }
@@ -90,7 +105,6 @@ public class StockQuarter implements Serializable {
     public BigDecimal getOperatingProfit() {
         return operatingProfit;
     }
-
     public void setOperatingProfit(BigDecimal operatingProfit) {
         this.operatingProfit = operatingProfit;
     }
@@ -98,7 +112,6 @@ public class StockQuarter implements Serializable {
     public BigDecimal getOtherIncome() {
         return otherIncome;
     }
-
     public void setOtherIncome(BigDecimal otherIncome) {
         this.otherIncome = otherIncome;
     }
@@ -106,7 +119,6 @@ public class StockQuarter implements Serializable {
     public BigDecimal getDepreciation() {
         return depreciation;
     }
-
     public void setDepreciation(BigDecimal depreciation) {
         this.depreciation = depreciation;
     }
@@ -114,7 +126,6 @@ public class StockQuarter implements Serializable {
     public BigDecimal getInterest() {
         return interest;
     }
-
     public void setInterest(BigDecimal interest) {
         this.interest = interest;
     }
@@ -122,7 +133,6 @@ public class StockQuarter implements Serializable {
     public BigDecimal getProfitBeforeTax() {
         return profitBeforeTax;
     }
-
     public void setProfitBeforeTax(BigDecimal profitBeforeTax) {
         this.profitBeforeTax = profitBeforeTax;
     }
@@ -130,7 +140,6 @@ public class StockQuarter implements Serializable {
     public BigDecimal getTax() {
         return tax;
     }
-
     public void setTax(BigDecimal tax) {
         this.tax = tax;
     }
@@ -138,7 +147,6 @@ public class StockQuarter implements Serializable {
     public BigDecimal getNetProfit() {
         return netProfit;
     }
-
     public void setNetProfit(BigDecimal netProfit) {
         this.netProfit = netProfit;
     }
@@ -146,7 +154,6 @@ public class StockQuarter implements Serializable {
     public BigDecimal getDummy1() {
         return dummy1;
     }
-
     public void setDummy1(BigDecimal dummy1) {
         this.dummy1 = dummy1;
     }
@@ -154,8 +161,70 @@ public class StockQuarter implements Serializable {
     public BigDecimal getOpm() {
         return opm;
     }
-
     public void setOpm(BigDecimal opm) {
         this.opm = opm;
+    }
+
+    public BigDecimal getNoplat() {
+        return noplat;
+    }
+    public void setNoplat(BigDecimal noplat) {
+        this.noplat = noplat;
+    }
+
+    public BigDecimal getTtmSales() {
+        return ttmSales;
+    }
+    public void setTtmSales(BigDecimal ttmSales) {
+        this.ttmSales = ttmSales;
+    }
+
+    public BigDecimal getTtmEbitda() {
+        return ttmEbitda;
+    }
+    public void setTtmEbitda(BigDecimal ttmEbitda) {
+        this.ttmEbitda = ttmEbitda;
+    }
+
+    public BigDecimal getTtmNoplat() {
+        return ttmNoplat;
+    }
+    public void setTtmNoplat(BigDecimal ttmNoplat) {
+        this.ttmNoplat = ttmNoplat;
+    }
+
+    public BigDecimal getTtmOpm() {
+        return ttmOpm;
+    }
+    public void setTtmOpm(BigDecimal ttmOpm) {
+        this.ttmOpm = ttmOpm;
+    }
+
+    public BigDecimal getSalesG() {
+        return salesG;
+    }
+    public void setSalesG(BigDecimal salesG) {
+        this.salesG = salesG;
+    }
+
+    public BigDecimal getTtmSalesG() {
+        return ttmSalesG;
+    }
+    public void setTtmSalesG(BigDecimal ttmSalesG) {
+        this.ttmSalesG = ttmSalesG;
+    }
+
+    public BigDecimal getEbitdaG() {
+        return ebitdaG;
+    }
+    public void setEbitdaG(BigDecimal ebitdaG) {
+        this.ebitdaG = ebitdaG;
+    }
+
+    public BigDecimal getTtmEbitdaG() {
+        return ttmEbitdaG;
+    }
+    public void setTtmEbitdaG(BigDecimal ttmEbitdaG) {
+        this.ttmEbitdaG = ttmEbitdaG;
     }
 }

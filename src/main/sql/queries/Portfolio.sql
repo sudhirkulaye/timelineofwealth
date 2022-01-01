@@ -8,17 +8,17 @@ select * from adviser_user_mapping;
 select * from composite; -- 5 composites
 select * from composite_constituents; 
 select * from portfolio a order by start_date desc, a.memberid, a.portfolioid; -- total 23 portfolios 
-select * from portfolio_holdings a where memberid in (1063, 1024) order by asset_classid, ticker, buy_date;
+select * from portfolio_holdings a where memberid in (1000) order by asset_classid, ticker, buy_date;
 select compositeid, count(1) from portfolio a group by compositeid order by a.compositeid; -- (composite 1: 10, 2: 11)
-select * from portfolio_cashflow where memberid in (1026) order by portfolioid, date desc;
-select * from portfolio_value_history a where memberid in (1, 1003, 1007, 1063, 1024) and  date >= '2021-05-31' order by memberid, date desc;
+select * from portfolio_cashflow where memberid in (1047) order by portfolioid, date desc;
+select * from portfolio_value_history a where memberid in (1047) and  date >= '2021-11-30' order by memberid, date desc;
 select * from portfolio_returns_calculation_support a where memberid in (1000);
 select * from portfolio_twrr_summary a where memberid in (1, 1024);
 select * from portfolio_twrr_monthly a where memberid in (1);
 select * from benchmark;
 
 -- All portfolio holdings
-SELECT * FROM portfolio_holdings a WHERE memberid = 1007 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+SELECT * FROM portfolio_holdings a WHERE memberid = 1000 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
 SELECT * FROM portfolio_historical_holdings a  WHERE memberid = 1007 order by a.memberid, a.portfolioid, a.sell_date desc, a.asset_classid, a.ticker;
 
 -- query to find wt of each security to compare with model portfolio
@@ -153,11 +153,11 @@ SELECT a.memberid, a.portfolioid, b.asset_class_group, sum(a.market_value) from 
 
 SET SQL_SAFE_UPDATES = 0;
 Commit;
-update portfolio_holdings a, stock_universe b set a.name = b.name, a.short_name = b.short_name, a.asset_classid = b.asset_classid, a.subindustryid = b.subindustryid where a.ticker = b.ticker ;
-update portfolio_holdings a set a.asset_classid = 101010, name = 'MOSL Cash', a.short_name = 'MOSL Cash' Where a.ticker = 'MOSL_CASH';
-UPDATE portfolio_holdings a, nse_price_history b SET a.cmp = b.close_price WHERE  a.ticker = b.nse_ticker AND b.date = (select date_today from setup_dates);
-UPDATE portfolio_holdings a, bse_price_history b SET a.cmp = b.close_price WHERE  a.ticker = b.bse_ticker AND b.date = (select date_today from setup_dates);
-update portfolio_holdings a set total_cost = ((quantity * rate) + brokerage + tax), net_rate = round((total_cost/quantity),2), market_value = (cmp * quantity), net_profit = (market_value - total_cost), holding_period = ROUND((DATEDIFF((select date_today from setup_dates), buy_date) / 365.25), 2),absolute_return = round((market_value / total_cost) - 1, 2),annualized_return = round(pow((absolute_return + 1), (1 / holding_period)) - 1, 2);
+-- update portfolio_holdings a, stock_universe b set a.name = b.name, a.short_name = b.short_name, a.asset_classid = b.asset_classid, a.subindustryid = b.subindustryid where a.ticker = b.ticker ;
+-- update portfolio_holdings a set a.asset_classid = 101010, name = 'MOSL Cash', a.short_name = 'MOSL Cash' Where a.ticker = 'MOSL_CASH';
+-- UPDATE portfolio_holdings a, nse_price_history b SET a.cmp = b.close_price WHERE  a.ticker = b.nse_ticker AND b.date = (select date_today from setup_dates);
+-- UPDATE portfolio_holdings a, bse_price_history b SET a.cmp = b.close_price WHERE  a.ticker = b.bse_ticker AND b.date = (select date_today from setup_dates);
+-- update portfolio_holdings a set total_cost = ((quantity * rate) + brokerage + tax), net_rate = round((total_cost/quantity),2), market_value = (cmp * quantity), net_profit = (market_value - total_cost), holding_period = ROUND((DATEDIFF((select date_today from setup_dates), buy_date) / 365.25), 2),absolute_return = round((market_value / total_cost) - 1, 2),annualized_return = round(pow((absolute_return + 1), (1 / holding_period)) - 1, 2);
 commit;
 
 -- ap_process_mosl_transactions to be called after uploading transactions
@@ -166,11 +166,12 @@ select * from log_table;
 truncate log_table; 
 -- DELETE from mosl_transaction where moslcode = 'H20488'; 
 select * from mosl_transaction where is_processed = 'N' order by date desc;
-select * from mosl_transaction where /*quantity < 0 and*/ date >= '2021-08-15' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
-select moslcode, date, script_name, sell_buy, sum(quantity) from mosl_transaction where date >= '2021-05-01' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') group by moslcode, date, script_name, sell_buy order by moslcode, date desc, script_name;
+select * from mosl_transaction where /*quantity < 0 and*/ date >= '2021-12-27' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
+select moslcode, date, script_name, sell_buy, sum(quantity), sum(brokerage) from mosl_transaction where date >= '2021-01-01' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') group by moslcode, date, script_name, sell_buy order by moslcode, date desc, script_name;
 -- update mosl_transaction set portfolioid = 1 where date = '2019-11-18';
 select * from portfolio_holdings a where a.memberid in (1) order by portfolioid, asset_classid, ticker, buy_date;
 select * from portfolio_historical_holdings a where a.memberid in (1) order by sell_date desc, ticker;
+select * from portfolio_historical_holdings a where sell_date >= '2021-11-26';
 select b.moslcode, a.memberid, a.portfolioid, a.ticker, a.total_cost, a.cmp, a.market_value, b.net_amount 
 from portfolio_holdings a, moslcode_memberid c, mosl_transaction b
 WHERE a.memberid = c.memberid and a.portfolioid = b.portfolioid and b.moslcode = c.moslcode 
@@ -182,8 +183,8 @@ and b.script_name = 'MOSL_CASH' and a.ticker = 'MOSL_CASH' and b.is_processed = 
 select * from moslcode_memberid a where moslcode = 'H22295';
 SELECT * from portfolio a where a. memberid = 1 and portfolioid = 1;
 select * from portfolio_cashflow a where a. memberid = 1026 and portfolioid = 1;
-select * from portfolio_holdings a where a. memberid = 1051 and portfolioid = 1 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
-SELECT * from portfolio_value_history a where a.date >= '2021-06-01' and a.memberid in (1051) order by memberid, portfolioid, date desc; 
+select * from portfolio_holdings a where a. memberid = 1026 order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+SELECT * from portfolio_value_history a where a.date >= '2021-12-20' and a.memberid in (1026) order by memberid, portfolioid, date desc; 
 SELECT * from portfolio_returns_calculation_support a where a. memberid = 1026 and portfolioid = 1 ORDER BY a.memberid, a.portfolioid, a.date;
 select * from portfolio_twrr_monthly a where a.memberid IN (1026, 1, 1003, 1001, 1024);
 SELECT * from portfolio_twrr_summary a where a.memberid IN (1026, 1, 1003, 1001, 1024);
