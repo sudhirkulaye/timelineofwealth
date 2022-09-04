@@ -818,7 +818,7 @@ ALTER TABLE stock_quarter ADD INDEX index_stock_quarter_date (date);
 
 select count(1), year(date) from stock_quarter a group by year(date) order by date desc; 
 select * from stock_quarter a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;
-select * from stock_quarter a where a.ticker in ('TCS') and date >= '2019-03-31';
+select * from stock_quarter a where a.ticker in ('ICICIBANK') and date >= '2019-03-31';
 -- update stock_quarter a set a.ticker = 'BAJFINANCE_1' where a.ticker = 'BAJFINANCE' and cons_standalone = 'C'; 
 select * from stock_quarter a where date = '2021-09-30';
 -- pending results

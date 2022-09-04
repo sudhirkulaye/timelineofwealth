@@ -2,10 +2,16 @@
 select count(1), name from daily_data_s a group by name order by count(1); 
 
 -- Queries to update Screener Short Name (In case of Name Change or ticker Change)
-select * from stock_universe a where a.ticker = 'POWERINDIA' or a.ticker5 = 'ABB Power Products'; -- Bharat Forge, 25101010
-select * from daily_data_s a where date <= '2021-12-10' and name like 'ABB Power%' order by date desc;
+select * from stock_universe a where (is_bse500 = 1 or is_nse500 = 1) and a.ticker IN ('MINDACORP', '') or a.ticker5 = ' '; -- Bharat Forge, 25101010
+select * from daily_data_s a where date >= '2022-02-10' and name like '%Ruchi%' order by date desc;
 select * from stock_price_movement_history where ticker = 'NIITTECH';
 
+-- update stock_universe set subindustryid = 15101020 where subindustryid = 15101050 and (is_bse500 = 1 or is_nse500 = 1);
+
+-- update stock_universe set ticker5 = 'Patanjali Foods', short_name = 'Patanjali Foods', name = 'Patanjali Foods Ltd' where ticker = 'RUCHISOYA';
+-- update stock_universe set ticker5 = 'Zydus Lifesci.', short_name = 'Zydus Lifescience', name = 'Zydus Lifescience' where ticker = 'CADILAHC';
+-- update stock_universe set ticker5 = 'Restaurant Brand', short_name = 'Restaurant Brand', name = 'Restaurant Brands Asia Ltd' where ticker = 'BURGERKING';
+-- update stock_universe set ticker5 = 'PCBL Ltd', short_name = 'PCBL', name = 'PCBL Ltd' where ticker = 'PHILIPCARB';
 -- update stock_universe set ticker5 = 'Hitachi Energy', short_name = 'Hitachi Energy', name = 'Hitachi Energy India Ltd' where ticker = 'POWERINDIA';
 -- update stock_universe set ticker5 = 'Borosil Renew.' where ticker = 'BORORENEW';
 -- update stock_universe set ticker5 = 'Fiem Industries' where ticker = 'FIEMIND';
@@ -15,6 +21,10 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update stock_universe set ticker5 = 'Jubilant Pharmo', short_name = 'Jubilant Pharmova', name = 'Jubilant Pharmova Ltd' where ticker = 'JUBILANT';
 -- update stock_universe set ticker5 = 'SIS' where ticker = 'SIS' or ticker5 = 'Security & Intel' ;
 
+-- update daily_data_s set name = 'Patanjali Foods' where name = 'Ruchi Soya Inds.';
+-- update daily_data_s set name = 'Zydus Lifesci.' where name = 'Cadila Health.';
+-- update daily_data_s set name = 'Restaurant Brand' where name = 'Burger King';
+-- update daily_data_s set name = 'PCBL Ltd' where name = 'Phillips Carbon';
 -- update daily_data_s set name = 'Hitachi Energy' where name = 'ABB Power Produc';
 -- update daily_data_s set name = 'RHI Magnestia' where name = 'Orient Refrac.';
 -- update daily_data_s set name = 'Hatsun Agro' where name = 'Hatsun AgroProd.';
@@ -26,6 +36,10 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update daily_data_s set name = 'Coforge' where name = 'NIIT Tech.';
 -- update daily_data_s set name = 'Dhani Services' where name = 'Indiabulls Vent.';
 
+-- UPDATE stock_universe SET ticker = 'PATANJALI', nse_code = 'PATANJALI', ticker_old = 'RUCHISOYA' WHERE ticker = 'RUCHISOYA';
+-- UPDATE stock_universe SET ticker = 'ZYDUSLIFE', nse_code = 'ZYDUSLIFE', ticker_old = 'CADILAHC' WHERE ticker = 'CADILAHC';
+-- update stock_universe set ticker = 'RBA', nse_code = 'RBA', ticker_old = 'BURGERKING'  where ticker = 'BURGERKING';
+-- update stock_universe set ticker = 'PCBL', nse_code = 'PCBL', ticker_old = 'PHILIPCARB'  where ticker = 'PHILIPCARB';
 -- update stock_universe set ticker = 'ANGELONE', nse_code = 'ANGELONE', ticker_old = 'ANGELBRKG'  where ticker = 'ANGELBRKG';
 -- update stock_universe set ticker = 'BORORENEW',  nse_code = 'BORORENEW', ticker_old = 'BOROSIL'  where ticker = 'BOROSIL';
 -- UPDATE stock_universe SET ticker = 'STLTECH',   nse_code = 'STLTECH', ticker_old = 'STRTECH' WHERE (`ticker` = 'STRTECH');
@@ -36,6 +50,10 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- UPDATE stock_universe SET ticker = 'JUBLPHARMA', ticker_old = 'JUBILANT' WHERE (`ticker` = 'JUBILANT');
 
 -- update nse_price_history a set nse_ticker = 'XXX' where nse_ticker = 'XXX';
+-- update nse_price_history a set nse_ticker = 'PATANJALI' where nse_ticker = 'RUCHISOYA';
+-- update nse_price_history a set nse_ticker = 'ZYDUSLIFE' where nse_ticker = 'CADILAHC';
+-- update nse_price_history a set nse_ticker = 'RBA' where nse_ticker = 'BURGERKING';
+-- update nse_price_history a set nse_ticker = 'PCBL' where nse_ticker = 'PHILIPCARB';
 -- update nse_price_history a set nse_ticker = 'ANGELONE' where nse_ticker = 'ANGELBRKG';
 -- update nse_price_history a set nse_ticker = 'STLTECH' where nse_ticker = 'STRTECH';
 -- update nse_price_history a set nse_ticker = 'RHIM' where nse_ticker = 'ORIENTREF';
@@ -47,6 +65,10 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update nse_price_history a set nse_ticker = 'TATACONSUM' where nse_ticker = 'TATAGLOBAL';
 
 -- update stock_price_movement set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_price_movement set ticker = 'PATANJALI' where ticker = 'RUCHISOYA';
+-- update stock_price_movement set ticker = 'ZYDUSLIFE' where ticker = 'CADILAHC';
+-- update stock_price_movement set ticker = 'RBA' where ticker = 'BURGERKING';
+-- update stock_price_movement set ticker = 'PCBL' where ticker = 'PHILIPCARB';
 -- update stock_price_movement set ticker = 'ANGELONE' where ticker = 'ANGELBRKG';
 -- update stock_price_movement set ticker = 'STLTECH' where ticker = 'STRTECH';
 -- update stock_price_movement set ticker = 'RHIM' where ticker = 'ORIENTREF';
@@ -57,6 +79,10 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update stock_price_movement set ticker = 'DHANI' where ticker = 'IBVENTURES' and date < '2020-11-06';
 
 -- update stock_price_movement_history set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_price_movement_history set ticker = 'PATANJALI' where ticker = 'RUCHISOYA';
+-- update stock_price_movement_history set ticker = 'ZYDUSLIFE' where ticker = 'CADILAHC';
+-- update stock_price_movement_history set ticker = 'RBA' where ticker = 'BURGERKING';
+-- update stock_price_movement_history set ticker = 'PCBL' where ticker = 'PHILIPCARB';
 -- update stock_price_movement_history set ticker = 'ANGELONE' where ticker = 'ANGELBRKG';
 -- update stock_price_movement_history set ticker = 'STLTECH' where ticker = 'STRTECH';
 -- update stock_price_movement_history set ticker = 'RHIM' where ticker = 'ORIENTREF';
@@ -67,6 +93,10 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update stock_price_movement_history set ticker = 'DHANI' where ticker = 'IBVENTURES' and date < '2020-11-06';
 
 -- update stock_quarter set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_quarter set ticker = 'PATANJALI' where ticker = 'RUCHISOYA';
+-- update stock_quarter set ticker = 'ZYDUSLIFE' where ticker = 'CADILAHC';
+-- update stock_quarter set ticker = 'RBA' where ticker = 'BURGERKING';
+-- update stock_quarter set ticker = 'PCBL' where ticker = 'PHILIPCARB';
 -- update stock_quarter set ticker = 'ANGELONE' where ticker = 'ANGELBRKG';
 -- update stock_quarter set ticker = 'STLTECH' where ticker = 'STRTECH';
 -- update stock_quarter set ticker = 'RHIM' where ticker = 'ORIENTREF';
@@ -77,6 +107,10 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update stock_quarter set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
 -- update stock_pnl set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_pnl set ticker = 'PATANJALI' where ticker = 'RUCHISOYA';
+-- update stock_pnl set ticker = 'ZYDUSLIFE' where ticker = 'CADILAHC';
+-- update stock_pnl set ticker = 'RBA' where ticker = 'BURGERKING';
+-- update stock_pnl set ticker = 'PCBL' where ticker = 'PHILIPCARB';
 -- update stock_pnl set ticker = 'ANGELONE' where ticker = 'ANGELBRKG';
 -- update stock_pnl set ticker = 'STLTECH' where ticker = 'STRTECH';
 -- update stock_pnl set ticker = 'RHIM' where ticker = 'ORIENTREF';
@@ -87,6 +121,10 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update stock_pnl set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
 -- update stock_cashflow set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_cashflow set ticker = 'PATANJALI' where ticker = 'RUCHISOYA';
+-- update stock_cashflow set ticker = 'ZYDUSLIFE' where ticker = 'CADILAHC';
+-- update stock_cashflow set ticker = 'RBA' where ticker = 'BURGERKING';
+-- update stock_cashflow set ticker = 'PCBL' where ticker = 'PHILIPCARB';
 -- update stock_cashflow set ticker = 'ANGELONE' where ticker = 'ANGELBRKG';
 -- update stock_cashflow set ticker = 'STLTECH' where ticker = 'STRTECH';
 -- update stock_cashflow set ticker = 'RHIM' where ticker = 'ORIENTREF';
@@ -97,6 +135,10 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update stock_cashflow set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
 -- update stock_balancesheet set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_balancesheet set ticker = 'PATANJALI' where ticker = 'RUCHISOYA';
+-- update stock_balancesheet set ticker = 'ZYDUSLIFE' where ticker = 'CADILAHC';
+-- update stock_balancesheet set ticker = 'RBA' where ticker = 'BURGERKING';
+-- update stock_balancesheet set ticker = 'PCBL' where ticker = 'PHILIPCARB';
 -- update stock_balancesheet set ticker = 'ANGELONE' where ticker = 'ANGELBRKG';
 -- update stock_balancesheet set ticker = 'STLTECH' where ticker = 'STRTECH';
 -- update stock_balancesheet set ticker = 'RHIM' where ticker = 'ORIENTREF';

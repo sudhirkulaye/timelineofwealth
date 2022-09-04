@@ -32,7 +32,7 @@ public class PublicViewController {
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Timeline of Wealth");
-        return "public/index";
+        return "public/stocklist";
     }
 
     @RequestMapping(value = "/userlogin", method = RequestMethod.GET)
