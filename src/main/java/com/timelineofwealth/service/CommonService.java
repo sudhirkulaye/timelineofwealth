@@ -485,10 +485,12 @@ public class CommonService {
     public static List<RecentValuations> getRecentValuations(String ticker) {
         List<RecentValuations> recentPES = new ArrayList<>();
         LocalDate now = LocalDate.now();
-        LocalDate oneYearOld = now.minusDays(365);
+        LocalDate oneAndhHalYearOld = now.minusMonths(18);
         NseBse500 stockDetails = getStockDetails(ticker);
 
-        List<DailyDataS> dailyDataSList = CommonService.dailyDataSRepository.findAllByKeyNameAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker5(),java.sql.Date.valueOf(oneYearOld));
+        List<java.sql.Date> resultDates = CommonService.stockQuarterRepository.findDistinctResultDateForTicker(ticker, java.sql.Date.valueOf(oneAndhHalYearOld));
+
+        List<DailyDataS> dailyDataSList = CommonService.dailyDataSRepository.findAllByKeyNameAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker5(),java.sql.Date.valueOf(oneAndhHalYearOld));
         //List<DailyDataB> dailyDataBList = CommonService.dailyDataBRepository.findAllByKeyTickerBAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker2(),java.sql.Date.valueOf(oneYearOld));
         for(DailyDataS dailyDataS: dailyDataSList){
             RecentValuations recentPE = new RecentValuations();
@@ -499,6 +501,12 @@ public class CommonService {
             recentPE.setEvToEbita(dailyDataS.getEvToEbit());
             recentPE.setMarketCap(dailyDataS.getMarketCap());
             recentPE.setMarketPrice(dailyDataS.getCmp());
+            int index = Collections.binarySearch(resultDates, dailyDataS.getKey().getDate());
+            if (index > 0) {
+                recentPE.setResultDateMCap(dailyDataS.getMarketCap());
+            } else {
+                recentPE.setResultDateMCap(new BigDecimal(0));
+            }
             recentPES.add(recentPE);
         }
         // set PB from bloomberg data

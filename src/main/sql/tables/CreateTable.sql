@@ -811,10 +811,14 @@ create table stock_quarter (
   ttm_ebitda_g decimal(10,4) DEFAULT '0.0000' COMMENT 'YoY ebitda growth based on TTM ebitda',
   mcap decimal(20,3) DEFAULT '0.000' COMMENT 'Market Cap on the result day',
   price decimal(20,3) DEFAULT '0.000' COMMENT 'Stock price on the result day',
+  result_date DATE NULL COMMENT 'Quarter result date',
   PRIMARY KEY (ticker, cons_standalone, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Quarter P&L Results';
 ALTER TABLE stock_quarter ADD INDEX index_stock_quarter_ticker (ticker);
 ALTER TABLE stock_quarter ADD INDEX index_stock_quarter_date (date);
+-- ALTER TABLE `timelineofwealth`.`stock_quarter` 
+-- ADD COLUMN `result_date` DATE NULL COMMENT 'Quarter result date' AFTER `price`;
+
 
 select count(1), year(date) from stock_quarter a group by year(date) order by date desc; 
 select * from stock_quarter a where sales = 0 and expenses = 0 and operating_profit = 0 and other_income = 0;

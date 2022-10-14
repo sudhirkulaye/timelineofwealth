@@ -2,7 +2,7 @@
 select count(1), name from daily_data_s a group by name order by count(1); 
 
 -- Queries to update Screener Short Name (In case of Name Change or ticker Change)
-select * from stock_universe a where (is_bse500 = 1 or is_nse500 = 1) and a.ticker IN ('MINDACORP', '') or a.ticker5 = ' '; -- Bharat Forge, 25101010
+select * from stock_universe a where (is_bse500 = 1 or is_nse500 = 1) and a.ticker IN ('GMRINFRA', '') or a.ticker5 = ' '; -- Bharat Forge, 25101010
 select * from daily_data_s a where date >= '2022-02-10' and name like '%Ruchi%' order by date desc;
 select * from stock_price_movement_history where ticker = 'NIITTECH';
 

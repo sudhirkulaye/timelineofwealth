@@ -178,3 +178,26 @@ select * from stock_cashflow where 1=2;
 
 select * from index_valuation a where date in ('2022-08-30', '2022-07-29') order by date desc;
 delete from index_valuation where date > '2022-08-30';
+
+SELECT VERSION();
+
+SELECT SUM(TABLE_ROWS) 
+     FROM INFORMATION_SCHEMA.TABLES 
+     WHERE TABLE_SCHEMA = 'timelineofwealth';
+     
+SELECT table_name, table_rows
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA = 'timelineofwealth';
+
+select * from mutual_fund_nav_history where scheme_code = 118531 order by date desc;
+
+select * from mutual_fund_universe a where a.fund_house = 'XXX';
+select distinct fund_house from mutual_fund_universe;
+
+
+select * from stock_pnl a where ticker IN ('KAJARIACER') and date >= '2012-12-31';
+select * from stock_balancesheet a where ticker IN ('KAJARIACER')  and date >= '2012-12-31';
+select * from stock_cashflow a where ticker IN ('KAJARIACER')  and date >= '2012-12-31';
+select * from stock_quarter a where ticker IN ('KAJARIACER')  and date >= '2020-03-31';
+
+-- GARFIBRES, TRIDENT, KPRMILL, VTL, ALOKINDS, WELSPUNIND, ICIL

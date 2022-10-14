@@ -3,6 +3,7 @@ var module = angular.module('StockAnalysisManagement', ['angular.filter','chart.
 module.controller('StockAnalysisController', function($scope, $http, $filter, $window) {
     var urlBase="/public/api";
     $scope.newColors = ['#26B99A', '#03586A', '#1E947B', '#1a3c33', '#DCDCDC', '#46BFBD', '#FDB45C'];
+    $scope.newColors1 = ['#26B99A', '#03586A', '#1a53ff'];
     $scope.chartOptions = { scales: { yAxes: [{ ticks: { min:0 } }] } };
     $http.defaults.headers.post["Content-Type"] = "application/json";
 
@@ -25,6 +26,12 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
     $scope.labelsYearsStockMargin = [];
     $scope.stockMarginDataOverride = [];
     $scope.chartOptionsStockMargin = {};
+    $scope.chartStockGrowthSeries = [];
+
+    $scope.stockGrowth = [];
+    $scope.labelsYearsStockGrowth = [];
+    $scope.stockGrowthDataOverride = [];
+    $scope.chartOptionsStockGrowth = {};
 
     $scope.stockValuation = [];
     $scope.labelsYearsStockValuation = [];
@@ -123,16 +130,16 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 }
         });
 
-        url = "/getpricemovements/"+$scope.ticker;
-        $http.get(urlBase + url).
-            then(function (response) {
-                if (response != undefined) {
-                    $scope.priceMovements = response.data;
-                    populateStockPriceMovements();
-                } else {
-                    $scope.priceMovements = [];
-                }
-        });
+//        url = "/getpricemovements/"+$scope.ticker;
+//        $http.get(urlBase + url).
+//            then(function (response) {
+//                if (response != undefined) {
+//                    $scope.priceMovements = response.data;
+//                    populateStockPriceMovements();
+//                } else {
+//                    $scope.priceMovements = [];
+//                }
+//        });
 
     }
 
@@ -145,7 +152,10 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
 
         var years = [];
         var sales = [];
-        var operatingProfit = [];
+        var noplat = [];
+        var salesG3yr = [];
+        var salesG5yr = [];
+        var salesG10yr = [];
         var salesGrowth = [];
         var operatingProfitGrowth = [];
         var margin = [];
@@ -158,12 +168,16 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
              continue;
            }
            years.push(yr);
+           $scope.labelsYearsStockGrowth.push(yr);
            //console.log(yr);
            sales.push(Math.round(map[yr][0].sales*100)/100);
            //console.log(map[yr][0].sales);
-           operatingProfit.push(Math.round(map[yr][0].operatingProfit*100)/100);
+           noplat.push(Math.round(map[yr][0].noplat*100)/100);
 //           salesGrowth.push(Math.round(map[yr][0].salesG*100)/100);
 //           operatingProfitGrowth.push(Math.round(map[yr][0].ebitdaG*100)/100);
+           salesG3yr.push(Number(Math.round(map[yr][0].salesG3yr*100 * 100)/100 || 1));
+           salesG5yr.push(Number(Math.round(map[yr][0].salesG5yr*100 * 100)/100 || 1));
+           salesG10yr.push(Number(Math.round(map[yr][0].salesG10yr*100 * 100)/100 || 1));
            salesGrowth.push(Number(Math.round(map[yr][0].salesG*100 * 100)/100 || 1));
            operatingProfitGrowth.push(Number(Math.round(map[yr][0].ebitdaG*100 * 100)/100 || 1));
            pe.push(Math.round(map[yr][0].pe*100)/100);
@@ -188,7 +202,7 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
         var map1 = $filter('groupBy')(reverseSortedStockQuarter, 'key.date');
         i = 0;
         var ttmSales = Number(0.00||0);
-        var ttmOperatingProfit = Number(0.00||0);
+        var ttmNoplat = Number(0.00||0);
         var ttmSalesGrowth = Number(0.00||0);
         var ttmOperatingProfitGrowth = Number(0.00||0);
 
@@ -198,7 +212,7 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
              break;
            }
            ttmSales = Number(map1[yr][0].ttmSales || 0);
-           ttmOperatingProfit = Number(map1[yr][0].ttmEbitda || 0);
+           ttmNoplat = Number(map1[yr][0].ttmNoplat || 0);
 //           ttmSalesGrowth = ttmSalesGrowth + Number(map1[yr][0].ttmSalesG || 0);
 //           ttmOperatingProfitGrowth = ttmOperatingProfitGrowth + Number(map1[yr][0].ttmEbitdaG || 0);
            ttmSalesGrowth = Number(Math.round(map1[yr][0].ttmSalesG*100 * 100) / 100 || 1);
@@ -216,20 +230,32 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
         //years.push($filter('date')(new Date(), 'yyyy-MM-dd'));
         years.push("TTM");
         sales.push(Math.round(ttmSales*100)/100);
-        operatingProfit.push(Math.round(ttmOperatingProfit*100)/100);
+        noplat.push(Math.round(ttmNoplat*100)/100);
         salesGrowth.push(ttmSalesGrowth);
         operatingProfitGrowth.push(ttmOperatingProfitGrowth);
 
         $scope.labelsYearsStockPnl = years;
         $scope.stockPnl = [];
         $scope.stockPnl.push(sales);
-        $scope.stockPnl.push(operatingProfit);
-        $scope.stockPnl.push(salesGrowth);
-        $scope.stockPnl.push(operatingProfitGrowth);
+        $scope.stockPnl.push(noplat);
+        //$scope.stockPnl.push(salesGrowth);
+        $scope.stockPnl.push(margin);
+        //$scope.stockPnl.push(operatingProfitGrowth);
+        //$scope.stockPnl.push(margin);
 
         $scope.labelsYearsStockMargin = years;
         $scope.stockMargin = [];
         $scope.stockMargin.push(margin);
+
+        $scope.stockGrowth = [];
+        $scope.stockGrowth.push(salesG3yr);
+        //console.log(salesG3yr);
+        $scope.stockGrowth.push(salesG5yr);
+        //console.log(salesG5yr);
+        $scope.stockGrowth.push(salesG10yr);
+        //console.log(salesG10yr);
+        //console.log($scope.stockGrowth);
+
 
         $scope.labelsYearsStockValuation = years;
         $scope.stockValuation = [];
@@ -250,7 +276,8 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                                                     id: 'y-axis-2',
                                                     type: 'linear',
                                                     display: true,
-                                                    position: 'right'
+                                                    position: 'right',
+                                                    ticks: { min:0 }
                                                 }
                                             ]
                                        } };
@@ -262,18 +289,50 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 type: 'bar'
               },
               {
-                label: "Operating Profit",
+                label: "NOPLAT",
                 yAxisID: 'y-axis-1',
                 type: 'bar'
               },
               {
-                label: "Sales g%",
+                label: "OPM%",
                 yAxisID: 'y-axis-2',
                 type: 'line'
               },
+//              {
+//                label: "EBIT%",
+//                yAxisID: 'y-axis-2',
+//                type: 'line'
+//              },
+        ];
+
+        $scope.chartStockGrowthSeries = ['3 Yr Sales g%', '5 Yr Sales g%', '10 Yr Sales g%'];
+
+        $scope.chartOptionsStockGrowth = { scales: {
+                                            yAxes: [
+                                                {
+                                                    id: 'y-axis-1',
+                                                    type: 'linear',
+                                                    display: true,
+                                                    position: 'left',
+                                                    ticks: { min:0 }
+                                                }
+                                            ]
+                                       } };
+
+        $scope.stockGrowthDataOverride = [
               {
-                label: "Op. Profit g%",
-                yAxisID: 'y-axis-2',
+                label: "3 Yr Sales g%",
+                yAxisID: 'y-axis-1',
+                type: 'line'
+              },
+              {
+                label: "5 Yr Sales g%",
+                yAxisID: 'y-axis-1',
+                type: 'line'
+              },
+              {
+                label: "10 Yr Sales g%",
+                yAxisID: 'y-axis-1',
                 type: 'line'
               },
         ];
@@ -351,6 +410,7 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
         var recentpb = [];
         var recentevtoebita = [];
         var recentpedate = [];
+        var resultDateMCap = [];
 
         for (var i = 0; i < $scope.recentValuations.length; i++) {
             recentpe.push($scope.recentValuations[i].pe);
@@ -359,13 +419,15 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
             recentpb.push($scope.recentValuations[i].pb);
             recentevtoebita.push($scope.recentValuations[i].evToEbita);
             recentpedate.push($scope.recentValuations[i].date);
+            resultDateMCap.push($scope.recentValuations[i].resultDateMCap);
         }
         $scope.dataRecentPE.push(recentpe);
         $scope.dataRecentMCap.push(recentmcap);
         $scope.dataRecentMarketPrice.push(recentMarketPrice);
         $scope.dataRecentMCapAndPrice.push(recentmcap);
         $scope.dataRecentMCapAndPrice.push(recentMarketPrice);
-        //console.log($scope.dataRecentMCap);
+        $scope.dataRecentMCapAndPrice.push(resultDateMCap);
+        //console.log(resultDateMCap);
         $scope.dataRecentPB.push(recentpb);
         $scope.dataRecentEvToEbita.push(recentevtoebita);
         $scope.labelsRecentPE = recentpedate;
@@ -376,18 +438,24 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                                                     id: 'y-axis-1',
                                                     type: 'linear',
                                                     display: true,
-                                                    position: 'left'
+                                                    position: 'left',
+                                                    ticks: { min:0 }
                                                 },
                                                 {
                                                     id: 'y-axis-2',
                                                     type: 'linear',
                                                     display: true,
-                                                    position: 'right'
+                                                    position: 'right',
+                                                    ticks: { min:0 }
                                                 }
                                             ]
                                        } };
-        $scope.chartMCapAndPriceDatasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
-        $scope.chartMCapAndPriceSeries = ['Market Cap', 'Price'];
+        $scope.chartMCapAndPriceDatasetOverride = [
+            { label: "MCap", yAxisID: 'y-axis-1', type: 'line' },
+            { label: "Price", yAxisID: 'y-axis-2', type: 'line' },
+            { label: "Result MCap", yAxisID: 'y-axis-1', type: 'line' }
+        ];
+        $scope.chartMCapAndPriceSeries = ['Market Cap', 'Price', 'Result MCap'];
 
 
     }
@@ -402,8 +470,9 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
 
         var years = [];
         var sales = [];
-        var operatingProfit = [];
+        var noplat = [];
         var salesGrowth = [];
+        var opm = [];
         var operatingProfitGrowth = [];
 //        var computedNpm = 0.00;
         var i = Object.keys(map).length;
@@ -417,9 +486,11 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
            //console.log(yr);
            sales.push(map[yr][0].sales);
            //console.log(map[yr][0].sales);
-           operatingProfit.push(map[yr][0].operatingProfit);
+           noplat.push(map[yr][0].noplat);
            salesGrowth.push(Number(Math.round(map[yr][0].salesG*100 * 100)/100 || 1));
            operatingProfitGrowth.push(Number(Math.round(map[yr][0].ebitdaG*100 * 100)/100 || 1));
+           opm.push(Number(Math.round(map[yr][0].opm*100 * 100)/100 || 1));
+//           console.log(map[yr][0].opm);
 //           computedNpm = (map[yr][0].netProfit/map[yr][0].sales);
 //           computedNpm = Math.round(computedNpm * 100)/100;
 //           npm.push(computedNpm);
@@ -428,9 +499,10 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
         $scope.labelsYearsStockQuarter = years;
         $scope.stockQuarter = [];
         $scope.stockQuarter.push(sales);
-        $scope.stockQuarter.push(operatingProfit);
-        $scope.stockQuarter.push(salesGrowth);
-        $scope.stockQuarter.push(operatingProfitGrowth);
+        $scope.stockQuarter.push(noplat);
+        $scope.stockQuarter.push(opm);
+        //$scope.stockQuarter.push(salesGrowth);
+        //$scope.stockQuarter.push(operatingProfitGrowth);
 
         $scope.chartOptionsStockQuarter = { scales: {
                                             yAxes: [
@@ -445,7 +517,8 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                                                     id: 'y-axis-2',
                                                     type: 'linear',
                                                     display: true,
-                                                    position: 'right'
+                                                    position: 'right',
+                                                    ticks: { min:0 }
                                                 }
                                             ]
                                        } };
@@ -457,20 +530,20 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 type: 'bar'
               },
               {
-                label: "Operating Profit",
+                label: "NOPLAT",
                 yAxisID: 'y-axis-1',
                 type: 'bar'
               },
               {
-                label: "Sales g%",
+                label: "OPM%",
                 yAxisID: 'y-axis-2',
                 type: 'line'
               },
-              {
-                label: "Op. Profit g%",
-                yAxisID: 'y-axis-2',
-                type: 'line'
-              },
+//              {
+//                label: "Op. Profit g%",
+//                yAxisID: 'y-axis-2',
+//                type: 'line'
+//              },
         ];
 
     }

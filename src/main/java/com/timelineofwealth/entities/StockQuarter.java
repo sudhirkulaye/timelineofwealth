@@ -80,6 +80,12 @@ public class StockQuarter implements Serializable {
     private BigDecimal ebitdaG;
     @Column(name = "ttm_ebitda_g")
     private BigDecimal ttmEbitdaG;
+    @Column(name = "mcap")
+    private BigDecimal mcap;
+    @Column(name = "price")
+    private BigDecimal price;
+    @Column(name = "result_date")
+    private Date resultDate;
 
     public StockQuarterKey getKey() {
         return key;
@@ -226,5 +232,26 @@ public class StockQuarter implements Serializable {
     }
     public void setTtmEbitdaG(BigDecimal ttmEbitdaG) {
         this.ttmEbitdaG = ttmEbitdaG;
+    }
+
+    public BigDecimal getMcap() {
+        return mcap;
+    }
+    public void setMcap(BigDecimal mcap) {
+        this.mcap = mcap;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public Date getResultDate() {
+        return resultDate;
+    }
+    public void setResultDate(Date resultDate) {
+        this.resultDate = resultDate;
     }
 }
