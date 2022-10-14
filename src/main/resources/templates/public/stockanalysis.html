@@ -107,7 +107,7 @@
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="x_panel">
                                 <div class="x_title">
-                                    <h2>Annual Sales &amp; Operating Profit <small>Consolidated Sales &amp; Net Profit (or Standalone in case consolidated not available)</small></h2>
+                                    <h2>Annual Sales &amp; NOPLAT <small>Consolidated Sales &amp; NOPLAT (or Standalone in case consolidated not available)</small></h2>
                                     <ul class="nav navbar-right panel_toolbox">
                                         <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                         </li>
@@ -126,13 +126,13 @@
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
-                                    <canvas id="pnlchart"  class="chart chart-bar" chart-colors="newColors" chart-options="chartOptionsStockPnl"
+                                    <canvas id="pnlchart"  class="chart chart-bar" chart-colors="newColors1" chart-options="chartOptionsStockPnl"
                                             chart-data="stockPnl" chart-labels="labelsYearsStockPnl" chart-dataset-override="stockPnlDataOverride"  ></canvas>
                                 </div>
                             </div>
                             <div class="x_panel">
                                 <div class="x_title">
-                                    <h2>Quarterly Sales &amp; Net Profit <small>Consolidated Sales &amp; Net Profit (or Standalone in case consolidated not available)</small></h2>
+                                    <h2>Quarterly Sales &amp; NOPLAT <small>Consolidated Sales &amp; NOPLAT (or Standalone in case consolidated not available)</small></h2>
                                     <ul class="nav navbar-right panel_toolbox">
                                         <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                         </li>
@@ -151,13 +151,13 @@
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
-                                    <canvas id="quarterchart"  class="chart chart-bar" chart-colors="newColors" chart-options="chartOptionsStockQuarter"
+                                    <canvas id="quarterchart"  class="chart chart-bar" chart-colors="newColors1" chart-options="chartOptionsStockQuarter"
                                             chart-data="stockQuarter" chart-labels="labelsYearsStockQuarter" chart-dataset-override="stockQuarterDataOverride"  ></canvas>
                                 </div>
                             </div>
                             <div class="x_panel">
                                 <div class="x_title">
-                                    <h2>Operating Margin Trend<small>Consolidated EBITDA Margin (or Standalone in case consolidated not available)</small></h2>
+                                    <h2>Recent Market Capital and Price<small>Last one year Market Capital and Price</small></h2>
                                     <ul class="nav navbar-right panel_toolbox">
                                         <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                         </li>
@@ -176,8 +176,33 @@
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
-                                    <canvas id="marginchart"  class="chart chart-line" chart-colors="newColors" chart-options="chartOptions"
-                                            chart-data="stockMargin" chart-labels="labelsYearsStockValuation" ></canvas>
+                                    <canvas id="recentmcapandprice"  class="chart chart-bar" chart-colors="newColors1" chart-options="chartOptionsMCapAndPrice"
+                                            chart-data="dataRecentMCapAndPrice" chart-dataset-override="chartMCapAndPriceDatasetOverride"  chart-labels="labelsRecentPE" chart-series="chartMCapAndPriceSeries" ></canvas>
+                                </div>
+                            </div>
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Growth Trend<small>3 yr, 5 yr and 10 yr sales growth trend</small></h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Settings 1</a>
+                                                </li>
+                                                <li><a href="#">Settings 2</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <canvas id="growthchart"  class="chart chart-line" chart-colors="newColors1" chart-options="chartOptionsStockGrowth"
+                                            chart-data="stockGrowth" chart-labels="labelsYearsStockGrowth" chart-dataset-override="stockGrowthDataOverride" chart-series="chartStockGrowthSeries" ></canvas>
                                 </div>
                             </div>
                             <div class="x_panel">
@@ -203,31 +228,6 @@
                                 <div class="x_content">
                                     <canvas id="valuationchart"  class="chart chart-line" chart-colors="newColors" chart-options="chartOptions"
                                             chart-data="stockValuation" chart-labels="labelsYearsStockValuation" ></canvas>
-                                </div>
-                            </div>
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Recent Market Capital and Price<small>Last one year Market Capital and Price</small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="recentmcapandprice"  class="chart chart-line" chart-colors="newColors" chart-options="chartOptionsMCapAndPrice"
-                                            chart-data="dataRecentMCapAndPrice" chart-dataset-override="chartMCapAndPriceDatasetOverride"  chart-labels="labelsRecentPE" chart-series="chartMCapAndPriceSeries" ></canvas>
                                 </div>
                             </div>
                             <div class="x_panel">
@@ -305,106 +305,106 @@
                                             chart-data="dataRecentEvToEbita" chart-labels="labelsRecentPE" ></canvas>
                                 </div>
                             </div>
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Recent Price Movments<small>Last one year 1D Price Movements: Mean {{mean1D | number:2}}%, Median {{median1D | number:2}}% </small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="recent1Dpricemovements"  class="chart chart-line" chart-colors="newColors"
-                                            chart-data="data1DPriceMovements" chart-labels="labelsPriceMovements" ></canvas>
-                                </div>
-                            </div>
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Recent Price Movments<small>Last one year 1W Price Movements: Mean {{mean1W | number:2}}%, Median {{median1W | number:2}}% </small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="recent1Wpricemovements"  class="chart chart-line" chart-colors="newColors"
-                                            chart-data="data1WPriceMovements" chart-labels="labelsPriceMovements" ></canvas>
-                                </div>
-                            </div>
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Recent Price Movments<small>Last one year 2W Price Movements: Mean {{mean2W | number:2}}%, Median {{median2W | number:2}}% </small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="recent2Wpricemovements"  class="chart chart-line" chart-colors="newColors"
-                                            chart-data="data2WPriceMovements" chart-labels="labelsPriceMovements" ></canvas>
-                                </div>
-                            </div>
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Recent Price Movments<small>Last one year 1M Price Movements: Mean {{mean1M | number:2}}%, Median {{median1M | number:2}}% </small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="recent1Mpricemovements"  class="chart chart-line" chart-colors="newColors"
-                                            chart-data="data1MPriceMovements" chart-labels="labelsPriceMovements" ></canvas>
-                                </div>
-                            </div>
+                            <!--<div class="x_panel">-->
+                                <!--<div class="x_title">-->
+                                    <!--<h2>Recent Price Movments<small>Last one year 1D Price Movements: Mean {{mean1D | number:2}}%, Median {{median1D | number:2}}% </small></h2>-->
+                                    <!--<ul class="nav navbar-right panel_toolbox">-->
+                                        <!--<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>-->
+                                        <!--</li>-->
+                                        <!--<li class="dropdown">-->
+                                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>-->
+                                            <!--<ul class="dropdown-menu" role="menu">-->
+                                                <!--<li><a href="#">Settings 1</a>-->
+                                                <!--</li>-->
+                                                <!--<li><a href="#">Settings 2</a>-->
+                                                <!--</li>-->
+                                            <!--</ul>-->
+                                        <!--</li>-->
+                                        <!--<li><a class="close-link"><i class="fa fa-close"></i></a>-->
+                                        <!--</li>-->
+                                    <!--</ul>-->
+                                    <!--<div class="clearfix"></div>-->
+                                <!--</div>-->
+                                <!--<div class="x_content">-->
+                                    <!--<canvas id="recent1Dpricemovements"  class="chart chart-line" chart-colors="newColors"-->
+                                            <!--chart-data="data1DPriceMovements" chart-labels="labelsPriceMovements" ></canvas>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="x_panel">-->
+                                <!--<div class="x_title">-->
+                                    <!--<h2>Recent Price Movments<small>Last one year 1W Price Movements: Mean {{mean1W | number:2}}%, Median {{median1W | number:2}}% </small></h2>-->
+                                    <!--<ul class="nav navbar-right panel_toolbox">-->
+                                        <!--<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>-->
+                                        <!--</li>-->
+                                        <!--<li class="dropdown">-->
+                                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>-->
+                                            <!--<ul class="dropdown-menu" role="menu">-->
+                                                <!--<li><a href="#">Settings 1</a>-->
+                                                <!--</li>-->
+                                                <!--<li><a href="#">Settings 2</a>-->
+                                                <!--</li>-->
+                                            <!--</ul>-->
+                                        <!--</li>-->
+                                        <!--<li><a class="close-link"><i class="fa fa-close"></i></a>-->
+                                        <!--</li>-->
+                                    <!--</ul>-->
+                                    <!--<div class="clearfix"></div>-->
+                                <!--</div>-->
+                                <!--<div class="x_content">-->
+                                    <!--<canvas id="recent1Wpricemovements"  class="chart chart-line" chart-colors="newColors"-->
+                                            <!--chart-data="data1WPriceMovements" chart-labels="labelsPriceMovements" ></canvas>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="x_panel">-->
+                                <!--<div class="x_title">-->
+                                    <!--<h2>Recent Price Movments<small>Last one year 2W Price Movements: Mean {{mean2W | number:2}}%, Median {{median2W | number:2}}% </small></h2>-->
+                                    <!--<ul class="nav navbar-right panel_toolbox">-->
+                                        <!--<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>-->
+                                        <!--</li>-->
+                                        <!--<li class="dropdown">-->
+                                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>-->
+                                            <!--<ul class="dropdown-menu" role="menu">-->
+                                                <!--<li><a href="#">Settings 1</a>-->
+                                                <!--</li>-->
+                                                <!--<li><a href="#">Settings 2</a>-->
+                                                <!--</li>-->
+                                            <!--</ul>-->
+                                        <!--</li>-->
+                                        <!--<li><a class="close-link"><i class="fa fa-close"></i></a>-->
+                                        <!--</li>-->
+                                    <!--</ul>-->
+                                    <!--<div class="clearfix"></div>-->
+                                <!--</div>-->
+                                <!--<div class="x_content">-->
+                                    <!--<canvas id="recent2Wpricemovements"  class="chart chart-line" chart-colors="newColors"-->
+                                            <!--chart-data="data2WPriceMovements" chart-labels="labelsPriceMovements" ></canvas>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="x_panel">-->
+                                <!--<div class="x_title">-->
+                                    <!--<h2>Recent Price Movments<small>Last one year 1M Price Movements: Mean {{mean1M | number:2}}%, Median {{median1M | number:2}}% </small></h2>-->
+                                    <!--<ul class="nav navbar-right panel_toolbox">-->
+                                        <!--<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>-->
+                                        <!--</li>-->
+                                        <!--<li class="dropdown">-->
+                                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>-->
+                                            <!--<ul class="dropdown-menu" role="menu">-->
+                                                <!--<li><a href="#">Settings 1</a>-->
+                                                <!--</li>-->
+                                                <!--<li><a href="#">Settings 2</a>-->
+                                                <!--</li>-->
+                                            <!--</ul>-->
+                                        <!--</li>-->
+                                        <!--<li><a class="close-link"><i class="fa fa-close"></i></a>-->
+                                        <!--</li>-->
+                                    <!--</ul>-->
+                                    <!--<div class="clearfix"></div>-->
+                                <!--</div>-->
+                                <!--<div class="x_content">-->
+                                    <!--<canvas id="recent1Mpricemovements"  class="chart chart-line" chart-colors="newColors"-->
+                                            <!--chart-data="data1MPriceMovements" chart-labels="labelsPriceMovements" ></canvas>-->
+                                <!--</div>-->
+                            <!--</div>-->
                             <br />
                             <strong>Note: </strong> Values are in Cr. INR. First preference is given to consolidated data and ratios. Data Sources: Publicly available information on NSE India, BSE India, MorningStar.in, Screener.in, ValueResearchOnline.com, MoneyControl.com, Motilal Oswal, Prabhudas Lilladher, Edelweiss, HDFC Securities, ICICI Direct, Kotak Securities, tradingeconomics.com and Internal Data Processing
                         </div>

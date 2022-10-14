@@ -143,6 +143,7 @@ select * from index_valuation a where a.date >= (select max(date) from index_val
 SELECT * from index_statistics a; 
 SELECT DISTINCT ticker from index_valuation a where ticker like '%200';
 UPDATE index_valuation Set ticker = 'NIFTY200' where ticker = 'NIFY200';
+select * from index_valuation where ticker = 'NIFTY200' order by date desc;
 commit;
 -- new quarter results
 SELECT b.ticker from daily_data_s a, stock_universe b 

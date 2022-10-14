@@ -1,12 +1,22 @@
 <head th:fragment="common-header">
 
+    <!-- Google tag (gtag.js) -->
+    <script async='async' src="https://www.googletagmanager.com/gtag/js?id=G-84333MFEW3"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-84333MFEW3');
+    </script>
+
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <!-- Meta, title, CSS, favicons, etc. -->
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="MobileOptimized" content="width" />
-    <meta name="description" content="Timeline of wealth is a professional wealth management solution for individual &amp; institutional clients. " />
+    <meta name="description" content="sudhirkulaye.com is a professional wealth management solution for individual clients. " />
     <meta name="HandheldFriendly" content="true" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="generator" content="Bootstrap Admin Theme (https://startbootstrap.com), Gentelella bootstrap-admin-template, Spring Boot (http://start.spring.io/), Angular JS (https://angularjs.org/), MySQL (https://www.mysql.com/)" />
@@ -25,15 +35,15 @@
     <!-- Custom Theme Style -->
     <link href="../../static/custom/custom.min.css" th:href="@{/custom/custom.min.css}" rel="stylesheet" />
 
-    <!-- googleAnalytics -->
-    <!--<script src="../../static/vendors/google-analytics/analytics.min.js" th:src="@{/js/googleAnalytics.js}"></script>-->
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async='async' src="https://www.googletagmanager.com/gtag/js?id=UA-36101471-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-36101471-9');
-    </script>
+    <!--&lt;!&ndash; googleAnalytics &ndash;&gt;-->
+    <!--&lt;!&ndash;<script src="../../static/vendors/google-analytics/analytics.min.js" th:src="@{/js/googleAnalytics.js}"></script>&ndash;&gt;-->
+    <!--&lt;!&ndash; Global site tag (gtag.js) - Google Analytics &ndash;&gt;-->
+    <!--<script async='async' src="https://www.googletagmanager.com/gtag/js?id=UA-36101471-9"></script>-->
+    <!--<script>-->
+      <!--window.dataLayer = window.dataLayer || [];-->
+      <!--function gtag(){dataLayer.push(arguments);}-->
+      <!--gtag('js', new Date());-->
+      <!--gtag('config', 'UA-36101471-9');-->
+    <!--</script>-->
 
 </head>

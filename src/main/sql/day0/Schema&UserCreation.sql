@@ -7,7 +7,7 @@ create schema twealthbookprod;
 create user 'apiuser'@'%' identified by 'ApiU$er108';
 GRANT ALL ON twealthbookprod.* TO 'apiuser'@'localhost' IDENTIFIED BY 'ApiU$er108';
 
-/**  timelineofwealth.com  **/
+/**  sudhirkulaye.com  **/
 
 create schema timelineofwealth;
 create user 'towdevuser'@'%' identified by 'Dev703';

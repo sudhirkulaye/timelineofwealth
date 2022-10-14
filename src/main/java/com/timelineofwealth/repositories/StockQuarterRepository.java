@@ -13,4 +13,8 @@ public interface StockQuarterRepository  extends JpaRepository<StockQuarter, Sto
 
     @Query("select distinct stockQuarter.key.date from StockQuarter stockQuarter WHERE stockQuarter.key.ticker= :ticker Order By stockQuarter.key.date")
     List<Date> findDistinctDatesForTicker(@Param("ticker")String ticker);
+
+    @Query("select distinct stockQuarter.resultDate from StockQuarter stockQuarter WHERE stockQuarter.key.ticker= :ticker and stockQuarter.resultDate >= :resultDate Order By stockQuarter.resultDate")
+    List<Date> findDistinctResultDateForTicker(@Param("ticker")String ticker, @Param("resultDate")Date date);
+
 }

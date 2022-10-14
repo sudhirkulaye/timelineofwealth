@@ -1,6 +1,23 @@
 DROP PROCEDURE IF EXISTS ap_process_eod;
 CREATE PROCEDURE ap_process_eod()
 BEGIN
+
+    DECLARE var_finished INT DEFAULT 0;
+    DECLARE var_result_date DATE;
+
+    DECLARE result_date_cursor CURSOR FOR
+    SELECT distinct result_date
+    FROM   stock_quarter
+	WHERE result_date not in (select date from daily_data_s)
+    AND result_date > '2010-01-01'
+    ORDER BY result_date;
+
+	DECLARE CONTINUE HANDLER
+	FOR NOT FOUND
+		SET var_finished = 1;
+
+	SET SQL_SAFE_UPDATES          = 0;
+
 	INSERT INTO log_table
 	VALUES      (now(), 'ap_process_eod: Begin');
 
@@ -51,7 +68,7 @@ BEGIN
 	when scheme_name_full like 'Shriram %' then 'Shriram'
 	when scheme_name_full like 'IIFCL %' then 'IIFCL'
 	when scheme_name_full like 'IL&FS %' then 'IL&FS'
-	when scheme_name_full like 'Mahindra %' then 'Mahindra' end where fund_house = 'XXX';
+	when scheme_name_full like 'Mahindra %' then 'Mahindra' else 'XXX' end where fund_house = 'XXX';
 
 	update mutual_fund_universe a set a.direct_regular = 'Regular' where direct_regular is null or direct_regular = '' or direct_regular not like '%Direct%';
 	update mutual_fund_universe a set a.dividend_growth = 'Growth' where dividend_growth is null or dividend_growth = '' and a.isin_div_payout_or_isin_growth = 'XXX';
@@ -82,6 +99,27 @@ BEGIN
 	update wealth_details a, mutual_fund_universe b set a.short_name = b.scheme_name_part, a.asset_classid = b.asset_classid where a.ticker = b.scheme_code;
 	update wealth_details a, stock_universe b set a.short_name = b.short_name, a.subindustryid = b.subindustryid, a.asset_classid = b.asset_classid where a.ticker = b.ticker;
 	update sip a, mutual_fund_universe b set a.scheme_name = b.scheme_name_part where a.scheme_code = b.scheme_code;
+
+    -- update result_date as a next working dates
+    OPEN result_date_cursor;
+	SET var_finished = 0;
+
+  FETCH_DATA:
+	LOOP
+		FETCH result_date_cursor INTO var_result_date;
+		IF var_finished = 1
+		THEN
+		  LEAVE fetch_data;
+		END IF;
+
+        UPDATE stock_quarter
+        SET result_date = (select min(date) from daily_data_s where date > var_result_date)
+        WHERE result_date = var_result_date;
+
+	END LOOP fetch_data;
+    CLOSE result_date_cursor;
+
+    call ap_process_benchmark_returns();
 
     COMMIT;
 

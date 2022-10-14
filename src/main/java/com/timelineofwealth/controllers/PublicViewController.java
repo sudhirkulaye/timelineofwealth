@@ -31,8 +31,8 @@ public class PublicViewController {
     public String index(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
-        return "public/stocklist";
+        model.addAttribute("title", "Sudhir Kulaye");
+        return "public/index";
     }
 
     @RequestMapping(value = "/userlogin", method = RequestMethod.GET)
@@ -84,7 +84,7 @@ public class PublicViewController {
     public String wealthManagementapp(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Sudhir Kulaye");
         return "public/wealthmanagementapp";
     }
 
@@ -92,7 +92,7 @@ public class PublicViewController {
     public String pmsApp(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Sudhir Kulaye");
         return "public/pmsapp";
     }
 
@@ -108,7 +108,7 @@ public class PublicViewController {
     public String whyIndependentAdvice(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Sudhir Kulaye");
         return "public/whyindependentadvice";
     }
 
@@ -116,7 +116,7 @@ public class PublicViewController {
     public String privacy(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Sudhir Kulaye");
         return "public/privacy";
     }
 
@@ -125,7 +125,7 @@ public class PublicViewController {
     public String assetClasses(Model model){
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Timeline of Wealth");
+        model.addAttribute("title", "Sudhir Kulaye");
         return "public/saa";
     }
 
