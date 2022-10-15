@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -496,14 +497,14 @@ public class CommonService {
             RecentValuations recentPE = new RecentValuations();
             recentPE.setTicker(ticker);
             recentPE.setDate(dailyDataS.getKey().getDate());
-            recentPE.setPe(dailyDataS.getPeTtm());
-            recentPE.setPb(dailyDataS.getPbTtm());
-            recentPE.setEvToEbita(dailyDataS.getEvToEbit());
-            recentPE.setMarketCap(dailyDataS.getMarketCap());
-            recentPE.setMarketPrice(dailyDataS.getCmp());
+            recentPE.setPe(dailyDataS.getPeTtm().setScale(2, RoundingMode.HALF_UP));
+            recentPE.setPb(dailyDataS.getPbTtm().setScale(2, RoundingMode.HALF_UP));
+            recentPE.setEvToEbita(dailyDataS.getEvToEbit().setScale(2, RoundingMode.HALF_UP));
+            recentPE.setMarketCap(dailyDataS.getMarketCap().setScale(0, RoundingMode.HALF_UP));
+            recentPE.setMarketPrice(dailyDataS.getCmp().setScale(0, RoundingMode.HALF_UP));
             int index = Collections.binarySearch(resultDates, dailyDataS.getKey().getDate());
-            if (index > 0) {
-                recentPE.setResultDateMCap(dailyDataS.getMarketCap());
+            if (index >= 0) {
+                recentPE.setResultDateMCap(dailyDataS.getMarketCap().setScale(0, RoundingMode.HALF_UP));
             } else {
                 recentPE.setResultDateMCap(new BigDecimal(0));
             }

@@ -420,6 +420,9 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
             recentevtoebita.push($scope.recentValuations[i].evToEbita);
             recentpedate.push($scope.recentValuations[i].date);
             resultDateMCap.push($scope.recentValuations[i].resultDateMCap);
+//            if ($scope.recentValuations[i].resultDateMCap > 0) {
+//                console.log("i = " + i + " MCap = " + $scope.recentValuations[i].resultDateMCap);
+//            }
         }
         $scope.dataRecentPE.push(recentpe);
         $scope.dataRecentMCap.push(recentmcap);
