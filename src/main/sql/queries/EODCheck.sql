@@ -148,10 +148,10 @@ commit;
 -- new quarter results
 SELECT b.ticker from daily_data_s a, stock_universe b 
 where a.name = b.ticker5 and 
-a.last_result_date = '202203' and 
+a.last_result_date = '202209' and 
 date = (select max(date) from daily_data_s a) and 
 b.ticker not in ('ADANIGAS', 'CENTURYPLY', 'GRSE', 'RVNL', 'STRTECH', 'BSOFT') and 
-b.ticker not in (select distinct ticker from stock_quarter a where date = '2022-03-31');
+b.ticker not in (select distinct ticker from stock_quarter a where date = '2022-09-30');
 -- new annual p&L 
 select distinct ticker, max(date) from stock_pnl a where month(date) != 3 group by ticker having max(date) not in ('2018-12-31', '2019-03-31', '2018-06-30') ORDER BY max(date) desc;
 SELECT ticker, cons_standalone, max(date) from stock_pnl a group by ticker, cons_standalone 

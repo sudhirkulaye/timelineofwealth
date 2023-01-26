@@ -8,10 +8,10 @@ select * from adviser_user_mapping;
 select * from composite; -- 7 composites
 select * from composite_constituents; 
 select * from portfolio a order by start_date desc, a.memberid, a.portfolioid; -- total 26 portfolios 
-select * from portfolio_holdings a where memberid in (1052) order by asset_classid, ticker, buy_date;
+select * from portfolio_holdings a where memberid in (1000) order by asset_classid, ticker, buy_date;
 select compositeid, count(1) from portfolio a group by compositeid order by a.compositeid; -- (composite 1: 10, 2: 11)
-select * from portfolio_cashflow where memberid in (1069) order by portfolioid, date desc;
-select * from portfolio_value_history a where memberid in (1069) and  date >= '2022-08-01' order by memberid, date desc;
+select * from portfolio_cashflow where memberid in (1018) order by portfolioid, date desc;
+select * from portfolio_value_history a where memberid in (1000, 1070) and  date >= '2022-08-01' order by memberid, date desc;
 select * from portfolio_returns_calculation_support a where memberid in (1000);
 select * from portfolio_twrr_summary a where memberid in (1, 1024);
 select * from portfolio_twrr_monthly a where memberid in (1);
@@ -169,7 +169,7 @@ truncate log_table;
 -- DELETE from mosl_transaction where moslcode = 'H20488'; 
 -- update mosl_transaction set script_name = '516030' where script_name = 'YASHPAKKA';
 select * from mosl_transaction where is_processed = 'N' order by date desc;
-select * from mosl_transaction where /*quantity < 0 and*/ date >= '2022-08-31' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
+select * from mosl_transaction where /*quantity < 0 and*/ date >= '2022-12-01' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
 select moslcode, date, script_name, sell_buy, sum(quantity), sum(brokerage) from mosl_transaction where date >= '2022-04-01' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') group by moslcode, date, script_name, sell_buy order by moslcode, date desc, script_name;
 -- update mosl_transaction set portfolioid = 1 where date = '2019-11-18';
 select * from portfolio_holdings a where a.memberid in (1) order by portfolioid, asset_classid, ticker, buy_date;

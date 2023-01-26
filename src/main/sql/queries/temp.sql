@@ -201,3 +201,6 @@ select * from stock_cashflow a where ticker IN ('KAJARIACER')  and date >= '2012
 select * from stock_quarter a where ticker IN ('KAJARIACER')  and date >= '2020-03-31';
 
 -- GARFIBRES, TRIDENT, KPRMILL, VTL, ALOKINDS, WELSPUNIND, ICIL
+
+
+
