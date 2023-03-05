@@ -88,6 +88,9 @@ public class StockUniverse  implements Serializable {
     @Column(name = "is_nse500")
     private int isNse500;
 
+    @Column(name = "is_fno")
+    private int isFno;
+
     @Column(name = "marketcap")
     private BigDecimal marketcap;
 
@@ -276,6 +279,13 @@ public class StockUniverse  implements Serializable {
     }
     public void setIsNse500(int isNse500) {
         this.isNse500 = isNse500;
+    }
+
+    public int getIsFno() {
+        return isFno;
+    }
+    public void setIsFno(int isFno) {
+        this.isFno = isFno;
     }
 
     public BigDecimal getMarketcap() {

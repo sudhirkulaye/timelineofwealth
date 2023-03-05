@@ -36,6 +36,7 @@ public class NseBse500 implements Serializable {
     private int isNse200;
     private int isBse500;
     private int isNse500;
+    private int isFno;
     private BigDecimal marketcap;
     private BigDecimal peTtm;
     private String tickerOld;
@@ -75,6 +76,7 @@ public class NseBse500 implements Serializable {
         this.isNse200 = stockUniverse.getIsNse200();
         this.isBse500 = stockUniverse.getIsBse500();
         this.isNse500 = stockUniverse.getIsNse500();
+        this.isFno = stockUniverse.getIsFno();
         this.marketcap = stockUniverse.getMarketcap();
         this.peTtm = stockUniverse.getPeTtm();
         this.tickerOld = stockUniverse.getTickerOld();
@@ -274,6 +276,13 @@ public class NseBse500 implements Serializable {
     }
     public void setIsNse500(int isNse500) {
         this.isNse500 = isNse500;
+    }
+
+    public int getIsFno() {
+        return isFno;
+    }
+    public void setIsFno(int isFno) {
+        this.isFno = isFno;
     }
 
     public BigDecimal getMarketcap() {

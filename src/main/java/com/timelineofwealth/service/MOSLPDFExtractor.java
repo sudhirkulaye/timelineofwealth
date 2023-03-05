@@ -30,9 +30,12 @@ public class MOSLPDFExtractor {
         for (int i = 1; config.containsKey("link" + i); i++) {
             int pageNum = Integer.parseInt(config.getProperty("link" + i));
             for (PdfAnnotation annotation : pdfDoc.getPage(pageNum).getAnnotations()) {
+                System.out.println(" annotation " + annotation);
                 String annotationTag = annotation.getPdfObject().get(PdfName.A).toString();
-                String pdfLink = annotationTag.substring(annotationTag.indexOf("http://ftp.motilaloswal.com/"),annotationTag.indexOf(" >>"));
-
+                System.out.println(" annotationTag " + annotationTag);
+//                String pdfLink = annotationTag.substring(annotationTag.indexOf("http://ftp.motilaloswal.com/"),annotationTag.indexOf(" >>"));
+                String pdfLink = annotationTag.substring(annotationTag.indexOf("http"),annotationTag.indexOf(" >>"));
+//
                 // Download the PDF document from the link
                 URL website = new URL(pdfLink);
                 ReadableByteChannel rbc = Channels.newChannel(website.openStream());
@@ -50,6 +53,7 @@ public class MOSLPDFExtractor {
                 fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
                 fos.close();
 
+                System.out.println(" Downloaded File - " + config.getProperty("fileName" + i));
             }
         }
         pdfDoc.close();

@@ -21,9 +21,17 @@ select * from daily_data_s where date = (select date_today from setup_dates) ord
 
 -- proceed EOD
 call ap_update_wealth_data();
+-- *** Report Download patch ***
+UPDATE portfolio_holdings SET rate = '1', total_cost = '1', net_rate = '1', cmp = '1', market_value = '1' WHERE ticker = 'MOSL_CASH'  and total_cost = 0 and rate = 0 and net_rate = 0 and market_value = 0;
+-- *** Download data patch *******
+update benchmark_twrr_monthly set returns_fin_year = 0.0000 where returns_fin_year > 1000;
 call ap_process_eod();
 select * from log_table;
 truncate table log_table;
+
+CALL populate_table_row_count();
+select * from dummy_user_table_row_count; 
+
 
 select * from setup_dates;
 select count(1), date from wealth_history

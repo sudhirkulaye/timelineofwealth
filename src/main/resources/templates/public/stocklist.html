@@ -95,7 +95,7 @@
                             <p>
                                 <lable style="float: right;" th:text="${dateToday}"></lable>
                                 <lable style="float: right;">Last updated : </lable>
-                                <lable style="float: left;">Returns for more than one year are annualized.</lable>
+                                <lable style="float: left;">Returns for more than one year are annualized. Stocks ended with <i class="fa fa-star"></i> are available for FnO trading on NSE</lable>
                             </p>
                             <table class="table table-hover">
                                 <thead>
@@ -167,7 +167,7 @@
                                     <!--<td>{{ (assetClasses | filter : { 'classid' : stock.assetClassid})[0].subclassName }}</td>-->
                                     <!--<td>{{stock.ticker}}</td>-->
                                     <td ng-hide="flagBasicInfo">{{stock.includedIndexName}}</td>
-                                    <td ><a href="/public/stockanalysis/{{stock.ticker}}" target="_blank">{{stock.shortName}}</a></td>
+                                    <td><a href="/public/stockanalysis/{{stock.ticker}}" target="_blank">{{stock.shortName}} <i class="fa fa-star" ng-if="stock.isFno == '1'"></i></a></td>
                                     <!--<td>{{(industries | filter : { 'subindustryid' : stock.subindustryid})[0].sectorNameDisplay}}-{{(industries | filter : { 'subindustryid' : stock.subindustryid})[0].industryNameDisplay}}</td>-->
                                     <td ng-hide="flagBasicInfo">{{stock.sectorNameDisplay}}</td>
                                     <td ng-hide="flagBasicInfo">{{stock.industryNameDisplay}}</td>
