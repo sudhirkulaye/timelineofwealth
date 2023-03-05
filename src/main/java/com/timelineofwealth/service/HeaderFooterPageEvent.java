@@ -42,7 +42,7 @@ public class HeaderFooterPageEvent extends PdfPageEventHelper {
     }
 
         public void onEndPage(PdfWriter writer, Document document) {
-            //ColumnText.showTextAligned(writer.getDirectContent(), Element.ALIGN_CENTER, new Phrase("" + document.getPageNumber(),paraTextFont), 550, 30, 0);
+            //ColumnText.showTextAligned(writer.getDirectContent(), Element.ALIGN_CENTER, new Phrase("" + document.getPageNumberForMatchingPattern(),paraTextFont), 550, 30, 0);
             ColumnText.showTextAligned(writer.getDirectContent(), Element.ALIGN_CENTER, new Phrase("" + document.getPageNumber(),paraTextFont), (document.right() - document.left()) / 2 + document.leftMargin(), document.bottom() - 10, 0);
             ColumnText.showTextAligned(writer.getDirectContent(), Element.ALIGN_LEFT, new Phrase("www.sudhirkulaye.com", paraLinkFont), document.left(), document.bottom() - 10, 0);
 

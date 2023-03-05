@@ -251,6 +251,7 @@ CREATE TABLE stock_universe (
   is_nse200 int(1) DEFAULT '0' COMMENT '1 = If Stock is in NSE200',
   is_bse500 int(1) DEFAULT '0' COMMENT '1 = If Stock is in BSE500',
   is_nse500 int(1) DEFAULT '0' COMMENT '1 = If Stock is in NSE500',
+  is_fno int(1) DEFAULT '0' COMMENT '1 = Future and options are available',
   marketcap decimal(20,0) DEFAULT '0' COMMENT 'Market Cap in Rs',
   marketcap_rank int(5) DEFAULT '0' COMMENT 'Market Cap Rank',
   pe_ttm decimal(10,2) DEFAULT NULL COMMENT 'Company Latest TTM PE ratio',

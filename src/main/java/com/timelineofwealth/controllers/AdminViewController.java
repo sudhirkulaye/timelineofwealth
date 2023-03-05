@@ -262,7 +262,7 @@ public class AdminViewController {
                 nsePriceHistories.add(nsePriceHistory);
             }
             //nsePriceHistories.sort(Comparator.comparing(CompanyDailyDataG::getCompanyDailyMarketCapNo).reversed());
-            nsePriceHistoryRepository.save(nsePriceHistories);
+            nsePriceHistoryRepository.saveAll(nsePriceHistories);
             scanner.close();
             csvFile.delete();
 
@@ -361,7 +361,7 @@ public class AdminViewController {
                 bsePriceHistories.add(bsePriceHistory);
             }
             //nsePriceHistories.sort(Comparator.comparing(CompanyDailyDataG::getCompanyDailyMarketCapNo).reversed());
-            bsePriceHistoryRepository.save(bsePriceHistories);
+            bsePriceHistoryRepository.saveAll(bsePriceHistories);
             scanner.close();
             csvFile.delete();
 
@@ -505,7 +505,7 @@ public class AdminViewController {
             }
             mutualFundNavHistories.sort(Comparator.comparing(l->l.getKey().getSchemeCode()));
             //mutualFundRepository.deleteAllInBatch();
-            mutualFundNavHistoryRepository.save(mutualFundNavHistories);
+            mutualFundNavHistoryRepository.saveAll(mutualFundNavHistories);
             scanner.close();
             csvFile.delete();
 
@@ -640,7 +640,7 @@ public class AdminViewController {
                 dailyDataSList.add(dailyDataS);
             }
             dailyDataSList.sort(Comparator.comparing(DailyDataS::getMarketCap).reversed());
-            dailyDataSRepository.save(dailyDataSList);
+            dailyDataSRepository.saveAll(dailyDataSList);
 
             model.addAttribute("message",
                     "You successfully uploaded '" + file.getOriginalFilename() + "'");
@@ -779,7 +779,7 @@ public class AdminViewController {
                 }
             }
             //moslTransactions.sort(Comparator.comparing(MOSLTransaction::getMarketCap).reversed());
-            moslTransactionRepository.save(moslTransactions);
+            moslTransactionRepository.saveAll(moslTransactions);
 
             StoredProcedureQuery storedProcedure = entityManager.createStoredProcedureQuery(AP_PROCESS_MOSL_TRANSACTIONS);
             boolean result = storedProcedure.execute();
@@ -871,7 +871,7 @@ public class AdminViewController {
 //                companyDailyDataBRepository.save(companyDailyDataB);
             }
             dailyDataBList.sort(Comparator.comparing(DailyDataB::getMarketCap).reversed());
-            dailyDataBRepository.save(dailyDataBList);
+            dailyDataBRepository.saveAll(dailyDataBList);
 
             model.addAttribute("message",
                     "You successfully uploaded '" + file.getOriginalFilename() + "'");

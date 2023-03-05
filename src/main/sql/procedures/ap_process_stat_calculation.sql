@@ -66,7 +66,7 @@ BEGIN
   ( SELECT nse_ticker, '','','','','', nse_ticker, '', isin_code, nse_ticker, nse_ticker,
       CASE when nse_ticker like '%GOLD%' then '502010' when nse_ticker like '%NIF%' then '401010'
            when nse_ticker like '%JUNIOR%' then '401030' when nse_ticker like '%ETF%' then '401010' else '406040' END,
-      '', 0, close_price, date, 0,0,0,0,0,0,0,0,0,0,0,0, '', date
+      '', 0, close_price, date, 0,0,0,0,0,0,0,0,0,0,0,0,0, '', date
       FROM nse_price_history a
       WHERE date = var_date_today
       AND a.series = 'EQ'
