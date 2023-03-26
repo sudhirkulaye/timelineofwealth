@@ -191,13 +191,13 @@ public class AnalystRecoExtractor {
                         XSSFCell y2EVBYEBITCell = row.getCell(25);
                         y2EVBYEBITCell.setCellValue(reportParameters.getY2EVBYEBIT().doubleValue());
 
-                        XSSFCell analystNamesCell = row.getCell(26);
+                        XSSFCell analystNamesCell = row.getCell(39);
                         if (analystNamesCell == null) {
-                            analystNamesCell = row.createCell(26);
+                            analystNamesCell = row.createCell(39);
                         }
                         analystNamesCell.setCellValue(reportParameters.getAnalystsNames());
 
-                        XSSFCell summaryCell = row.getCell(27);
+                        XSSFCell summaryCell = row.getCell(40);
                         evaluator.evaluate(summaryCell);
                     }
 

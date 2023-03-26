@@ -2,7 +2,7 @@ SET SQL_SAFE_UPDATES = 0;
 Commit;
 
 -- Newly added IPOs
-select * from stock_universe a where short_name like 'Nestle%' and is_bse500 = 1 and is_nse500 = 1;
+select * from stock_universe a where short_name like 'GREEN%' and is_bse500 = 1 and is_nse500 = 1;
 select * from stock_universe a where short_name like 'Vedant Fashions%';
 select * from subindustry;
 -- Recent IPOs which daily trading value is at least 10Cr 
