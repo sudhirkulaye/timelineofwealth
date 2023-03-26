@@ -2,6 +2,11 @@ package com.timelineofwealth.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.stream.Stream;
 
 public class CreateFolderStructureForIndustry {
 /*    public static void main(String[] argv) throws IOException {
@@ -54,7 +59,7 @@ public class CreateFolderStructureForIndustry {
     }
 
     // Driver Method
-    public static void main(String[] args) throws Exception
+    public static void main1(String[] args) throws Exception
     {
         // Provide full path for directory(change
         // accordingly)
@@ -79,6 +84,26 @@ public class CreateFolderStructureForIndustry {
 
             // Calling recursive method
             RecursivePrint(arr, 0, 0);
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        // base folder
+        Path start = Paths.get("C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis");
+        // set to store file names
+        HashSet<String> fileNames = new HashSet<>();
+
+        try (Stream<Path> stream = Files.walk(start)) {
+            stream
+                    .filter(Files::isRegularFile)
+                    .forEach(file -> {
+                        String fileName = file.getFileName().toString();
+                        if (fileNames.contains(fileName)) {
+                            System.out.println("Duplicate file: " + file);
+                        } else {
+                            fileNames.add(fileName);
+                        }
+                    });
         }
     }
 }

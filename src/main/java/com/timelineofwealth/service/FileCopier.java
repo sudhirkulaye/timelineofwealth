@@ -9,6 +9,21 @@ public class FileCopier {
     public static void main(String[] args) throws IOException {
         // Set the source and destination folders
 
+        String localLaptop = "C:\\MyDocuments\\03Business";
+        String paragLaptop = "\\\\DESKTOP-UV0PRDE\\03 Business";
+        String redMILaptop = "\\\\redmibook15\\03Business";
+        String hpSpectreLaptop = "\\DESKTOP-UV0PRDE\03Business";
+        String dailyData = "\\03DailyData";
+        String excels = "\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
+        String reports = "\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
+        String clientReports = "\\06ClientData\\PMS\\ClientReports";
+        String researchAndAnalysis = "\\05ResearchAndAnalysis";
+        String javaWorkspace = "\\02workspace\\timelineofwealth";
+        String pythonWorkspace = "\\02workspace\\PythonDev";
+
+        String srcFolder = localLaptop + dailyData;
+        String dstFolder = redMILaptop + dailyData;
+
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2023Q2";
@@ -38,8 +53,8 @@ public class FileCopier {
 //        String dstFolder = "\\\\redmibook15\\02UsefulSoftwares\\EditPlus 3";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth";
 //        String dstFolder = "\\\\redmibook15\\03Business\\02workspace\\timelineofwealth";
-        String srcFolder = "C:\\MyDocuments\\03Business\\03DailyData";
-        String dstFolder = "\\\\redmibook15\\03Business\\03DailyData";
+//        String srcFolder = "C:\\MyDocuments\\03Business\\03DailyData";
+//        String dstFolder = "\\\\redmibook15\\03Business\\03DailyData";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
 //        String dstFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2023Q2";
@@ -62,6 +77,8 @@ public class FileCopier {
 //        String dstFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
 //        String dstFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
+//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis";
+//        String dstFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\06ClientData\\";
 //        String dstFolder = "\\\\redmibook15\\03Business\\06ClientData\\";
 
