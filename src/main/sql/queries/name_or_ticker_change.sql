@@ -2,12 +2,15 @@
 select count(1), name from daily_data_s a group by name order by count(1); 
 
 -- Queries to update Screener Short Name (In case of Name Change or ticker Change)
-select * from stock_universe a where (is_bse500 = 1 or is_nse500 = 1) and a.ticker IN ('IIFLWAM', '') or a.ticker5 = ' '; -- Bharat Forge, 25101010
+select * from stock_universe a where (is_bse500 = 1 or is_nse500 = 1) and a.ticker IN ('360ONE', '') or a.ticker5 = ' '; -- Bharat Forge, 25101010
 select * from daily_data_s a where date >= '2022-01-10' and name like '%IIFL%' order by date desc;
 select * from stock_price_movement_history where ticker = 'NIITTECH';
+select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 
 -- update stock_universe set subindustryid = 15101020 where subindustryid = 15101050 and (is_bse500 = 1 or is_nse500 = 1);
 
+-- update stock_universe SET ticker = '360ONE', nse_code = '360ONE', ticker5 = '360ONE', short_name = '360 ONE', name = '360 ONE WAM Ltd', ticker_old = 'IIFLWAM' where ticker = 'IIFLWAM';
+-- update stock_universe SET ticker = 'LTIM', nse_code = 'LTIM', ticker5 = 'LTIM', short_name = 'LTI Mindtree', name = 'LTI Mindtree Ltd', ticker_old = 'LTI' where ticker = 'LTIM';
 -- update stock_universe set ticker5 = 'Shriram Finance', short_name = 'Shriram Finance', name = 'Shriram Finance Ltd' where ticker = 'SRTRANSFIN';
 -- update stock_universe set ticker5 = '360 ONE', short_name = '360 ONE WAM', name = '360 ONE WAM Ltd' where ticker = 'IIFLWAM';
 -- update stock_universe set ticker5 = 'LTI Mindtree', short_name = 'LTI Mindtree', name = 'LTI Mindtree Ltd' where ticker = 'LTI';
@@ -25,6 +28,7 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update stock_universe set ticker5 = 'Jubilant Pharmo', short_name = 'Jubilant Pharmova', name = 'Jubilant Pharmova Ltd' where ticker = 'JUBILANT';
 -- update stock_universe set ticker5 = 'SIS' where ticker = 'SIS' or ticker5 = 'Security & Intel' ;
 
+-- update daily_data_s set name = '360ONE' where name = 'IIFLWAM';
 -- update daily_data_s set name = 'Shriram Finance' where name = 'Shriram Trans.';
 -- update daily_data_s set name = '360 ONE' where name = 'IIFL Wealth Mgt';
 -- update daily_data_s set name = 'LTI Mindtree' where name = 'L & T Infotech';
@@ -46,6 +50,7 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update daily_data_s set name = 'Coforge' where name = 'NIIT Tech.';
 -- update daily_data_s set name = 'Dhani Services' where name = 'Indiabulls Vent.';
 
+-- update stock_universe SET ticker = '360ONE', nse_code = '360ONE', ticker5 = '360ONE', short_name = '360 ONE', name = '360 ONE WAM Ltd', ticker_old = 'IIFLWAM' where ticker = 'IIFLWAM';
 -- UPDATE stock_universe SET ticker = 'SHRIRAMFIN', ticker5 = 'Shriram Finance', short_name = 'Shriram Finance', name = 'Shriram Finance Ltd', ticker_old = 'SRTRANSFIN' WHERE ticker = 'SRTRANSFIN';
 -- UPDATE stock_universe SET ticker = 'LTIM', ticker5 = 'LTI Mindtree', short_name = 'LTI Mindtree', name = 'LTI Mindtree Ltd', ticker_old = 'LTI' WHERE ticker = 'LTI';
 -- UPDATE stock_universe SET ticker = 'MOTHERSON', ticker5 = 'Samvardh. Mothe.', short_name = 'Samvardhana Motherson', name = 'Samvardhana Motherson International Ltd', ticker_old = 'MOTHERSUMI' WHERE ticker = 'MOTHERSUMI';
@@ -63,6 +68,7 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- UPDATE stock_universe SET ticker = 'JUBLPHARMA', ticker_old = 'JUBILANT' WHERE (`ticker` = 'JUBILANT');
 
 -- update nse_price_history a set nse_ticker = 'XXX' where nse_ticker = 'XXX';
+-- update nse_price_history a set nse_ticker = '360ONE' where nse_ticker = 'IIFLWAM';
 -- update nse_price_history a set nse_ticker = 'SHRIRAMFIN' where nse_ticker = 'SRTRANSFIN';
 -- update nse_price_history a set nse_ticker = 'LTIM' where nse_ticker = 'LTI';
 -- update nse_price_history a set nse_ticker = 'MOTHERSON' where nse_ticker = 'MOTHERSUMI';
@@ -81,6 +87,7 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update nse_price_history a set nse_ticker = 'TATACONSUM' where nse_ticker = 'TATAGLOBAL';
 
 -- update stock_price_movement set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_price_movement set ticker = '360ONE' where ticker = 'IIFLWAM';
 -- update stock_price_movement set ticker = 'SHRIRAMFIN' where ticker = 'SRTRANSFIN';
 -- update stock_price_movement set ticker = 'LTIM' where ticker = 'LTI';
 -- update stock_price_movement set ticker = 'MOTHERSON' where ticker = 'MOTHERSUMI';
@@ -98,6 +105,7 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update stock_price_movement set ticker = 'DHANI' where ticker = 'IBVENTURES' and date < '2020-11-06';
 
 -- update stock_price_movement_history set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_price_movement_history set ticker = '360ONE' where ticker = 'IIFLWAM';
 -- update stock_price_movement_history set ticker = 'SHRIRAMFIN' where ticker = 'SRTRANSFIN';
 -- update stock_price_movement_history set ticker = 'LTIM' where ticker = 'LTI';
 -- update stock_price_movement_history set ticker = 'MOTHERSON' where ticker = 'MOTHERSUMI';
@@ -115,6 +123,7 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update stock_price_movement_history set ticker = 'DHANI' where ticker = 'IBVENTURES' and date < '2020-11-06';
 
 -- update stock_quarter set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_quarter set ticker = '360ONE' where ticker = 'IIFLWAM';
 -- update stock_quarter set ticker = 'SHRIRAMFIN' where ticker = 'SRTRANSFIN';
 -- update stock_quarter set ticker = 'LTIM' where ticker = 'LTI';
 -- update stock_quarter set ticker = 'MOTHERSON' where ticker = 'MOTHERSUMI';
@@ -132,6 +141,7 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update stock_quarter set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
 -- update stock_pnl set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_pnl set ticker = '360ONE' where ticker = 'IIFLWAM';
 -- update stock_pnl set ticker = 'SHRIRAMFIN' where ticker = 'SRTRANSFIN';
 -- update stock_pnl set ticker = 'LTIM' where ticker = 'LTI';
 -- update stock_pnl set ticker = 'MOTHERSON' where ticker = 'MOTHERSUMI';
@@ -149,6 +159,7 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update stock_pnl set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
 -- update stock_cashflow set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_cashflow set ticker = '360ONE' where ticker = 'IIFLWAM';
 -- update stock_cashflow set ticker = 'SHRIRAMFIN' where ticker = 'SRTRANSFIN';
 -- update stock_cashflow set ticker = 'LTIM' where ticker = 'LTI';
 -- update stock_cashflow set ticker = 'MOTHERSON' where ticker = 'MOTHERSUMI';
@@ -166,6 +177,7 @@ select * from stock_price_movement_history where ticker = 'NIITTECH';
 -- update stock_cashflow set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
 -- update stock_balancesheet set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_balancesheet set ticker = '360ONE' where ticker = 'IIFLWAM';
 -- update stock_balancesheet set ticker = 'SHRIRAMFIN' where ticker = 'SRTRANSFIN';
 -- update stock_balancesheet set ticker = 'LTIM' where ticker = 'LTI';
 -- update stock_balancesheet set ticker = 'MOTHERSON' where ticker = 'MOTHERSUMI';

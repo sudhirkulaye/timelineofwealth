@@ -491,7 +491,7 @@ public class CommonService {
 
         List<java.sql.Date> resultDates = CommonService.stockQuarterRepository.findDistinctResultDateForTicker(ticker, java.sql.Date.valueOf(tenQuarterBefore));
 
-        List<DailyDataS> dailyDataSList = CommonService.dailyDataSRepository.findAllByKeyNameAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker5(),java.sql.Date.valueOf(tenQuarterBefore));
+        List<DailyDataS> dailyDataSList = CommonService.dailyDataSRepository.findAllByKeyNameAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker(),java.sql.Date.valueOf(tenQuarterBefore));
         //List<DailyDataB> dailyDataBList = CommonService.dailyDataBRepository.findAllByKeyTickerBAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker2(),java.sql.Date.valueOf(oneYearOld));
         for(DailyDataS dailyDataS: dailyDataSList){
             RecentValuations recentPE = new RecentValuations();

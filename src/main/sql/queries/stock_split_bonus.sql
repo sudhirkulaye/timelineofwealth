@@ -9,6 +9,8 @@ select a.* from stock_split_probability a, stock_universe b where a.ticker = b.t
 -- FOr 1:2 Bonus update price as 2/3 and so on (i.e. Newly Issued Bonus Stocks / (sum of newly issued stocks + original stocks)
 -- For 2:10 Stock Split update price as (New FV/Old FV) i.e. (2/10) or (1/5)
 
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:2 & Bonus 1:1' WHERE (ticker = '360ONE') and (date = '2023-03-02');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:10' WHERE (ticker = 'IRB') and (date = '2023-02-22');
 -- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'SFL') and (date = '2022-12-21');
 -- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 2:5' WHERE (ticker = 'JBMA') and (date = '2022-02-21');
 -- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:10' WHERE (ticker = 'TATASTEEL') and (date = '2022-07-28');
@@ -68,7 +70,7 @@ select a.* from stock_split_probability a, stock_universe b where a.ticker = b.t
 -- update rest of the stocks as ignored
 -- update stock_split_probability set is_processed = 'YES', note = 'Ignored' where is_processed = 'NO' and ticker not in (select ticker from stock_universe where is_nse500 = 1 or is_bse500 = 1);
 
-SELECT date, close_price, a.* from nse_price_history a where a.nse_ticker = 'SFL' and date <= '2022-12-21' order by date desc;
+SELECT date, close_price, a.* from nse_price_history a where a.nse_ticker = 'IRB' and date <= '2023-02-22' order by date desc;
 SELECT date, close_price from bse_price_history a where a.bse_ticker = '000000' and date <= '2019-12-05' order by date desc;
 select * from stock_price_movement_history a where a.ticker = 'TTKPRESTIG' and date >= '2021-12-14';
 SELECT * from wealth_details a where ticker = 'DIXON';
@@ -83,6 +85,8 @@ update portfolio_holdings set quantity = quantity * 2, rate = rate * (1/2), net_
 -- Copy this below and then replace ticker XXX to right one and replace date and most imp. replace fraction
 update nse_price_history a set close_price = close_price * ( 1 / 1	) where a.nse_ticker = 'XXX' and date < 'XXXX-XX-XX' ;
 
+update nse_price_history a set close_price = close_price * ( 1 / 10	) where a.nse_ticker = 'IRB' and date < '2023-02-22' ;
+update nse_price_history a set close_price = close_price * ( 1 / 4	) where a.nse_ticker = '360ONE' and date < '2023-03-02' ;
 update nse_price_history a set close_price = close_price * ( 1 / 2	) where a.nse_ticker = 'SFL' and date < '2022-12-21' ;
 update nse_price_history a set close_price = close_price * ( 1 / 8	) where a.nse_ticker = 'EASEMYTRIP' and date < '2022-11-21' ;
 update nse_price_history a set close_price = close_price * ( 1 / 2	) where a.nse_ticker = 'EASEMYTRIP' and date < '2022-02-28' ;
@@ -160,6 +164,8 @@ update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse
 -- Copy this below and then replace ticker XXX to right one and replace date and most imp. replace fraction
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 1 ) where b.ticker = 'XXX' and b.ticker5 = a.name  and date < 'XXXX-XX-XX' ;
 
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 10 ) where b.ticker = 'IRB' and b.ticker5 = a.name  and date < '2023-02-22' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 4 ) where b.ticker = '360ONE' and b.ticker5 = a.name  and date < '2023-03-02' ;
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'SFL' and b.ticker5 = a.name  and date < '2022-12-21' ;
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 8	) where b.ticker = 'EASEMYTRIP' and b.ticker5 = a.name  and date < '2022-11-21' ;
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2	) where b.ticker = 'EASEMYTRIP' and b.ticker5 = a.name  and date < '2022-02-28' ;
