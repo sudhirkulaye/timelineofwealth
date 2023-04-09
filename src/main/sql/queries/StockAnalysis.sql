@@ -30,7 +30,7 @@ c.opm_latest_quarter, c.opm_last_year, c.npm_latest_quarter, c.npm_last_year,
 c.sales_growth_3years, c.profit_growth_3years, c.roe, 
 d.return_1D, d.return_1W, d.return_2W, d.return_1M, d.return_2M, d.return_3M, d.return_6M, d.return_9M, d.return_1Y
 from daily_data_b a, stock_universe b, daily_data_s c, stock_price_movement d
-where a.ticker_b = b.ticker2 and c.name = b.ticker5 and d.ticker = b.ticker and (b.is_nse500 = 1 or b.is_bse500 = 1) and 
+where a.ticker_b = b.ticker2 and c.name = b.ticker and d.ticker = b.ticker and (b.is_nse500 = 1 or b.is_bse500 = 1) and
 a.date = (select date_today from setup_dates) and c.date = (select date_today from setup_dates)  and 
 next_earning_date >= '2019-04-01' order by next_earning_date;
 

@@ -9,6 +9,8 @@ import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.*;
 import com.timelineofwealth.service.CSVUtils;
 import com.timelineofwealth.service.CommonService;
+import com.timelineofwealth.service.DownloadEODFiles;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -546,91 +548,205 @@ public class AdminViewController {
             List<DailyDataS> dailyDataSList = new ArrayList<>();
             XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
             XSSFSheet worksheet = workbook.getSheetAt(0);
+            String filename = file.getOriginalFilename();
+            String dateString = filename.substring(0, 8);
+            java.sql.Date date =  java.sql.Date.valueOf(dateString.substring(0, 4) + "-" + dateString.substring(4, 6) + "-" + dateString.substring(6));
 
             for(int i=1;i<worksheet.getPhysicalNumberOfRows() ;i++) {
                 DailyDataS dailyDataS = new DailyDataS();
 
                 XSSFRow row = worksheet.getRow(i);
                 dailyDataS.setKey(new DailyDataS.DailyDataSKey());
-                dailyDataS.getKey().setDate(new java.sql.Date(row.getCell(0).getDateCellValue().getTime()));
-                dailyDataS.setRank((int) row.getCell(1).getNumericCellValue());
-                dailyDataS.getKey().setName((String) row.getCell(2).getStringCellValue());
-                dailyDataS.setCmp(new BigDecimal(row.getCell(3).getNumericCellValue()));
-                dailyDataS.setMarketCap(new BigDecimal(row.getCell(4).getNumericCellValue()));
-                dailyDataS.setLastResultDate((int) row.getCell(5).getNumericCellValue());
-                dailyDataS.setNetProfit(new BigDecimal(row.getCell(6).getNumericCellValue()));
-                dailyDataS.setSales(new BigDecimal(row.getCell(7).getNumericCellValue()));
-                dailyDataS.setYoyQuarterlySalesGrowth(new BigDecimal(row.getCell(8).getNumericCellValue()));
-                dailyDataS.setYoyQuarterlyProfitGrowth(new BigDecimal(row.getCell(9).getNumericCellValue()));
-                dailyDataS.setQoqSalesGrowth(new BigDecimal(row.getCell(10).getNumericCellValue()));
-                dailyDataS.setQoqProfitGrowth(new BigDecimal(row.getCell(11).getNumericCellValue()));
-                dailyDataS.setOpmLatestQuarter(new BigDecimal(row.getCell(12).getNumericCellValue()));
-                dailyDataS.setOpmLastYear(new BigDecimal(row.getCell(13).getNumericCellValue()));
-                dailyDataS.setNpmLatestQuarter(new BigDecimal(row.getCell(14).getNumericCellValue()));
-                dailyDataS.setNpmLastYear(new BigDecimal(row.getCell(15).getNumericCellValue()));
-                dailyDataS.setProfitGrowth3years(new BigDecimal(row.getCell(16).getNumericCellValue()));
-                dailyDataS.setSalesGrowth3years(new BigDecimal(row.getCell(17).getNumericCellValue()));
-                dailyDataS.setPeTtm(new BigDecimal(row.getCell(18).getNumericCellValue()));
-                dailyDataS.setHistoricalPe3years(new BigDecimal(row.getCell(19).getNumericCellValue()));
-                dailyDataS.setPegRatio(new BigDecimal(row.getCell(20).getNumericCellValue()));
-                dailyDataS.setPbTtm(new BigDecimal(row.getCell(21).getNumericCellValue()));
-                dailyDataS.setEvToEbit(new BigDecimal(row.getCell(22).getNumericCellValue()));
-                dailyDataS.setDividendPayout(new BigDecimal(row.getCell(23).getNumericCellValue()));
-                dailyDataS.setRoe(new BigDecimal(row.getCell(24).getNumericCellValue()));
-                dailyDataS.setAvgRoe3years(new BigDecimal(row.getCell(25).getNumericCellValue()));
-                dailyDataS.setDebt(new BigDecimal(row.getCell(26).getNumericCellValue()));
-                dailyDataS.setDebtToEquity(new BigDecimal(row.getCell(27).getNumericCellValue()));
-                dailyDataS.setDebt3yearsback(new BigDecimal(row.getCell(28).getNumericCellValue()));
-                try{
-                    dailyDataS.setRoce(new BigDecimal(row.getCell(29).getNumericCellValue()));
-                } catch (Exception e) {
+                dailyDataS.getKey().setDate(date); // set as date
+                dailyDataS.setRank(i);
+
+                if(row.getCell(2).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(2).getCellType() == Cell.CELL_TYPE_STRING && !row.getCell(2).getStringCellValue().trim().isEmpty())
+                    dailyDataS.getKey().setName((String) row.getCell(2).getStringCellValue());
+                else if (row.getCell(1).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(1).getCellType() == Cell.CELL_TYPE_STRING)
+                    dailyDataS.getKey().setName((String) row.getCell(1).getStringCellValue());
+                else
+                    continue;
+
+                if(row.getCell(4) != null && row.getCell(4).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(4).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setCmp(new BigDecimal(row.getCell(4).getNumericCellValue()));
+                else
+                    dailyDataS.setCmp(new BigDecimal(0));
+
+                if(row.getCell(5) != null && row.getCell(5).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(5).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setMarketCap(new BigDecimal(row.getCell(5).getNumericCellValue()));
+                else
+                    dailyDataS.setMarketCap(new BigDecimal(0));
+
+                if(row.getCell(6) != null && row.getCell(6).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(6).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setLastResultDate((int) row.getCell(6).getNumericCellValue());
+                else
+                    dailyDataS.setLastResultDate(0);
+
+                if(row.getCell(7) != null && row.getCell(7).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(7).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setNetProfit(new BigDecimal(row.getCell(7).getNumericCellValue()));
+                else
+                    dailyDataS.setNetProfit(new BigDecimal(0));
+
+                if(row.getCell(8) != null && row.getCell(8).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(8).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setSales(new BigDecimal(row.getCell(8).getNumericCellValue()));
+                else
+                    dailyDataS.setSales(new BigDecimal(0));
+
+                if(row.getCell(9) != null && row.getCell(9).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(9).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setYoyQuarterlySalesGrowth(new BigDecimal(row.getCell(9).getNumericCellValue()));
+                else
+                    dailyDataS.setYoyQuarterlySalesGrowth(new BigDecimal(0));
+
+                if(row.getCell(10) != null && row.getCell(10).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(10).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setYoyQuarterlyProfitGrowth(new BigDecimal(row.getCell(10).getNumericCellValue()));
+                else
+                    dailyDataS.setYoyQuarterlyProfitGrowth(new BigDecimal(0));
+
+                if(row.getCell(11) != null && row.getCell(11).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(11).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setQoqSalesGrowth(new BigDecimal(row.getCell(11).getNumericCellValue()));
+                else
+                    dailyDataS.setQoqSalesGrowth(new BigDecimal(0));
+
+                if(row.getCell(12) != null && row.getCell(12).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(12).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setQoqProfitGrowth(new BigDecimal(row.getCell(12).getNumericCellValue()));
+                else
+                    dailyDataS.setQoqProfitGrowth(new BigDecimal(0));
+
+                if(row.getCell(13) != null && row.getCell(13).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(13).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setOpmLatestQuarter(new BigDecimal(row.getCell(13).getNumericCellValue()));
+                else
+                    dailyDataS.setOpmLatestQuarter(new BigDecimal(0));
+
+                if(row.getCell(14) != null && row.getCell(14).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(14).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setOpmLastYear(new BigDecimal(row.getCell(14).getNumericCellValue()));
+                else
+                    dailyDataS.setOpmLastYear(new BigDecimal(0));
+
+                if(row.getCell(15) != null && row.getCell(15).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(15).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setNpmLatestQuarter(new BigDecimal(row.getCell(15).getNumericCellValue()));
+                else
+                    dailyDataS.setNpmLatestQuarter(new BigDecimal(0));
+
+                if(row.getCell(16) != null && row.getCell(16).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(16).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setNpmLastYear(new BigDecimal(row.getCell(16).getNumericCellValue()));
+                else
+                    dailyDataS.setNpmLastYear(new BigDecimal(0));
+
+                if(row.getCell(17) != null && row.getCell(17).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(17).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setProfitGrowth3years(new BigDecimal(row.getCell(17).getNumericCellValue()));
+                else
+                    dailyDataS.setProfitGrowth3years(new BigDecimal(0));
+
+                if(row.getCell(18) != null && row.getCell(18).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(18).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setSalesGrowth3years(new BigDecimal(row.getCell(18).getNumericCellValue()));
+                else
+                    dailyDataS.setSalesGrowth3years(new BigDecimal(0));
+
+                if(row.getCell(19) != null && row.getCell(19).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(19).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setPeTtm(new BigDecimal(row.getCell(19).getNumericCellValue()));
+                else
+                    dailyDataS.setPeTtm(new BigDecimal(0));
+
+                if(row.getCell(20) != null && row.getCell(20).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(20).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setHistoricalPe3years(new BigDecimal(row.getCell(20).getNumericCellValue()));
+                else
+                    dailyDataS.setHistoricalPe3years(new BigDecimal(0));
+
+                if(row.getCell(21) != null && row.getCell(21).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(21).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setPegRatio(new BigDecimal(row.getCell(21).getNumericCellValue()));
+                else
+                    dailyDataS.setPegRatio(new BigDecimal(0));
+
+                if(row.getCell(22) != null && row.getCell(22).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(22).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setPbTtm(new BigDecimal(row.getCell(22).getNumericCellValue()));
+                else
+                    dailyDataS.setPbTtm(new BigDecimal(0));
+
+                if(row.getCell(23) != null && row.getCell(23).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(23).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setEvToEbit(new BigDecimal(row.getCell(23).getNumericCellValue()));
+                else
+                    dailyDataS.setEvToEbit(new BigDecimal(0));
+
+                if(row.getCell(24) != null && row.getCell(24).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(24).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setDividendPayout(new BigDecimal(row.getCell(24).getNumericCellValue()));
+                else
+                    dailyDataS.setDividendPayout(new BigDecimal(0));
+
+                if(row.getCell(25) != null && row.getCell(25).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(25).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setRoe(new BigDecimal(row.getCell(25).getNumericCellValue()));
+                else
+                    dailyDataS.setRoe(new BigDecimal(0));
+
+                if(row.getCell(26) != null && row.getCell(26).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(26).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setAvgRoe3years(new BigDecimal(row.getCell(26).getNumericCellValue()));
+                else
+                    dailyDataS.setAvgRoe3years(new BigDecimal(0));
+
+                if(row.getCell(27) != null && row.getCell(27).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(27).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setDebt(new BigDecimal(row.getCell(27).getNumericCellValue()));
+                else
+                    dailyDataS.setDebt(new BigDecimal(0));
+
+                if(row.getCell(28) != null && row.getCell(28).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(28).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setDebtToEquity(new BigDecimal(row.getCell(28).getNumericCellValue()));
+                else
+                    dailyDataS.setDebtToEquity(new BigDecimal(0));
+
+                if(row.getCell(29) != null && row.getCell(29).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(29).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setDebt3yearsback(new BigDecimal(row.getCell(29).getNumericCellValue()));
+                else
+                    dailyDataS.setDebt3yearsback(new BigDecimal(0));
+
+                if(row.getCell(30) != null && row.getCell(30).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(30).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setRoce(new BigDecimal(row.getCell(30).getNumericCellValue()));
+                else
                     dailyDataS.setRoce(new BigDecimal(0));
-                }
-                try{
-                    dailyDataS.setAvgRoce3years(new BigDecimal(row.getCell(30).getNumericCellValue()));
-                } catch (Exception e) {
+
+                if(row.getCell(31) != null && row.getCell(31).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(31).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setAvgRoce3years(new BigDecimal(row.getCell(31).getNumericCellValue()));
+                else
                     dailyDataS.setAvgRoce3years(new BigDecimal(0));
-                }
-                try{
-                    dailyDataS.setFcfS(new BigDecimal(row.getCell(31).getNumericCellValue()));
-                } catch (Exception e) {
+
+                if(row.getCell(32) != null && row.getCell(32).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(32).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setFcfS(new BigDecimal(row.getCell(32).getNumericCellValue()));
+                else
                     dailyDataS.setFcfS(new BigDecimal(0));
-                }
-                try{
-                    dailyDataS.setSalesGrowth5years(new BigDecimal(row.getCell(32).getNumericCellValue()));
-                } catch (Exception e) {
+
+                if(row.getCell(33) != null && row.getCell(33).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(33).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setSalesGrowth5years(new BigDecimal(row.getCell(33).getNumericCellValue()));
+                else
                     dailyDataS.setSalesGrowth5years(new BigDecimal(0));
-                }
-                try{
-                    dailyDataS.setSalesGrowth10years(new BigDecimal(row.getCell(33).getNumericCellValue()));
-                } catch (Exception e) {
+
+                if(row.getCell(34) != null && row.getCell(34).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(34).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setSalesGrowth10years(new BigDecimal(row.getCell(34).getNumericCellValue()));
+                else
                     dailyDataS.setSalesGrowth10years(new BigDecimal(0));
-                }
-                try{
-                    dailyDataS.setNoplat(new BigDecimal(row.getCell(34).getNumericCellValue()));
-                } catch (Exception e) {
+
+                if(row.getCell(35) != null && row.getCell(35).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(35).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setNoplat(new BigDecimal(row.getCell(35).getNumericCellValue()));
+                else
                     dailyDataS.setNoplat(new BigDecimal(0));
-                }
-                try{
-                    dailyDataS.setCapex(new BigDecimal(row.getCell(35).getNumericCellValue()));
-                } catch (Exception e) {
+
+                if(row.getCell(36) != null && row.getCell(36).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(36).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setCapex(new BigDecimal(row.getCell(36).getNumericCellValue()));
+                else
                     dailyDataS.setCapex(new BigDecimal(0));
-                }
-                try{
-                    dailyDataS.setFcff(new BigDecimal(row.getCell(36).getNumericCellValue()));
-                } catch (Exception e) {
+
+                if(row.getCell(37) != null && row.getCell(37).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(37).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setFcff(new BigDecimal(row.getCell(37).getNumericCellValue()));
+                else
                     dailyDataS.setFcff(new BigDecimal(0));
-                }
-                try{
-                    dailyDataS.setInvestedCapital(new BigDecimal(row.getCell(37).getNumericCellValue()));
-                } catch (Exception e) {
+
+                if(row.getCell(38) != null && row.getCell(38).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(38).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setInvestedCapital(new BigDecimal(row.getCell(38).getNumericCellValue()));
+                else
                     dailyDataS.setInvestedCapital(new BigDecimal(0));
-                }
-                try{
-                    dailyDataS.setRoic(new BigDecimal(row.getCell(38).getNumericCellValue()));
-                } catch (Exception e) {
+
+                if(row.getCell(39) != null && row.getCell(39).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(39).getCellType() == Cell.CELL_TYPE_NUMERIC)
+                    dailyDataS.setRoic(new BigDecimal(row.getCell(39).getNumericCellValue()));
+                else
                     dailyDataS.setRoic(new BigDecimal(0));
-                }
+
                 dailyDataS.setMcapToNetprofit(new BigDecimal(0));
                 dailyDataS.setMcapToSales(new BigDecimal(0));
                 dailyDataS.setSector("");
@@ -840,6 +956,58 @@ public class AdminViewController {
         } else {
             model.addAttribute("message", "Please confirm Yes/No to process daily data");
             return "admin/eodprocs";
+        }
+    }
+
+    @RequestMapping(value = "/admin/oneclickupload")
+    public String oneClickUpload(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        List<Object[]> objects = nsePriceHistoryRepository.findMaxDateAndCount();
+        for (Object[] object : objects) {
+            model.addAttribute("nsecount", object[0]);
+            model.addAttribute("nsemaxdate", object[1]);
+        }
+        List<Object[]> objects1 = bsePriceHistoryRepository.findMaxDateAndCount();
+        for (Object[] object : objects1) {
+            model.addAttribute("bsecount", object[0]);
+            model.addAttribute("bsemaxdate", object[1]);
+        }
+        List<Object[]> objects2 = mutualFundNavHistoryRepository.findMaxDateAndCount();
+        for (Object[] object : objects2) {
+            model.addAttribute("mfcount", object[0]);
+            model.addAttribute("mfmaxdate", object[1]);
+        }
+        List<Object[]> objects3 = dailyDataSRepository.findMaxDateAndCount();
+        for (Object[] object : objects3) {
+            model.addAttribute("screenercount", object[0]);
+            model.addAttribute("screenermaxdate", object[1]);
+        }
+
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "TimelineOfWealth");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "admin/oneclickupload";
+    }
+
+    @RequestMapping(value=("/admin/oneclickuploadstatus"),method=RequestMethod.POST)
+    public String oneClickUploadStatus(Model model, @RequestParam("confirmation") String confirmation){
+        if (confirmation.equalsIgnoreCase("yes")) {
+            DownloadEODFiles downloadEODFiles = new DownloadEODFiles();
+            int returnvalue = 0;
+            try {
+                returnvalue = downloadEODFiles.oneClickUpload(nsePriceHistoryRepository, bsePriceHistoryRepository, mutualFundNavHistoryRepository, dailyDataSRepository, mutualFundUniverseRepository);
+                if (returnvalue < 0) {
+                    model.addAttribute("message", "Failed to Download and Upload Data files successfully. Check log files.");
+                } else {
+                    model.addAttribute("message", "Successfully Downloaded and uploaded Data files");
+                }
+            } catch (Exception e) {
+                model.addAttribute("message", "Failed to Upload Data files successfully. Check log files.");
+            }
+            return "admin/oneclickupload";
+        } else {
+            model.addAttribute("message", "Please confirm Yes/No to process Download, upload and running EOD");
+            return "admin/oneclickupload";
         }
     }
 

@@ -117,12 +117,12 @@ select asset_classid, min(marketcap), max(marketcap) from stock_universe a group
 -- update stock_universe a set asset_classid = 406020 where (a.is_bse200 = 1 and a.is_bse100 = 0) or (a.is_nse200 = 1 and a.is_nse100 = 0);
 -- update stock_universe a set asset_classid = 406030 where (a.is_bse500 = 1 and a.is_bse200 = 0) or (a.is_nse500 = 1 and a.is_nse200 = 0);
 -- update stock_universe a set asset_classid = 406040 where asset_classid = 0;
--- update stock_universe a, daily_data_s b set asset_classid = '406010' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap > 50000;
--- update stock_universe a, daily_data_s b set asset_classid = '406020' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 50000 and market_cap > 10000;
--- update stock_universe a, daily_data_s b set asset_classid = '406030' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 10000 and market_cap > 5000;
--- update stock_universe a, daily_data_s b set asset_classid = '406040' where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 5000;
+-- update stock_universe a, daily_data_s b set asset_classid = '406010' where ticker = b.name and date = (select date_today from setup_dates) and market_cap > 50000;
+-- update stock_universe a, daily_data_s b set asset_classid = '406020' where ticker = b.name and date = (select date_today from setup_dates) and market_cap < 50000 and market_cap > 10000;
+-- update stock_universe a, daily_data_s b set asset_classid = '406030' where ticker = b.name and date = (select date_today from setup_dates) and market_cap < 10000 and market_cap > 5000;
+-- update stock_universe a, daily_data_s b set asset_classid = '406040' where ticker = b.name and date = (select date_today from setup_dates) and market_cap < 5000;
 
-select ticker, b.name, asset_classid, marketcap, market_cap from stock_universe a, daily_data_s b where ticker5 = b.name and date = (select date_today from setup_dates) and market_cap < 10000 and market_cap > 5000 order by asset_classid, marketcap desc;
+select ticker, b.name, asset_classid, marketcap, market_cap from stock_universe a, daily_data_s b where ticker = b.name and date = (select date_today from setup_dates) and market_cap < 10000 and market_cap > 5000 order by asset_classid, marketcap desc;
 
 select * from stock_universe a where (a.is_bse500 = 1 or a.is_nse500 = 1) and subindustryid like '40203030%' order by asset_classid, marketcap desc, ticker;
 select * from nse_price_history a where nse_ticker = 'ICICIBANK' and date >= '2021-01-01' order by date desc;
@@ -139,7 +139,7 @@ where a.date = (select min(date) from daily_data_s where date > '2022-01-27') an
 name like 'CMS%' order by date desc;
 
 select a.name, date, "~", round(market_cap,-1) MCap, " / ",  round(cmp, 0) from daily_data_s a, stock_universe b
-where a.date = (select min(date) from daily_data_s where date > '2021-01-21') and a.name = b.ticker5 and b.ticker = 'MCX' order by date desc;
+where a.date = (select min(date) from daily_data_s where date > '2021-01-21') and a.name = b.ticker and b.ticker = 'MCX' order by date desc;
 
 
 select if(is_sensex = 1, 'SENSEX', if(is_nifty50 = 1, 'NIFTY', if(is_nse100 = 1 or is_bse100 = 1, 'NSE-BSE100', if(is_nse200 = 1 or is_bse200 = 1, 'NSE-BSE200', 'NSE-BSE500'))) ) index1, 
@@ -154,7 +154,7 @@ a.pe_ttm, a.pb_ttm, (a.market_cap/sales),
 from daily_data_s a, stock_universe b, subindustry c, stock_price_movement d
 where 
 a.date = (select date_today from setup_dates) and 
-a.name = b.ticker5 and 
+a.name = b.ticker and 
 b.subindustryid = c.subindustryid and 
 (b.is_bse500 = 1 or b.is_nse500 = 1) and
 b.ticker = d.ticker

@@ -3,10 +3,11 @@ package com.timelineofwealth.repositories;
 import com.timelineofwealth.entities.DailyDataS;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
 import java.util.List;
-
+@Repository
 public interface DailyDataSRepository extends JpaRepository<DailyDataS, DailyDataS.DailyDataSKey> {
     public DailyDataS findByKeyNameAndKeyDate(String name, Date date);
     public List<DailyDataS> findAllByKeyDate(Date date);

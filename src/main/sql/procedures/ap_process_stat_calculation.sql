@@ -36,7 +36,7 @@ BEGIN
   -- Update rank and marketcap data in stock universe
   UPDATE stock_universe a, daily_data_s b
   SET a.marketcap = b.market_cap, a.marketcap_rank = rank, a.pe_ttm = b.pe_ttm
-  WHERE a.ticker5 = b.name
+  WHERE a.ticker = b.name
   AND b.date = var_date_today;
 
   -- Find any new Stock Entry

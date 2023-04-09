@@ -155,7 +155,7 @@ select * from index_valuation where ticker = 'NIFTY200' order by date desc;
 commit;
 -- new quarter results
 SELECT b.ticker from daily_data_s a, stock_universe b 
-where a.name = b.ticker5 and 
+where a.name = b.ticker and 
 a.last_result_date = '202212' and 
 date = (select max(date) from daily_data_s a) and 
 b.ticker not in ('ADANIGAS', 'CENTURYPLY', 'GRSE', 'RVNL', 'STRTECH', 'BSOFT') and 
