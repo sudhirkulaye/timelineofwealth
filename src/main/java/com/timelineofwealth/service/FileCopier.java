@@ -24,8 +24,8 @@ public class FileCopier {
         String localMyDocuments = "C:\\MyDocuments\\";
         String redMIMyDocuments = "\\\\redmibook15\\MyDocuments";
 
-//        String srcFolder = localMyDocuments; // localLaptop + researchAndAnalysis;
-//        String dstFolder = redMIMyDocuments; // redMILaptop + researchAndAnalysis;
+        String srcFolder = localMyDocuments; // localLaptop + researchAndAnalysis;
+        String dstFolder = redMIMyDocuments; // redMILaptop + researchAndAnalysis;
 
 //        String srcFolder = localLaptop + reports;
 //        String dstFolder = paragLaptop + reports;
@@ -33,8 +33,8 @@ public class FileCopier {
 //        String srcFolder = localLaptop + excels;
 //        String dstFolder = paragLaptop + excels;
 
-        String srcFolder = localLaptop + dailyData;
-        String dstFolder = paragLaptop + dailyData;
+//        String srcFolder = localLaptop + dailyData;
+//        String dstFolder = paragLaptop + dailyData;
 
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";

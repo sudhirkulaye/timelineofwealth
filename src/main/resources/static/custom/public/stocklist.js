@@ -11,7 +11,8 @@ module.controller('StockListController', function($scope, $http, $filter) {
     $scope.flagValuations = true;
     $scope.flagPricePerformance = true;
     $scope.flagAdditionalInfo = true;
-    $scope.flagAnalystsCall = true;
+    $scope.flagAnalystsReco = true;
+    $scope.flagDCFValuation = true;
     $scope.reverseSort = false;
 
     showRecords();
@@ -56,6 +57,19 @@ module.controller('StockListController', function($scope, $http, $filter) {
         } else {
             if (stock.shortName.toLowerCase().indexOf($scope.searchTextFilter.toLowerCase()) != -1 ) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    $scope.filterByFno = function (stock) {
+        if ($scope.fnoFilter == undefined || $scope.fnoFilter == "") {
+            return true;
+        } else {
+            if($scope.fnoFilter == "FnO") {
+                if(stock.isFno == "1") {
+                    return true;
+                }
             }
         }
         return false;
@@ -144,7 +158,8 @@ module.controller('StockListController', function($scope, $http, $filter) {
             $scope.flagValuations = true;
             $scope.flagPricePerformance = true;
             $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsCall = true;
+            $scope.flagAnalystsReco = true;
+            $scope.flagDCFValuation = true;
         }
         if (selectedOption == "FundamentalInfo") {
             $scope.flagBasicInfo = true;
@@ -153,7 +168,8 @@ module.controller('StockListController', function($scope, $http, $filter) {
             $scope.flagValuations = true;
             $scope.flagPricePerformance = true;
             $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsCall = true;
+            $scope.flagAnalystsReco = true;
+            $scope.flagDCFValuation = true;
         }
         if (selectedOption == "CapitalStructureInfo") {
             $scope.flagBasicInfo = true;
@@ -162,7 +178,8 @@ module.controller('StockListController', function($scope, $http, $filter) {
             $scope.flagValuations = true;
             $scope.flagPricePerformance = true;
             $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsCall = true;
+            $scope.flagAnalystsReco = true;
+            $scope.flagDCFValuation = true;
         }
         if (selectedOption == "Valuations") {
             $scope.flagBasicInfo = true;
@@ -171,7 +188,8 @@ module.controller('StockListController', function($scope, $http, $filter) {
             $scope.flagValuations = false;
             $scope.flagPricePerformance = true;
             $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsCall = true;
+            $scope.flagAnalystsReco = true;
+            $scope.flagDCFValuation = true;
         }
         if (selectedOption == "PricePerformance") {
             $scope.flagBasicInfo = true;
@@ -180,7 +198,8 @@ module.controller('StockListController', function($scope, $http, $filter) {
             $scope.flagValuations = true;
             $scope.flagPricePerformance = false;
             $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsCall = true;
+            $scope.flagAnalystsReco = true;
+            $scope.flagDCFValuation = true;
         }
         if (selectedOption == "AdditionalInfo") {
             $scope.flagBasicInfo = true;
@@ -189,16 +208,28 @@ module.controller('StockListController', function($scope, $http, $filter) {
             $scope.flagValuations = true;
             $scope.flagPricePerformance = true;
             $scope.flagAdditionalInfo = false;
-            $scope.flagAnalystsCall = true;
+            $scope.flagAnalystsReco = true;
+            $scope.flagDCFValuation = true;
         }
-        if (selectedOption == "AnalystsCall") {
+        if (selectedOption == "AnalystsReco") {
             $scope.flagBasicInfo = true;
             $scope.flagFundamentalInfo = true;
             $scope.flagCapitalStructureInfo = true;
             $scope.flagValuations = true;
             $scope.flagPricePerformance = true;
             $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsCall = false;
+            $scope.flagAnalystsReco = false;
+            $scope.flagDCFValuation = true;
+        }
+        if (selectedOption == "DCFValuation") {
+            $scope.flagBasicInfo = true;
+            $scope.flagFundamentalInfo = true;
+            $scope.flagCapitalStructureInfo = true;
+            $scope.flagValuations = true;
+            $scope.flagPricePerformance = true;
+            $scope.flagAdditionalInfo = true;
+            $scope.flagAnalystsReco = true;
+            $scope.flagDCFValuation = false;
         }
     }
 
@@ -241,3 +272,61 @@ module.filter('unique', function() {
       return output;
    };
 });
+
+module.filter('quarterSplit', function() {
+  return function(input) {
+    if (!input) return input;
+    var lines = input.split(' FY');
+    for (var i = 1; i < lines.length; i++) {
+      lines[i] = lines[i].substring(2);
+    }
+    if(lines[0].length > 4)
+        lines[0] = lines[0].substring(4);
+    return lines.join('\n');
+  };
+});
+
+module.filter('removeQuarter', function() {
+  return function(input) {
+    if (!input) return input;
+    var lines = input.split(' FY');
+    for (var i = 1; i < lines.length; i++) {
+      lines[i] = lines[i].substring(5);
+    }
+    if(lines[0].length > 7)
+        lines[0] = lines[0].substring(7);
+    return lines.join('\n');
+  };
+});
+
+/*module.filter('recoSplit', function() {
+  return function(input) {
+    if (!input) return input;
+    var lines = input.split(' FY');
+    lines[0] = lines[0].replace("FY", "").trim();
+    for (var i = 1; i < lines.length; i++) {
+      lines[i] = lines[i].trim();
+    }
+    return lines.join('\n');
+  };
+});*/
+
+/*module.filter('recoSplit', function() {
+  return function(input) {
+    if (!input) return input;
+    var lines = input.split(' FY');
+    for (var i = 1; i < lines.length; i++) {
+      lines[i] = 'FY' + lines[i];
+    }
+    return lines.join('\n') + '\n';
+  };
+});*/
+
+
+
+
+
+
+
+
+

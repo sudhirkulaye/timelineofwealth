@@ -67,6 +67,12 @@
                                 <!--<option ng-repeat="stock in stocks | unique:'sectorNameDisplay'">{{stock.sectorNameDisplay}}</option>-->
                             <!--</select>-->
                             <label class="pull-left" >&nbsp;&nbsp;&nbsp;</label>
+                            <label class="pull-left" >FnO : &nbsp;&nbsp;&nbsp;</label>
+                            <select class="pull-left" ng-model="fnoFilter" >
+                                <option></option>
+                                <option>FnO</option>
+                            </select>
+                            <label class="pull-left" >&nbsp;&nbsp;&nbsp;</label>
                             <label class="pull-left" >Sector : &nbsp;&nbsp;&nbsp;</label>
                             <select class="pull-left" ng-model="sectorFilter" >
                                 <option value=""></option>
@@ -89,7 +95,8 @@
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios4" name="optionsRadios" ng-click="showColumns('Valuations')" /> Growth &amp; Valuations &nbsp;&nbsp;&nbsp;</lebel>
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios5" name="optionsRadios" ng-click="showColumns('PricePerformance')" /> Price Performance &nbsp;&nbsp;&nbsp;</lebel>
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios6" name="optionsRadios" ng-click="showColumns('AdditionalInfo')" /> Additional (K Cr) &nbsp;&nbsp;&nbsp;</lebel>
-                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios7" name="optionsRadios" ng-click="showColumns('AnalystsCall')" /> Analysts Call [Up coming]&nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios7" name="optionsRadios" ng-click="showColumns('AnalystsReco')" /> Analysts Reco &nbsp;&nbsp;&nbsp;</lebel>
+                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios8" name="optionsRadios" ng-click="showColumns('DCFValuation')" /> DCF Valuation Range &nbsp;&nbsp;&nbsp;</lebel>
                         </div>
                         <div class="x_content">
                             <p>
@@ -110,7 +117,7 @@
                                     <th align='right'>Price</th>
                                     <th align='right' ng-click="sortData('dailyDataS.rank')" ng-hide="flagBasicInfo">MCap Rank<i ng-class="getSortClass('dailyDataS.rank')" /></th>
                                     <th ng-click="sortData('dailyDataS.lastResultDate')" ng-hide="flagFundamentalInfo">Last Result<i ng-class="getSortClass('dailyDataS.lastResultDate')" /></th>
-                                    <th ng-click="sortData('dailyDataS.sales')" ng-hide="flagFundamentalInfo">TTM Sales<i ng-class="getSortClass('dailyDataS.sales')" /></th>
+                                    <th ng-click="sortData('dailyDataS.priceChange')" ng-hide="flagFundamentalInfo">TTM Sales<i ng-class="getSortClass('dailyDataS.priceChange')" /></th>
                                     <th ng-click="sortData('dailyDataS.netProfit')" ng-hide="flagFundamentalInfo">TTM Profit<i ng-class="getSortClass('dailyDataS.netProfit')" /></th>
                                     <th ng-click="sortData('dailyDataS.opmLatestQuarter')" ng-hide="flagFundamentalInfo">OPM Latest<i ng-class="getSortClass('dailyDataS.opmLatestQuarter')" /></th>
                                     <th ng-click="sortData('dailyDataS.npmLatestQuarter')" ng-hide="flagFundamentalInfo">NPM Latest<i ng-class="getSortClass('dailyDataS.npmLatestQuarter')" /></th>
@@ -150,7 +157,7 @@
                                     <!--<th ng-hide="flagPricePerformance">10Y</th>-->
                                     <!--<th ng-hide="flagPricePerformance">5Years</th>-->
                                     <!--<th ng-hide="flagPricePerformance">10Years</th>-->
-                                    <th ng-click="sortData('dailyDataS.sales')" ng-hide="flagAdditionalInfo">Sales<i ng-class="getSortClass('dailyDataS.noplat')" /></th>
+                                    <th ng-click="sortData('dailyDataS.priceChange')" ng-hide="flagAdditionalInfo">Sales<i ng-class="getSortClass('dailyDataS.noplat')" /></th>
                                     <th ng-click="sortData('dailyDataS.salesGrowth5years')" ng-hide="flagAdditionalInfo">5Y g%<i ng-class="getSortClass('dailyDataS.salesGrowth5years')" /></th>
                                     <th ng-click="sortData('dailyDataS.salesGrowth10years')" ng-hide="flagAdditionalInfo">10Y g%<i ng-class="getSortClass('dailyDataS.salesGrowth10years')" /></th>
                                     <th ng-click="sortData('dailyDataS.opmLastYear')" ng-hide="flagAdditionalInfo">OPM%<i ng-class="getSortClass('dailyDataS.opmLastYear')" /></th>
@@ -161,9 +168,28 @@
                                     <th ng-click="sortData('dailyDataS.investedCapital')" ng-hide="flagAdditionalInfo">InvtCap.<i ng-class="getSortClass('dailyDataS.investedCapital')" /></th>
                                     <th ng-click="sortData('dailyDataS.roic')" ng-hide="flagAdditionalInfo">RoIC%<i ng-class="getSortClass('dailyDataS.roic')" /></th>
 
+                                    <th ng-hide="flagAnalystsReco">MOSL</th>
+                                    <th ng-hide="flagAnalystsReco">Broker 2</th>
+                                    <th ng-hide="flagAnalystsReco">AXIS</th>
+                                    <th ng-hide="flagAnalystsReco">ICICI Direct</th>
+                                    <th ng-hide="flagAnalystsReco">Broker 5</th>
+                                    <th ng-hide="flagAnalystsReco">Broker 6</th>
+
+                                    <th ng-hide="flagDCFValuation">Min. MCap/Price(<i class="fa fa-arrow-down"></i>%)/g%</th>
+                                    <th ng-hide="flagDCFValuation">Max. MCap/Price(<i class="fa fa-arrow-up"></i>%)/g%</th>
+                                    <th ng-hide="flagDCFValuation">WACC</th>
+                                    <!--<th ng-hide="flagDCFValuation">Tax%</th>-->
+                                    <th ng-hide="flagDCFValuation">10Yr g</th>
+                                    <th ng-hide="flagDCFValuation">OPM</th>
+                                    <th ng-hide="flagDCFValuation">PPE/Rev</th>
+                                    <th ng-hide="flagDCFValuation">Dep/PPE</th>
+                                    <!--<th ng-hide="flagDCFValuation">Hist. RoIC%</th>-->
+                                    <th ng-hide="flagDCFValuation">Second and Terminal Stage g% Assumptions</th>
+                                    <th ng-hide="flagDCFValuation">Other Inc. g% Assumptions</th>
+
                                 </tr>
                                 <tbody>
-                                <tr ng-repeat="stock in stocks  | filter:filterByIndex | filter:filterBySector | filter:filterByIndustry | filter:searchStock | orderBy:sortColumn:reverseSort">
+                                <tr ng-repeat="stock in stocks  | filter:filterByIndex | filter:filterByFno | filter:filterBySector | filter:filterByIndustry | filter:searchStock | orderBy:sortColumn:reverseSort">
                                     <!--<td>{{ (assetClasses | filter : { 'classid' : stock.assetClassid})[0].subclassName }}</td>-->
                                     <!--<td>{{stock.ticker}}</td>-->
                                     <td ng-hide="flagBasicInfo">{{stock.includedIndexName}}</td>
@@ -177,7 +203,7 @@
                                     <td align='right'>{{stock.latestPrice | number:0}}</td>
                                     <td align='right' ng-hide="flagBasicInfo">{{stock.dailyDataS.rank}}</td>
                                     <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.lastResultDate}}</td>
-                                    <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.sales | currency:"&#8377;":0}}</td>
+                                    <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.priceChange | currency:"&#8377;":0}}</td>
                                     <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.netProfit | currency:"&#8377;":0}}</td>
                                     <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.opmLatestQuarter}}%</td>
                                     <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.npmLatestQuarter}}%</td>
@@ -198,7 +224,7 @@
                                     <td align='right' ng-hide="flagValuations">{{stock.dailyDataS.profitGrowth3years}}%</td>
                                     <td align='right' ng-hide="flagValuations">{{stock.dailyDataS.peTtm}}</td>
                                     <td align='right' ng-hide="flagValuations">{{stock.dailyDataS.pbTtm}}</td>
-                                    <td align='right' ng-hide="flagValuations">{{stock.dailyDataS.sales/stock.dailyDataS.marketCap | number:2}}</td>
+                                    <td align='right' ng-hide="flagValuations">{{stock.dailyDataS.priceChange/stock.dailyDataS.marketCap | number:2}}</td>
                                     <td align='right' ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return1D | number:1}}%</td>
                                     <td align='right' ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return1W | number:1}}%</td>
                                     <td align='right' ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return2W | number:1}}%</td>
@@ -217,7 +243,7 @@
                                     <!--<td ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return10Y | number:2}}%</td>-->
                                     <!--<td ng-hide="flagPricePerformance">-</td>-->
                                     <!--<td ng-hide="flagPricePerformance">-</td>-->
-                                    <td align='right' ng-hide="flagAdditionalInfo">{{(stock.dailyDataS.sales/1000) | number:1}}</td>
+                                    <td align='right' ng-hide="flagAdditionalInfo">{{(stock.dailyDataS.priceChange/1000) | number:1}}</td>
                                     <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.salesGrowth5years | number:2}}%</td>
                                     <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.salesGrowth10years | number:2}}%</td>
                                     <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.opmLastYear | number:2}}%</td>
@@ -227,6 +253,26 @@
                                     <td align='right' ng-hide="flagAdditionalInfo">{{(stock.dailyDataS.fcff/1000) | number:0}}</td>
                                     <td align='right' ng-hide="flagAdditionalInfo">{{(stock.dailyDataS.investedCapital/1000) | number:0}}</td>
                                     <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.roic | number:2}}%</td>
+
+                                    <td align='left' ng-hide="flagAnalystsReco"><pre>{{stock.latestMOSLReco | quarterSplit }}</pre></td>
+                                    <td align='left' ng-hide="flagAnalystsReco"><pre>{{stock.latestAMBITReco | quarterSplit }}</pre></td>
+                                    <td align='left' ng-hide="flagAnalystsReco"><pre>{{stock.latestAXISReco | quarterSplit }}</pre></td>
+                                    <td align='left' ng-hide="flagAnalystsReco"><pre>{{stock.latestICICIDIRECTReco | quarterSplit }}</pre></td>
+                                    <td align='left' ng-hide="flagAnalystsReco"><pre>{{stock.latestPLReco | quarterSplit }}</pre></td>
+                                    <td align='left' ng-hide="flagAnalystsReco"><pre>{{stock.latestKOTAKReco | quarterSplit }}</pre></td>
+
+
+                                    <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.minValuation | quarterSplit }}</pre></td>
+                                    <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.maxValuation | removeQuarter }}</pre></td>
+                                    <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.wacc | removeQuarter }}</pre></td>
+                                    <!--<td align='left' ng-hide="flagDCFValuation"><pre>{{stock.taxRate | removeQuarter }}</pre></td>-->
+                                    <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.revenueGrowthNext10yr | removeQuarter }}</pre></td>
+                                    <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.opmNext10yr | removeQuarter }}</pre></td>
+                                    <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.netPpeByRevenue10yr | removeQuarter }}</pre></td>
+                                    <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.depreciationByNetPpe10yr | removeQuarter }}</pre></td>
+                                    <!--<td align='left' ng-hide="flagDCFValuation"><pre>{{stock.historicalRoic | removeQuarter }}</pre></td>-->
+                                    <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.secondAndTerminalStageAssumptions | removeQuarter }}</pre></td>
+                                    <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.otherIncGrowthAssumptions | removeQuarter }}</pre></td>
                                 </tr>
                                 </tbody>
                                 </thead>

@@ -214,7 +214,7 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             int revenueLineNumber = -1;
             revenueLineNumber = getLineNumberForMatchingPattern(lines, headerLineNumber, REVENUE_ROW_NAME,rdec, BROKER);
             if (revenueLineNumber > 1)
-                System.out.println("Revenue Line No. : " + revenueLineNumber);
+                System.out.println("Revenue Line No. : " + revenueLineNumber + " Value - " + lines[revenueLineNumber]);
             else
                 System.out.println("\n\n ********** Exception ********* \n\n Revenue Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 
@@ -222,7 +222,7 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             int ebitdaLineNumber = -1;
             ebitdaLineNumber = getLineNumberForMatchingPattern(lines, revenueLineNumber, EBITDA_ROW_NAME,rdec, BROKER);
             if (ebitdaLineNumber > 1)
-                System.out.println("EBITDA Line No. : " + ebitdaLineNumber);
+                System.out.println("EBITDA Line No. : " + ebitdaLineNumber + " Value - " + lines[ebitdaLineNumber]);
             else
                 System.out.println("\n\n ********** Exception ********* \n\n EBITDA Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 
@@ -230,7 +230,7 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             int depreciationLineNumber = -1;
             depreciationLineNumber = getLineNumberForMatchingPattern(lines, ebitdaLineNumber, DEPRECIATION_ROW_NAME,rdec, BROKER);
             if (depreciationLineNumber > 1)
-                System.out.println("Depreciation Line No. : " + depreciationLineNumber);
+                System.out.println("Depreciation Line No. : " + depreciationLineNumber + " Value - " + lines[depreciationLineNumber]);
             else
                 System.out.println("\n\n ********** Exception ********* \n\n Depreciation Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 
@@ -238,7 +238,7 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             int ebitdaMarginLineNumber = -1;
             ebitdaMarginLineNumber = getLineNumberForMatchingPattern(lines, ebitdaLineNumber, EBITDAMARGIN_ROW_NAME,rdec, BROKER);
             if (ebitdaMarginLineNumber > 1)
-                System.out.println("OPM Line No. : " + ebitdaMarginLineNumber);
+                System.out.println("OPM Line No. : " + ebitdaMarginLineNumber + " Value - " + lines[ebitdaMarginLineNumber]);
             else
                 System.out.println("\n\n ********** Exception ********* \n\n OPM Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 
@@ -254,7 +254,8 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
                 String ratioPage = PdfTextExtractor.getTextFromPage(pdfReader, ratioPageNumber);
                 String[] ratioPageLines = ratioPage.split("\n");
                 ebitdaMarginLineNumber = getLineNumberForMatchingPattern(ratioPageLines, 0, EBITDAMARGIN_ROW_NAME,rdec, BROKER);
-                ebitdaMargin = ratioPageLines[ebitdaMarginLineNumber];
+                if(ebitdaMarginLineNumber>0)
+                    ebitdaMargin = ratioPageLines[ebitdaMarginLineNumber];
             } else {
                 ebitdaMargin = lines[ebitdaMarginLineNumber];
             }
@@ -264,7 +265,15 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             String[] revenueColumns = getDataColumnsForHeader(revenue, REVENUE_ROW_NAME);
             String[] ebitdaColumns = getDataColumnsForHeader(ebitda, EBITDA_ROW_NAME);
             String[] depreciationColumns = getDataColumnsForHeader(depreciation, DEPRECIATION_ROW_NAME);
-            String[] ebitdaMarginColumns = getDataColumnsForHeader(ebitdaMargin, EBITDAMARGIN_ROW_NAME);
+            // code if depreciation numbers on previous line
+//            if (depreciationColumns.length == 0) {
+//                //in case depreciation numbers are on new line
+//                System.out.println(" depreciation+lines[depreciationLineNumber-1] " + depreciation+lines[depreciationLineNumber-1].trim());
+//                depreciationColumns = getDataColumnsForHeader(depreciation+lines[depreciationLineNumber-1].trim(), DEPRECIATION_ROW_NAME);
+//            }
+            String[] ebitdaMarginColumns = null;
+            if(ebitdaMargin != null)
+                ebitdaMarginColumns = getDataColumnsForHeader(ebitdaMargin, EBITDAMARGIN_ROW_NAME);
 
             // Set million or billion flag
             MILLIONS_OR_BILLIONS_FLAG = Pattern.compile(MILLIONS_OR_BILLIONS).matcher(pageContent).find()? "B" : "M";
@@ -281,7 +290,10 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             System.out.println("Revenue Columns " + revenueColumns.length);
             System.out.println("EBITDA Columns  " + ebitdaColumns.length);
             System.out.println("Dep. Columns    " + depreciationColumns.length);
-            System.out.println("OPM Columns     " + ebitdaMarginColumns.length);
+            if (ebitdaMarginColumns!=null)
+                System.out.println("OPM Columns     " + ebitdaMarginColumns.length);
+            else
+                System.out.println("OPM Line Missing  " );
 
             String y0Revenue = "", y1Revenue = "", y2Revenue = "";
             String y0EBITDA = "", y1EBITDA = "", y2EBITDA = "";
@@ -297,7 +309,10 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
                 y0Revenue = revenueColumns[y0Column];
                 y0EBITDA = ebitdaColumns[y0Column];
                 y0Depreciation = depreciationColumns[y0Column];
-                y0EBITDAMargin = ebitdaMarginColumns[y0Column];
+                if(ebitdaMarginColumns!=null)
+                    y0EBITDAMargin = ebitdaMarginColumns[y0Column];
+                else
+                    y0EBITDAMargin = "0";
 
                 y0RevenueNumber = Double.parseDouble(y0Revenue.replace(",", ""));
                 y0EBITDANumber = Double.parseDouble(y0EBITDA.replace(",", ""));
@@ -319,7 +334,10 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
                 y1Revenue = revenueColumns[y1Column];
                 y1EBITDA = ebitdaColumns[y1Column];
                 y1Depreciation = depreciationColumns[y1Column];
-                y1EBITDAMargin = ebitdaMarginColumns[y1Column];
+                if(ebitdaMarginColumns!=null)
+                    y1EBITDAMargin = ebitdaMarginColumns[y1Column];
+                else
+                    y1EBITDAMargin = "0";
 
                 y1RevenueNumber = Double.parseDouble(y1Revenue.replace(",", ""));
                 y1EBITDANumber = Double.parseDouble(y1EBITDA.replace(",", ""));
@@ -341,7 +359,10 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
                 y2Revenue = revenueColumns[y2Column];
                 y2EBITDA = ebitdaColumns[y2Column];
                 y2Depreciation = depreciationColumns[y2Column];
-                y2EBITDAMargin = ebitdaMarginColumns[y2Column];
+                if(ebitdaMarginColumns!=null)
+                    y2EBITDAMargin = ebitdaMarginColumns[y2Column];
+                else
+                    y2EBITDAMargin = "0";
 
                 y2RevenueNumber = Double.parseDouble(y2Revenue.replace(",", ""));
                 y2EBITDANumber = Double.parseDouble(y2EBITDA.replace(",", ""));
@@ -385,7 +406,7 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             int evbyebitdaLineNumber = -1;
             evbyebitdaLineNumber = getLineNumberForMatchingPattern(lines, headerLineNumber, EVBYEBITDA_ROW_NAME,rdec, BROKER);
             if (evbyebitdaLineNumber > 1)
-                System.out.println("EVBYEBITDA Line No. : " + evbyebitdaLineNumber);
+                System.out.println("EVBYEBITDA Line No. : " + evbyebitdaLineNumber + "  Value -" + lines[evbyebitdaLineNumber]);
             else
                 System.out.println("\n\n ********** Exception ********* \n\n EVBYEBITDA Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 
@@ -417,20 +438,26 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             if (y0Column == -1) {
                 System.out.println(Y0 + " column not found in the header on " + RATIO_PAGE + " page");
             } else {
-                if (headerColumns.length != roceColumns.length && headerColumns.length > roceColumns.length) {
+                if (headerColumns.length != roceColumns.length && headerColumns.length > roceColumns.length && roceColumns.length != 0) {
                     System.out.println("Header mismatch for " +  QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
                     System.out.print(" Header Length " +  headerColumns.length);
                     System.out.print(" roce Length " +  roceColumns.length);
                     System.out.print(" evbyebitda Length " +  evbyebitdaColumns.length);
 
                     y0ROCE = roceColumns[y0Column-(headerColumns.length-roceColumns.length)];
-                } else {
+                } else if (roceColumns.length != 0) {
                     y0ROCE = roceColumns[y0Column];
-                }
-                if (headerColumns.length != evbyebitdaColumns.length && headerColumns.length > evbyebitdaColumns.length) {
-                    y0EVBYEBITDA = evbyebitdaColumns[y0Column-(headerColumns.length-evbyebitdaColumns.length)];
                 } else {
-                    y0EVBYEBITDA = evbyebitdaColumns[y0Column];
+                    y0ROCE = "0";
+                }
+                try {
+                    if (headerColumns.length != evbyebitdaColumns.length && headerColumns.length > evbyebitdaColumns.length) {
+                        y0EVBYEBITDA = evbyebitdaColumns[y0Column - (headerColumns.length - evbyebitdaColumns.length)];
+                    } else {
+                        y0EVBYEBITDA = evbyebitdaColumns[y0Column];
+                    }
+                } catch (Exception e) {
+                    y0EVBYEBITDA = "0";
                 }
 
                 y0EVBYEBITDANumber = Double.parseDouble(y0EVBYEBITDA);
@@ -439,15 +466,21 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             if (y1Column == -1) {
                 System.out.println(Y1 + " column not found in the header on " + RATIO_PAGE + " page");
             } else {
-                if (headerColumns.length != roceColumns.length && headerColumns.length > roceColumns.length) {
-                    y1ROCE = roceColumns[y1Column-(headerColumns.length-roceColumns.length)];
-                } else {
-                    y1ROCE = roceColumns[y1Column];
-                }
-                if (headerColumns.length != evbyebitdaColumns.length && headerColumns.length > evbyebitdaColumns.length) {
-                    y1EVBYEBITDA = evbyebitdaColumns[y1Column-(headerColumns.length-evbyebitdaColumns.length)];
-                } else {
-                    y1EVBYEBITDA = evbyebitdaColumns[y1Column];
+                try {
+                    if (headerColumns.length != roceColumns.length && headerColumns.length > roceColumns.length && roceColumns.length != 0) {
+                        y1ROCE = roceColumns[y1Column - (headerColumns.length - roceColumns.length)];
+                    } else if (roceColumns.length != 0) {
+                        y1ROCE = roceColumns[y1Column];
+                    } else {
+                        y1ROCE = "0";
+                    }
+                    if (headerColumns.length != evbyebitdaColumns.length && headerColumns.length > evbyebitdaColumns.length) {
+                        y1EVBYEBITDA = evbyebitdaColumns[y1Column - (headerColumns.length - evbyebitdaColumns.length)];
+                    } else {
+                        y1EVBYEBITDA = evbyebitdaColumns[y1Column];
+                    }
+                } catch (Exception e) {
+                    y1EVBYEBITDA = "0";
                 }
 
                 y1EVBYEBITDANumber = Double.parseDouble(y1EVBYEBITDA);
@@ -455,15 +488,21 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             if (y2Column == -1) {
                 System.out.println(Y2 + " column not found in the header on " + RATIO_PAGE + " page");
             } else {
-                if (headerColumns.length != roceColumns.length && headerColumns.length > roceColumns.length) {
-                    y2ROCE = roceColumns[y2Column-(headerColumns.length-roceColumns.length)];
-                } else {
-                    y2ROCE = roceColumns[y2Column];
-                }
-                if (headerColumns.length != evbyebitdaColumns.length && headerColumns.length > evbyebitdaColumns.length) {
-                    y2EVBYEBITDA = evbyebitdaColumns[y2Column-(headerColumns.length-evbyebitdaColumns.length)];
-                } else {
-                    y2EVBYEBITDA = evbyebitdaColumns[y2Column];
+                try {
+                    if (headerColumns.length != roceColumns.length && headerColumns.length > roceColumns.length && roceColumns.length != 0) {
+                        y2ROCE = roceColumns[y2Column - (headerColumns.length - roceColumns.length)];
+                    } else if (roceColumns.length != 0) {
+                        y2ROCE = roceColumns[y2Column];
+                    } else {
+                        y2ROCE = "0";
+                    }
+                    if (headerColumns.length != evbyebitdaColumns.length && headerColumns.length > evbyebitdaColumns.length) {
+                        y2EVBYEBITDA = evbyebitdaColumns[y2Column - (headerColumns.length - evbyebitdaColumns.length)];
+                    } else {
+                        y2EVBYEBITDA = evbyebitdaColumns[y2Column];
+                    }
+                } catch (Exception e) {
+                    y2EVBYEBITDA = "0";
                 }
                 y2EVBYEBITDANumber = Double.parseDouble(y2EVBYEBITDA);
             }

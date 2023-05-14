@@ -17,6 +17,7 @@ import org.springframework.cache.annotation.Cacheable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,6 +70,20 @@ public class CommonService {
     @Autowired
     public void setStockUniverseRepository(StockUniverseRepository stockUniverseRepository){
         CommonService.stockUniverseRepository = stockUniverseRepository;
+    }
+
+    @Autowired
+    private static StockAnalystRecoRepository stockAnalystRecoRepository;
+    @Autowired
+    public void setStockAnalystRecoRepository(StockAnalystRecoRepository stockAnalystRecoRepository){
+        CommonService.stockAnalystRecoRepository = stockAnalystRecoRepository;
+    }
+
+    @Autowired
+    private static StockValuationRepository stockValuationRepository;
+    @Autowired
+    public void setStockAnalystRecoRepository(StockValuationRepository stockValuationRepository){
+        CommonService.stockValuationRepository = stockValuationRepository;
     }
 
     @Autowired
@@ -381,10 +396,233 @@ public class CommonService {
 
             nseBse500.setDailyDataS(dailyDataSList.stream().filter(dailyDataS -> nseBse500.getTicker5().equals(dailyDataS.getKey().getName())).findAny().orElse(null));
             nseBse500.setStockPriceMovement(stockPriceMovementList.stream().filter(stockPriceMovement -> nseBse500.getTicker().equals(stockPriceMovement.getTicker())).findAny().orElse(null));
+            nseBse500.setLatestMOSLReco(getLatestFourRecommendations(stockUniverse.getTicker(), "MOSL", stockUniverse.getLatestPrice().doubleValue()));
+            nseBse500.setLatestAMBITReco(getLatestFourRecommendations(stockUniverse.getTicker(), "AMBIT", stockUniverse.getLatestPrice().doubleValue()));
+            nseBse500.setLatestAXISReco(getLatestFourRecommendations(stockUniverse.getTicker(), "AXIS", stockUniverse.getLatestPrice().doubleValue()));
+            nseBse500.setLatestICICIDIRECTReco(getLatestFourRecommendations(stockUniverse.getTicker(), "ICICIDIRECT", stockUniverse.getLatestPrice().doubleValue()));
+            nseBse500.setLatestPLReco(getLatestFourRecommendations(stockUniverse.getTicker(), "PL", stockUniverse.getLatestPrice().doubleValue()));
+            nseBse500.setLatestKOTAKReco(getLatestFourRecommendations(stockUniverse.getTicker(), "KOTAK", stockUniverse.getLatestPrice().doubleValue()));
+
+            getLatestFourValuation(stockUniverse.getTicker(),stockUniverse.getLatestPrice().doubleValue(), nseBse500);
 
             nseBse500List.add(nseBse500);
         }
         return nseBse500List;
+    }
+
+    private static String getLatestFourRecommendations(String ticker, String broker, double cmp) {
+        // Get the latest quarter across all records
+        String latestQuarter = stockAnalystRecoRepository.findMaxKeyQuarter();
+
+        // Build a list of the four quarters to query for
+        List<String> quartersToQuery = new ArrayList<>();
+        quartersToQuery.add(latestQuarter);
+        int currentYear = Integer.parseInt(latestQuarter.substring(2, 4));
+        int currentQuarter = Integer.parseInt(latestQuarter.substring(5));
+        for (int i = 1; i <= 3; i++) {
+            currentQuarter--;
+            if (currentQuarter == 0) {
+                currentYear--;
+                currentQuarter = 4;
+            }
+            quartersToQuery.add(String.format("FY%dQ%d", currentYear, currentQuarter));
+        }
+
+        // Query the database for the four quarters for the ticker and broker
+        List<StockAnalystReco> recoList = stockAnalystRecoRepository
+                .findAllByKeyTickerAndKeyBrokerAndKeyQuarterIn(ticker, broker, quartersToQuery);
+
+        // Build the result string with the latest four recommendations
+        String result = "";
+        for (int i = 0; i < 4; i++) {
+            String quarter = quartersToQuery.get(i);
+            StockAnalystReco reco = null;
+            for (StockAnalystReco r : recoList) {
+                if (r.getKey().getQuarter().equals(quarter)) {
+                    reco = r;
+                    break;
+                }
+            }
+            if (reco != null) {
+                String recoStr = reco.getReco();
+                BigDecimal target = reco.getTarget();
+                BigDecimal growth = reco.getSalesGrowth();
+                DecimalFormat df = new DecimalFormat("#,##0");
+                String targetStr = "-";
+                if (target != null) {
+                    targetStr = df.format(target.intValue());
+                }
+                if (target != null && target.doubleValue() > 0 && cmp > 0) {
+                    result += quarter + "-" + recoStr + "/" + targetStr + "(" + df.format(((target.doubleValue()/cmp)-1)*100)+ "%)" + "/g%~" + df.format(growth.doubleValue()*100) + "%";
+                } else
+                    result += quarter + "-" + recoStr + "/" + targetStr + "/g%~" + df.format(growth.doubleValue()*100) + "%";
+            } else {
+                result += quarter + "- ";
+            }
+            if (i < 3) {
+                result += " ";
+            }
+        }
+
+        return result;
+    }
+
+    private static void getLatestFourValuation(String ticker, double cmp, NseBse500 nseBse500) {
+        // Get the latest quarter across all records
+        String latestQuarter = stockValuationRepository.findMaxKeyQuarter();
+
+        // Build a list of the four quarters to query for
+        List<String> quartersToQuery = new ArrayList<>();
+        quartersToQuery.add(latestQuarter);
+        int currentYear = Integer.parseInt(latestQuarter.substring(2, 4));
+        int currentQuarter = Integer.parseInt(latestQuarter.substring(5));
+        for (int i = 1; i <= 3; i++) {
+            currentQuarter--;
+            if (currentQuarter == 0) {
+                currentYear--;
+                currentQuarter = 4;
+            }
+            quartersToQuery.add(String.format("FY%dQ%d", currentYear, currentQuarter));
+        }
+
+        // Query the database for the four quarters for the ticker and broker
+        List<StockValuation> recoList = stockValuationRepository
+                .findAllByKeyTickerAndKeyQuarterIn(ticker, quartersToQuery);
+
+        // Build the result string with the latest four recommendations
+        String minValuation = "";
+        String maxValuation = "";
+        String wacc = "";
+        String taxRate = "";
+        String revenueGrowthNext10yr = "";
+        String opmNext10yr = "";
+        String netPpeByRevenue10yr = "";
+        String depreciationByNetPpe10yr = "";
+        String historicalRoic = "";
+        String secondAndTerminalStageAssumptions = "";
+        String otherIncGrowthAssumptions = "";
+
+        for (int i = 0; i < 4; i++) {
+            String quarter = quartersToQuery.get(i);
+            StockValuation valuation = null;
+            for (StockValuation r : recoList) {
+                if (r.getKey().getQuarter().equals(quarter)) {
+                    valuation = r;
+                    break;
+                }
+            }
+            if (valuation != null) {
+                DecimalFormat df = new DecimalFormat("#,##0");
+                DecimalFormat pf = new DecimalFormat("#,##0.0");
+
+                if (valuation.getMinFairPrice() != null && cmp > 0) {
+                    String minMcap = df.format(valuation.getMinMcap().doubleValue());
+                    String minPrice = df.format(valuation.getMinFairPrice().doubleValue());
+
+                    String maxMcap = df.format(valuation.getMaxMcap().doubleValue());
+                    String maxPrice = df.format(valuation.getMaxFairPrice().doubleValue());
+
+                    minValuation += quarter + "-" + minMcap + "/" + minPrice + "(" + df.format(((cmp/valuation.getMinFairPrice().doubleValue())-1)*100)+ "%)" + "/"+df.format(valuation.getMinRevenueGrowthNext10yr().doubleValue()*100)+"%";
+                    maxValuation += quarter + "-" + maxMcap + "/" + maxPrice + "(" + df.format(((valuation.getMaxFairPrice().doubleValue()/cmp)-1)*100)+ "%)" + "/"+df.format(valuation.getMaxRevenueGrowthNext10yr().doubleValue()*100)+"%";
+
+                } else {
+                    minValuation += quarter + "-";
+                    maxValuation += quarter + "-";
+                }
+
+                if (valuation.getWacc() != null) {
+                    wacc += quarter + "-" + pf.format(valuation.getWacc().doubleValue()*100)+ "%";
+                } else {
+                    wacc += quarter + "-";
+                }
+
+                if (valuation.getTaxRate() != null) {
+                    taxRate += quarter + "-" + df.format(valuation.getTaxRate().doubleValue()*100)+ "%";
+                } else {
+                    taxRate += quarter + "-";
+                }
+
+                if (valuation.getRevenueGrowthNext10yr() != null) {
+                    revenueGrowthNext10yr += quarter + "-" + df.format(valuation.getRevenueGrowthNext10yr().doubleValue()*100)+ "%";
+                } else {
+                    revenueGrowthNext10yr += quarter + "-";
+                }
+
+                if (valuation.getOpmNext10yr() != null) {
+                    opmNext10yr += quarter + "-" + df.format(valuation.getOpmNext10yr().doubleValue()*100)+ "%";
+                } else {
+                    opmNext10yr += quarter + "-";
+                }
+
+                if (valuation.getNetPpeByRevenue10yr() != null) {
+                    netPpeByRevenue10yr += quarter + "-" + df.format(valuation.getNetPpeByRevenue10yr().doubleValue()*100)+ "%";
+                } else {
+                    netPpeByRevenue10yr += quarter + "-";
+                }
+
+                if (valuation.getDepreciationByNetPpe10yr() != null) {
+                    depreciationByNetPpe10yr += quarter + "-" + df.format(valuation.getDepreciationByNetPpe10yr().doubleValue()*100)+ "%";
+                } else {
+                    depreciationByNetPpe10yr += quarter + "-";
+                }
+
+                if (valuation.getHistoricalRoic() != null) {
+                    historicalRoic += quarter + "-" + df.format(valuation.getHistoricalRoic().doubleValue()*100)+ "%";
+                } else {
+                    historicalRoic += quarter + "-";
+                }
+
+                if (valuation.getRoicSecondStage() != null) {
+                    secondAndTerminalStageAssumptions += quarter + "-" + "g% ~ " + df.format(valuation.getRevenueGrowthSecondStage().doubleValue()*100) + "@" + df.format(valuation.getNextStageGrowthPeriod()) + "Yrs / " + df.format(valuation.getTerminalGrowth().doubleValue()*100) + "%; RoNIC ~ " + df.format(valuation.getRoicSecondStage().doubleValue()*100) + "% / " + df.format(valuation.getTerminalRoic().doubleValue()*100);
+                } else {
+                    secondAndTerminalStageAssumptions += quarter + "-";
+                }
+
+                if (valuation.getOtherIncGrowthNext10yr() != null) {
+                    otherIncGrowthAssumptions += quarter + "-" + df.format(valuation.getOtherIncGrowthNext10yr().doubleValue()*100)+ "%@" + df.format(valuation.getOtherIncGrowthPeriod().doubleValue()) + "Yrs then " + df.format(valuation.getOtherIncTerminalGrowth().doubleValue()*100) + "%";
+                } else {
+                    otherIncGrowthAssumptions += quarter + "-";
+                }
+
+            } else {
+                minValuation += quarter + "- ";
+                maxValuation += quarter + "- ";
+                wacc += quarter + "- ";
+                taxRate += quarter + "- ";
+                revenueGrowthNext10yr += quarter + "- ";
+                opmNext10yr += quarter + "- ";
+                netPpeByRevenue10yr += quarter + "- ";
+                depreciationByNetPpe10yr += quarter + "- ";
+                historicalRoic += quarter + "- ";
+                secondAndTerminalStageAssumptions += quarter + "- ";
+                otherIncGrowthAssumptions += quarter + "- ";
+            }
+            if (i < 3) {
+                minValuation += " ";
+                maxValuation += " ";
+                wacc += " ";
+                taxRate += " ";
+                revenueGrowthNext10yr += " ";
+                opmNext10yr += " ";
+                netPpeByRevenue10yr += " ";
+                depreciationByNetPpe10yr += " ";
+                historicalRoic += " ";
+                secondAndTerminalStageAssumptions += " ";
+                otherIncGrowthAssumptions += " ";
+            }
+        }
+
+        nseBse500.setMinValuation(minValuation);
+        nseBse500.setMaxValuation(maxValuation);
+        nseBse500.setWacc(wacc);
+        nseBse500.setTaxRate(taxRate);
+        nseBse500.setRevenueGrowthNext10yr(revenueGrowthNext10yr);
+        nseBse500.setOpmNext10yr(opmNext10yr);
+        nseBse500.setNetPpeByRevenue10yr(netPpeByRevenue10yr);
+        nseBse500.setDepreciationByNetPpe10yr(depreciationByNetPpe10yr);
+        nseBse500.setHistoricalRoic(historicalRoic);
+        nseBse500.setSecondAndTerminalStageAssumptions(secondAndTerminalStageAssumptions);
+        nseBse500.setOtherIncGrowthAssumptions(otherIncGrowthAssumptions);
     }
 
     /**
@@ -457,7 +695,7 @@ public class CommonService {
             history.setTicker(ticker);
             history.setDate(stockPnl.getKey().getDate());
             history.setPe(stockPnl.getPe());
-            //history.setPb(stockPnl.getPrice());
+            //history.setPb(stockPnl.getCmp());
             valuationHistories.add(history);
         }
         return valuationHistories;
