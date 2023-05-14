@@ -22,7 +22,7 @@
 
 		function doPlot(position) {
 			$.plot("#placeholder", [
-				{ data: oilprices, label: "Oil price ($)" },
+				{ data: oilprices, label: "Oil cmp ($)" },
 				{ data: exchangerates, label: "USD/EUR exchange rate", yaxis: 2 }
 			], {
 				xaxes: [ { mode: "time" } ],
@@ -61,7 +61,7 @@
 			<div id="placeholder" class="demo-placeholder"></div>
 		</div>
 
-		<p>Multiple axis support showing the raw oil price in US $/barrel of crude oil vs. the exchange rate from US $ to €.</p>
+		<p>Multiple axis support showing the raw oil cmp in US $/barrel of crude oil vs. the exchange rate from US $ to €.</p>
 
 		<p>As illustrated, you can put in multiple axes if you need to. For each data series, simply specify the axis number. In the options, you can then configure where you want the extra axes to appear.</p>
 

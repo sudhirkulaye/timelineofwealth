@@ -48,6 +48,25 @@ public class NseBse500 implements Serializable {
     private String subIndustryNameDisplay;
     private DailyDataS dailyDataS;
     private StockPriceMovement stockPriceMovement;
+    private String latestMOSLReco;
+    private String latestAMBITReco;
+    private String latestAXISReco;
+    private String latestICICIDIRECTReco;
+    private String latestPLReco;
+    private String latestKOTAKReco;
+    private String latestOTHERReco;
+    private String minValuation;
+    private String maxValuation;
+    private String wacc;
+    private String taxRate;
+    private String revenueGrowthNext10yr;
+    private String opmNext10yr;
+    private String netPpeByRevenue10yr;
+    private String depreciationByNetPpe10yr;
+    private String historicalRoic;
+    private String secondAndTerminalStageAssumptions;
+    private String otherIncGrowthAssumptions;
+
 
     public NseBse500(){}
     public NseBse500(StockUniverse stockUniverse){
@@ -355,4 +374,129 @@ public class NseBse500 implements Serializable {
         this.stockPriceMovement = stockPriceMovement;
     }
 
+    public String getLatestMOSLReco() {
+        return latestMOSLReco;
+    }
+    public void setLatestMOSLReco(String latestMOSLReco) {
+        this.latestMOSLReco = latestMOSLReco;
+    }
+
+    public String getLatestAMBITReco() {
+        return latestAMBITReco;
+    }
+    public void setLatestAMBITReco(String latestAMBITReco) {
+        this.latestAMBITReco = latestAMBITReco;
+    }
+
+    public String getLatestAXISReco() {
+        return latestAXISReco;
+    }
+    public void setLatestAXISReco(String latestAXISReco) {
+        this.latestAXISReco = latestAXISReco;
+    }
+
+    public String getLatestICICIDIRECTReco() {
+        return latestICICIDIRECTReco;
+    }
+    public void setLatestICICIDIRECTReco(String latestICICIDIRECTReco) {
+        this.latestICICIDIRECTReco = latestICICIDIRECTReco;
+    }
+
+    public String getLatestPLReco() {
+        return latestPLReco;
+    }
+    public void setLatestPLReco(String latestPLReco) {
+        this.latestPLReco = latestPLReco;
+    }
+
+    public String getLatestKOTAKReco() {
+        return latestKOTAKReco;
+    }
+    public void setLatestKOTAKReco(String latestKOTAKReco) {
+        this.latestKOTAKReco = latestKOTAKReco;
+    }
+
+    public String getLatestOTHERReco() {
+        return latestOTHERReco;
+    }
+    public void setLatestOTHERReco(String latestOTHERReco) {
+        this.latestOTHERReco = latestOTHERReco;
+    }
+
+    public String getMinValuation() {
+        return minValuation;
+    }
+    public void setMinValuation(String minValuation) {
+        this.minValuation = minValuation;
+    }
+
+    public String getMaxValuation() {
+        return maxValuation;
+    }
+    public void setMaxValuation(String maxValuation) {
+        this.maxValuation = maxValuation;
+    }
+
+    public String getWacc() {
+        return wacc;
+    }
+    public void setWacc(String wacc) {
+        this.wacc = wacc;
+    }
+
+    public String getTaxRate() {
+        return taxRate;
+    }
+    public void setTaxRate(String taxRate) {
+        this.taxRate = taxRate;
+    }
+
+    public String getRevenueGrowthNext10yr() {
+        return revenueGrowthNext10yr;
+    }
+    public void setRevenueGrowthNext10yr(String revenueGrowthNext10yr) {
+        this.revenueGrowthNext10yr = revenueGrowthNext10yr;
+    }
+
+    public String getOpmNext10yr() {
+        return opmNext10yr;
+    }
+    public void setOpmNext10yr(String opmNext10yr) {
+        this.opmNext10yr = opmNext10yr;
+    }
+
+    public String getNetPpeByRevenue10yr() {
+        return netPpeByRevenue10yr;
+    }
+    public void setNetPpeByRevenue10yr(String netPpeByRevenue10yr) {
+        this.netPpeByRevenue10yr = netPpeByRevenue10yr;
+    }
+
+    public String getDepreciationByNetPpe10yr() {
+        return depreciationByNetPpe10yr;
+    }
+    public void setDepreciationByNetPpe10yr(String depreciationByNetPpe10yr) {
+        this.depreciationByNetPpe10yr = depreciationByNetPpe10yr;
+    }
+
+    public String getHistoricalRoic() {
+        return historicalRoic;
+    }
+    public void setHistoricalRoic(String historicalRoic) {
+        this.historicalRoic = historicalRoic;
+    }
+
+    public String getSecondAndTerminalStageAssumptions() {
+        return secondAndTerminalStageAssumptions;
+    }
+    public void setSecondAndTerminalStageAssumptions(String secondAndTerminalStageAssumptions) {
+        this.secondAndTerminalStageAssumptions = secondAndTerminalStageAssumptions;
+    }
+
+    public String getOtherIncGrowthAssumptions() {
+        return otherIncGrowthAssumptions;
+    }
+    public void setOtherIncGrowthAssumptions(String otherIncGrowthAssumptions) {
+        this.otherIncGrowthAssumptions = otherIncGrowthAssumptions;
+    }
 }
