@@ -117,7 +117,7 @@
                                     <th align='right'>Price</th>
                                     <th align='right' ng-click="sortData('dailyDataS.rank')" ng-hide="flagBasicInfo">MCap Rank<i ng-class="getSortClass('dailyDataS.rank')" /></th>
                                     <th ng-click="sortData('dailyDataS.lastResultDate')" ng-hide="flagFundamentalInfo">Last Result<i ng-class="getSortClass('dailyDataS.lastResultDate')" /></th>
-                                    <th ng-click="sortData('dailyDataS.priceChange')" ng-hide="flagFundamentalInfo">TTM Sales<i ng-class="getSortClass('dailyDataS.priceChange')" /></th>
+                                    <th ng-click="sortData('dailyDataS.sales')" ng-hide="flagFundamentalInfo">TTM Sales<i ng-class="getSortClass('dailyDataS.sales')" /></th>
                                     <th ng-click="sortData('dailyDataS.netProfit')" ng-hide="flagFundamentalInfo">TTM Profit<i ng-class="getSortClass('dailyDataS.netProfit')" /></th>
                                     <th ng-click="sortData('dailyDataS.opmLatestQuarter')" ng-hide="flagFundamentalInfo">OPM Latest<i ng-class="getSortClass('dailyDataS.opmLatestQuarter')" /></th>
                                     <th ng-click="sortData('dailyDataS.npmLatestQuarter')" ng-hide="flagFundamentalInfo">NPM Latest<i ng-class="getSortClass('dailyDataS.npmLatestQuarter')" /></th>
@@ -157,7 +157,7 @@
                                     <!--<th ng-hide="flagPricePerformance">10Y</th>-->
                                     <!--<th ng-hide="flagPricePerformance">5Years</th>-->
                                     <!--<th ng-hide="flagPricePerformance">10Years</th>-->
-                                    <th ng-click="sortData('dailyDataS.priceChange')" ng-hide="flagAdditionalInfo">Sales<i ng-class="getSortClass('dailyDataS.noplat')" /></th>
+                                    <th ng-click="sortData('dailyDataS.sales')" ng-hide="flagAdditionalInfo">Sales<i ng-class="getSortClass('dailyDataS.sales')" /></th>
                                     <th ng-click="sortData('dailyDataS.salesGrowth5years')" ng-hide="flagAdditionalInfo">5Y g%<i ng-class="getSortClass('dailyDataS.salesGrowth5years')" /></th>
                                     <th ng-click="sortData('dailyDataS.salesGrowth10years')" ng-hide="flagAdditionalInfo">10Y g%<i ng-class="getSortClass('dailyDataS.salesGrowth10years')" /></th>
                                     <th ng-click="sortData('dailyDataS.opmLastYear')" ng-hide="flagAdditionalInfo">OPM%<i ng-class="getSortClass('dailyDataS.opmLastYear')" /></th>
@@ -203,7 +203,7 @@
                                     <td align='right'>{{stock.latestPrice | number:0}}</td>
                                     <td align='right' ng-hide="flagBasicInfo">{{stock.dailyDataS.rank}}</td>
                                     <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.lastResultDate}}</td>
-                                    <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.priceChange | currency:"&#8377;":0}}</td>
+                                    <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.sales | currency:"&#8377;":0}}</td>
                                     <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.netProfit | currency:"&#8377;":0}}</td>
                                     <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.opmLatestQuarter}}%</td>
                                     <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.npmLatestQuarter}}%</td>
@@ -224,7 +224,7 @@
                                     <td align='right' ng-hide="flagValuations">{{stock.dailyDataS.profitGrowth3years}}%</td>
                                     <td align='right' ng-hide="flagValuations">{{stock.dailyDataS.peTtm}}</td>
                                     <td align='right' ng-hide="flagValuations">{{stock.dailyDataS.pbTtm}}</td>
-                                    <td align='right' ng-hide="flagValuations">{{stock.dailyDataS.priceChange/stock.dailyDataS.marketCap | number:2}}</td>
+                                    <td align='right' ng-hide="flagValuations">{{stock.dailyDataS.sales/stock.dailyDataS.marketCap | number:2}}</td>
                                     <td align='right' ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return1D | number:1}}%</td>
                                     <td align='right' ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return1W | number:1}}%</td>
                                     <td align='right' ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return2W | number:1}}%</td>
@@ -243,7 +243,7 @@
                                     <!--<td ng-hide="flagPricePerformance">{{stock.stockPriceMovement.return10Y | number:2}}%</td>-->
                                     <!--<td ng-hide="flagPricePerformance">-</td>-->
                                     <!--<td ng-hide="flagPricePerformance">-</td>-->
-                                    <td align='right' ng-hide="flagAdditionalInfo">{{(stock.dailyDataS.priceChange/1000) | number:1}}</td>
+                                    <td align='right' ng-hide="flagAdditionalInfo">{{(stock.dailyDataS.sales/1000) | number:1}}</td>
                                     <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.salesGrowth5years | number:2}}%</td>
                                     <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.salesGrowth10years | number:2}}%</td>
                                     <td align='right' ng-hide="flagAdditionalInfo">{{stock.dailyDataS.opmLastYear | number:2}}%</td>
