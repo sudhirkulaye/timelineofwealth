@@ -259,6 +259,8 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             } else {
                 ebitdaMargin = lines[ebitdaMarginLineNumber];
             }
+            //patch to remove '%' from ebitdaMargin
+            ebitdaMargin = ebitdaMargin.replaceAll("%", "");
 
             // Convert rest of the line into Array
             String[] headerColumns = getDataColumnsForHeader(header, HEADER_ROW_NAME);
@@ -390,7 +392,7 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             headerLineNumber = -1;
             headerLineNumber = getLineNumberForMatchingPattern(lines, 0, HEADER_ROW_NAME,rdec, BROKER);
             if (headerLineNumber > 1)
-                System.out.println("Ratio Header Line No. : " + headerLineNumber);
+                System.out.println("Ratio Header Line No. : " + headerLineNumber + " Value - " + lines[headerLineNumber]);
             else
                 System.out.println("\n\n ********** Exception ********* \n\n Ratio Header Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 
@@ -398,7 +400,7 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             int roceLineNumber = -1;
             roceLineNumber = getLineNumberForMatchingPattern(lines, headerLineNumber, ROCE_ROW_NAME,rdec, BROKER);
             if (roceLineNumber > 1)
-                System.out.println("ROCE Line No. : " + roceLineNumber);
+                System.out.println("ROCE Line No. : " + roceLineNumber + " Value - " + lines[roceLineNumber]);
             else
                 System.out.println("\n\n ********** Exception ********* \n\n ROCE Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 
@@ -406,7 +408,7 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             int evbyebitdaLineNumber = -1;
             evbyebitdaLineNumber = getLineNumberForMatchingPattern(lines, headerLineNumber, EVBYEBITDA_ROW_NAME,rdec, BROKER);
             if (evbyebitdaLineNumber > 1)
-                System.out.println("EVBYEBITDA Line No. : " + evbyebitdaLineNumber + "  Value -" + lines[evbyebitdaLineNumber]);
+                System.out.println("EVBYEBITDA Line No. : " + evbyebitdaLineNumber + "  Value - " + lines[evbyebitdaLineNumber]);
             else
                 System.out.println("\n\n ********** Exception ********* \n\n EVBYEBITDA Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 
@@ -422,6 +424,22 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             // Handle exceptional case if Coumnn array is null
             if (headerColumns == null || headerColumns.length == 0) {
                 headerColumns = appendPreviousRow(lines, headerLineNumber, HEADER_ROW_NAME, true);
+                //evenif header columns are null thne add next line
+                if(headerColumns == null || headerColumns.length == 0) {
+                    header = lines[headerLineNumber] + lines[headerLineNumber+1];
+                    headerColumns = getDataColumnsForHeader(header, HEADER_ROW_NAME);
+                }
+                // case when header "Y/E March" is on the next line and corresponding data on the previous line
+                if(headerColumns == null || headerColumns.length == 0) {
+                    header = lines[headerLineNumber] + lines[headerLineNumber-1];
+                    headerColumns = getDataColumnsForHeader(header, HEADER_ROW_NAME);
+                    if (roceColumns == null || roceColumns.length == 0){
+                        roceColumns = getDataColumnsForHeader(roce + lines[roceLineNumber-1], ROCE_ROW_NAME);
+                    }
+                    if (evbyebitdaColumns == null || evbyebitdaColumns.length == 0){
+                        evbyebitdaColumns = getDataColumnsForHeader(evbyebitda + lines[evbyebitdaLineNumber-1], EVBYEBITDA_ROW_NAME);
+                    }
+                }
             }
 
 
@@ -551,9 +569,18 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             reportParameters.setY0OPM(new BigDecimal(Double.parseDouble(y0EBITDAMargin)/100).setScale(4, RoundingMode.HALF_UP));
             reportParameters.setY1OPM(new BigDecimal(Double.parseDouble(y1EBITDAMargin)/100).setScale(4, RoundingMode.HALF_UP));
             reportParameters.setY2OPM(new BigDecimal(Double.parseDouble(y2EBITDAMargin)/100).setScale(4, RoundingMode.HALF_UP));
-            reportParameters.setY0ROCE(new BigDecimal(Double.parseDouble(y0ROCE)/100).setScale(4, RoundingMode.HALF_UP));
-            reportParameters.setY1ROCE(new BigDecimal(Double.parseDouble(y1ROCE)/100).setScale(4, RoundingMode.HALF_UP));
-            reportParameters.setY2ROCE(new BigDecimal(Double.parseDouble(y2ROCE)/100).setScale(4, RoundingMode.HALF_UP));
+            if(!y0ROCE.isEmpty())
+                reportParameters.setY0ROCE(new BigDecimal(Double.parseDouble(y0ROCE)/100).setScale(4, RoundingMode.HALF_UP));
+            else
+                reportParameters.setY0ROCE(new BigDecimal("0"));
+            if(!y1ROCE.isEmpty())
+                reportParameters.setY1ROCE(new BigDecimal(Double.parseDouble(y1ROCE)/100).setScale(4, RoundingMode.HALF_UP));
+            else
+                reportParameters.setY1ROCE(new BigDecimal("0"));
+            if(!y2ROCE.isEmpty())
+                reportParameters.setY2ROCE(new BigDecimal(Double.parseDouble(y2ROCE)/100).setScale(4, RoundingMode.HALF_UP));
+            else
+                reportParameters.setY2ROCE(new BigDecimal("0"));
             reportParameters.setY0EVBYEBIT(new BigDecimal(y0EVBYEBITNumber).setScale(2, RoundingMode.HALF_UP));
             reportParameters.setY1EVBYEBIT(new BigDecimal(y1EVBYEBITNumber).setScale(2, RoundingMode.HALF_UP));
             reportParameters.setY2EVBYEBIT(new BigDecimal(y2EVBYEBITNumber).setScale(2, RoundingMode.HALF_UP));

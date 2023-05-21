@@ -55,6 +55,7 @@ public class NseBse500 implements Serializable {
     private String latestPLReco;
     private String latestKOTAKReco;
     private String latestOTHERReco;
+    private String resultValuation;
     private String minValuation;
     private String maxValuation;
     private String wacc;
@@ -421,6 +422,13 @@ public class NseBse500 implements Serializable {
     }
     public void setLatestOTHERReco(String latestOTHERReco) {
         this.latestOTHERReco = latestOTHERReco;
+    }
+
+    public String getResultValuation() {
+        return resultValuation;
+    }
+    public void setResultValuation(String resultValuation) {
+        this.resultValuation = resultValuation;
     }
 
     public String getMinValuation() {

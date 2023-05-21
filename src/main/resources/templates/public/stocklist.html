@@ -175,17 +175,18 @@
                                     <th ng-hide="flagAnalystsReco">Broker 5</th>
                                     <th ng-hide="flagAnalystsReco">Broker 6</th>
 
+                                    <th ng-hide="flagDCFValuation">Result MCap/Price(<i class="fa fa-arrow-down"></i>%)</th>
                                     <th ng-hide="flagDCFValuation">Min. MCap/Price(<i class="fa fa-arrow-down"></i>%)/g%</th>
                                     <th ng-hide="flagDCFValuation">Max. MCap/Price(<i class="fa fa-arrow-up"></i>%)/g%</th>
                                     <th ng-hide="flagDCFValuation">WACC</th>
                                     <!--<th ng-hide="flagDCFValuation">Tax%</th>-->
-                                    <th ng-hide="flagDCFValuation">10Yr g</th>
+                                    <th ng-hide="flagDCFValuation">10Yr g%</th>
                                     <th ng-hide="flagDCFValuation">OPM</th>
                                     <th ng-hide="flagDCFValuation">PPE/Rev</th>
                                     <th ng-hide="flagDCFValuation">Dep/PPE</th>
                                     <!--<th ng-hide="flagDCFValuation">Hist. RoIC%</th>-->
-                                    <th ng-hide="flagDCFValuation">Second and Terminal Stage g% Assumptions</th>
-                                    <th ng-hide="flagDCFValuation">Other Inc. g% Assumptions</th>
+                                    <th ng-hide="flagDCFValuation">Second and Terminal Stage g%</th>
+                                    <th ng-hide="flagDCFValuation">Other Inc. g%</th>
 
                                 </tr>
                                 <tbody>
@@ -262,7 +263,8 @@
                                     <td align='left' ng-hide="flagAnalystsReco"><pre>{{stock.latestKOTAKReco | quarterSplit }}</pre></td>
 
 
-                                    <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.minValuation | quarterSplit }}</pre></td>
+                                    <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.resultValuation | quarterSplit }}</pre></td>
+                                    <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.minValuation | removeQuarter }}</pre></td>
                                     <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.maxValuation | removeQuarter }}</pre></td>
                                     <td align='left' ng-hide="flagDCFValuation"><pre>{{stock.wacc | removeQuarter }}</pre></td>
                                     <!--<td align='left' ng-hide="flagDCFValuation"><pre>{{stock.taxRate | removeQuarter }}</pre></td>-->

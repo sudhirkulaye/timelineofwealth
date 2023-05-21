@@ -211,12 +211,12 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             tableHeadLineNumber = getLineNumberForMatchingPattern(lines, 0, INCOME_STATEMENT_PAGE,rdec, BROKER);
             headerLineNumber = getLineNumberForMatchingPattern(lines, tableHeadLineNumber, HEADER_ROW_NAME,rdec, BROKER);
             if (headerLineNumber > 1)
-                System.out.println("Inc. Statement Header Line No. : " + headerLineNumber);
+                System.out.println("Inc. Statement Header Line No. : " + headerLineNumber + " Value - " + lines[headerLineNumber]);
             else {
                 // search for header from the top
                 headerLineNumber = getLineNumberForMatchingPattern(lines, 0, HEADER_ROW_NAME,rdec, BROKER);
                 if (headerLineNumber > 0)
-                    System.out.println("Inc. Statement Header Line No. : " + headerLineNumber);
+                    System.out.println("Inc. Statement Header Line No. : " + headerLineNumber + " Value - " + lines[headerLineNumber]);
                 else
                     System.out.println("\n\n ********** Exception ********* \n\n Income Statement Header Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
             }
@@ -225,7 +225,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             int revenueLineNumber = -1;
             revenueLineNumber = getLineNumberForMatchingPattern(lines, headerLineNumber, REVENUE_ROW_NAME,rdec, BROKER);
             if (revenueLineNumber > 1)
-                System.out.println("Revenue Line No. : " + revenueLineNumber);
+                System.out.println("Revenue Line No. : " + revenueLineNumber + " Value - " + lines[revenueLineNumber]);
             else
                 System.out.println("\n\n ********** Exception ********* \n\n Revenue Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 
@@ -233,7 +233,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             int ebitdaLineNumber = -1;
             ebitdaLineNumber = getLineNumberForMatchingPattern(lines, revenueLineNumber, EBITDA_ROW_NAME,rdec, BROKER);
             if (ebitdaLineNumber > 1)
-                System.out.println("EBITDA Line No. : " + ebitdaLineNumber);
+                System.out.println("EBITDA Line No. : " + ebitdaLineNumber + " Value - " + lines[ebitdaLineNumber]);
             else
                 System.out.println("\n\n ********** Exception ********* \n\n EBITDA Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 
@@ -241,7 +241,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             int depreciationLineNumber = -1;
             depreciationLineNumber = getLineNumberForMatchingPattern(lines, ebitdaLineNumber, DEPRECIATION_ROW_NAME,rdec, BROKER);
             if (depreciationLineNumber > 1)
-                System.out.println("Depreciation Line No. : " + depreciationLineNumber);
+                System.out.println("Depreciation Line No. : " + depreciationLineNumber + " Value - " + lines[depreciationLineNumber]);
             else
                 System.out.println("\n\n ********** Exception ********* \n\n Depreciation Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 

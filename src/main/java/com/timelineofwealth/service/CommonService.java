@@ -490,6 +490,7 @@ public class CommonService {
                 .findAllByKeyTickerAndKeyQuarterIn(ticker, quartersToQuery);
 
         // Build the result string with the latest four recommendations
+        String resultValuaiton = "";
         String minValuation = "";
         String maxValuation = "";
         String wacc = "";
@@ -515,7 +516,18 @@ public class CommonService {
                 DecimalFormat df = new DecimalFormat("#,##0");
                 DecimalFormat pf = new DecimalFormat("#,##0.0");
 
-                if (valuation.getMinFairPrice() != null && cmp > 0) {
+                if (valuation.getPrice() != null && valuation.getPrice().doubleValue() > 0 && cmp > 0) {
+
+                    String mcap = df.format(valuation.getMcap().doubleValue());
+                    String price = df.format(valuation.getPrice().doubleValue());
+
+                    resultValuaiton += quarter + "-" + mcap + "/" + price + "(" + df.format(((cmp/valuation.getPrice().doubleValue())-1)*100)+ "%)";
+
+                } else {
+                    resultValuaiton += quarter + "-";
+                }
+
+                if (valuation.getMinFairPrice() != null && valuation.getMinFairPrice().doubleValue() > 0 && cmp > 0) {
                     String minMcap = df.format(valuation.getMinMcap().doubleValue());
                     String minPrice = df.format(valuation.getMinFairPrice().doubleValue());
 
@@ -573,7 +585,7 @@ public class CommonService {
                 }
 
                 if (valuation.getRoicSecondStage() != null) {
-                    secondAndTerminalStageAssumptions += quarter + "-" + "g% ~ " + df.format(valuation.getRevenueGrowthSecondStage().doubleValue()*100) + "@" + df.format(valuation.getNextStageGrowthPeriod()) + "Yrs / " + df.format(valuation.getTerminalGrowth().doubleValue()*100) + "%; RoNIC ~ " + df.format(valuation.getRoicSecondStage().doubleValue()*100) + "% / " + df.format(valuation.getTerminalRoic().doubleValue()*100);
+                    secondAndTerminalStageAssumptions += quarter + "-" + "g% ~ " + df.format(valuation.getRevenueGrowthSecondStage().doubleValue()*100) + "%@" + df.format(valuation.getNextStageGrowthPeriod()) + "Yrs/" + df.format(valuation.getTerminalGrowth().doubleValue()*100) + "%; RoNIC ~ " + df.format(valuation.getRoicSecondStage().doubleValue()*100) + "%/" + df.format(valuation.getTerminalRoic().doubleValue()*100)+"%";
                 } else {
                     secondAndTerminalStageAssumptions += quarter + "-";
                 }
@@ -585,6 +597,7 @@ public class CommonService {
                 }
 
             } else {
+                resultValuaiton += quarter + "- ";
                 minValuation += quarter + "- ";
                 maxValuation += quarter + "- ";
                 wacc += quarter + "- ";
@@ -598,6 +611,7 @@ public class CommonService {
                 otherIncGrowthAssumptions += quarter + "- ";
             }
             if (i < 3) {
+                resultValuaiton += " ";
                 minValuation += " ";
                 maxValuation += " ";
                 wacc += " ";
@@ -612,6 +626,7 @@ public class CommonService {
             }
         }
 
+        nseBse500.setResultValuation(resultValuaiton);
         nseBse500.setMinValuation(minValuation);
         nseBse500.setMaxValuation(maxValuation);
         nseBse500.setWacc(wacc);
