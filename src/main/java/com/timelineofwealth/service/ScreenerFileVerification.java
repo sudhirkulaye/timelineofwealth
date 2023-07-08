@@ -14,7 +14,7 @@ import java.util.Date;
 public class ScreenerFileVerification {
     public static void main(String[] args) {
         String excelPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2023Q4";
-        String latestDateString = "2023-05-20 05:52:00 PM";
+        String latestDateString = "2023-05-30 12:00:00 AM";
 
         try {
             // Parse the latestDate string to a Date object

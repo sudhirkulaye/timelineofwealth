@@ -9,9 +9,20 @@ import java.util.HashSet;
 import java.util.stream.Stream;
 
 public class CreateFolderStructureForIndustry {
-/*    public static void main(String[] argv) throws IOException {
-        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY23Q2";
-        String destinationPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY23Q3";
+
+    public static void main(String[] argv) throws Exception {
+        //1. Create Folder Structure from source folder
+//        createFolderStructure(argv);
+        //2. List Duplicate excel files in Analysis Folder
+//        listDuplicateFiles(argv);
+        //3. List Files and their path in Analysis Folder
+//        listFilesAndFolderPath(argv);
+
+    }
+
+    public static void createFolderStructure(String[] argv) throws IOException {
+        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY23Q4";
+        String destinationPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q1";
 
         File sourceDirectory = new File(sourcePath);
 
@@ -28,7 +39,7 @@ public class CreateFolderStructureForIndustry {
 
 
         System.out.println("Folders for industries created...");
-    }*/
+    }
 
     static void RecursivePrint(File[] arr, int index, int level) throws Exception
     {
@@ -59,7 +70,7 @@ public class CreateFolderStructureForIndustry {
     }
 
     // Driver Method
-    public static void main1(String[] args) throws Exception
+    public static void listFilesAndFolderPath(String[] args) throws Exception
     {
         // Provide full path for directory(change
         // accordingly)
@@ -87,7 +98,8 @@ public class CreateFolderStructureForIndustry {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    //List of duplicate files in multiple folders under the folder \QuarterResultsScreenerExcels\Analysis
+    public static void listDuplicateFiles(String[] args) throws IOException {
         // base folder
         Path start = Paths.get("C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis");
         // set to store file names

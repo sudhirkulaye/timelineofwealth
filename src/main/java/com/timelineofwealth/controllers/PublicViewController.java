@@ -29,6 +29,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/")
     public String index(Model model){
+        logger.debug(String.format("Visited Homepage"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
@@ -37,6 +38,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/userlogin", method = RequestMethod.GET)
     public String  login(Model model, String error, String logout){
+        logger.debug(String.format("Visited Login Page"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Login");
@@ -66,6 +68,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/services")
     public String services(Model model){
+        logger.debug(String.format("Visited /public/services"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Services");
@@ -74,6 +77,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/contactus")
     public String contactus(Model model){
+        logger.debug(String.format("Visited /public/contactus"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Contact Us");
@@ -82,6 +86,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/wealthmanagementapp")
     public String wealthManagementapp(Model model){
+        logger.debug(String.format("Visited /public/wealthmanagementapp"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
@@ -90,6 +95,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/pmsapp")
     public String pmsApp(Model model){
+        logger.debug(String.format("Visited /public/pmsapp"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
@@ -98,6 +104,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/ethicalstandards")
     public String ethicalStandards(Model model){
+        logger.debug(String.format("Visited /public/ethicalstandards"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Ethical Standards");
@@ -106,6 +113,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/whyindependentadvice")
     public String whyIndependentAdvice(Model model){
+        logger.debug(String.format("Visited /public/whyindependentadvice"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
@@ -114,6 +122,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/privacy")
     public String privacy(Model model){
+        logger.debug(String.format("Visited /public/privacy"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
@@ -123,6 +132,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/saa")
     public String assetClasses(Model model){
+        logger.debug(String.format("Visited /public/saa"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
@@ -131,6 +141,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/mftypes")
     public String mutualFundTypes(Model model){
+        logger.debug(String.format("Visited /public/mftypes"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Types of Mutual Funds");
@@ -139,6 +150,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/mflist")
     public String mutualFundList(Model model){
+        logger.debug(String.format("Visited /public/mflist"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Performance of Mutual Funds");
@@ -147,6 +159,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/indexstats")
     public String indexStats(Model model){
+        logger.debug(String.format("Visited /public/indexstats"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "NIFTY-50 Index Statistics");
@@ -155,6 +168,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/stocklist")
     public String stockList(Model model){
+        logger.debug(String.format("Visited /public/stocklist"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Valuation Matrix of NSE-BSE 500");
@@ -163,6 +177,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/stockanalysis/{ticker}")
     public String stockAnalysis(@PathVariable("ticker") String ticker, Model model){
+        logger.debug(String.format("Visited /public/stockanalysis/"+ticker));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Fundamental Analysis of "+ CommonService.getStockDetails(ticker).getName());
@@ -172,6 +187,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/indianeconomy")
     public String indianEconomy(Model model){
+        logger.debug(String.format("Visited /public/indianeconomy"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Indian Economic Indicators");
@@ -180,6 +196,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/retirementfundcalculation")
     public String retirementFundCalculation(Model model){
+        logger.debug(String.format("Visited /public/retirementfundcalculation"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Retirement Fund Calculation");
@@ -188,6 +205,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/midandsmallcapindexstats")
     public String midAndSmallCapIndexStats(Model model){
+        logger.debug(String.format("Visited /public/midandsmallcapindexstats"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "BSE-MidCap and BSE-SmallCap Statistics");
@@ -196,6 +214,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/benchmarkreturns")
     public String benchmarkReturns(Model model){
+        logger.debug(String.format("Visited /public/benchmarkreturns"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Returns Comparision of Benchmarks");
@@ -204,6 +223,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/bankanalysis1")
     public String bankAnalysis1(Model model){
+        logger.debug(String.format("Visited /public/bankanalysis1"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Banking Stocks Analysis - Large Cap");
@@ -212,6 +232,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/bankanalysis2")
     public String bankAnalysis2(Model model){
+        logger.debug(String.format("Visited /public/bankanalysis2"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Banking Stocks Analysis - Mid Cap");
@@ -220,6 +241,7 @@ public class PublicViewController {
 
     @RequestMapping(value = "/public/bankanalysis3")
     public String bankAnalysis3(Model model){
+        logger.debug(String.format("Visited /public/bankanalysis3"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Banking Stocks Analysis - Small Cap");

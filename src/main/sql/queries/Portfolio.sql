@@ -169,11 +169,11 @@ truncate log_table;
 -- DELETE from mosl_transaction where moslcode = 'H20488'; 
 -- update mosl_transaction set script_name = '516030' where script_name = 'YASHPAKKA';
 select * from mosl_transaction where is_processed = 'N' order by date desc;
-select * from mosl_transaction where /*quantity < 0 and*/ date >= '2023-04-17' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
+select * from mosl_transaction where /*quantity < 0 and*/ date >= '2023-07-07' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
 select moslcode, date, script_name, sell_buy, sum(quantity), sum(brokerage) from mosl_transaction where date >= '2023-02-13' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') group by moslcode, date, script_name, sell_buy order by moslcode, date desc, script_name;
 -- update mosl_transaction set portfolioid = 1 where date = '2019-11-18';
 select * from portfolio_holdings a where a.memberid in (1) order by portfolioid, asset_classid, ticker, buy_date;
-select * from portfolio_historical_holdings a where a.memberid in (1) and sell_date > '2022-12-01' order by sell_date desc, ticker;
+select * from portfolio_historical_holdings a where a.memberid in (1) and sell_date > '2023-01-01' order by sell_date desc, ticker;
 select * from portfolio_historical_holdings a where sell_date >= '2021-11-26';
 select b.moslcode, a.memberid, a.portfolioid, a.ticker, a.total_cost, a.cmp, a.market_value, b.net_amount 
 from portfolio_holdings a, moslcode_memberid c, mosl_transaction b

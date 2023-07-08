@@ -462,17 +462,17 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
                     System.out.print(" roce Length " +  roceColumns.length);
                     System.out.print(" evbyebitda Length " +  evbyebitdaColumns.length);
 
-                    y0ROCE = roceColumns[y0Column-(headerColumns.length-roceColumns.length)];
+                    y0ROCE = roceColumns[y0Column-(headerColumns.length-roceColumns.length)].replace("(", "-").replace(")", "").replace("NA", "0");
                 } else if (roceColumns.length != 0) {
-                    y0ROCE = roceColumns[y0Column];
+                    y0ROCE = roceColumns[y0Column].replace("(", "-").replace(")", "").replace("NA", "0");
                 } else {
                     y0ROCE = "0";
                 }
                 try {
                     if (headerColumns.length != evbyebitdaColumns.length && headerColumns.length > evbyebitdaColumns.length) {
-                        y0EVBYEBITDA = evbyebitdaColumns[y0Column - (headerColumns.length - evbyebitdaColumns.length)];
+                        y0EVBYEBITDA = evbyebitdaColumns[y0Column - (headerColumns.length - evbyebitdaColumns.length)].replace("NA", "0").replace("n/m", "0");
                     } else {
-                        y0EVBYEBITDA = evbyebitdaColumns[y0Column];
+                        y0EVBYEBITDA = evbyebitdaColumns[y0Column].replace("NA", "0").replace("n/m", "0");
                     }
                 } catch (Exception e) {
                     y0EVBYEBITDA = "0";
@@ -486,16 +486,16 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             } else {
                 try {
                     if (headerColumns.length != roceColumns.length && headerColumns.length > roceColumns.length && roceColumns.length != 0) {
-                        y1ROCE = roceColumns[y1Column - (headerColumns.length - roceColumns.length)];
+                        y1ROCE = roceColumns[y1Column - (headerColumns.length - roceColumns.length)].replace("(", "-").replace(")", "").replace("NA", "0");
                     } else if (roceColumns.length != 0) {
-                        y1ROCE = roceColumns[y1Column];
+                        y1ROCE = roceColumns[y1Column].replace("(", "-").replace(")", "").replace("NA", "0");
                     } else {
                         y1ROCE = "0";
                     }
                     if (headerColumns.length != evbyebitdaColumns.length && headerColumns.length > evbyebitdaColumns.length) {
-                        y1EVBYEBITDA = evbyebitdaColumns[y1Column - (headerColumns.length - evbyebitdaColumns.length)];
+                        y1EVBYEBITDA = evbyebitdaColumns[y1Column - (headerColumns.length - evbyebitdaColumns.length)].replace("NA", "0").replace("n/m", "0");
                     } else {
-                        y1EVBYEBITDA = evbyebitdaColumns[y1Column];
+                        y1EVBYEBITDA = evbyebitdaColumns[y1Column].replace("NA", "0").replace("n/m", "0");
                     }
                 } catch (Exception e) {
                     y1EVBYEBITDA = "0";
@@ -508,16 +508,16 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             } else {
                 try {
                     if (headerColumns.length != roceColumns.length && headerColumns.length > roceColumns.length && roceColumns.length != 0) {
-                        y2ROCE = roceColumns[y2Column - (headerColumns.length - roceColumns.length)];
+                        y2ROCE = roceColumns[y2Column - (headerColumns.length - roceColumns.length)].replace("(", "-").replace(")", "").replace("NA", "0");
                     } else if (roceColumns.length != 0) {
-                        y2ROCE = roceColumns[y2Column];
+                        y2ROCE = roceColumns[y2Column].replace("(", "-").replace(")", "").replace("NA", "0");
                     } else {
                         y2ROCE = "0";
                     }
                     if (headerColumns.length != evbyebitdaColumns.length && headerColumns.length > evbyebitdaColumns.length) {
-                        y2EVBYEBITDA = evbyebitdaColumns[y2Column - (headerColumns.length - evbyebitdaColumns.length)];
+                        y2EVBYEBITDA = evbyebitdaColumns[y2Column - (headerColumns.length - evbyebitdaColumns.length)].replace("NA", "0").replace("n/m", "0");
                     } else {
-                        y2EVBYEBITDA = evbyebitdaColumns[y2Column];
+                        y2EVBYEBITDA = evbyebitdaColumns[y2Column].replace("NA", "0").replace("n/m", "0");
                     }
                 } catch (Exception e) {
                     y2EVBYEBITDA = "0";
@@ -566,9 +566,18 @@ public class AnalystRecoExtractorMOSL extends AnalystRecoExtractor {
             reportParameters.setY0EBIT(y0EBITDANumber + "-" + y0DepreciationNumber);
             reportParameters.setY1EBIT(y1EBITDANumber + "-" + y1DepreciationNumber);
             reportParameters.setY2EBIT(y2EBITDANumber + "-" + y2DepreciationNumber);
-            reportParameters.setY0OPM(new BigDecimal(Double.parseDouble(y0EBITDAMargin)/100).setScale(4, RoundingMode.HALF_UP));
-            reportParameters.setY1OPM(new BigDecimal(Double.parseDouble(y1EBITDAMargin)/100).setScale(4, RoundingMode.HALF_UP));
-            reportParameters.setY2OPM(new BigDecimal(Double.parseDouble(y2EBITDAMargin)/100).setScale(4, RoundingMode.HALF_UP));
+            if(!y0EBITDAMargin.isEmpty())
+                reportParameters.setY0OPM(new BigDecimal(Double.parseDouble(y0EBITDAMargin)/100).setScale(4, RoundingMode.HALF_UP));
+            else
+                reportParameters.setY0OPM(new BigDecimal(0));
+            if(!y1EBITDAMargin.isEmpty())
+                reportParameters.setY1OPM(new BigDecimal(Double.parseDouble(y1EBITDAMargin)/100).setScale(4, RoundingMode.HALF_UP));
+            else
+                reportParameters.setY1OPM(new BigDecimal(0));
+            if(!y2EBITDAMargin.isEmpty())
+                reportParameters.setY2OPM(new BigDecimal(Double.parseDouble(y2EBITDAMargin)/100).setScale(4, RoundingMode.HALF_UP));
+            else
+                reportParameters.setY2OPM(new BigDecimal(0));
             if(!y0ROCE.isEmpty())
                 reportParameters.setY0ROCE(new BigDecimal(Double.parseDouble(y0ROCE)/100).setScale(4, RoundingMode.HALF_UP));
             else
