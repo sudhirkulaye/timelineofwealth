@@ -540,6 +540,7 @@ public class AnalystRecoExtractorKOTAK extends AnalystRecoExtractor {
                 System.out.print(" Y2 Index " + y2Column + "\n");
                 System.out.println("Header Columns  " + headerColumns.length);
                 System.out.println("OPM Columns " + ebitdaMarginColumns.length);
+
                 System.out.println("ROCE Columns  " + roceColumns.length);
 
                 if (y0Column == -1) {
@@ -554,11 +555,14 @@ public class AnalystRecoExtractorKOTAK extends AnalystRecoExtractor {
                     } else {
                         y0ROCE = roceColumns[y0Column].replace("%", "").replace("NM", "0");
                     }
-                    if (headerColumns.length != ebitdaMarginColumns.length && headerColumns.length > ebitdaMarginColumns.length) {
-                        y0EBITDAMargin = ebitdaMarginColumns[y0Column - (headerColumns.length - ebitdaMarginColumns.length)].replace("%", "");
-                    } else {
-                        y0EBITDAMargin = ebitdaMarginColumns[y0Column].replace("%", "");
-                    }
+                    if(ebitdaMarginColumns.length != 0) {
+                        if (headerColumns.length != ebitdaMarginColumns.length && headerColumns.length > ebitdaMarginColumns.length) {
+                            y0EBITDAMargin = ebitdaMarginColumns[y0Column - (headerColumns.length - ebitdaMarginColumns.length)].replace("%", "");
+                        } else {
+                            y0EBITDAMargin = ebitdaMarginColumns[y0Column].replace("%", "");
+                        }
+                    } else
+                        y0EBITDAMargin = "0";
                 }
                 if (y1Column == -1) {
                     System.out.println(Y1 + " column not found in the header on " + RATIO_PAGE + " page");
@@ -568,11 +572,14 @@ public class AnalystRecoExtractorKOTAK extends AnalystRecoExtractor {
                     } else {
                         y1ROCE = roceColumns[y1Column].replace("%", "").replace("NM", "0");
                     }
-                    if (headerColumns.length != ebitdaMarginColumns.length && headerColumns.length > ebitdaMarginColumns.length) {
-                        y1EBITDAMargin = ebitdaMarginColumns[y1Column - (headerColumns.length - ebitdaMarginColumns.length)].replace("%", "");
-                    } else {
-                        y1EBITDAMargin = ebitdaMarginColumns[y1Column].replace("%", "");
-                    }
+                    if(ebitdaMarginColumns.length != 0) {
+                        if (headerColumns.length != ebitdaMarginColumns.length && headerColumns.length > ebitdaMarginColumns.length) {
+                            y1EBITDAMargin = ebitdaMarginColumns[y1Column - (headerColumns.length - ebitdaMarginColumns.length)].replace("%", "");
+                        } else {
+                            y1EBITDAMargin = ebitdaMarginColumns[y1Column].replace("%", "");
+                        }
+                    } else
+                        y1EBITDAMargin = "0";
                 }
                 if (y2Column == -1) {
                     System.out.println(Y2 + " column not found in the header on " + RATIO_PAGE + " page");
@@ -582,11 +589,14 @@ public class AnalystRecoExtractorKOTAK extends AnalystRecoExtractor {
                     } else {
                         y2ROCE = roceColumns[y2Column].replace("%", "").replace("NM", "0");
                     }
-                    if (headerColumns.length != ebitdaMarginColumns.length && headerColumns.length > ebitdaMarginColumns.length) {
-                        y2EBITDAMargin = ebitdaMarginColumns[y2Column - (headerColumns.length - ebitdaMarginColumns.length)].replace("%", "");
-                    } else {
-                        y2EBITDAMargin = ebitdaMarginColumns[y2Column].replace("%", "");
-                    }
+                    if(ebitdaMarginColumns.length!=0) {
+                        if (headerColumns.length != ebitdaMarginColumns.length && headerColumns.length > ebitdaMarginColumns.length) {
+                            y2EBITDAMargin = ebitdaMarginColumns[y2Column - (headerColumns.length - ebitdaMarginColumns.length)].replace("%", "");
+                        } else {
+                            y2EBITDAMargin = ebitdaMarginColumns[y2Column].replace("%", "");
+                        }
+                    } else
+                        y2EBITDAMargin = "0";
                 }
             } else {
                     System.out.println("\\n\\n*************************\\n\\n Exception Ratio Page is missing - Ratio Page No. -" + valuationPageNumber);

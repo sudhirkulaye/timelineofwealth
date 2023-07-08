@@ -19,7 +19,7 @@ public class PublicApi {
 
     @RequestMapping(value = "/getDates", method = RequestMethod.GET)
     public SetupDates getSetupDates() {
-        logger.debug(String.format("Call public/api/getassetclassifications/"));
+//        logger.debug(String.format("Call public/api/getSetupDates/"));
 
         return CommonService.getSetupDates();
     }
