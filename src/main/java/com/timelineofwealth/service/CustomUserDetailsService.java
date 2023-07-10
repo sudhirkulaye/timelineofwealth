@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,9 +28,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         logger.debug(String.format("In CustomUserDetailsService.loadUserByUsername: username %s", username));
 
         Optional<User> optionalUser = userRepository.findByEmail(username);
+        User user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User Login Id Not Found"));
 
-        optionalUser
-                .orElseThrow(() -> new UsernameNotFoundException("User Login Id Not Found"));
+        if (user.getActive() == 4) {
+            throw new DisabledException("User account is inactive");
+        }
 
         return optionalUser.map(CustomUserDetails::new).get();
     }

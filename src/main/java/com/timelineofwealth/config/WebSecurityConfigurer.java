@@ -1,7 +1,12 @@
 package com.timelineofwealth.config;
 
+import com.timelineofwealth.controllers.UserViewController;
 import com.timelineofwealth.repositories.UserRepository;
+import com.timelineofwealth.service.AccountService;
+import com.timelineofwealth.service.CustomAuthenticationFailureHandler;
 import com.timelineofwealth.service.CustomUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +20,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -22,8 +28,13 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableJpaRepositories(basePackageClasses = UserRepository.class)
 public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserViewController.class);
+
     @Autowired
     CustomUserDetailsService userDetailsService;
+
+    @Autowired
+    private AccountService accountService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -46,6 +57,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/default", true)
                 .usernameParameter("username")
                 .passwordParameter("password")
+                .failureHandler(authenticationFailureHandler())
                 .and()
                 .logout()
                 .permitAll()
@@ -55,6 +67,12 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 .accessDeniedPage("/access-denied");
     }
+
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler(accountService);
+    }
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
