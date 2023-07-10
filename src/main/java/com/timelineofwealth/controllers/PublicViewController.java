@@ -28,8 +28,11 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/")
-    public String index(Model model){
-        logger.debug(String.format("Visited Homepage"));
+    public String index(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited Homepage: IP - " + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
@@ -37,8 +40,11 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/userlogin", method = RequestMethod.GET)
-    public String  login(Model model, String error, String logout){
-        logger.debug(String.format("Visited Login Page"));
+    public String  login(HttpServletRequest request, Model model, String error, String logout){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited Login: IP - " + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Login");
