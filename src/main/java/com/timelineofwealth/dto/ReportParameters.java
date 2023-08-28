@@ -32,7 +32,50 @@ public class ReportParameters implements Serializable {
     private BigDecimal y0EVBYEBIT;
     private BigDecimal y1EVBYEBIT;
     private BigDecimal y2EVBYEBIT;
+    private BigDecimal y0AUM;
+    private BigDecimal y1AUM;
+    private BigDecimal y2AUM;
+    private BigDecimal y0CreditCost;
+    private BigDecimal y1CreditCost;
+    private BigDecimal y2CreditCost;
+    private BigDecimal y0GNPA;
+    private BigDecimal y1GNPA;
+    private BigDecimal y2GNPA;
+    private BigDecimal y0NNPA;
+    private BigDecimal y1NNPA;
+    private BigDecimal y2NNPA;
     private String analystsNames;
+
+    public ReportParameters(){
+        this.quarter = "";
+        this.reportDate = "";
+        this.mcap = new BigDecimal("0");
+        this.price = new BigDecimal("0");
+        this.priceChange = new BigDecimal("0");
+        this.broker = "";
+        this.rating = "";
+        this.target = new BigDecimal("0");
+        this.targetChange = new BigDecimal("0");
+        this.y0Revenue = new BigDecimal("0");
+        this.y1Revenue = new BigDecimal("0");
+        this.y2Revenue = new BigDecimal("0");
+        this.revenueChange = new BigDecimal("0");
+        this.y0EBIT = null;
+        this.y1EBIT = null;
+        this.y2EBIT = null;
+        this.ebitChange = "";
+        this.y0OPM = new BigDecimal("0");
+        this.y1OPM = new BigDecimal("0");
+        this.y2OPM = new BigDecimal("0");
+        this.y0ROCE = new BigDecimal("0");
+        this.y1ROCE = new BigDecimal("0");
+        this.y2ROCE = new BigDecimal("0");
+        this.y0EVBYEBIT = new BigDecimal("0");
+        this.y1EVBYEBIT = new BigDecimal("0");
+        this.y2EVBYEBIT = new BigDecimal("0");
+        this.analystsNames = "";
+
+    }
 
     public String getQuarter() {
         return quarter;
@@ -248,5 +291,101 @@ public class ReportParameters implements Serializable {
 
     public void setAnalystsNames(String analystsNames) {
         this.analystsNames = analystsNames;
+    }
+
+    public BigDecimal getY0AUM() {
+        return y0AUM;
+    }
+
+    public void setY0AUM(BigDecimal y0AUM) {
+        this.y0AUM = y0AUM;
+    }
+
+    public BigDecimal getY1AUM() {
+        return y1AUM;
+    }
+
+    public void setY1AUM(BigDecimal y1AUM) {
+        this.y1AUM = y1AUM;
+    }
+
+    public BigDecimal getY2AUM() {
+        return y2AUM;
+    }
+
+    public void setY2AUM(BigDecimal y2AUM) {
+        this.y2AUM = y2AUM;
+    }
+
+    public BigDecimal getY0CreditCost() {
+        return y0CreditCost;
+    }
+
+    public void setY0CreditCost(BigDecimal y0CreditCost) {
+        this.y0CreditCost = y0CreditCost;
+    }
+
+    public BigDecimal getY1CreditCost() {
+        return y1CreditCost;
+    }
+
+    public void setY1CreditCost(BigDecimal y1CreditCost) {
+        this.y1CreditCost = y1CreditCost;
+    }
+
+    public BigDecimal getY2CreditCost() {
+        return y2CreditCost;
+    }
+
+    public void setY2CreditCost(BigDecimal y2CreditCost) {
+        this.y2CreditCost = y2CreditCost;
+    }
+
+    public BigDecimal getY0GNPA() {
+        return y0GNPA;
+    }
+
+    public void setY0GNPA(BigDecimal y0GNPA) {
+        this.y0GNPA = y0GNPA;
+    }
+
+    public BigDecimal getY1GNPA() {
+        return y1GNPA;
+    }
+
+    public void setY1GNPA(BigDecimal y1GNPA) {
+        this.y1GNPA = y1GNPA;
+    }
+
+    public BigDecimal getY2GNPA() {
+        return y2GNPA;
+    }
+
+    public void setY2GNPA(BigDecimal y2GNPA) {
+        this.y2GNPA = y2GNPA;
+    }
+
+    public BigDecimal getY0NNPA() {
+        return y0NNPA;
+    }
+
+    public void setY0NNPA(BigDecimal y0NNPA) {
+        this.y0NNPA = y0NNPA;
+    }
+
+    public BigDecimal getY1NNPA() {
+        return y1NNPA;
+    }
+
+    public void setY1NNPA(BigDecimal y1NNPA) {
+        this.y1NNPA = y1NNPA;
+    }
+
+    public BigDecimal getY2NNPA() {
+        return y2NNPA;
+    }
+
+    public void setY2NNPA(BigDecimal y2NNPA) {
+        this.y2NNPA = y2NNPA;
     }
 }

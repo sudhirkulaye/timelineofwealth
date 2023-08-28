@@ -1094,50 +1094,54 @@ public class UpdateQuarterlyExcels {
                 XSSFCell firstColumnCell = row.getCell(0);
 
                 // Check if the first column cell is not null
-                if (firstColumnCell != null) {
-                    CellValue firstColumnValue = evaluator.evaluate(firstColumnCell);
+                try {
+                    if (firstColumnCell != null) {
+                        CellValue firstColumnValue = evaluator.evaluate(firstColumnCell);
 
-                    // Loop through each row in the old workbook
-                    for (int j = startRowNum; j <= endRowNumOld; j++) {
-                        XSSFRow oldRow = oldWs.getRow(j);
-                        if(oldRow != null) {
-                            XSSFCell oldFirstColumnCell = oldRow.getCell(0);
+                        // Loop through each row in the old workbook
+                        for (int j = startRowNum; j <= endRowNumOld; j++) {
+                            XSSFRow oldRow = oldWs.getRow(j);
+                            if (oldRow != null) {
+                                XSSFCell oldFirstColumnCell = oldRow.getCell(0);
 
-                            // Check if the first column cell in the old workbook is not null
-                            if (oldFirstColumnCell != null) {
-                                CellValue oldFirstColumnValue = evaluatorOld.evaluate(oldFirstColumnCell);
+                                // Check if the first column cell in the old workbook is not null
+                                if (oldFirstColumnCell != null) {
+                                    CellValue oldFirstColumnValue = evaluatorOld.evaluate(oldFirstColumnCell);
 
-                                if (firstColumnValue != null && oldFirstColumnValue != null && oldFirstColumnValue.getStringValue() != null) {
-                                    // Check if the first column values match
-                                    if (firstColumnValue.getStringValue().equals(oldFirstColumnValue.getStringValue())) {
-                                        lastMatchingRowNo = j;
-                                        // Copy the row from the old workbook to the new workbook
-                                        for (int k = 0; k < row.getLastCellNum(); k++) {
-                                            XSSFCell oldCell = oldRow.getCell(k);
-                                            XSSFCell newCell = row.getCell(k);
-                                            if (oldCell != null) {
-                                                if (oldCell.getCellType() == Cell.CELL_TYPE_STRING) {
-                                                    newCell.setCellType(Cell.CELL_TYPE_BLANK);
-                                                    newCell.setCellValue(evaluatorOld.evaluate(oldCell).getStringValue());
-                                                } else if (oldCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-                                                    newCell.setCellType(Cell.CELL_TYPE_BLANK);
-                                                    newCell.setCellValue(evaluatorOld.evaluate(oldCell).getNumberValue());
+                                    if (firstColumnValue != null && oldFirstColumnValue != null && oldFirstColumnValue.getStringValue() != null) {
+                                        // Check if the first column values match
+                                        if (firstColumnValue.getStringValue().equals(oldFirstColumnValue.getStringValue())) {
+                                            lastMatchingRowNo = j;
+                                            // Copy the row from the old workbook to the new workbook
+                                            for (int k = 0; k < row.getLastCellNum(); k++) {
+                                                XSSFCell oldCell = oldRow.getCell(k);
+                                                XSSFCell newCell = row.getCell(k);
+                                                if (oldCell != null) {
+                                                    if (oldCell.getCellType() == Cell.CELL_TYPE_STRING) {
+                                                        newCell.setCellType(Cell.CELL_TYPE_BLANK);
+                                                        newCell.setCellValue(evaluatorOld.evaluate(oldCell).getStringValue());
+                                                    } else if (oldCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                                                        newCell.setCellType(Cell.CELL_TYPE_BLANK);
+                                                        newCell.setCellValue(evaluatorOld.evaluate(oldCell).getNumberValue());
+                                                    }
+
+                                                    int oldCellStyleIndex = oldCell.getCellStyle().getIndex();
+                                                    XSSFCellStyle newCellStyle = wb.createCellStyle();
+                                                    newCellStyle.cloneStyleFrom(oldWb.getStylesSource().getStyleAt(oldCellStyleIndex));
+                                                    newCell.setCellStyle(newCellStyle);
                                                 }
-
-                                                int oldCellStyleIndex = oldCell.getCellStyle().getIndex();
-                                                XSSFCellStyle newCellStyle = wb.createCellStyle();
-                                                newCellStyle.cloneStyleFrom(oldWb.getStylesSource().getStyleAt(oldCellStyleIndex));
-                                                newCell.setCellStyle(newCellStyle);
                                             }
+                                            break;
                                         }
-                                        break;
+
                                     }
 
                                 }
-
                             }
                         }
                     }
+                } catch (Exception e) {
+                    System.out.println("Error copying file: " + e.getMessage());
                 }
             }
         }
@@ -1299,15 +1303,15 @@ public class UpdateQuarterlyExcels {
                     XSSFCell cell18 = ws.getRow(i).getCell(18);
                     XSSFCell cell19 = ws.getRow(i).getCell(19);
 
-                    if (cell17 != null && oldCell17 != null && oldCell17.getCellFormula() != null) {
+                    if (cell17 != null && oldCell17 != null && oldCell17.getCellType()==Cell.CELL_TYPE_FORMULA && oldCell17.getCellFormula() != null) {
                         cell17.setCellFormula(oldCell17.getCellFormula());
                         evaluator.evaluate(cell17);
                     }
-                    if (cell18 != null && oldCell18 != null && oldCell18.getCellFormula() != null) {
+                    if (cell18 != null && oldCell18 != null && oldCell18.getCellType()==Cell.CELL_TYPE_FORMULA && oldCell18.getCellFormula() != null) {
                         cell18.setCellFormula(oldCell18.getCellFormula());
                         evaluator.evaluate(cell18);
                     }
-                    if (cell19 != null && oldCell19 != null && oldCell19.getCellFormula() != null) {
+                    if (cell19 != null && oldCell19 != null && oldCell19.getCellType()==Cell.CELL_TYPE_FORMULA && oldCell19.getCellFormula() != null) {
                         cell19.setCellFormula(oldCell19.getCellFormula());
                         evaluator.evaluate(cell19);
                     }
@@ -1381,6 +1385,7 @@ public class UpdateQuarterlyExcels {
                             }
                             if(oldDataCell != null) {
                                 if (oldDataCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                                    ws.getRow(rownum).getCell(col).setCellType(Cell.CELL_TYPE_NUMERIC);
                                     data = oldDataCell.getNumericCellValue();
                                     ws.getRow(rownum).getCell(col).setCellValue(data);
                                 }
@@ -1422,7 +1427,13 @@ public class UpdateQuarterlyExcels {
                                 oldCol = i;
                                 break;
                             }
+                        } else if(cellOld.getCellType() == Cell.CELL_TYPE_FORMULA) {
+                            if (cellOld != null && (cellOld.getNumericCellValue() + "").equals(date)) {
+                                oldCol = i;
+                                break;
+                            }
                         }
+
                     }
                 } else if (col == 29) {
                     oldCol = 29;
@@ -1438,6 +1449,9 @@ public class UpdateQuarterlyExcels {
                             oldDataCell = oldDatarow.getCell(oldCol);
                             evaluatorOld.evaluateFormulaCell(oldDataCell);
                             if(oldDataCell != null) {
+                                if(ws.getRow(rownum) == null) {
+                                    ws.createRow(rownum);
+                                }
                                 if(ws.getRow(rownum) != null && ws.getRow(rownum).getCell(col) == null) {
                                     ws.getRow(rownum).createCell(col);
                                 }

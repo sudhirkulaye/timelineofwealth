@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -97,10 +96,7 @@ public class AnalystRecoExtractor {
                     // Call saveReportParameters
                     extractor.saveReportParameters(reportParameters, excelFilePath);
                 }
-
             }
-
-
         } catch (Exception e) {
             System.out.println("Exception in AnalystRecoExtractor.main " + e.getMessage());
             e.printStackTrace();
@@ -190,6 +186,66 @@ public class AnalystRecoExtractor {
 
                         XSSFCell y2EVBYEBITCell = row.getCell(25);
                         y2EVBYEBITCell.setCellValue(reportParameters.getY2EVBYEBIT().doubleValue());
+
+                        if (reportParameters.getY0AUM() != null) {
+                            XSSFCell y0AUMCell = row.getCell(26);
+                            y0AUMCell.setCellValue(reportParameters.getY0AUM().doubleValue());
+                        }
+
+                        if (reportParameters.getY1AUM() != null) {
+                            XSSFCell y1AUMCell = row.getCell(27);
+                            y1AUMCell.setCellValue(reportParameters.getY1AUM().doubleValue());
+                        }
+
+                        if (reportParameters.getY2AUM() != null) {
+                            XSSFCell y2AUMCell = row.getCell(28);
+                            y2AUMCell.setCellValue(reportParameters.getY2AUM().doubleValue());
+                        }
+
+                        if(reportParameters.getY0CreditCost() != null) {
+                            XSSFCell y0CreditCostCell = row.getCell(30);
+                            y0CreditCostCell.setCellValue(reportParameters.getY0CreditCost().doubleValue());
+                        }
+
+                        if(reportParameters.getY1CreditCost() != null) {
+                            XSSFCell y1CreditCostCell = row.getCell(31);
+                            y1CreditCostCell.setCellValue(reportParameters.getY1CreditCost().doubleValue());
+                        }
+
+                        if(reportParameters.getY2CreditCost() != null) {
+                            XSSFCell y2CreditCostCell = row.getCell(32);
+                            y2CreditCostCell.setCellValue(reportParameters.getY2CreditCost().doubleValue());
+                        }
+
+                        if(reportParameters.getY0GNPA() != null) {
+                            XSSFCell y0GNPACell = row.getCell(33);
+                            y0GNPACell.setCellValue(reportParameters.getY0GNPA().doubleValue());
+                        }
+
+                        if(reportParameters.getY1GNPA() != null) {
+                            XSSFCell y1GNPACell = row.getCell(34);
+                            y1GNPACell.setCellValue(reportParameters.getY1GNPA().doubleValue());
+                        }
+
+                        if(reportParameters.getY2GNPA() != null) {
+                            XSSFCell y2GNPACell = row.getCell(35);
+                            y2GNPACell.setCellValue(reportParameters.getY2GNPA().doubleValue());
+                        }
+
+                        if(reportParameters.getY0NNPA() != null) {
+                            XSSFCell y0NNPACell = row.getCell(36);
+                            y0NNPACell.setCellValue(reportParameters.getY0NNPA().doubleValue());
+                        }
+
+                        if(reportParameters.getY1NNPA() != null) {
+                            XSSFCell y1NNPACell = row.getCell(37);
+                            y1NNPACell.setCellValue(reportParameters.getY1NNPA().doubleValue());
+                        }
+
+                        if(reportParameters.getY2NNPA() != null) {
+                            XSSFCell y2NNPACell = row.getCell(38);
+                            y2NNPACell.setCellValue(reportParameters.getY2NNPA().doubleValue());
+                        }
 
                         XSSFCell analystNamesCell = row.getCell(39);
                         if (analystNamesCell == null) {
@@ -397,6 +453,11 @@ public class AnalystRecoExtractor {
             int RESEARCHANALYST1ColumnPosition = -1;
             int RESEARCHANALYST2ColumnPosition = -1;
 
+            int AUMColumnPosition  = -1;
+            int CREDITCOSTSColumnPosition = -1;
+            int GNPAColumnPosition = -1;
+            int NNPAColumnPosition = -1;
+
             // Read header row to get the column index of MCAP header
             for (int i = 2; i < headerRow.getLastCellNum(); i++) {
                 XSSFCell headerCell = headerRow.getCell(i);
@@ -474,6 +535,23 @@ public class AnalystRecoExtractor {
                 if (headerCell.getStringCellValue().equals("RESEARCHANALYST2")) {
                     RESEARCHANALYST2ColumnPosition = i;
                 }
+
+                if (headerCell.getStringCellValue().equals("AUM_ROW_NAME")) {
+                    AUMColumnPosition = i;
+                }
+
+                if (headerCell.getStringCellValue().equals("CREDITCOSTS_ROW_NAME")) {
+                    CREDITCOSTSColumnPosition = i;
+                }
+
+                if (headerCell.getStringCellValue().equals("GNPA_ROW_NAME")) {
+                    GNPAColumnPosition = i;
+                }
+
+                if (headerCell.getStringCellValue().equals("NNPA_ROW_NAME")) {
+                    NNPAColumnPosition = i;
+                }
+
             }
 
 
@@ -548,6 +626,35 @@ public class AnalystRecoExtractor {
 
                 if (MILLIONS_OR_BILLIONSColumnPosition != -1) {
                     reportDataExtractConfig.setMILLIONS_OR_BILLIONS(dataRow.getCell(MILLIONS_OR_BILLIONSColumnPosition).getStringCellValue());
+                }
+
+                if (AUMColumnPosition != -1) {
+                    try {
+                        reportDataExtractConfig.setAUM_ROW_NAME(dataRow.getCell(AUMColumnPosition).getStringCellValue());
+                    } catch (Exception e) {
+                        reportDataExtractConfig.setAUM_ROW_NAME("");
+                    }
+                }
+                if (CREDITCOSTSColumnPosition != -1) {
+                    try {
+                        reportDataExtractConfig.setCREDITCOSTS_ROW_NAME(dataRow.getCell(CREDITCOSTSColumnPosition).getStringCellValue());
+                    } catch (Exception e) {
+                        reportDataExtractConfig.setCREDITCOSTS_ROW_NAME("");
+                    }
+                }
+                if (GNPAColumnPosition != -1) {
+                    try {
+                        reportDataExtractConfig.setGNPA_ROW_NAME(dataRow.getCell(GNPAColumnPosition).getStringCellValue());
+                    } catch (Exception e) {
+                        reportDataExtractConfig.setGNPA_ROW_NAME("");
+                    }
+                }
+                if (NNPAColumnPosition != -1) {
+                    try {
+                        reportDataExtractConfig.setNNPA_ROW_NAME(dataRow.getCell(NNPAColumnPosition).getStringCellValue());
+                    } catch (Exception e) {
+                        reportDataExtractConfig.setNNPA_ROW_NAME("");
+                    }
                 }
 
                 switch (brokerName) {
@@ -924,6 +1031,35 @@ public class AnalystRecoExtractor {
                 String rowHeader = matcher.group(1);
                 int strDataColumnsIndex = headerLine.trim().indexOf(rowHeader)+rowHeader.length();
                 String strDataColumns = headerLine.trim().substring(strDataColumnsIndex, headerLine.trim().length()); // headerLine.replace(rowHeader, "");
+                dataColumns = strDataColumns.trim().split(" ");
+                dataColumns = Arrays.stream(dataColumns)
+                        .filter(s -> !s.isEmpty())
+                        .toArray(String[]::new);
+            }
+        } else {
+            dataColumns = headerLine.trim().split(" ");
+            dataColumns = Arrays.stream(dataColumns)
+                    .filter(s -> !s.isEmpty())
+                    .toArray(String[]::new);
+        }
+        return dataColumns;
+    }
+
+    protected String[] getDataColumnsForHeaderPL(String headerLine, String rowHeaderPattern){
+        String[] dataColumns = null;
+        Pattern pattern = Pattern.compile(rowHeaderPattern);
+        Matcher matcher = pattern.matcher(headerLine.trim());
+        if(!rowHeaderPattern.isEmpty()) {
+            if (matcher.find()) {
+                String rowHeader = matcher.group(1);
+                int strDataColumnsIndex = headerLine.trim().indexOf(rowHeader)+rowHeader.length();
+                String strDataColumns = headerLine.trim().substring(strDataColumnsIndex, headerLine.trim().length()); // headerLine.replace(rowHeader, "");
+                Pattern pattern1 = Pattern.compile("[a-zA-Z]");
+                Matcher matcher1 = pattern1.matcher(strDataColumns);
+                if (matcher1.find()) {
+                    int endIndex = matcher1.start();
+                    strDataColumns = strDataColumns.substring(0, endIndex).trim();
+                }
                 dataColumns = strDataColumns.trim().split(" ");
                 dataColumns = Arrays.stream(dataColumns)
                         .filter(s -> !s.isEmpty())
