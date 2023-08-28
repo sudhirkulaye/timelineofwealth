@@ -37,6 +37,11 @@ public class ReportDataExtractConfig {
     private String RESEARCHANALYST1;
     private String RESEARCHANALYST2;
 
+    private String AUM_ROW_NAME;
+    private String CREDITCOSTS_ROW_NAME;
+    private String GNPA_ROW_NAME;
+    private String NNPA_ROW_NAME;
+
     public ReportDataExtractConfig() {
     }
 
@@ -246,5 +251,37 @@ public class ReportDataExtractConfig {
 
     public void setRESEARCHANALYST2(String RESEARCHANALYST2) {
         this.RESEARCHANALYST2 = RESEARCHANALYST2;
+    }
+
+    public String getAUM_ROW_NAME() {
+        return AUM_ROW_NAME;
+    }
+
+    public void setAUM_ROW_NAME(String AUM_ROW_NAME) {
+        this.AUM_ROW_NAME = AUM_ROW_NAME;
+    }
+
+    public String getCREDITCOSTS_ROW_NAME() {
+        return CREDITCOSTS_ROW_NAME;
+    }
+
+    public void setCREDITCOSTS_ROW_NAME(String CREDITCOSTS_ROW_NAME) {
+        this.CREDITCOSTS_ROW_NAME = CREDITCOSTS_ROW_NAME;
+    }
+
+    public String getGNPA_ROW_NAME() {
+        return GNPA_ROW_NAME;
+    }
+
+    public void setGNPA_ROW_NAME(String GNPA_ROW_NAME) {
+        this.GNPA_ROW_NAME = GNPA_ROW_NAME;
+    }
+
+    public String getNNPA_ROW_NAME() {
+        return NNPA_ROW_NAME;
+    }
+
+    public void setNNPA_ROW_NAME(String NNPA_ROW_NAME) {
+        this.NNPA_ROW_NAME = NNPA_ROW_NAME;
     }
 }

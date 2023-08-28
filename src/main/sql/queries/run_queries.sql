@@ -139,8 +139,7 @@ where a.date = (select min(date) from daily_data_s where date > '2022-01-27') an
 name like 'CMS%' order by date desc;
 
 select a.name, date, "~", round(market_cap,-1) MCap, " / ",  round(cmp, 0) from daily_data_s a, stock_universe b
-where a.date = (select min(date) from daily_data_s where date > '2023-05-23') and a.name = b.ticker and b.ticker = 'AKZOINDIA' order by date desc;
-
+where a.date = (select min(date) from daily_data_s where date > '2023-05-25') and a.name = b.ticker and b.ticker = 'PRAJIND' order by date desc;
 
 select if(is_sensex = 1, 'SENSEX', if(is_nifty50 = 1, 'NIFTY', if(is_nse100 = 1 or is_bse100 = 1, 'NSE-BSE100', if(is_nse200 = 1 or is_bse200 = 1, 'NSE-BSE200', 'NSE-BSE500'))) ) index1, 
 b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, a.cmp, a.market_cap, rank, 
