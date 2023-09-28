@@ -87,7 +87,7 @@ public class AdviserService {
     }
 
     public static List<ClientDTO> getPMSClients(String email) {
-        logger.debug(String.format("In AdviserService.getPMSClients: Email %s", email));
+        logger.debug(String.format("In AdviserService.getLatestResultExcels: Email %s", email));
 
         List<ClientDTO> clientDTOS = new ArrayList<>();
         List<AdviserUserMapping> clients = adviserUserMappingRepository.findByKeyAdviseridOrderByKeyUseridAsc(email);

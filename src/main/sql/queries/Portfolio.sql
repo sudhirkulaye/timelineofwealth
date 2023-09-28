@@ -91,7 +91,7 @@ ORDER BY memberid, portfolioid,sum(a.market_value) desc;
 -- Portfolio Vs Benchmark Performance
 select b.benchmark_name, b.benchmark_type, a.returns_twrr_since_current_month, a.returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_ytd, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from benchmark_twrr_summary a, benchmark b Where a.benchmarkid = b.benchmarkid order by benchmark_type, a.benchmarkid, a.returns_twrr_one_year desc;
 select 'Focus-Five', 'Multi-Cap', returns_twrr_since_current_month, returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_ytd, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from portfolio_twrr_summary a WHERE  a.memberid = 1 AND a.portfolioid = 2;
-select a.memberid /* 'Focus-Five'*/, 'Multi-Cap', returns_twrr_since_current_month, returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_ytd, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from portfolio_twrr_summary a, portfolio b where a.memberid = b.memberid and a.portfolioid = b.portfolioid and b.compositeid in (2,3) order by  a.memberid;
+select d.first_name, d.last_name, a.memberid /* 'Focus-Five'*/, 'Multi-Cap', returns_twrr_since_current_month, returns_twrr_three_months, returns_twrr_half_year, returns_twrr_one_year, returns_twrr_ytd, returns_twrr_two_year, returns_twrr_three_year, returns_twrr_five_year from portfolio_twrr_summary a, portfolio b, member d where a.memberid = b.memberid and b.memberid = d.memberid and a.portfolioid = b.portfolioid and b.compositeid in (2,3) order by  a.memberid;
 
 -- Portfolio returns
 SELECT  c.moslcode, d.first_name, d.last_name, a.*  
@@ -169,8 +169,8 @@ truncate log_table;
 -- DELETE from mosl_transaction where moslcode = 'H20488'; 
 -- update mosl_transaction set script_name = '516030' where script_name = 'YASHPAKKA';
 select * from mosl_transaction where is_processed = 'N' order by date desc;
-select * from mosl_transaction where /*quantity < 0 and*/ date >= '2023-08-17' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
-select moslcode, date, script_name, sell_buy, sum(quantity), sum(brokerage) from mosl_transaction where date = '2023-08-17' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') group by moslcode, date, script_name, sell_buy order by moslcode, date desc, script_name;
+select * from mosl_transaction where /*quantity < 0 and*/ date >= '2023-09-13' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
+select moslcode, date, script_name, sell_buy, sum(quantity), sum(brokerage) from mosl_transaction where date >= '2023-09-13' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') group by moslcode, date, script_name, sell_buy order by moslcode, date desc, script_name;
 -- update mosl_transaction set portfolioid = 1 where date = '2019-11-18';
 select * from portfolio_holdings a where a.memberid in (1) order by portfolioid, asset_classid, ticker, buy_date;
 select * from portfolio_historical_holdings a where a.memberid in (1) and sell_date > '2023-01-01' order by sell_date desc, ticker;
