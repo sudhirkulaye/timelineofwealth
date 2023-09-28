@@ -7,8 +7,11 @@ select * from daily_data_s a where date >= '2023-01-10' and name like '%Nuvoco%'
 select * from stock_price_movement_history where ticker = 'NIITTECH';
 select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 
+-- UPDATE `timelineofwealth`.`stock_universe` SET `ticker` = 'EPIGRAL', `ticker4` = 'Epigral', `ticker5` = 'EPIGRAL', `nse_code` = 'EPIGRAL', `short_name` = 'Epigral', `name` = 'Epigral Ltd', `ticker_old` = 'MFL' WHERE (`ticker` = 'MFL');
 -- update stock_universe set subindustryid = 15101020 where subindustryid = 15101050 and (is_bse500 = 1 or is_nse500 = 1);
-
+-- UPDATE stock_universe SET ticker4 = 'Lloyds Metals', ticker5 = 'LLOYDSME', ticker_old = 'LLOYDMETAL' WHERE (ticker = 'LLOYDSME');
+-- UPDATE stock_universe SET ticker = 'TVSHLTD', ticker4 = 'TVS Holdings', ticker5 = 'TVSHLTD', nse_code = 'TVSHLTD', short_name = 'TVS Holdings', name = 'TVS Holdings Ltd', ticker_old = 'SUNCLAYLTD' WHERE (ticker = 'SUNCLAYLTD');
+-- UPDATE stock_universe SET ticker = 'ADANIENSOL', ticker4 = 'Adani Energy Sol', ticker5 = 'ADANIENSOL', nse_code = 'ADANIENSOL', short_name = 'Adani Energy Solutions', name = 'Adani Energy Solutions Ltd', ticker_old = 'ADANITRANS' WHERE (ticker = 'ADANITRANS');
 -- update stock_universe SET ticker = 'KPIL', nse_code = 'KPIL', ticker5 = 'KPIL', short_name = 'Kalpataru Projects', name = 'Kalpataru Projects International Ltd', ticker_old = 'KALPATPOWR' where ticker = 'KALPATPOWR';
 -- update stock_universe SET ticker = 'CIEINDIA', nse_code = 'CIEINDIA', ticker5 = 'CIEINDIA', short_name = 'CIE Automotive', name = 'CIE Automotive Ltd', ticker_old = 'MAHINDCIE' where ticker = 'MAHINDCIE';
 -- update stock_universe SET ticker = 'PVRINOX', nse_code = 'PVRINOX', ticker5 = 'PVRINOX', short_name = 'PVR Inox', name = 'PVR Inox Ltd', ticker_old = 'PVR' where ticker = 'PVR';
@@ -30,6 +33,10 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update stock_universe set ticker5 = 'Jubilant Pharmo', short_name = 'Jubilant Pharmova', name = 'Jubilant Pharmova Ltd' where ticker = 'JUBILANT';
 -- update stock_universe set ticker5 = 'SIS' where ticker = 'SIS' or ticker5 = 'Security & Intel' ;
 
+-- update daily_data_s set name = 'EPIGRAL' where name = 'MFL';
+-- update daily_data_s set name = 'LLOYDSME' where name = 'LLOYDMETAL';
+-- update daily_data_s set name = 'TVSHLTD' where name = 'SUNCLAYLTD';
+-- update daily_data_s set name = 'ADANIENSOL' where name = 'ADANITRANS';
 -- update daily_data_s set name = 'KPIL' where name = 'KALPATPOWR';
 -- update daily_data_s set name = 'CIEINDIA' where name = 'MAHINDCIE';
 -- update daily_data_s set name = '360ONE' where name = 'IIFLWAM';
@@ -66,14 +73,18 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update stock_universe set ticker = 'PCBL', nse_code = 'PCBL', ticker_old = 'PHILIPCARB'  where ticker = 'PHILIPCARB';
 -- update stock_universe set ticker = 'ANGELONE', nse_code = 'ANGELONE', ticker_old = 'ANGELBRKG'  where ticker = 'ANGELBRKG';
 -- update stock_universe set ticker = 'BORORENEW',  nse_code = 'BORORENEW', ticker_old = 'BOROSIL'  where ticker = 'BOROSIL';
--- UPDATE stock_universe SET ticker = 'STLTECH',   nse_code = 'STLTECH', ticker_old = 'STRTECH' WHERE (`ticker` = 'STRTECH');
--- UPDATE stock_universe SET ticker = 'RHIM', ticker_old = 'ORIENTREF' WHERE (`ticker` = 'ORIENTREF');
--- UPDATE stock_universe SET ticker = 'HUHTAMAKI', ticker_old = 'PAPERPROD' WHERE (`ticker` = 'PAPERPROD');
--- UPDATE stock_universe SET ticker = 'ALOKINDS', ticker_old = 'ALOKTEXT' WHERE (`ticker` = 'ALOKTEXT');
--- UPDATE stock_universe SET ticker = 'ATGL', ticker_old = 'ADANIGAS' WHERE (`ticker` = 'ADANIGAS');
--- UPDATE stock_universe SET ticker = 'JUBLPHARMA', ticker_old = 'JUBILANT' WHERE (`ticker` = 'JUBILANT');
+-- UPDATE stock_universe SET ticker = 'STLTECH',   nse_code = 'STLTECH', ticker_old = 'STRTECH' WHERE (ticker = 'STRTECH');
+-- UPDATE stock_universe SET ticker = 'RHIM', ticker_old = 'ORIENTREF' WHERE (ticker = 'ORIENTREF');
+-- UPDATE stock_universe SET ticker = 'HUHTAMAKI', ticker_old = 'PAPERPROD' WHERE (ticker = 'PAPERPROD');
+-- UPDATE stock_universe SET ticker = 'ALOKINDS', ticker_old = 'ALOKTEXT' WHERE (ticker = 'ALOKTEXT');
+-- UPDATE stock_universe SET ticker = 'ATGL', ticker_old = 'ADANIGAS' WHERE (ticker = 'ADANIGAS');
+-- UPDATE stock_universe SET ticker = 'JUBLPHARMA', ticker_old = 'JUBILANT' WHERE (ticker = 'JUBILANT');
 
 -- update nse_price_history a set nse_ticker = 'XXX' where nse_ticker = 'XXX';
+-- update nse_price_history a set nse_ticker = 'EPIGRAL' where nse_ticker = 'MFL';
+-- update nse_price_history a set nse_ticker = 'LLOYDSME' where nse_ticker = 'LLOYDMETAL';
+-- update nse_price_history a set nse_ticker = 'TVSHLTD' where nse_ticker = 'SUNCLAYLTD';
+-- update nse_price_history a set nse_ticker = 'ADANIENSOL' where nse_ticker = 'ADANITRANS';
 -- update nse_price_history a set nse_ticker = 'KPIL' where nse_ticker = 'KALPATPOWR';
 -- update nse_price_history a set nse_ticker = 'CIEINDIA' where nse_ticker = 'MAHINDCIE';
 -- update nse_price_history a set nse_ticker = '360ONE' where nse_ticker = 'IIFLWAM';
@@ -95,6 +106,12 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update nse_price_history a set nse_ticker = 'TATACONSUM' where nse_ticker = 'TATAGLOBAL';
 
 -- update stock_price_movement set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_price_movement set ticker = 'EPIGRAL' where ticker = 'MFL';
+-- update stock_price_movement set ticker = 'LLOYDSME' where ticker = 'LLOYDMETAL';
+-- delete from stock_price_movement where ticker = 'TVSHLTD';
+-- update stock_price_movement set ticker = 'TVSHLTD' where ticker = 'SUNCLAYLTD';
+-- delete from stock_price_movement where ticker = 'ADANIENSOL';
+-- update stock_price_movement set ticker = 'ADANIENSOL' where ticker = 'ADANITRANS';
 -- update stock_price_movement set ticker = 'KPIL' where ticker = 'KALPATPOWR';
 -- update stock_price_movement set ticker = 'CIEINDIA' where ticker = 'MAHINDCIE';
 -- update stock_price_movement set ticker = '360ONE' where ticker = 'IIFLWAM';
@@ -115,6 +132,12 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update stock_price_movement set ticker = 'DHANI' where ticker = 'IBVENTURES' and date < '2020-11-06';
 
 -- update stock_price_movement_history set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_price_movement_history set ticker = 'EPIGRAL' where ticker = 'MFL';
+-- update stock_price_movement_history set ticker = 'LLOYDSME' where ticker = 'LLOYDMETAL';
+-- delete from stock_price_movement_history where ticker = 'TVSHLTD';
+-- update stock_price_movement_history set ticker = 'TVSHLTD' where ticker = 'SUNCLAYLTD';
+-- delete from stock_price_movement_history where ticker = 'ADANIENSOL';
+-- update stock_price_movement_history set ticker = 'ADANIENSOL' where ticker = 'ADANITRANS';
 -- update stock_price_movement_history set ticker = 'KPIL' where ticker = 'KALPATPOWR';
 -- update stock_price_movement_history set ticker = 'CIEINDIA' where ticker = 'MAHINDCIE';
 -- update stock_price_movement_history set ticker = '360ONE' where ticker = 'IIFLWAM';
@@ -135,6 +158,10 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update stock_price_movement_history set ticker = 'DHANI' where ticker = 'IBVENTURES' and date < '2020-11-06';
 
 -- update stock_quarter set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_quarter set ticker = 'EPIGRAL' where ticker = 'MFL';
+-- delete from stock_quarter where ticker = 'LLOYDMETAL';
+-- update stock_quarter set ticker = 'TVSHLTD' where ticker = 'SUNCLAYLTD';
+-- update stock_quarter set ticker = 'ADANIENSOL' where ticker = 'ADANITRANS';
 -- update stock_quarter set ticker = 'KPIL' where ticker = 'KALPATPOWR';
 -- update stock_quarter set ticker = 'CIEINDIA' where ticker = 'MAHINDCIE';
 -- update stock_quarter set ticker = '360ONE' where ticker = 'IIFLWAM';
@@ -155,6 +182,10 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update stock_quarter set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
 -- update stock_pnl set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_pnl set ticker = 'EPIGRAL' where ticker = 'MFL';
+-- delete from stock_pnl where ticker = 'LLOYDMETAL';
+-- update stock_pnl set ticker = 'TVSHLTD' where ticker = 'SUNCLAYLTD';
+-- update stock_pnl set ticker = 'ADANIENSOL' where ticker = 'ADANITRANS';
 -- update stock_pnl set ticker = 'KPIL' where ticker = 'KALPATPOWR';
 -- update stock_pnl set ticker = 'CIEINDIA' where ticker = 'MAHINDCIE';
 -- update stock_pnl set ticker = '360ONE' where ticker = 'IIFLWAM';
@@ -175,6 +206,10 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update stock_pnl set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
 -- update stock_cashflow set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_cashflow set ticker = 'EPIGRAL' where ticker = 'MFL';
+-- delete from stock_cashflow where ticker = 'LLOYDMETAL';
+-- update stock_cashflow set ticker = 'TVSHLTD' where ticker = 'SUNCLAYLTD';
+-- update stock_cashflow set ticker = 'ADANIENSOL' where ticker = 'ADANITRANS';
 -- update stock_cashflow set ticker = 'KPIL' where ticker = 'KALPATPOWR';
 -- update stock_cashflow set ticker = 'CIEINDIA' where ticker = 'MAHINDCIE';
 -- update stock_cashflow set ticker = '360ONE' where ticker = 'IIFLWAM';
@@ -195,6 +230,10 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update stock_cashflow set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
 -- update stock_balancesheet set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_balancesheet set ticker = 'EPIGRAL' where ticker = 'MFL';
+-- delete from stock_balancesheet where ticker = 'LLOYDMETAL';
+-- update stock_balancesheet set ticker = 'TVSHLTD' where ticker = 'SUNCLAYLTD';
+-- update stock_balancesheet set ticker = 'ADANIENSOL' where ticker = 'ADANITRANS';
 -- update stock_balancesheet set ticker = 'KPIL' where ticker = 'KALPATPOWR';
 -- update stock_balancesheet set ticker = 'CIEINDIA' where ticker = 'MAHINDCIE';
 -- update stock_balancesheet set ticker = '360ONE' where ticker = 'IIFLWAM';

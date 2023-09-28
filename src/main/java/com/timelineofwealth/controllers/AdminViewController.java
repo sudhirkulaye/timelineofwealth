@@ -10,6 +10,7 @@ import com.timelineofwealth.repositories.*;
 import com.timelineofwealth.service.CSVUtils;
 import com.timelineofwealth.service.CommonService;
 import com.timelineofwealth.service.DownloadEODFiles;
+import com.timelineofwealth.service.GeneratePDFReport;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -19,9 +20,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,13 +33,15 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
@@ -1048,6 +1053,243 @@ public class AdminViewController {
             e.printStackTrace();
         }
         return "admin/uploaddailydatab";
+    }
+
+    @RequestMapping(value = "/admin/uploadresultexcel")
+    public String uploadResultExcel(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "TimelineOfWealth");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "admin/uploadresultexcel";
+    }
+
+    @RequestMapping(value = ("/admin/uploadresultexcelstatus"), headers = ("content-type=multipart/*"), method = RequestMethod.POST)
+    public String uploadResultExcelStatus(Model model, @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            model.addAttribute("error", "Please select a file to upload");
+            return "admin/uploadresultexcel";
+        }
+
+        try {
+            // Get the original filename
+            String originalFilename = file.getOriginalFilename();
+
+            // Define a pattern to extract ticker and quarter from the filename
+            Pattern pattern = Pattern.compile("^(\\w+)_FY(\\d{2})Q([1-4])\\..*$");
+            Matcher matcher = pattern.matcher(originalFilename);
+
+            if (matcher.matches()) {
+                try {
+                    String ticker = matcher.group(1);
+                    String year = matcher.group(2);
+                    String quarter = matcher.group(3);
+
+                    // Create the subfolder path based on year and quarter
+                    String subfolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\20" + year + "Q" + quarter;
+
+                    // Create the subfolder if it doesn't exist
+                    File subfolderDir = new File(subfolder);
+                    if (!subfolderDir.exists()) {
+                        subfolderDir.mkdirs();
+                    }
+
+                    // Check if the file already exists in the subfolder
+                    File newFile = new File(subfolder, originalFilename);
+                    int counter = 0;
+                    while (newFile.exists()) {
+                        counter++;
+                        // Rename the existing file with "_n.xlsx" where n is the next available number
+                        String baseFilename = ticker + "_FY" + year + "Q" + quarter;
+                        String existingFilename = baseFilename + (counter > 0 ? "_" + counter : "") + ".xlsx";
+                        File existingFile = new File(subfolder, existingFilename);
+                        newFile.renameTo(existingFile);
+                    }
+
+                    // Save the file to the subfolder with the newFile name
+                    file.transferTo(newFile);
+
+                    String industrySubindustry = findSubfolderForTicker(ticker, "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis\\tickerFolderonfig.properties");
+                    String yearQuarter = "20" + year + "Q" + quarter;
+                    updateConfigFile(ticker, industrySubindustry, yearQuarter, originalFilename);
+                    callUpdateQuarterlyExcelsMain();
+                    removeParametersFromConfigFile("C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis\\config.properties");
+
+                    model.addAttribute("message", "File '" + originalFilename + "' uploaded successfully.");
+                } catch (Exception e) {
+                    model.addAttribute("error", "Error in Processing the file.");
+                }
+            } else {
+                model.addAttribute("error", "Invalid file name format. Please use '<<ticker>>_FY<<year>>Q<<quarter>>' format.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "admin/uploadresultexcel";
+    }
+
+    private String findSubfolderForTicker(String ticker, String configFile) {
+        // Create a map to store ticker-subfolder mappings
+        Map<String, String> tickerSubfolderMap = new HashMap<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(configFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Split each line by whitespace to get ticker and subfolder
+                String[] parts = line.split("\t");
+                if (parts.length == 2) {
+                    String currentTicker = parts[0];
+                    String subfolder = parts[1];
+                    tickerSubfolderMap.put(currentTicker, subfolder);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Check if the given ticker exists in the map
+        if (tickerSubfolderMap.containsKey(ticker)) {
+            return tickerSubfolderMap.get(ticker);
+        } else {
+            // Return a default value or handle the case when the ticker is not found
+            return "";
+        }
+    }
+
+    private void updateConfigFile(String ticker, String industrySubindustry, String yearQuarter, String originalFilename) {
+        String configFile = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis\\config.properties";
+
+        Properties properties = new Properties();
+        try (FileInputStream fis = new FileInputStream(configFile)) {
+            properties.load(fis);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Construct the parameter keys based on ticker, industrySubindustry, and yearQuarter
+        String sourcePathKey = "C" + "&#58;" +  "\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\" + yearQuarter;
+        String oldFileNameKey = "C" + "&#58;" + "\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis\\" + industrySubindustry + "\\" + ticker + ".xlsx";
+        String newFileNameKey = "C" + "&#58;" +  "\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\" + yearQuarter + "\\" + originalFilename;
+        String sourceFileKey = originalFilename;
+        String destinationPathKey = "C" + "&#58;" + "\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis\\" + industrySubindustry + "\\";
+
+
+        // Update the properties
+        properties.setProperty("FileCopyFlag", "false");
+        properties.setProperty("FileContentCopyFlag", "true");
+        properties.setProperty("SourcePath", sourcePathKey);
+        properties.setProperty("OldFileName1", oldFileNameKey);
+        properties.setProperty("NewFileName1", newFileNameKey);
+        properties.setProperty("SourceFile1", sourceFileKey);
+        properties.setProperty("DestinationPath1", destinationPathKey);
+
+        // Save the updated properties back to the file
+        try (FileOutputStream fos = new FileOutputStream(configFile)) {
+            properties.store(fos, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void callUpdateQuarterlyExcelsMain() {
+        try {
+            // Assuming UpdateQuarterlyExcels.main() accepts no arguments
+            com.timelineofwealth.service.UpdateQuarterlyExcels.main(new String[]{});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void removeParametersFromConfigFile(String configFile) {
+        Properties properties = new Properties();
+
+        try (FileInputStream fis = new FileInputStream(configFile)) {
+            properties.load(fis);
+
+            // Remove the parameters associated with the given ticker
+            properties.remove("SourcePath");
+            properties.remove("OldFileName1");
+            properties.remove("NewFileName1");
+            properties.remove("SourceFile1");
+            properties.remove("DestinationPath1");
+
+            // If you have other parameters to remove, add them here
+
+            // Save the updated properties back to the file
+            try (FileOutputStream fos = new FileOutputStream(configFile)) {
+                properties.store(fos, null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "/admin/downloadresultexcel")
+    public String downloadResultExcel(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "TimelineOfWealth");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "admin/downloadresultexcel";
+    }
+
+    @RequestMapping(value = "/admin/downloadresultexcelname/{excelFileName}", method = RequestMethod.GET)
+    public void downloadResultExcelName(@PathVariable String excelFileName, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        logger.debug(String.format("/admin/downloadresultexcelname/ %s", excelFileName));
+
+        // Define the base folder path
+        String basePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
+
+        // Find the latest quarter result folder
+        File baseFolder = new File(basePath);
+        File[] subdirectories = baseFolder.listFiles(File::isDirectory);
+        File latestQuarterFolder = null;
+
+        if (subdirectories != null) {
+            for (File folder : subdirectories) {
+                if (isQuarterFolder(folder)) {
+                    if (latestQuarterFolder == null || folder.getName().compareTo(latestQuarterFolder.getName()) > 0) {
+                        latestQuarterFolder = folder;
+                    }
+                }
+            }
+        }
+
+        // Check if the latestQuarterFolder is not null
+        if (latestQuarterFolder != null) {
+            // Construct the full path to the Excel file
+            String excelFilePath = latestQuarterFolder.getAbsolutePath() + File.separator + excelFileName;
+
+            File excelFile = new File(excelFilePath);
+
+            // Check if the file exists
+            if (excelFile.exists()) {
+                // Set the response content type
+                response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                response.setHeader("Content-Disposition", "attachment; filename=" + excelFileName);
+
+                try (FileInputStream fis = new FileInputStream(excelFile);
+                     OutputStream os = response.getOutputStream()) {
+
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = fis.read(buffer)) != -1) {
+                        os.write(buffer, 0, bytesRead);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    // Helper method to check if a folder name is in the format YYYYQn
+    private static boolean isQuarterFolder(File folder) {
+        String folderName = folder.getName();
+        return folderName.matches("\\d{4}Q[1-4]");
     }
 
     @RequestMapping(value = "/admin/uploadscreenerdata")

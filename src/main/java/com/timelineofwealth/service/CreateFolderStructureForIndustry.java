@@ -14,9 +14,9 @@ public class CreateFolderStructureForIndustry {
         //1. Create Folder Structure from source folder
 //        createFolderStructure(argv);
         //2. List Duplicate excel files in Analysis Folder
-        listDuplicateFiles(argv);
+//        listDuplicateFiles(argv);
         //3. List Files and their path in Analysis Folder
-//        listFilesAndFolderPath(argv);
+        listFilesAndFolderPath(argv);
 
     }
 

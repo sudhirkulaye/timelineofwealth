@@ -31,7 +31,7 @@ public class UpdateQuarterlyExcels {
         prop.load(input);
         input.close();
 
-        String sourcePath = prop.getProperty("SourcePath");
+        String sourcePath = prop.getProperty("SourcePath").replace("&#58;", ":");
         boolean fileCopyFlag = prop.getProperty("FileCopyFlag").equalsIgnoreCase("true") ? true : false;
         boolean fileContentCopyFlag = prop.getProperty("FileContentCopyFlag").equalsIgnoreCase("true") ? true : false;
         ArrayList<String> sourceFiles = new ArrayList<String>();
@@ -42,7 +42,7 @@ public class UpdateQuarterlyExcels {
             if (sourceFile == null) {
                 break;
             }
-            sourceFiles.add(sourceFile);
+            sourceFiles.add(sourceFile.replace("&#58;", ":"));
             destinationPaths.add(prop.getProperty("DestinationPath" + count));
             count++;
         }
@@ -57,12 +57,12 @@ public class UpdateQuarterlyExcels {
                 newFile = copyLatestFileToDestination(sourcePath, destinationPath, sourceFile);
             }
             if(oldFileRenamed == null) {
-                String strOldFileName = prop.getProperty("OldFileName" + fileNumber);
+                String strOldFileName = prop.getProperty("OldFileName" + fileNumber).replace("&#58;", ":");
                 oldFileRenamed = new File(strOldFileName);
             }
             if (fileContentCopyFlag == true) {
                 if(newFile == null) {
-                    String strOldFileName = prop.getProperty("NewFileName" + fileNumber);
+                    String strOldFileName = prop.getProperty("NewFileName" + fileNumber).replace("&#58;", ":");
                     newFile = new File(strOldFileName);
                 }
                 copyQuarterPAndLSheet(oldFileRenamed, newFile);
