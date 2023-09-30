@@ -7,6 +7,9 @@ public class ClientDTO implements Serializable {
     private long memberid;
     private String relationship;
     private String memberName;
+    private String firstName;
+    private String lastName;
+    private String moslCode;
 
     public String getUserid() {
         return userid;
@@ -36,4 +39,24 @@ public class ClientDTO implements Serializable {
         this.memberName = memberName;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getMoslCode() {
+        return moslCode;
+    }
+    public void setMoslCode(String moslCode) {
+        this.moslCode = moslCode;
+    }
 }

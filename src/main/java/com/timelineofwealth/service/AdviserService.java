@@ -1,9 +1,5 @@
 package com.timelineofwealth.service;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.timelineofwealth.dto.ClientDTO;
 import com.timelineofwealth.dto.ConsolidatedAssetsDTO;
 import com.timelineofwealth.entities.*;
@@ -16,11 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -65,6 +56,13 @@ public class AdviserService {
         AdviserService.compositeConstituentsRepository = compositeConstituentsRepository;
     }
 
+    @Autowired
+    private static MoslcodeMemberidRepository moslcodeMemberidRepository;
+    @Autowired
+    public void setMoslcodeMemberidRepository(MoslcodeMemberidRepository moslcodeMemberidRepository){
+        AdviserService.moslcodeMemberidRepository = moslcodeMemberidRepository;
+    }
+
 
     public static List<ClientDTO> getClients(String email){
         logger.debug(String.format("In AdviserService.getClients: Email %s", email));
@@ -74,12 +72,15 @@ public class AdviserService {
         for (AdviserUserMapping client : clients ){
             //members.add(memberRepository.findByMemberid(userMember.getMemberid()));
             List<Member> members = MemberService.getUserMembers(client.getKey().getUserid());
+
             for (Member member : members){
                 ClientDTO clientDTO = new ClientDTO();
                 clientDTO.setMemberid(member.getMemberid());
                 clientDTO.setRelationship(member.getRelationship());
                 clientDTO.setUserid(client.getKey().getUserid());
                 clientDTO.setMemberName(member.getFirstName());
+                clientDTO.setFirstName(member.getFirstName());
+                clientDTO.setLastName(member.getLastName());
                 clientDTOS.add(clientDTO);
             }
         }
@@ -87,7 +88,7 @@ public class AdviserService {
     }
 
     public static List<ClientDTO> getPMSClients(String email) {
-        logger.debug(String.format("In AdviserService.getLatestResultExcels: Email %s", email));
+        logger.debug(String.format("In AdviserService.getPMSClients: Email %s", email));
 
         List<ClientDTO> clientDTOS = new ArrayList<>();
         List<AdviserUserMapping> clients = adviserUserMappingRepository.findByKeyAdviseridOrderByKeyUseridAsc(email);
@@ -107,7 +108,15 @@ public class AdviserService {
                     clientDTO.setMemberid(portfolio.getKey().getMemberid());
                     clientDTO.setRelationship(member.getRelationship());
                     clientDTO.setUserid(member.getEmail());
-                    clientDTO.setMemberName(member.getFirstName()+" "+member.getLastName());
+                    clientDTO.setMemberName(member.getFirstName()+"_"+member.getLastName());
+                    clientDTO.setFirstName(member.getFirstName());
+                    clientDTO.setLastName(member.getLastName());
+                    try {
+                        MoslcodeMemberid moslcodeMemberid = moslcodeMemberidRepository.findByMemberid(member.getMemberid());
+                        clientDTO.setMoslCode(moslcodeMemberid.getMoslcode());
+                    } catch (Exception e){
+                        clientDTO.setMoslCode("HXXX");
+                    }
                     clientDTOS.add(clientDTO);
                 }
             }

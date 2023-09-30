@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="" ng-controller="">
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/adminsidebarmenu :: common-adminsidebarmenu" />
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/usertopnavigation :: common-usertopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <br />
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h1>Update Analyst Recommendations</h1>
+                            <p />Upload reportconfig.properties file.
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div th:if="${message}">
+                                <h4 th:text="${message}"/>
+                            </div>
+                            <div th:if="${error}" style="font-size: 20; color: #FF1C19;">
+                                <h4 th:text="${error}"/>
+                            </div>
+                            <div  class="col-md-6 col-xs-12">
+                                <form method="POST" action="/admin/updateanalystrecostatus" enctype="multipart/form-data" >
+                                    <input class="form-control" type="file" name="file" /><br/><br/>
+                                    <input class="btn btn-lg btn-success btn-block" type="submit" value="Submit" />
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+
+
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- jQuery Smart Wizard -->
+<script src="../../static/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js" th:src="@{/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js}"></script>
+<!-- iCheck -->
+<script src="../../static/vendors/iCheck/icheck.min.js" th:src="@{/vendors/iCheck/icheck.min.js}"></script>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+<!-- jquery.inputmask -->
+<script src="../../static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js" th:src="@{/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js}"></script>
+
+</body>
+</html>

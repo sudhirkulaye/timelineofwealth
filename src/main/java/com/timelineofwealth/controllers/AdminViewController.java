@@ -10,7 +10,6 @@ import com.timelineofwealth.repositories.*;
 import com.timelineofwealth.service.CSVUtils;
 import com.timelineofwealth.service.CommonService;
 import com.timelineofwealth.service.DownloadEODFiles;
-import com.timelineofwealth.service.GeneratePDFReport;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -20,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -787,6 +787,7 @@ public class AdminViewController {
             return "admin/uploadmosltxn";
         }
         try {
+
             List<MOSLTransaction> moslTransactions = new ArrayList<>();
             XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
             XSSFSheet worksheet = workbook.getSheetAt(0);
@@ -905,12 +906,13 @@ public class AdminViewController {
             StoredProcedureQuery storedProcedure = entityManager.createStoredProcedureQuery(AP_PROCESS_MOSL_TRANSACTIONS);
             boolean result = storedProcedure.execute();
             if (!result) {
-                model.addAttribute("message", "Successfully uploaded transactions");
+                model.addAttribute("message", "Successfully uploaded transactions in the file "+ file.getOriginalFilename());
             } else {
                 model.addAttribute("message", "Failed to upload transactions successfully. Check log_table.");
             }
 
         } catch (IOException e) {
+            model.addAttribute("error", "Exception in Processing the file.");
             e.printStackTrace();
         }
         return "admin/uploadmosltxn";
@@ -1109,27 +1111,32 @@ public class AdminViewController {
                     // Save the file to the subfolder with the newFile name
                     file.transferTo(newFile);
 
-                    String industrySubindustry = findSubfolderForTicker(ticker, "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis\\tickerFolderonfig.properties");
+                    String industrySubindustry = findSubfolderForTicker(ticker);
                     String yearQuarter = "20" + year + "Q" + quarter;
                     updateConfigFile(ticker, industrySubindustry, yearQuarter, originalFilename);
-                    callUpdateQuarterlyExcelsMain();
+                    // Assuming UpdateQuarterlyExcels.main() accepts no arguments
+                    com.timelineofwealth.service.UpdateQuarterlyExcels.main(new String[]{});
                     removeParametersFromConfigFile("C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis\\config.properties");
 
                     model.addAttribute("message", "File '" + originalFilename + "' uploaded successfully.");
                 } catch (Exception e) {
-                    model.addAttribute("error", "Error in Processing the file.");
+                    model.addAttribute("error", "Exception in Processing the file.");
                 }
             } else {
                 model.addAttribute("error", "Invalid file name format. Please use '<<ticker>>_FY<<year>>Q<<quarter>>' format.");
             }
         } catch (Exception e) {
+            model.addAttribute("error", "Main Exception in Processing the file.");
             e.printStackTrace();
         }
 
         return "admin/uploadresultexcel";
     }
 
-    private String findSubfolderForTicker(String ticker, String configFile) {
+    private String findSubfolderForTicker(String ticker) {
+
+        String configFile = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis\\tickerfolderonfig.properties";
+
         // Create a map to store ticker-subfolder mappings
         Map<String, String> tickerSubfolderMap = new HashMap<>();
 
@@ -1192,15 +1199,6 @@ public class AdminViewController {
         }
     }
 
-    private void callUpdateQuarterlyExcelsMain() {
-        try {
-            // Assuming UpdateQuarterlyExcels.main() accepts no arguments
-            com.timelineofwealth.service.UpdateQuarterlyExcels.main(new String[]{});
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private void removeParametersFromConfigFile(String configFile) {
         Properties properties = new Properties();
 
@@ -1208,7 +1206,7 @@ public class AdminViewController {
             properties.load(fis);
 
             // Remove the parameters associated with the given ticker
-            properties.remove("SourcePath");
+//            properties.remove("SourcePath");
             properties.remove("OldFileName1");
             properties.remove("NewFileName1");
             properties.remove("SourceFile1");
@@ -1290,6 +1288,60 @@ public class AdminViewController {
     private static boolean isQuarterFolder(File folder) {
         String folderName = folder.getName();
         return folderName.matches("\\d{4}Q[1-4]");
+    }
+
+    @RequestMapping(value = "/admin/updateanalystreco")
+    public String updateAnalystReco(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "TimelineOfWealth");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "admin/updateanalystreco";
+    }
+
+    @RequestMapping(value = ("/admin/updateanalystrecostatus"), headers = ("content-type=multipart/*"), method = RequestMethod.POST)
+    public String updateAnalystRecoStatus(Model model, @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            model.addAttribute("error", "Please select a property file to upload");
+            return "admin/updateanalystreco";
+        }
+
+        // Check if the uploaded file has the correct name "reportconfig.properties"
+        if (!file.getOriginalFilename().equals("reportconfig.properties")) {
+            model.addAttribute("error", "Please upload a file with the name 'reportconfig.properties'");
+            return "admin/updateanalystreco";
+        }
+
+        try {
+            // Define the path where the property file should be saved
+            String configFilePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\reportconfig.properties";
+
+            // Save the uploaded property file to the specified path
+            try (FileOutputStream fos = new FileOutputStream(configFilePath)) {
+                fos.write(file.getBytes());
+            }
+
+            // Load the saved property file to check its contents
+            Properties properties = new Properties();
+            try (FileInputStream fis = new FileInputStream(configFilePath)) {
+                properties.load(fis);
+            }
+
+            // Check if the property file contains at least the required properties
+            if (properties.containsKey("ReportDataExtractConfigFilePath") && properties.containsKey("AnalystNamesFilePath")) {
+                // Execute AnalystRecoExtractor.main
+                com.timelineofwealth.service.AnalystRecoExtractor.main(new String[]{});
+
+                model.addAttribute("message", "Updated Analyst Recommendations to respective files");
+            } else {
+                model.addAttribute("error", "The property file is missing required properties");
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "Exception in Processing the file.");
+            e.printStackTrace();
+        }
+
+        return "admin/updateanalystreco";
     }
 
     @RequestMapping(value = "/admin/uploadscreenerdata")
