@@ -4,6 +4,7 @@ module.controller('IndexStatController', function($scope, $http, $filter, $local
     var urlBase="/public/api";
     $scope.indexStatRecords = [];
     $scope.indexConsolidatedStatistics = [];
+    $scope.indexMonthlyReturns = [];
     $scope.chartData = [];
     $scope.labelsDates = [];
     $scope.chartSeries = ['Index Trailing PE', 'Index Value'];
@@ -30,11 +31,34 @@ module.controller('IndexStatController', function($scope, $http, $filter, $local
       };
     $scope.labelsDates = [];
     $scope.chartData = [];
+    $scope.getCellColor = function(value) {
+        if (value < -0.02) {
+            return '#FF0000'; // Light Red
+        } else if (value >= -0.02 && value < 0) {
+            return '#D32F2F'; // Darker Red
+        } else if (value > 0 && value <= 0.02) {
+            return '#00FF00'; // Light Green
+        } else if (value > 0.02) {
+            return '#4CAF50'; // Darker Green
+        } else {
+            return ''; // Default color if value is not in any range
+        }
+    };
 
     showRecords();
 
     function showRecords(){
         $scope.indexStatRecords = new Map;
+
+        url = "/getindexmonthlyreturns/NIFTY";
+        $http.get(urlBase + url).
+            then(function (response) {
+                if (response != undefined) {
+                    $scope.indexMonthlyReturns = response.data;
+                } else {
+                    $scope.indexMonthlyReturns = [];
+                }
+            });
 
         url = "/getindexvaluation";
         $http.get(urlBase + url).

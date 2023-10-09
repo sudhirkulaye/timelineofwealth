@@ -66,8 +66,8 @@
                             <lebel class="pull-left" >&nbsp;&nbsp;&nbsp; Show &nbsp;&nbsp;&nbsp; </lebel>
                             <lebel class="pull-left" > <input type="radio" checked="" value="returns" id="optionsRadios1" name="optionsRadios" ng-click="showColumns('YearlyReturns')" /> Year wise Returns &nbsp;&nbsp;&nbsp;</lebel>
                             <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios2" name="optionsRadios" ng-click="showColumns('TrailingReturns')" /> Trailing Returns &nbsp;&nbsp;&nbsp;</lebel>
-                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios3" name="optionsRadios" ng-click="showColumns('SectorAllocation')" /> Sector Allocation &nbsp;&nbsp;&nbsp;</lebel>
-                            <lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios4" name="optionsRadios" ng-click="showColumns('TopStocks')" /> Top Stocks &nbsp;&nbsp;&nbsp;</lebel>
+                            <!--<lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios3" name="optionsRadios" ng-click="showColumns('SectorAllocation')" /> Sector Allocation &nbsp;&nbsp;&nbsp;</lebel>-->
+                            <!--<lebel class="pull-left" > <input type="radio" value="returns" id="optionsRadios4" name="optionsRadios" ng-click="showColumns('TopStocks')" /> Top Stocks &nbsp;&nbsp;&nbsp;</lebel>-->
                         </div>
                         <div class="x_content">
                             <p>
@@ -88,17 +88,17 @@
                                     <tr>
                                         <th ng-click="sortData('schemeType')" >Category<i ng-class="getSortClass('schemeType')" /></th>
                                         <th ng-click="sortData('schemeNamePart')" >Name<i ng-class="getSortClass('schemeNamePart')" /></th>
-                                        <th ng-click="sortData('totalReturnsY0')" ng-hide="flagYearlyReurns">2019*<i ng-class="getSortClass('totalReturnsY0')" /></th>
-                                        <th ng-click="sortData('totalReturnsY1')" ng-hide="flagYearlyReurns">2018<i ng-class="getSortClass('totalReturnsY1')" /></th>
-                                        <th ng-click="sortData('totalReturnsY2')" ng-hide="flagYearlyReurns">2017<i ng-class="getSortClass('totalReturnsY2')" /></th>
-                                        <th ng-click="sortData('totalReturnsY3')" ng-hide="flagYearlyReurns">2016<i ng-class="getSortClass('totalReturnsY3')" /></th>
-                                        <th ng-click="sortData('totalReturnsY4')" ng-hide="flagYearlyReurns">2015<i ng-class="getSortClass('totalReturnsY4')" /></th>
-                                        <th ng-click="sortData('totalReturnsY5')" ng-hide="flagYearlyReurns">2014<i ng-class="getSortClass('totalReturnsY5')" /></th>
-                                        <th ng-click="sortData('totalReturnsY6')" ng-hide="flagYearlyReurns">2013<i ng-class="getSortClass('totalReturnsY6')" /></th>
-                                        <th ng-click="sortData('totalReturnsY7')" ng-hide="flagYearlyReurns">2012<i ng-class="getSortClass('totalReturnsY7')" /></th>
-                                        <th ng-click="sortData('totalReturnsY8')" ng-hide="flagYearlyReurns">2011<i ng-class="getSortClass('totalReturnsY8')" /></th>
-                                        <th ng-click="sortData('totalReturnsY9')" ng-hide="flagYearlyReurns">2010<i ng-class="getSortClass('totalReturnsY9')" /></th>
-                                        <th ng-click="sortData('totalReturnsY10')" ng-hide="flagYearlyReurns">2009<i ng-class="getSortClass('totalReturnsY10')" /></th>
+                                        <th ng-click="sortData('totalReturnsY0')" ng-hide="flagYearlyReurns">{{extractYear()}}*<i ng-class="getSortClass('totalReturnsY0')" /></th>
+                                        <th ng-click="sortData('totalReturnsY1')" ng-hide="flagYearlyReurns">{{extractYear()-1}}<i ng-class="getSortClass('totalReturnsY1')" /></th>
+                                        <th ng-click="sortData('totalReturnsY2')" ng-hide="flagYearlyReurns">{{extractYear()-2}}<i ng-class="getSortClass('totalReturnsY2')" /></th>
+                                        <th ng-click="sortData('totalReturnsY3')" ng-hide="flagYearlyReurns">{{extractYear()-3}}<i ng-class="getSortClass('totalReturnsY3')" /></th>
+                                        <th ng-click="sortData('totalReturnsY4')" ng-hide="flagYearlyReurns">{{extractYear()-4}}<i ng-class="getSortClass('totalReturnsY4')" /></th>
+                                        <th ng-click="sortData('totalReturnsY5')" ng-hide="flagYearlyReurns">{{extractYear()-5}}<i ng-class="getSortClass('totalReturnsY5')" /></th>
+                                        <th ng-click="sortData('totalReturnsY6')" ng-hide="flagYearlyReurns">{{extractYear()-6}}<i ng-class="getSortClass('totalReturnsY6')" /></th>
+                                        <th ng-click="sortData('totalReturnsY7')" ng-hide="flagYearlyReurns">{{extractYear()-7}}<i ng-class="getSortClass('totalReturnsY7')" /></th>
+                                        <th ng-click="sortData('totalReturnsY8')" ng-hide="flagYearlyReurns">{{extractYear()-8}}<i ng-class="getSortClass('totalReturnsY8')" /></th>
+                                        <th ng-click="sortData('totalReturnsY9')" ng-hide="flagYearlyReurns">{{extractYear()-9}}<i ng-class="getSortClass('totalReturnsY9')" /></th>
+                                        <th ng-click="sortData('totalReturnsY10')" ng-hide="flagYearlyReurns">{{extractYear()-10}}<i ng-class="getSortClass('totalReturnsY10')" /></th>
                                         <th ng-click="sortData('trailingReturn1yr')" ng-hide="flagTrailingReturns">1 Yr<i ng-class="getSortClass('trailingReturn1yr')" /></th>
                                         <th ng-click="sortData('trailingReturn3yr')" ng-hide="flagTrailingReturns">3 Yr<i ng-class="getSortClass('trailingReturn3yr')" /></th>
                                         <th ng-click="sortData('trailingReturn5yr')" ng-hide="flagTrailingReturns">5 Yr<i ng-class="getSortClass('trailingReturn5yr')" /></th>

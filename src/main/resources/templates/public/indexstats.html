@@ -60,7 +60,47 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <font color="green"><strong><h2>NIFTY-50 Historical Return </h2></strong></font><p>Over last 18 Years (Last updated: {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE) </p>
+                            <font color="green"><strong><h2>NIFTY-50 Monthly Returns </h2></strong></font>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Jan</th>
+                                    <th>Feb</th>
+                                    <th>Mar</th>
+                                    <th>Apr</th>
+                                    <th>May</th>
+                                    <th>Jun</th>
+                                    <th>Jul</th>
+                                    <th>Aug</th>
+                                    <th>Sep</th>
+                                    <th>Oct</th>
+                                    <th>Nov</th>
+                                    <th>Dec</th>
+                                    <th>Annual</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="return in indexMonthlyReturns ">
+                                    <td>{{return.year}}</td>
+                                    <td>{{return.janReturn*100 | number:2}}%</td>
+                                    <td>{{return.febReturn*100 | number:2}}%</td>
+                                    <td>{{return.marReturn*100 | number:2}}%</td>
+                                    <td>{{return.aprReturn*100 | number:2}}%</td>
+                                    <td>{{return.mayReturn*100 | number:2}}%</td>
+                                    <td>{{return.junReturn*100 | number:2}}%</td>
+                                    <td>{{return.julReturn*100 | number:2}}%</td>
+                                    <td>{{return.augReturn*100 | number:2}}%</td>
+                                    <td>{{return.sepReturn*100 | number:2}}%</td>
+                                    <td>{{return.octReturn*100 | number:2}}%</td>
+                                    <td>{{return.novReturn*100 | number:2}}%</td>
+                                    <td>{{return.decReturn*100 | number:2}}%</td>
+                                    <td>{{return.annualReturn*100 | number:2}}%</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <font color="green"><strong><h2>NIFTY-50 Returns Statistics </h2></strong></font><p>Over last 18 Years (Last updated: {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE) </p>
                             <table class="table">
                                 <thead>
                                 <tr>
@@ -77,32 +117,32 @@
                                     <th>1 Year Returns </th>
                                     <td align="center">{{indexConsolidatedStatistics[0].meanReturns1yr*100 | number:2}}%</td>
                                     <td align="center">{{indexConsolidatedStatistics[0].medianReturns1yr*100 | number:2}}%</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns1yr*100 | number:2}}% (Jan-08 to Jan-09)</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns1yr*100 | number:2}}% (Apr-03 to Apr-04)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns1yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].minimumReturns1yrDuration}})</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns1yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].maximumReturns1yrDuration}})</td>
                                     <td align="center">{{indexConsolidatedStatistics[0].standardDeviation1yr*100 | number:2}}%</td>
                                 </tr>
                                 <tr>
                                     <th>3 Year Returns (Annualized) </th>
                                     <td align="center">{{indexConsolidatedStatistics[0].meanReturns3yr*100 | number:2}}%</td>
                                     <td align="center">{{indexConsolidatedStatistics[0].medianReturns3yr*100 | number:2}}%</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns3yr*100 | number:2}}% (Apr-00 to Apr-03)</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns3yr*100 | number:2}}% (May-03 to May-06)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns3yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].minimumReturns3yrDuration}})</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns3yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].maximumReturns3yrDuration}})</td>
                                     <td align="center">{{indexConsolidatedStatistics[0].standardDeviation3yr*100 | number:2}}%</td>
                                 </tr>
                                 <tr>
                                     <th>5 Year Returns (Annualized) </th>
                                     <td align="center">{{indexConsolidatedStatistics[0].meanReturns5yr*100 | number:2}}%</td>
                                     <td align="center">{{indexConsolidatedStatistics[0].medianReturns5yr*100 | number:2}}%</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns5yr*100 | number:2}}% (Nov-07 to Nov-12)</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns5yr*100 | number:2}}% (Oct-02 to Oct-07)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns5yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].minimumReturns5yrDuration}})</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns5yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].maximumReturns5yrDuration}})</td>
                                     <td align="center">{{indexConsolidatedStatistics[0].standardDeviation5yr*100 | number:2}}%</td>
                                 </tr>
                                 <tr>
                                     <th>10 Year Returns (Annualized) </th>
                                     <td align="center">{{indexConsolidatedStatistics[0].meanReturns10yr*100 | number:2}}%</td>
                                     <td align="center">{{indexConsolidatedStatistics[0].medianReturns10yr*100 | number:2}}%</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns10yr*100 | number:2}}% (Dec-07 to Dec-17)</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns10yr*100 | number:2}}% (May-03 to May-13)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns10yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].minimumReturns10yrDuration}})</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns10yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].maximumReturns10yrDuration}})</td>
                                     <td align="center">{{indexConsolidatedStatistics[0].standardDeviation10yr*100 | number:2}}%</td>
                                 </tr>
                                 </tbody>
