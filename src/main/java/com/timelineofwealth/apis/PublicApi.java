@@ -1,6 +1,7 @@
 package com.timelineofwealth.apis;
 
 import com.timelineofwealth.dto.*;
+import com.timelineofwealth.dto.IndexMonthlyReturnsDTO;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.service.CommonService;
 import org.slf4j.Logger;
@@ -140,16 +141,22 @@ public class PublicApi {
         return CommonService.getIndexValuation();
     }
 
+    @RequestMapping(value = "/getindexmonthlyreturns/{ticker}", method = RequestMethod.GET)
+    public List<IndexMonthlyReturnsDTO> getIndexMonthlyReturns(@PathVariable String ticker){
+        logger.debug(String.format("Call public/api/getindexmonthlyreturns/%s", ticker));
+        return CommonService.getIndexMonthlyReturns(ticker);
+    }
+
     @RequestMapping(value = "/getindexstatistics", method = RequestMethod.GET)
     public List<IndexStatistics> getIndexStatistics(){
         logger.debug(String.format("Call public/api/getindexstatistics"));
-        return CommonService.getIndexStatistics("NIFTY");
+        return CommonService.getIndexReturnStatistics("NIFTY");
     }
 
-    @RequestMapping(value = "/getmidandsmallcapindexstatistics", method = RequestMethod.GET)
-    public List<IndexStatistics> getMidAndSmallCapIndexStatistics(){
-        logger.debug(String.format("Call public/api/getmidandsmallcapindexstatistics"));
-        return CommonService.getIndexStatistics("Mid&Small");
+    @RequestMapping(value = "/getindexreturnstats", method = RequestMethod.GET)
+    public List<IndexStatistics> getindexreturnstats(){
+        logger.debug(String.format("Call public/api/getindexreturnstats"));
+        return CommonService.getIndexReturnStatistics("ALL");
     }
 
 

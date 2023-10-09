@@ -7,6 +7,7 @@ module.controller('MFListController', function($scope, $http, $filter) {
     $scope.flagSectorAllocation = true;
     $scope.flagTopStocks = true;
     $scope.reverseSort = false;
+    $scope.dateToday = "";
 
     showRecords();
 
@@ -20,6 +21,18 @@ module.controller('MFListController', function($scope, $http, $filter) {
                     $scope.fundsDTO = [];
                 }
             });
+
+        var ublicapiurl1 = "/public/api/getDates";
+                 $http.get(ublicapiurl1).
+                     then(function (response) {
+                         if (response != undefined) {
+                             $scope.dateToday = response.data.dateToday;
+                             console.log('dateToday:', $scope.dateToday);
+                             console.log('API Response:', response.data);
+                         } else {
+                             $scope.dateToday = "";
+                         }
+                     });
 
     }
 
@@ -82,5 +95,14 @@ module.controller('MFListController', function($scope, $http, $filter) {
         }
         return '';
     }
+
+    // Extract the year from dateToday
+    $scope.extractYear = function() {
+        if ($scope.dateToday) {
+            var date = new Date($scope.dateToday);
+            return date.getFullYear();
+        }
+        return '';
+    };
 
 });

@@ -36,7 +36,7 @@ public class PublicViewController {
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
-        return "public/index";
+        return "public/indexreturnstats";
     }
 
     @RequestMapping(value = "/userlogin", method = RequestMethod.GET)
@@ -88,6 +88,15 @@ public class PublicViewController {
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Contact Us");
         return "public/contactus";
+    }
+
+    @RequestMapping(value = "/public/blog0001")
+    public String blog0001(Model model){
+        logger.debug(String.format("Visited /public/blog0001"));
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Notes on Financial Shenanigans");
+        return "public/blog0001";
     }
 
     @RequestMapping(value = "/public/wealthmanagementapp")
@@ -163,13 +172,13 @@ public class PublicViewController {
         return "public/mflist";
     }
 
-    @RequestMapping(value = "/public/indexstats")
+    @RequestMapping(value = "/public/nifty50stats")
     public String indexStats(Model model){
-        logger.debug(String.format("Visited /public/indexstats"));
+        logger.debug(String.format("Visited /public/nifty50stats"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "NIFTY-50 Index Statistics");
-        return "public/indexstats";
+        return "public/nifty50stats";
     }
 
     @RequestMapping(value = "/public/stocklist")
@@ -209,13 +218,13 @@ public class PublicViewController {
         return "public/retirementfundcalculation";
     }
 
-    @RequestMapping(value = "/public/midandsmallcapindexstats")
-    public String midAndSmallCapIndexStats(Model model){
-        logger.debug(String.format("Visited /public/midandsmallcapindexstats"));
+    @RequestMapping(value = "/public/indexreturnstats")
+    public String indexReturnStats(Model model){
+        logger.debug(String.format("Visited /public/indexreturnstats"));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "BSE-MidCap and BSE-SmallCap Statistics");
-        return "public/midandsmallcapindexstats";
+        return "public/indexreturnstats";
     }
 
     @RequestMapping(value = "/public/benchmarkreturns")
@@ -254,6 +263,14 @@ public class PublicViewController {
         return "public/bankanalysis3";
     }
 
+    @RequestMapping(value = "/public/blog1")
+    public String blog1(Model model){
+        logger.debug(String.format("Visited /public/blog1"));
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Notes on Financial Shenanigans");
+        return "/public/blog1";
+    }
 
 
 }

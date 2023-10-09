@@ -1,6 +1,7 @@
 package com.timelineofwealth.service;
 
 import com.timelineofwealth.dto.*;
+import com.timelineofwealth.dto.IndexMonthlyReturnsDTO;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.*;
 import org.slf4j.Logger;
@@ -796,14 +797,25 @@ public class CommonService {
     }
 
     /**
+     * Get monthly returns of the Index
+     * @param ticker
+     * @return
+     */
+    @Cacheable(value = "IndexMonthlyReturnsDTO")
+    public static List<IndexMonthlyReturnsDTO> getIndexMonthlyReturns(String ticker){
+        return IndexService.getMonthlyReturns(ticker);
+    }
+
+    /**
      * Get Index Statistics
      * @return
      */
-    public static List<IndexStatistics> getIndexStatistics(String index){
+    public static List<IndexStatistics> getIndexReturnStatistics(String index){
         if (index.equalsIgnoreCase("NIFTY")) {
             return CommonService.indexStatisticsRepository.findOneByTicker("NIFTY");
         } else {
-            List<IndexStatistics> indexStatistics = CommonService.indexStatisticsRepository.findOneByTicker("BSEMidCap");
+            List<IndexStatistics> indexStatistics = CommonService.indexStatisticsRepository.findOneByTicker("NIFTY");
+            indexStatistics.addAll(CommonService.indexStatisticsRepository.findOneByTicker("BSEMidCap"));
             indexStatistics.addAll(CommonService.indexStatisticsRepository.findOneByTicker("BSESmallCap"));
             return indexStatistics;
         }

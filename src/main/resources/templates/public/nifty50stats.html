@@ -38,7 +38,7 @@
 <script src="https://cdn3.devexpress.com/jslib/18.2.3/js/dx.all.js"></script>
 <script>window.angular || document.write(decodeURIComponent('%3Cscript src="js/angular.min.js"%3E%3C\/script%3E'))</script>
 <!-- custom angular script -->
-<script type="text/javascript" src="../../static/custom/public/indexstats.js" th:src="@{/custom/public/indexstats.js}"></script>
+<script type="text/javascript" src="../../static/custom/public/nifty50stats.js" th:src="@{/custom/public/nifty50stats.js}"></script>
 
 <div class="container body">
     <div class="main_container">
@@ -56,11 +56,59 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
                         <div class="x_title">
-                            <font color="green"><strong><h1>Index Statistics</h1></strong></font>
+                            <font color="green"><strong><h1>NIFTY50 Statistics</h1></strong></font>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <font color="green"><strong><h2>NIFTY-50 Monthly Returns </h2></strong></font>
+                            <font color="green"><h2><strong>NIFTY50 Returns Statistics </strong></h2></font><p>Based on data Since 2000-01-01 to {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE, BSE) </p>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Mean Returns</th>
+                                    <th>Median Returns</th>
+                                    <th>Minimum Returns</th>
+                                    <th>Maximum Returns</th>
+                                    <th>Standard Deviation</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th>1 Year Returns </th>
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanReturns1yr*100 | number:2}}%</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianReturns1yr*100 | number:2}}%</td>
+                                    <td align="left">{{indexConsolidatedStatistics[0].minimumReturns1yr*100 | number:2}}% (Jan-08 to Jan-09)</td>
+                                    <td align="left">{{indexConsolidatedStatistics[0].maximumReturns1yr*100 | number:2}}% (Apr-03 to Apr-04)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].standardDeviation1yr*100 | number:2}}%</td>
+                                </tr>
+                                <tr>
+                                    <th>3 Year Returns (Annualized) </th>
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanReturns3yr*100 | number:2}}%</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianReturns3yr*100 | number:2}}%</td>
+                                    <td align="left">{{indexConsolidatedStatistics[0].minimumReturns3yr*100 | number:2}}% (Apr-00 to Apr-03)</td>
+                                    <td align="left">{{indexConsolidatedStatistics[0].maximumReturns3yr*100 | number:2}}% (May-03 to May-06)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].standardDeviation3yr*100 | number:2}}%</td>
+                                </tr>
+                                <tr>
+                                    <th>5 Year Returns (Annualized) </th>
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanReturns5yr*100 | number:2}}%</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianReturns5yr*100 | number:2}}%</td>
+                                    <td align="left">{{indexConsolidatedStatistics[0].minimumReturns5yr*100 | number:2}}% (Nov-07 to Nov-12)</td>
+                                    <td align="left">{{indexConsolidatedStatistics[0].maximumReturns5yr*100 | number:2}}% (Oct-02 to Oct-07)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].standardDeviation5yr*100 | number:2}}%</td>
+                                </tr>
+                                <tr>
+                                    <th>10 Year Returns (Annualized) </th>
+                                    <td align="center">{{indexConsolidatedStatistics[0].meanReturns10yr*100 | number:2}}%</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].medianReturns10yr*100 | number:2}}%</td>
+                                    <td align="left">{{indexConsolidatedStatistics[0].minimumReturns10yr*100 | number:2}}% (Dec-07 to Dec-17)</td>
+                                    <td align="left">{{indexConsolidatedStatistics[0].maximumReturns10yr*100 | number:2}}% (May-03 to May-13)</td>
+                                    <td align="center">{{indexConsolidatedStatistics[0].standardDeviation10yr*100 | number:2}}%</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <p />
+                            <font color="green"><h2><strong>NIFTY50 Calendar Returns</strong></h2></font>
                             <table class="table">
                                 <thead>
                                 <tr>
@@ -96,54 +144,6 @@
                                     <td>{{return.novReturn*100 | number:2}}%</td>
                                     <td>{{return.decReturn*100 | number:2}}%</td>
                                     <td>{{return.annualReturn*100 | number:2}}%</td>
-                                </tr>
-                                </tbody>
-                            </table>
-
-                            <font color="green"><strong><h2>NIFTY-50 Returns Statistics </h2></strong></font><p>Over last 18 Years (Last updated: {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE) </p>
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>Mean Returns</th>
-                                    <th>Median Returns</th>
-                                    <th>Minimum Returns</th>
-                                    <th>Maximum Returns</th>
-                                    <th>Standard Deviation <p /><small>(Risk in terms of volatility)</small></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <th>1 Year Returns </th>
-                                    <td align="center">{{indexConsolidatedStatistics[0].meanReturns1yr*100 | number:2}}%</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].medianReturns1yr*100 | number:2}}%</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns1yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].minimumReturns1yrDuration}})</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns1yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].maximumReturns1yrDuration}})</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].standardDeviation1yr*100 | number:2}}%</td>
-                                </tr>
-                                <tr>
-                                    <th>3 Year Returns (Annualized) </th>
-                                    <td align="center">{{indexConsolidatedStatistics[0].meanReturns3yr*100 | number:2}}%</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].medianReturns3yr*100 | number:2}}%</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns3yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].minimumReturns3yrDuration}})</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns3yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].maximumReturns3yrDuration}})</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].standardDeviation3yr*100 | number:2}}%</td>
-                                </tr>
-                                <tr>
-                                    <th>5 Year Returns (Annualized) </th>
-                                    <td align="center">{{indexConsolidatedStatistics[0].meanReturns5yr*100 | number:2}}%</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].medianReturns5yr*100 | number:2}}%</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns5yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].minimumReturns5yrDuration}})</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns5yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].maximumReturns5yrDuration}})</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].standardDeviation5yr*100 | number:2}}%</td>
-                                </tr>
-                                <tr>
-                                    <th>10 Year Returns (Annualized) </th>
-                                    <td align="center">{{indexConsolidatedStatistics[0].meanReturns10yr*100 | number:2}}%</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].medianReturns10yr*100 | number:2}}%</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].minimumReturns10yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].minimumReturns10yrDuration}})</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].maximumReturns10yr*100 | number:2}}% - ({{indexConsolidatedStatistics[0].maximumReturns10yrDuration}})</td>
-                                    <td align="center">{{indexConsolidatedStatistics[0].standardDeviation10yr*100 | number:2}}%</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -199,10 +199,10 @@
                                 </tbody>
                             </table>
                             <div class="x_content">
-                                <font color="green"><strong><h2>Graphical View: NIFTY-50 Historical Trailing PE </h2></strong></font>
+                                <font color="green"><h2><strong>Graphical View: NIFTY-50 Historical Trailing PE</strong></h2></font>
                                 <p />Current PE {{indexConsolidatedStatistics[0].currentPe}} (Last updated: {{indexConsolidatedStatistics[0].lastUpdated}}, Source: NSE)
                                 <br />
-                                <strong>Note:</strong> A market is always forward-looking. So, Forward PE is more appropriate for analysis. However, it is subjective and also not available publicly. (There is consensus forward PE published by some firms, but publicly not available. Moreover, even the methodology of deriving forward PE is also not available.)
+                                <strong>Note:</strong> A market is always forward-looking. Therefore, Forward P/E ratio is more appropriate for analysis. However, it is subjective and not publicly available. Although some firms publish consensus forward P/E ratios, they are not publicly available. Furthermore, the methodology for deriving forward P/E ratios is also not available publicly.
                                 <br />
                                 Select Years:
                                 <select ng-model="yearFilter" ng-change="callSetChartData()">

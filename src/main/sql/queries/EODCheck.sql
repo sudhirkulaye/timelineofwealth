@@ -149,6 +149,88 @@ select max(date) from daily_data_s;
 
 select * from index_valuation a where a.date >= (select max(date) from index_valuation); -- '2020-11-21';  -- 
 SELECT * from index_statistics a; 
+select * from index_monthly_returns order by year desc, ticker;
+-- code to update PE ratio
+/*
+SET SQL_SAFE_UPDATES = 0;
+Commit;
+update index_statistics set mean_pe_1yr = 
+(select avg(pe) from index_valuation where ticker = 'NIFTY' and date >= (select date_sub(max(date), INTERVAL 12 MONTH) from index_valuation where ticker = 'NIFTY')) where ticker = 'NIFTY'; 
+update index_statistics set minimum_pe_1yr = 
+(select min(pe) from index_valuation where ticker = 'NIFTY' and date >= (select date_sub(max(date), INTERVAL 12 MONTH) from index_valuation where ticker = 'NIFTY')) where ticker = 'NIFTY'; 
+update index_statistics set maximum_pe_1yr = 
+(select max(pe) from index_valuation where ticker = 'NIFTY' and date >= (select date_sub(max(date), INTERVAL 12 MONTH) from index_valuation where ticker = 'NIFTY')) where ticker = 'NIFTY'; 
+
+update index_statistics set mean_pe_3yr = 
+(select avg(pe) from index_valuation where ticker = 'NIFTY' and date >= (select date_sub(max(date), INTERVAL 36 MONTH) from index_valuation where ticker = 'NIFTY')) where ticker = 'NIFTY'; 
+update index_statistics set minimum_pe_3yr = 
+(select min(pe) from index_valuation where ticker = 'NIFTY' and date >= (select date_sub(max(date), INTERVAL 36 MONTH) from index_valuation where ticker = 'NIFTY')) where ticker = 'NIFTY'; 
+update index_statistics set maximum_pe_3yr = 
+(select max(pe) from index_valuation where ticker = 'NIFTY' and date >= (select date_sub(max(date), INTERVAL 36 MONTH) from index_valuation where ticker = 'NIFTY')) where ticker = 'NIFTY'; 
+
+update index_statistics set mean_pe_5yr = 
+(select avg(pe) from index_valuation where ticker = 'NIFTY' and date >= (select date_sub(max(date), INTERVAL 60 MONTH) from index_valuation where ticker = 'NIFTY')) where ticker = 'NIFTY'; 
+update index_statistics set minimum_pe_5yr = 
+(select min(pe) from index_valuation where ticker = 'NIFTY' and date >= (select date_sub(max(date), INTERVAL 60 MONTH) from index_valuation where ticker = 'NIFTY')) where ticker = 'NIFTY'; 
+update index_statistics set maximum_pe_5yr = 
+(select max(pe) from index_valuation where ticker = 'NIFTY' and date >= (select date_sub(max(date), INTERVAL 60 MONTH) from index_valuation where ticker = 'NIFTY')) where ticker = 'NIFTY'; 
+
+update index_statistics set mean_pe_10yr = 
+(select avg(pe) from index_valuation where ticker = 'NIFTY' and date >= (select date_sub(max(date), INTERVAL 120 MONTH) from index_valuation where ticker = 'NIFTY')) where ticker = 'NIFTY'; 
+update index_statistics set minimum_pe_10yr = 
+(select min(pe) from index_valuation where ticker = 'NIFTY' and date >= (select date_sub(max(date), INTERVAL 120 MONTH) from index_valuation where ticker = 'NIFTY')) where ticker = 'NIFTY'; 
+update index_statistics set maximum_pe_10yr = 
+(select max(pe) from index_valuation where ticker = 'NIFTY' and date >= (select date_sub(max(date), INTERVAL 120 MONTH) from index_valuation where ticker = 'NIFTY')) where ticker = 'NIFTY'; 
+
+update index_statistics set median_pe_1yr = 
+(SELECT AVG(dd.pe) as median_val
+FROM (
+SELECT d.pe, @rownum:=@rownum+1 as `row_number`, @total_rows:=@rownum
+  FROM index_valuation d, (SELECT @rownum:=0) r
+  WHERE d.pe is NOT NULL
+  AND ticker = 'NIFTY'
+  AND date >= (select date_sub(max(date), INTERVAL 12 MONTH) from index_valuation where ticker = 'NIFTY')
+  ORDER BY d.pe
+) as dd
+WHERE dd.row_number IN ( FLOOR((@total_rows+1)/2), FLOOR((@total_rows+2)/2) )) where ticker = 'NIFTY';
+
+update index_statistics set median_pe_3yr = 
+(SELECT AVG(dd.pe) as median_val
+FROM (
+SELECT d.pe, @rownum:=@rownum+1 as `row_number`, @total_rows:=@rownum
+  FROM index_valuation d, (SELECT @rownum:=0) r
+  WHERE d.pe is NOT NULL
+  AND ticker = 'NIFTY'
+  AND date >= (select date_sub(max(date), INTERVAL 36 MONTH) from index_valuation where ticker = 'NIFTY')
+  ORDER BY d.pe
+) as dd
+WHERE dd.row_number IN ( FLOOR((@total_rows+1)/2), FLOOR((@total_rows+2)/2) )) where ticker = 'NIFTY';
+
+update index_statistics set median_pe_5yr = 
+(SELECT AVG(dd.pe) as median_val
+FROM (
+SELECT d.pe, @rownum:=@rownum+1 as `row_number`, @total_rows:=@rownum
+  FROM index_valuation d, (SELECT @rownum:=0) r
+  WHERE d.pe is NOT NULL
+  AND ticker = 'NIFTY'
+  AND date >= (select date_sub(max(date), INTERVAL 60 MONTH) from index_valuation where ticker = 'NIFTY')
+  ORDER BY d.pe
+) as dd
+WHERE dd.row_number IN ( FLOOR((@total_rows+1)/2), FLOOR((@total_rows+2)/2) )) where ticker = 'NIFTY';
+
+update index_statistics set median_pe_10yr = 
+(SELECT AVG(dd.pe) as median_val
+FROM (
+SELECT d.pe, @rownum:=@rownum+1 as `row_number`, @total_rows:=@rownum
+  FROM index_valuation d, (SELECT @rownum:=0) r
+  WHERE d.pe is NOT NULL
+  AND ticker = 'NIFTY'
+  AND date >= (select date_sub(max(date), INTERVAL 120 MONTH) from index_valuation where ticker = 'NIFTY')
+  ORDER BY d.pe
+) as dd
+WHERE dd.row_number IN ( FLOOR((@total_rows+1)/2), FLOOR((@total_rows+2)/2) )) where ticker = 'NIFTY';
+*/
+
 SELECT DISTINCT ticker from index_valuation a where ticker like '%200';
 UPDATE index_valuation Set ticker = 'NIFTY200' where ticker = 'NIFY200';
 select * from index_valuation where ticker = 'NIFTY200' order by date desc;

@@ -10,6 +10,7 @@ import com.timelineofwealth.repositories.*;
 import com.timelineofwealth.service.CSVUtils;
 import com.timelineofwealth.service.CommonService;
 import com.timelineofwealth.service.DownloadEODFiles;
+import com.timelineofwealth.service.IndexService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -37,6 +38,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -97,6 +99,11 @@ public class AdminViewController {
     @Autowired
     public void setMoslTransactionRepository(MOSLTransactionRepository moslTransactionRepository){
         this.moslTransactionRepository = moslTransactionRepository;
+    }
+    @Autowired
+    IndexValuationRepository indexValuationRepository;
+    public void setIndexValuationRepository(IndexValuationRepository indexValuationRepository){
+        this.indexValuationRepository = indexValuationRepository;
     }
     @Autowired
     public AdminViewController(Environment environment){}
@@ -1389,13 +1396,54 @@ public class AdminViewController {
         return "admin/mfuniverse";
     }
 
-    @RequestMapping(value = "/admin/indexstatistics")
-    public String indexStatistics(Model model, @AuthenticationPrincipal UserDetails userDetails){
+    @RequestMapping(value = "/admin/computeindexstat")
+    public String computeIndexStat(Model model, @AuthenticationPrincipal UserDetails userDetails){
         dateToday = new PublicApi().getSetupDates().getDateToday();
+        Date maxNiftyDate, maxBSEMidCapDate, maxBSESmallCapDate;
+        maxNiftyDate = indexValuationRepository.findMaxKeyDateForKeyTicker("NIFTY");
+        maxBSEMidCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("NIFTY");
+        maxBSESmallCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("NIFTY");
+        model.addAttribute("maxNiftyDate", maxNiftyDate);
+        model.addAttribute("maxBSEMidCapDate", maxBSEMidCapDate);
+        model.addAttribute("maxBSESmallCapDate", maxBSESmallCapDate);
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
         model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
-        return "admin/indexstatistics";
+        return "admin/computeindexstat";
+    }
+
+    @RequestMapping(value=("/admin/computeindexstatstatus"),method=RequestMethod.POST)
+    public String computeIndexStatStatus(Model model, @RequestParam("confirmation") String confirmation){
+        if (confirmation.equalsIgnoreCase("yes")) {
+            try {
+                IndexService.computeAndSaveIndexMonthlyReturns("NIFTY", true);
+                IndexService.computeAndSaveIndexMonthlyReturns("BSEMidCap", true);
+                IndexService.computeAndSaveIndexMonthlyReturns("BSESmallCap", true);
+
+                IndexService.computeAndSavePeriodReturnStatistics("NIFTY", 1);
+                IndexService.computeAndSavePeriodReturnStatistics("NIFTY", 3);
+                IndexService.computeAndSavePeriodReturnStatistics("NIFTY", 5);
+                IndexService.computeAndSavePeriodReturnStatistics("NIFTY", 10);
+
+                IndexService.computeAndSavePeriodReturnStatistics("BSEMidCap", 1);
+                IndexService.computeAndSavePeriodReturnStatistics("BSEMidCap", 3);
+                IndexService.computeAndSavePeriodReturnStatistics("BSEMidCap", 5);
+                IndexService.computeAndSavePeriodReturnStatistics("BSEMidCap", 10);
+
+                IndexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 1);
+                IndexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 3);
+                IndexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 5);
+                IndexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 10);
+
+            } catch (Exception e) {
+                model.addAttribute("message", "Failed to compute index statistics.");
+            }
+            model.addAttribute("message", "Index Statistics computed");
+            return "admin/computeindexstat";
+        } else {
+            model.addAttribute("message", "Please confirm Yes/No to process Download, upload and running EOD");
+            return "admin/computeindexstat";
+        }
     }
 
 }

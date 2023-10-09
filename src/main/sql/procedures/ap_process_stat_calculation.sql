@@ -1,4 +1,5 @@
 DROP PROCEDURE IF EXISTS ap_process_stat_calculation;
+DELIMITER $$
 CREATE PROCEDURE ap_process_stat_calculation()
 BEGIN
 
@@ -86,12 +87,17 @@ BEGIN
 
   -- Compute Mutual Fund Stats
   call ap_process_mf_returns();
+  call ap_process_mf_calendar_returns();
 
   -- Compute Stock Pirce Returns
   call ap_process_stock_returns();
+
+  -- Compute Benchmark Returns
+  -- call ap_process_benchmark_returns();
 
   INSERT INTO log_table
   VALUES      (now(), 'ap_process_stat_calculation: End');
 
   commit;
-END
+END$$
+DELIMITER ;

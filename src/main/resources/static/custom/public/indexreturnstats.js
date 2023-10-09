@@ -1,6 +1,6 @@
-var module = angular.module('MidAndSmallCapIndexStatsManagement', []);
+var module = angular.module('IndexReturnStatsManagement', []);
 
-module.controller('MidAndSmallCapIndexStatsController', function($scope, $http, $filter) {
+module.controller('IndexReturnStatsController', function($scope, $http, $filter) {
     var urlBase="/public/api";
     $scope.indexConsolidatedStatistics = [];
 
@@ -9,7 +9,7 @@ module.controller('MidAndSmallCapIndexStatsController', function($scope, $http, 
     function showRecords(){
         $scope.indexStatRecords = new Map;
 
-        url = "/getmidandsmallcapindexstatistics";
+        url = "/getindexreturnstats";
         $http.get(urlBase + url).
             then(function (response) {
                 if (response != undefined) {

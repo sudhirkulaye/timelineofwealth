@@ -1356,3 +1356,24 @@ CREATE TABLE stock_valuation (
   PRIMARY KEY (ticker,quarter),
   KEY index_stock_valuation_ticker (ticker)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stock Valuation';
+
+-- DROP index_monthly_returns;
+CREATE TABLE index_monthly_returns (
+    ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK Index ticker',
+    year int(4) NOT NULL COMMENT 'Year',
+    jan_return DECIMAL(10,4) DEFAULT '0.00' COMMENT 'January Return',
+    feb_return DECIMAL(10,4) DEFAULT '0.00' COMMENT 'February Return',
+    mar_return DECIMAL(10,4) DEFAULT '0.00' COMMENT 'March Return',
+    apr_return DECIMAL(10,4) DEFAULT '0.00' COMMENT 'April Return',
+    may_return DECIMAL(10,4) DEFAULT '0.00' COMMENT 'May Return',
+    jun_return DECIMAL(10,4) DEFAULT '0.00' COMMENT 'June Return',
+    jul_return DECIMAL(10,4) DEFAULT '0.00' COMMENT 'July Return',
+    aug_return DECIMAL(10,4) DEFAULT '0.00' COMMENT 'August Return',
+    sep_return DECIMAL(10,4) DEFAULT '0.00' COMMENT 'September Return',
+    oct_return DECIMAL(10,4) DEFAULT '0.00' COMMENT 'October Return',
+    nov_return DECIMAL(10,4) DEFAULT '0.00' COMMENT 'November Return',
+    dec_return DECIMAL(10,4) DEFAULT '0.00' COMMENT 'December Return',
+    annual_return DECIMAL(10,4) COMMENT 'Annual Return',
+    PRIMARY KEY (ticker, year),
+    KEY index_index_monthly_returns_ticker (ticker)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Index Monthly Returns';
