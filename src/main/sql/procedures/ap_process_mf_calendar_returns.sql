@@ -63,7 +63,7 @@ BEGIN
 
 		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
 		  UPDATE mutual_fund_stats
-		  SET total_returns_y0 = (var_nav_end_date / var_nav_start_date) - 1
+		  SET total_returns_y0 = ((var_nav_end_date / var_nav_start_date) - 1)*100
 		  WHERE scheme_code = var_scheme_code;
 		ELSE
 		  UPDATE mutual_fund_stats
@@ -102,7 +102,7 @@ BEGIN
 
 		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
 		  UPDATE mutual_fund_stats
-		  SET total_returns_y1 = (var_nav_end_date / var_nav_start_date) - 1
+		  SET total_returns_y1 = ((var_nav_end_date / var_nav_start_date) - 1)*100
 		  WHERE scheme_code = var_scheme_code;
 		ELSE
 		  UPDATE mutual_fund_stats
@@ -141,7 +141,7 @@ BEGIN
 
 		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
 		  UPDATE mutual_fund_stats
-		  SET total_returns_y2 = (var_nav_end_date / var_nav_start_date) - 1
+		  SET total_returns_y2 = ((var_nav_end_date / var_nav_start_date) - 1)*100
 		  WHERE scheme_code = var_scheme_code;
 		ELSE
 		  UPDATE mutual_fund_stats
@@ -180,7 +180,7 @@ BEGIN
 
 		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
 		  UPDATE mutual_fund_stats
-		  SET total_returns_y3 = (var_nav_end_date / var_nav_start_date) - 1
+		  SET total_returns_y3 = ((var_nav_end_date / var_nav_start_date) - 1)*100
 		  WHERE scheme_code = var_scheme_code;
 		ELSE
 		  UPDATE mutual_fund_stats
@@ -219,7 +219,7 @@ BEGIN
 
 		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
 		  UPDATE mutual_fund_stats
-		  SET total_returns_y4 = (var_nav_end_date / var_nav_start_date) - 1
+		  SET total_returns_y4 = ((var_nav_end_date / var_nav_start_date) - 1)*100
 		  WHERE scheme_code = var_scheme_code;
 		ELSE
 		  UPDATE mutual_fund_stats
@@ -258,7 +258,7 @@ BEGIN
 
 		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
 		  UPDATE mutual_fund_stats
-		  SET total_returns_y5 = (var_nav_end_date / var_nav_start_date) - 1
+		  SET total_returns_y5 = ((var_nav_end_date / var_nav_start_date) - 1)*100
 		  WHERE scheme_code = var_scheme_code;
 		ELSE
 		  UPDATE mutual_fund_stats
@@ -297,7 +297,7 @@ BEGIN
 
 		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
 		  UPDATE mutual_fund_stats
-		  SET total_returns_y6 = (var_nav_end_date / var_nav_start_date) - 1
+		  SET total_returns_y6 = ((var_nav_end_date / var_nav_start_date) - 1)*100
 		  WHERE scheme_code = var_scheme_code;
 		ELSE
 		  UPDATE mutual_fund_stats
@@ -336,7 +336,7 @@ BEGIN
 
 		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
 		  UPDATE mutual_fund_stats
-		  SET total_returns_y7 = (var_nav_end_date / var_nav_start_date) - 1
+		  SET total_returns_y7 = ((var_nav_end_date / var_nav_start_date) - 1)*100
 		  WHERE scheme_code = var_scheme_code;
 		ELSE
 		  UPDATE mutual_fund_stats
@@ -375,7 +375,7 @@ BEGIN
 
 		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
 		  UPDATE mutual_fund_stats
-		  SET total_returns_y8 = (var_nav_end_date / var_nav_start_date) - 1
+		  SET total_returns_y8 = ((var_nav_end_date / var_nav_start_date) - 1)*100
 		  WHERE scheme_code = var_scheme_code;
 		ELSE
 		  UPDATE mutual_fund_stats
@@ -414,7 +414,7 @@ BEGIN
 
 		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
 		  UPDATE mutual_fund_stats
-		  SET total_returns_y9 = (var_nav_end_date / var_nav_start_date) - 1
+		  SET total_returns_y9 = ((var_nav_end_date / var_nav_start_date) - 1)*100
 		  WHERE scheme_code = var_scheme_code;
 		ELSE
 		  UPDATE mutual_fund_stats
@@ -453,7 +453,7 @@ BEGIN
 
 		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
 		  UPDATE mutual_fund_stats
-		  SET total_returns_y10 = (var_nav_end_date / var_nav_start_date) - 1
+		  SET total_returns_y10 = ((var_nav_end_date / var_nav_start_date) - 1)*100
 		  WHERE scheme_code = var_scheme_code;
 		ELSE
 		  UPDATE mutual_fund_stats

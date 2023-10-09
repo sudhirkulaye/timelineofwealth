@@ -1,4 +1,5 @@
 DROP PROCEDURE IF EXISTS ap_process_mf_returns;
+DELIMITER $$
 CREATE PROCEDURE ap_process_mf_returns()
 BEGIN
 
@@ -29,7 +30,7 @@ BEGIN
   SET var_date_1_yr_before = date_sub(var_date_today, INTERVAL 12 MONTH);
   SET var_date_3_yr_before = date_sub(var_date_today, INTERVAL 36 MONTH);
   SET var_date_5_yr_before = date_sub(var_date_today, INTERVAL 60 MONTH);
-  SET var_date_10_yr_before = date_sub(var_date_today, INTERVAL 72 MONTH); -- temp. setting to 6years
+  SET var_date_10_yr_before = date_sub(var_date_today, INTERVAL 120 MONTH);
   SET var_date_current_year_start = Makedate(Year(var_date_today), 1);
 
   OPEN mutual_fund_stats_cursor;
@@ -176,4 +177,5 @@ BEGIN
 
   commit;
 
-END
+END$$
+DELIMITER ;
