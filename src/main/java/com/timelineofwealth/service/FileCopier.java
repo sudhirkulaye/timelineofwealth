@@ -10,7 +10,7 @@ public class FileCopier {
         // Set the source and destination folders
 
         String localLaptop = "C:\\MyDocuments\\03Business";
-        String paragLaptop = "\\\\DESKTOP-UV0PRDE\\03 Business";
+        String paragLaptop = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business";
         String redMILaptop = "\\\\redmibook15\\03Business";
         String hpSpectreLaptop = "\\DESKTOP-UV0PRDE\03Business";
         String dailyData = "\\03DailyData";
@@ -27,6 +27,14 @@ public class FileCopier {
         String srcFolder = localMyDocuments; // localLaptop + researchAndAnalysis;
         String dstFolder = redMIMyDocuments; // redMILaptop + researchAndAnalysis;
 
+        //Move latest reports from HP to Redmi
+//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q2";
+//        String dstFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q2";
+
+        //Move latest Excels redmi to temp
+//        String srcFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2024Q2";
+//        String dstFolder = "C:\\temp";
+
 //        String srcFolder = localLaptop + reports;
 //        String dstFolder = paragLaptop + reports;
 
@@ -37,29 +45,29 @@ public class FileCopier {
 //        String dstFolder = paragLaptop + dailyData;
 
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2023Q2";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2023Q2";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
+//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2024Q2";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2024Q2";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY23Q2";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY23Q2";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY23Q2";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\AMBITDaily";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\AMBITDaily";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\AMBITDaily";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\KotakDaily";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\KotakDaily";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\KotakDaily";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\MOSLMorningIndia";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\MOSLMorningIndia";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\MOSLMorningIndia";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\03 Business\\06ClientData\\PMS\\ClientReports";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports";
 
 //        String srcFolder = "C:\\MyDocuments\\02UsefulSoftwares\\EditPlus 3";
 //        String dstFolder = "\\\\redmibook15\\02UsefulSoftwares\\EditPlus 3";
@@ -69,8 +77,8 @@ public class FileCopier {
 //        String dstFolder = "\\\\redmibook15\\03Business\\03DailyData";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
 //        String dstFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2023Q2";
-//        String dstFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2023Q2";
+//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2024Q2";
+//        String dstFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2024Q2";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert";
 //        String dstFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";

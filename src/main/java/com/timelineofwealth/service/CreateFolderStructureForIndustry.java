@@ -5,7 +5,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class CreateFolderStructureForIndustry {
@@ -14,15 +18,17 @@ public class CreateFolderStructureForIndustry {
         //1. Create Folder Structure from source folder
 //        createFolderStructure(argv);
         //2. List Duplicate excel files in Analysis Folder
-//        listDuplicateFiles(argv);
+        listDuplicateFiles(argv);
         //3. List Files and their path in Analysis Folder
-        listFilesAndFolderPath(argv);
-
+//        listFilesAndFolderPath(argv);
+        //4. File Name and Corresponding Folder Name
+//        listFileNameAndSectorFolder();
     }
 
     public static void createFolderStructure(String[] argv) throws IOException {
-        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY23Q4";
-        String destinationPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q1";
+//        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q1";
+        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
+        String destinationPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q2";
 
         File sourceDirectory = new File(sourcePath);
 
@@ -37,12 +43,10 @@ public class CreateFolderStructureForIndustry {
             }
         }
 
-
         System.out.println("Folders for industries created...");
     }
 
-    static void RecursivePrint(File[] arr, int index, int level) throws Exception
-    {
+    static void RecursivePrint(File[] arr, int index, int level) throws Exception {
         // terminate condition
         if (index == arr.length)
             return;
@@ -70,8 +74,7 @@ public class CreateFolderStructureForIndustry {
     }
 
     // Driver Method
-    public static void listFilesAndFolderPath(String[] args) throws Exception
-    {
+    public static void listFilesAndFolderPath(String[] args) throws Exception {
         // Provide full path for directory(change
         // accordingly)
         String maindirpath
@@ -116,6 +119,53 @@ public class CreateFolderStructureForIndustry {
                             fileNames.add(fileName);
                         }
                     });
+        }
+    }
+
+    public static void listFileNameAndSectorFolder(){
+        // Specify the directory path
+        String directoryPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
+
+        // Create a File object for the directory
+        File directory = new File(directoryPath);
+
+        // Check if the directory exists
+        if (directory.exists() && directory.isDirectory()) {
+            // Define the pattern for matching file names
+            Pattern pattern = Pattern.compile("\\d{8}_.+_.+\\.pdf");
+
+            // Create a Map to store unique file names and their corresponding subfolder names
+            Map<String, String> uniqueFileAndSubfolder = new HashMap<>();
+
+            // List all subdirectories
+            File[] subdirectories = directory.listFiles(File::isDirectory);
+
+            if (subdirectories != null) {
+                for (File subdirectory : subdirectories) {
+                    // List files in each subdirectory
+                    File[] files = subdirectory.listFiles();
+                    if (files != null) {
+                        for (File file : files) {
+                            // Check if the file name matches the pattern
+                            if (pattern.matcher(file.getName()).matches()) {
+                                // Extract the NameOfTheFile and add it to the map
+                                String[] parts = file.getName().split("_");
+                                if (parts.length >= 3) {
+                                    String nameOfFile = parts[1];
+                                    uniqueFileAndSubfolder.put(nameOfFile, subdirectory.getName());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Print the unique file names and their corresponding subfolder names
+            for (Map.Entry<String, String> entry : uniqueFileAndSubfolder.entrySet()) {
+                System.out.println(entry.getKey() + ", " + entry.getValue());
+            }
+        } else {
+            System.out.println("Directory does not exist or is not a directory.");
         }
     }
 }
