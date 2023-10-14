@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 @Service("AdminService")
 public class AdminService {
     private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
+    private static String basePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
 
     @Autowired
     private static AdviserUserMappingRepository adviserUserMappingRepository;
@@ -36,35 +37,15 @@ public class AdminService {
     public static List<ResultExcelDTO> getLatestResultExcels() {
         logger.debug(String.format("In AdminService.getLatestResultExcels"));
 
-        String basePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-        File baseFolder = new File(basePath);
-
-        if (!baseFolder.exists() || !baseFolder.isDirectory()) {
-            // Handle the case where the base folder doesn't exist or is not a directory
-            return new ArrayList<>();
-        }
-
-        // List all subdirectories (quarter result folders) within the base folder
-        File[] subdirectories = baseFolder.listFiles(File::isDirectory);
-
-        if (subdirectories == null || subdirectories.length == 0) {
-            // Handle the case where no subdirectories (quarter result folders) are found
-            return new ArrayList<>();
-        }
-
         // Find the latest quarter result folder by comparing folder names
-        File latestQuarterFolder = subdirectories[0];
-        for (File folder : subdirectories) {
-            if (isQuarterFolder(folder)) {
-                if (folder.getName().compareTo(latestQuarterFolder.getName()) > 0) {
-                    latestQuarterFolder = folder;
-                }
-            }
+        File latestQuarterFolder = getLatestQuarterFolder();
+        if(latestQuarterFolder == null) {
+            return new ArrayList<>();
         }
 
         // Define a filter to select only Excel files (with .xlsx extension)
         FileFilter excelFilter = file -> file.isFile() &&
-                file.getName().endsWith(".xlsx") &&
+                (file.getName().endsWith(".xlsx") || file.getName().endsWith(".sql")) &&
                 !file.getName().startsWith("$") &&
                 !file.getName().contains("$");
 
@@ -98,5 +79,36 @@ public class AdminService {
     private static boolean isQuarterFolder(File folder) {
         String folderName = folder.getName();
         return folderName.matches("\\d{4}Q[1-4]");
+    }
+
+    public static File getLatestQuarterFolder(){
+        File latestQuarterFolder = null;
+
+        File baseFolder = new File(basePath);
+
+        if (!baseFolder.exists() || !baseFolder.isDirectory()) {
+            // Handle the case where the base folder doesn't exist or is not a directory
+            return latestQuarterFolder;
+        }
+
+        // List all subdirectories (quarter result folders) within the base folder
+        File[] subdirectories = baseFolder.listFiles(File::isDirectory);
+
+        if (subdirectories == null || subdirectories.length == 0) {
+            // Handle the case where no subdirectories (quarter result folders) are found
+            return latestQuarterFolder;
+        }
+
+        // Find the latest quarter result folder by comparing folder names
+        latestQuarterFolder = subdirectories[0];
+        for (File folder : subdirectories) {
+            if (isQuarterFolder(folder)) {
+                if (folder.getName().compareTo(latestQuarterFolder.getName()) > 0) {
+                    latestQuarterFolder = folder;
+                }
+            }
+        }
+
+        return latestQuarterFolder;
     }
 }

@@ -7,11 +7,9 @@ import com.timelineofwealth.dto.DailyDataBJSON;
 import com.timelineofwealth.dto.Ticker;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.*;
-import com.timelineofwealth.service.CSVUtils;
-import com.timelineofwealth.service.CommonService;
-import com.timelineofwealth.service.DownloadEODFiles;
-import com.timelineofwealth.service.IndexService;
-import org.apache.poi.ss.usermodel.Cell;
+import com.timelineofwealth.service.*;
+import org.apache.poi.ss.formula.eval.NotImplementedFunctionException;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -36,8 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1011,12 +1007,55 @@ public class AdminViewController {
             try {
                 returnvalue = downloadEODFiles.oneClickUpload(nsePriceHistoryRepository, bsePriceHistoryRepository, mutualFundNavHistoryRepository, dailyDataSRepository, mutualFundUniverseRepository);
                 if (returnvalue < 0) {
-                    model.addAttribute("message", "Failed to Download and Upload Data files successfully. Check log files.");
+                    model.addAttribute("error", "Failed to Download and Upload Data files successfully. Check log files.");
                 } else {
                     model.addAttribute("message", "Successfully Downloaded and uploaded Data files");
                 }
             } catch (Exception e) {
-                model.addAttribute("message", "Failed to Upload Data files successfully. Check log files.");
+                model.addAttribute("error", "Failed to Upload Data files successfully. Check log files.");
+            }
+            try {
+                List<Object[]> objects = nsePriceHistoryRepository.findMaxDateAndCount();
+                java.sql.Date sqlDate = null;
+                for (Object[] object : objects) {
+                    sqlDate = (java.sql.Date) object[1];
+                }
+                if (sqlDate != null) {
+                    returnvalue = downloadEODFiles.downloadAndSaveNSEIndexData(sqlDate);
+                    if (returnvalue < 0) {
+                        System.out.println("Failed to upload NSE Index Data successfully.");
+                        model.addAttribute("error", "Failed to upload NSE Index Data successfully. Check log files.");
+                    } else {
+                        System.out.println("Uploaded NSE Index Data successfully.");
+                        try {
+                            downloadEODFiles = new DownloadEODFiles();
+                            downloadEODFiles.setIndexValuationRepository(indexValuationRepository);
+                            int returnValue = 0;
+                            returnValue = downloadEODFiles.uploadBSEIndexData(sqlDate, "BSEMidCap");
+                            if (returnValue < 0) {
+                                System.out.println("Failed to upload BSEMidCap Index Data.");
+                                model.addAttribute("error", "Failed to upload BSEMidCap Index Data. Please check log files.");
+                            } else {
+                                System.out.println("Uploaded BSEMidCap Index Data successfully.");
+                                downloadEODFiles.uploadBSEIndexData(sqlDate, "BSESmallCap");
+                                if (returnValue < 0) {
+                                    System.out.println("Failed to upload BSESmallCap Index Data.");
+                                    model.addAttribute("error", "Failed to upload BSESmallCap Index Data. Please check log files.");
+                                }
+                                else {
+                                    System.out.println("Uploaded BSESmallCap Index Data successfully.");
+                                    model.addAttribute("message", "Successfully uploaded both BSE Mid and Small Cap Index Data");
+                                }
+                            }
+                        } catch (Exception e) {
+                            model.addAttribute("error", "Failed to download and save BSE Index Data. Please check log files.");
+                        }
+                    }
+                } else {
+                    model.addAttribute("error", "Failed to upload NSE Index Data successfully. Check log files.");
+                }
+            } catch (Exception e) {
+                model.addAttribute("error", "Failed to upload NSE Index Data successfully. Check log files.");
             }
             return "admin/oneclickupload";
         } else {
@@ -1127,6 +1166,7 @@ public class AdminViewController {
 
                     model.addAttribute("message", "File '" + originalFilename + "' uploaded successfully.");
                 } catch (Exception e) {
+                    e.printStackTrace();
                     model.addAttribute("error", "Exception in Processing the file.");
                 }
             } else {
@@ -1399,10 +1439,13 @@ public class AdminViewController {
     @RequestMapping(value = "/admin/computeindexstat")
     public String computeIndexStat(Model model, @AuthenticationPrincipal UserDetails userDetails){
         dateToday = new PublicApi().getSetupDates().getDateToday();
+
         Date maxNiftyDate, maxBSEMidCapDate, maxBSESmallCapDate;
         maxNiftyDate = indexValuationRepository.findMaxKeyDateForKeyTicker("NIFTY");
-        maxBSEMidCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("NIFTY");
-        maxBSESmallCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("NIFTY");
+        maxBSEMidCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("BSEMidCap");
+        maxBSESmallCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("BSESmallCap");
+
+
         model.addAttribute("maxNiftyDate", maxNiftyDate);
         model.addAttribute("maxBSEMidCapDate", maxBSEMidCapDate);
         model.addAttribute("maxBSESmallCapDate", maxBSESmallCapDate);
@@ -1444,6 +1487,235 @@ public class AdminViewController {
             model.addAttribute("message", "Please confirm Yes/No to process Download, upload and running EOD");
             return "admin/computeindexstat";
         }
+    }
+
+    @RequestMapping(value = "/admin/uploadbseindexdata")
+    public String uploadBSEIndexData(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "TimelineOfWealth");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        Date maxBSEMidCapDate, maxBSESmallCapDate;
+        maxBSEMidCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("BSEMidCap");
+        maxBSESmallCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("BSESmallCap");
+        model.addAttribute("maxBSEMidCapDate", maxBSEMidCapDate);
+        model.addAttribute("maxBSESmallCapDate", maxBSESmallCapDate);
+        model.addAttribute("dateToday", dateToday);
+        return "admin/uploadbseindexdata";
+    }
+
+    @RequestMapping(value = "/admin/downloadandsavenseindexdata")
+    public String downloadAndSaveNSEIndexData(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "TimelineOfWealth");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        Date maxNiftyDate, maxBSEMidCapDate, maxBSESmallCapDate;
+        maxNiftyDate = indexValuationRepository.findMaxKeyDateForKeyTicker("NIFTY");
+        model.addAttribute("maxNiftyDate", maxNiftyDate);
+        return "admin/downloadandsavenseindexdata";
+    }
+
+    @RequestMapping(value=("/admin/downloadandsavenseindexdatastatus"),method=RequestMethod.POST)
+    public String downloadAndSaveNSEIndexDataStatus(Model model, @RequestParam("indexProcessDate") String indexProcessDate){
+        java.sql.Date sqlDate = null;
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date utilDate = dateFormat.parse(indexProcessDate);
+            sqlDate = new java.sql.Date(utilDate.getTime());
+        } catch (Exception e){
+            sqlDate = null;
+            model.addAttribute("error", "Please enter the date in the valid form");
+            return "admin/downloadandsavenseindexdata";
+        }
+
+        if (sqlDate != null) {
+            try {
+                DownloadEODFiles downloadEODFiles = new DownloadEODFiles();
+                downloadEODFiles = new DownloadEODFiles();
+                downloadEODFiles.setIndexValuationRepository(indexValuationRepository);
+                int returnValue = downloadEODFiles.downloadAndSaveNSEIndexData(sqlDate);
+                if (returnValue < 0)
+                    model.addAttribute("error", "Failed to download and save NSE Index Data. Please check log files.");
+                else
+                    model.addAttribute("message", "Successfully downloaded and saved NSE Index Data");
+            } catch (Exception e) {
+                model.addAttribute("error", "Failed to download and save NSE Index Data. Please check log files.");
+            }
+            return "admin/downloadandsavenseindexdata";
+        } else {
+            model.addAttribute("error", "Please enter the date in the valid form");
+            return "admin/downloadandsavenseindexdata";
+        }
+    }
+
+    @RequestMapping(value=("/admin/uploadbseindexdatastatus"),method=RequestMethod.POST)
+    public String uploadBSEIndexDataStatus(Model model, @RequestParam("indexProcessDate") String indexProcessDate){
+        java.sql.Date sqlDate = null;
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date utilDate = dateFormat.parse(indexProcessDate);
+            sqlDate = new java.sql.Date(utilDate.getTime());
+        } catch (Exception e){
+            sqlDate = null;
+            model.addAttribute("error", "Please enter the date in the valid form");
+            return "admin/uploadbseindexdata";
+        }
+
+        if (sqlDate != null) {
+            try {
+                DownloadEODFiles downloadEODFiles = new DownloadEODFiles();
+                downloadEODFiles = new DownloadEODFiles();
+                downloadEODFiles.setIndexValuationRepository(indexValuationRepository);
+                int returnValue = 0;
+                returnValue = downloadEODFiles.uploadBSEIndexData(sqlDate, "BSEMidCap");
+                if (returnValue < 0) {
+                    model.addAttribute("error", "Failed to upload BSEMidCap Index Data. Please check log files.");
+                } else {
+                    downloadEODFiles.uploadBSEIndexData(sqlDate, "BSESmallCap");
+                    if (returnValue < 0)
+                        model.addAttribute("error", "Failed to upload BSESmallCap Index Data. Please check log files.");
+                    else
+                        model.addAttribute("message", "Successfully uploaded both BSE Mid and Small Cap Index Data");
+                }
+            } catch (Exception e) {
+                model.addAttribute("error", "Failed to download and save BSE Index Data. Please check log files.");
+            }
+            return "admin/uploadbseindexdata";
+        } else {
+            model.addAttribute("error", "Please enter the date in the valid form");
+            return "admin/uploadbseindexdata";
+        }
+    }
+
+    @RequestMapping(value = "/admin/generatedbinsertscript")
+    public String createDBInsertScript(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "TimelineOfWealth");
+        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        return "admin/generatedbinsertscript";
+    }
+
+    @RequestMapping(value=("/admin/generatedbinsertscriptstatus"),method=RequestMethod.POST)
+    public static String generateDBInsertScriptStatus(Model model, @RequestParam("dateRange") String dateRange ) {
+
+        File inputFolderPath = AdminService.getLatestQuarterFolder();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
+        Date now = new Date(System.currentTimeMillis());
+        String outputFileName = dateFormat.format(now) + "_DBInsertScript.sql";
+
+        File outputFile = new File(inputFolderPath, outputFileName);
+
+        try (PrintWriter writer = new PrintWriter(outputFile)) {
+            File folder = inputFolderPath;
+            // Define a filter to select only Excel files (with .xlsx extension)
+            FileFilter excelFilter = file -> file.isFile() &&
+                    file.getName().endsWith(".xlsx") &&
+                    !file.getName().startsWith("$") &&
+                    !file.getName().contains("$");
+            File[] files = folder.listFiles(excelFilter);
+
+            // Sort the files based on last modified timestamp (latest first).
+            Arrays.sort(files, (file1, file2) -> Long.compare(file2.lastModified(), file1.lastModified()));
+
+            for (File file : files) {
+                if (dateRange.equals("Today")) {
+                    // Check if the file was modified today.
+                    long lastModified = file.lastModified();
+                    if (!isToday(lastModified)) {
+                        continue;
+                    }
+                } else if (dateRange.equals("TodayAndYesterday")) {
+                    // Check if the file was modified yesterday.
+                    long lastModified = file.lastModified();
+                    if (!isYesterday(lastModified)) {
+                        continue;
+                    }
+                } else if (dateRange.equals("Last7Days")) {
+                    // Check if the file was modified in the last 7 days.
+                    long lastModified = file.lastModified();
+                    if (!isLast7Days(lastModified)) {
+                        continue;
+                    }
+                }
+
+                if (file.getName().endsWith(".xlsx")) {
+                    FileInputStream excelFile = new FileInputStream(file);
+                    Workbook workbook = new XSSFWorkbook(excelFile);
+
+                    // Initialize a formula evaluator.
+                    FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+                    /*
+                    // Evaluate all cells in all sheet
+                    for (int sheetIndex = 0; sheetIndex < workbook.getNumberOfSheets(); sheetIndex++) {
+                        Sheet sheet = workbook.getSheetAt(sheetIndex);
+
+                        // Evaluate all formulas on the current sheet.
+                        for (Row row : sheet) {
+                            for (Cell cell : row) {
+                                try {
+                                    evaluator.evaluateInCell(cell);
+                                } catch (Exception e) {
+                                    // Handle or ignore this specific exception as needed.
+                                }
+                            }
+                        }
+                    }*/
+
+                    Sheet sheet = workbook.getSheet("DBInsert");
+                    for (int rowNumber = 72; rowNumber <= 488; rowNumber++) {
+                        Row row = sheet.getRow(rowNumber);
+                        if (row != null) {
+                            Cell cell = row.getCell(0);
+                            // Evaluate the cell's formula to get the value.
+                            CellValue cellValue = evaluator.evaluate(cell);
+                            String cellText = cellValue.formatAsString();
+                            if(cell != null) {
+                                try {
+                                    String cellValueStr = cell.getStringCellValue();
+                                    writer.println(cellValueStr);
+                                }catch (Exception e){
+
+                                }
+                            }
+                        }
+                    }
+                    writer.println(); // Separate SQL scripts.
+                    workbook.close();
+                }
+            }
+            model.addAttribute("message", "DB insert script generated");
+            return "admin/generatedbinsertscript";
+        } catch (IOException e) {
+            model.addAttribute("error", "Error while generating DB insert script");
+            return "admin/generatedbinsertscript";
+        }
+    }
+
+    private static boolean isToday(long timestamp) {
+        long now = System.currentTimeMillis();
+        return timestamp >= startOfDay(now) && timestamp <= endOfDay(now);
+    }
+
+    private static boolean isYesterday(long timestamp) {
+        long now = System.currentTimeMillis();
+        return timestamp >= startOfDay(now - 24 * 60 * 60 * 1000) && timestamp <= endOfDay(now - 24 * 60 * 60 * 1000);
+    }
+
+    private static boolean isLast7Days(long timestamp) {
+        long now = System.currentTimeMillis();
+        return timestamp >= startOfDay(now - 7 * 24 * 60 * 60 * 1000);
+    }
+
+    private static long startOfDay(long timestamp) {
+        return timestamp - (timestamp % (24 * 60 * 60 * 1000));
+    }
+
+    private static long endOfDay(long timestamp) {
+        return startOfDay(timestamp) + (24 * 60 * 60 * 1000) - 1;
     }
 
 }

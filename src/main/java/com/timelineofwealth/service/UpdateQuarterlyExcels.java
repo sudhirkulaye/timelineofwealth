@@ -1155,25 +1155,30 @@ public class UpdateQuarterlyExcels {
                     continue;
                 }
                 j++;
-                XSSFRow row = ws.createRow(j);
 
-                for (int k = 0; k < oldRow.getLastCellNum(); k++) {
-                    XSSFCell oldCell = oldRow.getCell(k);
-                    XSSFCell newCell = row.createCell(k);
+                XSSFRow row = null;
+                row = ws.getRow(j);
+                if (row == null || row.getCell(0) == null || row.getCell(0).getStringCellValue().trim().equals("")) { // Bug Fix: copy rows only if it is blank or null
+                    row = ws.createRow(j);
 
-                    if (oldCell != null) {
-                        if (oldCell.getCellType() == Cell.CELL_TYPE_STRING) {
-                            newCell.setCellValue(evaluatorOld.evaluate(oldCell).getStringValue());
-                            newCell.setCellValue(evaluator.evaluate(newCell).getStringValue());
-                        } else if (oldCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-                            newCell.setCellValue(evaluatorOld.evaluate(oldCell).getNumberValue());
-                            newCell.setCellValue(evaluator.evaluate(newCell).getNumberValue());
+                    for (int k = 0; k < oldRow.getLastCellNum(); k++) {
+                        XSSFCell oldCell = oldRow.getCell(k);
+                        XSSFCell newCell = row.createCell(k);
+
+                        if (oldCell != null) {
+                            if (oldCell.getCellType() == Cell.CELL_TYPE_STRING) {
+                                newCell.setCellValue(evaluatorOld.evaluate(oldCell).getStringValue());
+                                newCell.setCellValue(evaluator.evaluate(newCell).getStringValue());
+                            } else if (oldCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                                newCell.setCellValue(evaluatorOld.evaluate(oldCell).getNumberValue());
+                                newCell.setCellValue(evaluator.evaluate(newCell).getNumberValue());
+                            }
+
+                            int oldCellStyleIndex = oldCell.getCellStyle().getIndex();
+                            XSSFCellStyle newCellStyle = wb.createCellStyle();
+                            newCellStyle.cloneStyleFrom(oldWb.getStylesSource().getStyleAt(oldCellStyleIndex));
+                            newCell.setCellStyle(newCellStyle);
                         }
-
-                        int oldCellStyleIndex = oldCell.getCellStyle().getIndex();
-                        XSSFCellStyle newCellStyle = wb.createCellStyle();
-                        newCellStyle.cloneStyleFrom(oldWb.getStylesSource().getStyleAt(oldCellStyleIndex));
-                        newCell.setCellStyle(newCellStyle);
                     }
                 }
             }

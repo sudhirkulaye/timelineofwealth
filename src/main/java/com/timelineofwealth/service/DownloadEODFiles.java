@@ -1,7 +1,21 @@
 package com.timelineofwealth.service;
 
+import com.timelineofwealth.dto.BSEIndexDataEntry;
+import com.timelineofwealth.dto.BSEIndexDataResponse;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.*;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.springframework.stereotype.Service;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -14,7 +28,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -63,11 +78,19 @@ public class DownloadEODFiles {
     public void setDailyDataSRepository(DailyDataSRepository dailyDataSRepository){
         this.dailyDataSRepository = dailyDataSRepository;
     }
+    @Autowired
+    IndexValuationRepository indexValuationRepository;
+    @Autowired
+    public void setIndexValuationRepository(IndexValuationRepository indexValuationRepository){
+        this.indexValuationRepository = indexValuationRepository;
+    }
 
     public static void main(String[] args) throws IOException {
         DownloadEODFiles downloadEODFiles = new DownloadEODFiles();
         downloadEODFiles.oneClickUpload(downloadEODFiles.nsePriceHistoryRepository, downloadEODFiles.bsePriceHistoryRepository, downloadEODFiles.mutualFundNavHistoryRepository, downloadEODFiles.dailyDataSRepository, downloadEODFiles.mutualFundUniverseRepository);
     }
+
+    String downloadConfigFilePath = "C:\\MyDocuments\\03Business\\03DailyData\\downloadconfig.property";
 
     public int oneClickUpload(NsePriceHistoryRepository nsePriceHistoryRepository, BsePriceHistoryRepository bsePriceHistoryRepository, MutualFundNavHistoryRepository mutualFundNavHistoryRepository, DailyDataSRepository dailyDataSRepository, MutualFundUniverseRepository mutualFundUniverseRepository) throws IOException {
         int returnValue = 0;
@@ -78,7 +101,7 @@ public class DownloadEODFiles {
             this.dailyDataSRepository = dailyDataSRepository;
             this.mutualFundUniverseRepository = mutualFundUniverseRepository;
             Properties properties = new Properties();
-            properties.load(new FileInputStream("C:\\MyDocuments\\03Business\\03DailyData\\downloadconfig.property"));
+            properties.load(new FileInputStream(downloadConfigFilePath));
             returnValue = downloadAndUploadBSEBhavCopy(properties);
             if (returnValue < 0)
                 return returnValue;
@@ -985,5 +1008,300 @@ public class DownloadEODFiles {
         }
         return 0;
 
+    }
+
+    public int downloadAndSaveNSEIndexData(java.sql.Date date) {
+        try {
+            Properties properties = new Properties();
+            properties.load(new FileInputStream(downloadConfigFilePath));
+            String indexFilePath = properties.getProperty("indexfilepath");
+            String nseFileBaseURL = properties.getProperty("nsefilebseurl");
+
+            // Format the date to match the URL pattern (ddmmyyyy)
+            SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy");
+            String formattedDate = dateFormat.format(date);
+            String fileName = "ind_close_all_" + formattedDate + ".csv";
+
+            // Construct the URL
+            String url = nseFileBaseURL + fileName;
+
+            /*// Initialize an HttpClient - Old Code
+            HttpClient httpClient = HttpClients.createDefault();
+            HttpGet httpGet = new HttpGet(url);
+            // Execute the HTTP request
+            HttpResponse response = httpClient.execute(httpGet);*/
+
+            // Create a custom RequestConfig with a timeout of 60 seconds (60000 milliseconds)
+            RequestConfig requestConfig = RequestConfig.custom()
+                    .setSocketTimeout(60000) // Socket timeout (data retrieval)
+                    .setConnectTimeout(60000) // Connection timeout (establishing a connection)
+                    .build();
+
+            // Create a CloseableHttpClient with the custom RequestConfig
+            CloseableHttpClient httpClient = HttpClients.custom()
+                    .setDefaultRequestConfig(requestConfig)
+                    .build();
+
+            // Create an HttpGet request with the custom RequestConfig
+            HttpGet httpGet = new HttpGet(url);
+            httpGet.setConfig(requestConfig);
+
+            try {
+                // Execute the HTTP request
+                CloseableHttpResponse response = httpClient.execute(httpGet);
+
+                // Check if the response status code is 200 (OK)
+                if (response.getStatusLine().getStatusCode() == 200) {
+                    //Save the file
+                    byte[] content = EntityUtils.toByteArray(response.getEntity());
+
+                    // Construct the full download path
+                    String fullDownloadPath = indexFilePath + fileName;
+
+                    // Save the content to a local file
+                    try (FileOutputStream fileOutputStream = new FileOutputStream(fullDownloadPath)) {
+                        fileOutputStream.write(content);
+                    }
+
+                    boolean isNiftyFound = false, isNifty200Found = false;
+                    // Read and parse the CSV data
+                    File downloadedFile = new File(fullDownloadPath);
+                    if (downloadedFile.exists()) {
+                        try (FileReader fileReader = new FileReader(downloadedFile);
+                             CSVParser csvParser = new CSVParser(fileReader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+                            for (CSVRecord csvRecord : csvParser) {
+                                String indexName = csvRecord.get("Index Name");
+                                if ("Nifty 50".equals(indexName) || "Nifty 200".equals(indexName)) {
+                                    String ticker = null;
+                                    if ("Nifty 50".equals(indexName) || "Nifty 200".equals(indexName)) {
+                                        if ("Nifty 50".equals(indexName)) {
+                                            ticker = "NIFTY";
+                                            isNiftyFound = true;
+                                        } else if ("Nifty 200".equals(indexName)) {
+                                            ticker = "NIFTY200";
+                                            isNifty200Found = false;
+                                        }
+//                                    Date indexDate = date; // Use the provided date
+                                        String indexDateString = csvRecord.get("Index Date"); // Use the provided date
+                                        SimpleDateFormat inputFormat = new SimpleDateFormat("dd-MM-yyyy");
+                                        Date utilDate = inputFormat.parse(indexDateString);
+                                        java.sql.Date indexDate = new java.sql.Date(utilDate.getTime());
+
+                                        BigDecimal pe = new BigDecimal(csvRecord.get("P/E"));
+                                        BigDecimal pb = new BigDecimal(csvRecord.get("P/B"));
+                                        BigDecimal divYield = new BigDecimal(csvRecord.get("Div Yield"));
+                                        BigDecimal value = new BigDecimal(csvRecord.get("Closing Index Value"));
+                                        BigDecimal turnover = new BigDecimal(csvRecord.get("Turnover (Rs. Cr.)"));
+                                        BigDecimal impliedEarnings = new BigDecimal(0);
+                                        if(value.doubleValue() > 0 && pe.doubleValue() > 0) {
+                                            impliedEarnings = value.divide(pe, 2, BigDecimal.ROUND_HALF_UP);
+                                        }
+
+                                        // Create and save the IndexValuation entity
+                                        IndexValuation indexValuation = new IndexValuation();
+                                        indexValuation.setKey(new IndexValuation.IndexValuationKey());
+                                        indexValuation.getKey().setTicker(ticker);
+                                        indexValuation.getKey().setDate(indexDate);
+                                        indexValuation.setPe(pe);
+                                        indexValuation.setPb(pb);
+                                        indexValuation.setDivYield(divYield);
+                                        indexValuation.setValue(value);
+                                        indexValuation.setTurnover(turnover);
+                                        indexValuation.setImpliedEarnings(impliedEarnings);
+
+                                        indexValuationRepository.save(indexValuation);
+                                    }
+
+                                    if (isNiftyFound && isNifty200Found) {
+                                        System.out.println("Saved NSE Index Data.");
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Handle the case when the HTTP request fails
+                    System.out.println("Failed to download NSE Index Data file.");
+                    return -1;
+                }
+                // Ensure the response is closed to release resources
+                response.close();
+            } catch (Exception e) {
+                // Handle any exceptions, such as timeouts
+                System.out.println("Time out occurred while to download NSE Index Data file.");
+                return -1;
+            } finally {
+                // Close the HttpClient to release resources
+                try {
+                    httpClient.close();
+                } catch (Exception e) {
+                    System.out.println("Error in closing the HTTP Client connection while downloading NSE Index Data file.");
+                    return -1;
+                }
+            }
+        } catch (Exception e){
+            System.out.println("Failed to download NSE Index Data file.");
+            return -1;
+        }
+        return 0;
+    }
+
+    public void downloadAndSaveBSEIndexData(String indexName, String ticker, String period, java.sql.Date fromDate, java.sql.Date toDate) {
+        // Format the dates for the URL
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd%2FMM%2Fyyyy");
+        String formattedFromDate = dateFormat.format(fromDate);
+        String formattedToDate = dateFormat.format(toDate);
+
+        // Construct the URL with parameters
+        String url = "https://api.bseindia.com/BseIndiaAPI/api/IndexArchDaily/w?fmdt=" +
+                formattedFromDate + "&index=" + indexName + "&period=" + period + "&todt=" + formattedToDate;
+
+        // Create a RestTemplate
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Fetch data from the URL
+        BSEIndexDataResponse response = null;
+        try {
+            response = restTemplate.getForObject(url, BSEIndexDataResponse.class);
+            // Process the response here
+        } catch (RestClientException e) {
+            // Handle RestClientException (e.g., network issues, invalid URL)
+            e.printStackTrace();
+        } catch (Exception e) {
+            // Handle other exceptions
+            e.printStackTrace();
+        }
+
+
+        // Parse and save the data
+        if (response != null && response.getTable() != null) {
+            for (BSEIndexDataEntry entry : response.getTable()) {
+                IndexValuation indexValuation = new IndexValuation();
+                indexValuation.setKey(new IndexValuation.IndexValuationKey());
+                indexValuation.getKey().setTicker(ticker);
+                indexValuation.getKey().setDate(parseDate(entry.getDay(), entry.getMonth(), entry.getYear()));
+                indexValuation.setPe(entry.getI_pe());
+                indexValuation.setPb(entry.getI_pb());
+                indexValuation.setDivYield(entry.getI_yl());
+                indexValuation.setValue(entry.getI_close());
+                // Set other attributes as needed
+
+                // Save the IndexValuation object
+                indexValuationRepository.save(indexValuation);
+            }
+        }
+    }
+
+    public int uploadBSEIndexData(java.sql.Date date, String indexName){
+        try {
+            Properties properties = new Properties();
+            properties.load(new FileInputStream(downloadConfigFilePath));
+            String indexFilePath = properties.getProperty("indexfilepath");
+
+            // Format the date to match the URL pattern (ddmmyyyy)
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+            String formattedDate = dateFormat.format(date);
+            String fileName = formattedDate + "_" + indexName + ".csv";
+            String fullDownloadPath = indexFilePath + fileName;
+
+            // Read and parse the CSV data
+            File downloadedFile = new File(fullDownloadPath);
+            if (downloadedFile.exists()) {
+                try (FileReader fileReader = new FileReader(downloadedFile);
+                     CSVParser csvParser = new CSVParser(fileReader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+                    for (CSVRecord csvRecord : csvParser) {
+                        String indexDateString = csvRecord.get("Date"); // Use the provided date
+                        SimpleDateFormat inputFormat = new SimpleDateFormat("d-MMMM-yyyy");
+                        Date utilDate = inputFormat.parse(indexDateString);
+                        java.sql.Date indexDate = new java.sql.Date(utilDate.getTime());
+                        BigDecimal value = new BigDecimal(csvRecord.get("Close"));
+
+                        // Create and save the IndexValuation entity
+                        IndexValuation indexValuation = new IndexValuation();
+                        indexValuation.setKey(new IndexValuation.IndexValuationKey());
+                        indexValuation.getKey().setTicker(indexName);
+                        indexValuation.getKey().setDate(indexDate);
+                        indexValuation.setPe(new BigDecimal(0));
+                        indexValuation.setPb(new BigDecimal(0));
+                        indexValuation.setDivYield(new BigDecimal(0));
+                        indexValuation.setValue(value);
+                        indexValuation.setTurnover(new BigDecimal(0));
+                        indexValuation.setImpliedEarnings(new BigDecimal(0));
+
+                        indexValuationRepository.save(indexValuation);
+                    }
+                }
+            } else {
+                System.out.println("Download file does not exist.");
+                return -1;
+            }
+        } catch (Exception e){
+            System.out.println("Failed to BSE Index Data file.");
+            return -1;
+        }
+        return 0;
+    }
+
+    // Helper method to parse date
+    private Date parseDate(String dateString) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            return dateFormat.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public java.sql.Date parseDate(int day, String month, String year) {
+        // Create a Calendar instance
+        Calendar calendar = Calendar.getInstance();
+
+        // Set the year, month, and day
+        calendar.set(Calendar.YEAR, Integer.parseInt(year));
+        // Calendar months are 0-based, so subtract 1 from the month
+        calendar.set(Calendar.MONTH, getMonthNumber1(month) - 1);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+
+        // Convert the Calendar to a java.util.Date
+        Date date = calendar.getTime();
+
+        // Convert to java.sql.Date
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+
+        return sqlDate;
+    }
+
+    // Helper method to convert month name to month number
+    private int getMonthNumber1(String month) {
+        switch (month.toLowerCase()) {
+            case "january":
+                return 1;
+            case "february":
+                return 2;
+            case "march":
+                return 3;
+            case "april":
+                return 4;
+            case "may":
+                return 5;
+            case "june":
+                return 6;
+            case "july":
+                return 7;
+            case "august":
+                return 8;
+            case "september":
+                return 9;
+            case "october":
+                return 10;
+            case "november":
+                return 11;
+            case "december":
+                return 12;
+            default:
+                throw new IllegalArgumentException("Invalid month: " + month);
+        }
     }
 }
