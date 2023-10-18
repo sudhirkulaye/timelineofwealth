@@ -141,6 +141,8 @@ name like 'CMS%' order by date desc;
 select a.name, date, "~", round(market_cap,-1) MCap, " / ",  round(cmp, 0) from daily_data_s a, stock_universe b
 where a.date = (select min(date) from daily_data_s where date > '2023-06-29') and a.name = b.ticker and b.ticker = 'SPICEJET' order by date desc;
 
+select ticker, latest_price from stock_universe a where (a.is_nse500 = 1 or a.is_bse500 = 1) order by marketcap desc;
+
 select if(is_sensex = 1, 'SENSEX', if(is_nifty50 = 1, 'NIFTY', if(is_nse100 = 1 or is_bse100 = 1, 'NSE-BSE100', if(is_nse200 = 1 or is_bse200 = 1, 'NSE-BSE200', 'NSE-BSE500'))) ) index1, 
 b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, a.cmp, a.market_cap, rank, 
 last_result_date, sales, net_profit, (opm_latest_quarter/100), (npm_latest_quarter/100), (opm_last_year/100), (npm_last_year/100),

@@ -272,5 +272,14 @@ public class PublicViewController {
         return "/public/blog1";
     }
 
+    @RequestMapping(value = "/public/stockbubblechart")
+    public String stockBubbleChart(Model model){
+        logger.debug(String.format("Visited /public/stockbubblechart"));
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Stock Bubble Chart");
+        return "/public/stockbubblechart";
+    }
+
 
 }
