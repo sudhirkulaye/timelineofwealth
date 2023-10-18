@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md" ng-app="StockBubbleChartManagement" ng-controller="StockBubbleChartController">
+<!-- iCheck -->
+<link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
+<!-- bootstrap-wysiwyg -->
+<link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" th:href="@{/vendors/google-code-prettify/bin/prettify.min.css}"  rel="stylesheet" />
+<!-- Select2 -->
+<link href="../../static/vendors/select2/dist/css/select2.min.css" th:href="@{/vendors/select2/dist/css/select2.min.css}"  rel="stylesheet" />
+<!-- Switchery -->
+<link href="../../static/vendors/switchery/dist/switchery.min.css" th:href="@{/vendors/switchery/dist/switchery.min.css}" rel="stylesheet" />
+<!-- starrr -->
+<link href="../../static/vendors/starrr/dist/starrr.css" th:href="@{/vendors/starrr/dist/starrr.css}"  rel="stylesheet" />
+<!-- bootstrap-daterangepicker -->
+<link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}"  rel="stylesheet" />
+<!-- Animate.css -->
+<link href="../../static/vendors/animate.css/animate.min.css" th:href="@{/vendors/animate.css/animate.min.css}" rel="stylesheet" />
+<!-- jQuery custom content scroller -->
+<link href="../../static/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" th:href="@{/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css}" rel="stylesheet" />
+<!--Angular JS-->
+<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
+<!-- jQuery -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- ui-bootstrap-tpls.js -->
+<script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
+<!--Angular custom filter (for group by) JS-->
+<script src="../../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
+<!-- D3.js -->
+<script src='https://d3js.org/d3.v4.min.js'></script>
+<!-- Chart.js -->
+<!--<script src="../../static/vendors/Chart.js/dist/Chart.min.js" th:src="@{/vendors/Chart.js/dist/Chart.min.js}"></script>-->
+<script src="../../static/vendors/Chart.js/dist/Chart2.1.6.min.js" th:src="@{/vendors/Chart.js/dist/Chart2.1.6.min.js}"></script>
+<!-- angular.chartjs -->
+<script src="../../static/vendors/angular.chartjs/angular-chart.min.js" th:src="@{/vendors/angular.chartjs/angular-chart.min.js}"></script>
+<!-- Additional js for stack charts -->
+<script src="https://cdn3.devexpress.com/jslib/18.2.3/js/dx.all.js"></script>
+<script>window.angular || document.write(decodeURIComponent('%3Cscript src="js/angular.min.js"%3E%3C\/script%3E'))</script>
+<!-- custom angular script -->
+<script type="text/javascript" src="../../static/custom/public/stockbubblechart.js" th:src="@{/custom/public/stockbubblechart.js}"></script>
+
+<div class="container body">
+    <div class="main_container">
+        <!-- sidebar menu -->
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <!-- /sidebar menu -->
+
+        <!-- top navigation -->
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <font color="green"><strong><h1>Stock Bubble Chart1</h1></strong></font>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <font color="green"><strong><h2>Stock Bubble Chart</h2></strong></font>
+                            <div class="x_content">
+                                <label class="pull-left" >&nbsp;&nbsp;&nbsp;</label>
+                                <label class="pull-left" >Sector : &nbsp;&nbsp;&nbsp;</label>
+                                <select class="pull-left" ng-model="sectorFilter" >
+                                    <option value=""></option>
+                                    <option ng-repeat="stock in stocks | unique:'sectorNameDisplay' | orderBy:'sectorNameDisplay' ">{{stock.sectorNameDisplay}}</option>
+                                </select>
+                                <label class="pull-left" >&nbsp;&nbsp;&nbsp;</label>
+                                <label class="pull-left" >Industry : &nbsp;&nbsp;&nbsp;</label>
+                                <select class="pull-left" ng-model="industryFilter" >
+                                    <option value=""></option>
+                                    <option ng-repeat="stock in stocks | unique:'industryNameDisplay' | orderBy:['sectorNameDisplay','industryNameDisplay']">{{stock.sectorNameDisplay}}-{{stock.industryNameDisplay}}</option>
+                                </select>
+                                <label class="pull-left" >&nbsp;&nbsp;&nbsp;</label>
+                                <br />
+                                <div>
+                                    <canvas id="stockBubbleChart" class="chart chart-bubble" chart-colors="newColors"
+                                            chart-data="chartData" chart-series="chartSeries">
+                                    </canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+        <!-- /footer content -->
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
+<!-- Custom Theme Scripts -->
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>
