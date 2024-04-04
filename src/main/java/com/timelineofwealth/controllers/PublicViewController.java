@@ -73,8 +73,11 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/services")
-    public String services(Model model){
-        logger.debug(String.format("Visited /public/services"));
+    public String services(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/services" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Services");
@@ -82,8 +85,11 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/contactus")
-    public String contactus(Model model){
-        logger.debug(String.format("Visited /public/contactus"));
+    public String contactus(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/contactus" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Contact Us");
@@ -91,8 +97,11 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/blog0001")
-    public String blog0001(Model model){
-        logger.debug(String.format("Visited /public/blog0001"));
+    public String blog0001(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/blog0001" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Notes on Financial Shenanigans");
@@ -100,8 +109,11 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/wealthmanagementapp")
-    public String wealthManagementapp(Model model){
-        logger.debug(String.format("Visited /public/wealthmanagementapp"));
+    public String wealthManagementapp(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/wealthmanagementapp" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
@@ -109,8 +121,12 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/pmsapp")
-    public String pmsApp(Model model){
-        logger.debug(String.format("Visited /public/pmsapp"));
+    public String pmsApp(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/pmsapp" + ipAddress + ", browser - " + browser + ", OS - " + os));
+
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
@@ -118,8 +134,11 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/ethicalstandards")
-    public String ethicalStandards(Model model){
-        logger.debug(String.format("Visited /public/ethicalstandards"));
+    public String ethicalStandards(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/ethicalstandards" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Ethical Standards");
@@ -127,8 +146,11 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/whyindependentadvice")
-    public String whyIndependentAdvice(Model model){
-        logger.debug(String.format("Visited /public/whyindependentadvice"));
+    public String whyIndependentAdvice(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/whyindependentadvice" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
@@ -136,8 +158,11 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/privacy")
-    public String privacy(Model model){
-        logger.debug(String.format("Visited /public/privacy"));
+    public String privacy(Model model, HttpServletRequest request){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/privacy" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
@@ -146,8 +171,11 @@ public class PublicViewController {
 
 
     @RequestMapping(value = "/public/saa")
-    public String assetClasses(Model model){
-        logger.debug(String.format("Visited /public/saa"));
+    public String assetClasses(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/saa" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
@@ -155,8 +183,11 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/mftypes")
-    public String mutualFundTypes(Model model){
-        logger.debug(String.format("Visited /public/mftypes"));
+    public String mutualFundTypes(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/mftypes" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Types of Mutual Funds");
@@ -164,45 +195,60 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/mflist")
-    public String mutualFundList(Model model){
-        logger.debug(String.format("Visited /public/mflist"));
+    public String mutualFundList(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/mflist" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Performance of Mutual Funds");
+        model.addAttribute("title", "Funds' Performance");
         return "public/mflist";
     }
 
     @RequestMapping(value = "/public/nifty50stats")
-    public String indexStats(Model model){
-        logger.debug(String.format("Visited /public/nifty50stats"));
+    public String indexStats(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/nifty50stats" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "NIFTY-50 Index Statistics");
+        model.addAttribute("title", "NIFTY-50");
         return "public/nifty50stats";
     }
 
     @RequestMapping(value = "/public/stocklist")
-    public String stockList(Model model){
-        logger.debug(String.format("Visited /public/stocklist"));
+    public String stockList(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/stocklist" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Valuation Matrix of NSE-BSE 500");
+        model.addAttribute("title", "Stocks Fundamentals");
         return "public/stocklist";
     }
 
     @RequestMapping(value = "/public/stockanalysis/{ticker}")
-    public String stockAnalysis(@PathVariable("ticker") String ticker, Model model){
-        logger.debug(String.format("Visited /public/stockanalysis/"+ticker));
+    public String stockAnalysis(HttpServletRequest request, @PathVariable("ticker") String ticker, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/stockanalysis" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Fundamental Analysis of "+ CommonService.getStockDetails(ticker).getName());
+        model.addAttribute("title", "Fundamentals of "+ CommonService.getStockDetails(ticker).getName());
         model.addAttribute("ticker", ticker);
         return "public/stockanalysis";
     }
 
     @RequestMapping(value = "/public/indianeconomy")
-    public String indianEconomy(Model model){
-        logger.debug(String.format("Visited /public/indianeconomy"));
+    public String indianEconomy(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/indianeconomy" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Indian Economic Indicators");
@@ -210,8 +256,11 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/retirementfundcalculation")
-    public String retirementFundCalculation(Model model){
-        logger.debug(String.format("Visited /public/retirementfundcalculation"));
+    public String retirementFundCalculation(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/retirementfundcalculation" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Retirement Fund Calculation");
@@ -219,26 +268,35 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/indexreturnstats")
-    public String indexReturnStats(Model model){
-        logger.debug(String.format("Visited /public/indexreturnstats"));
+    public String indexReturnStats(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/indexreturnstats" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "BSE-MidCap and BSE-SmallCap Statistics");
+        model.addAttribute("title", "Index Statistics");
         return "public/indexreturnstats";
     }
 
     @RequestMapping(value = "/public/benchmarkreturns")
-    public String benchmarkReturns(Model model){
-        logger.debug(String.format("Visited /public/benchmarkreturns"));
+    public String benchmarkReturns(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/benchmarkreturns" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Returns Comparision of Benchmarks");
+        model.addAttribute("title", "Benchmarks Returns");
         return "public/benchmarkreturns";
     }
 
     @RequestMapping(value = "/public/bankanalysis1")
-    public String bankAnalysis1(Model model){
-        logger.debug(String.format("Visited /public/bankanalysis1"));
+    public String bankAnalysis1(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/bankanalysis1" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Banking Stocks Analysis - Large Cap");
@@ -246,8 +304,11 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/bankanalysis2")
-    public String bankAnalysis2(Model model){
-        logger.debug(String.format("Visited /public/bankanalysis2"));
+    public String bankAnalysis2(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/bankanalysis2" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Banking Stocks Analysis - Mid Cap");
@@ -255,26 +316,23 @@ public class PublicViewController {
     }
 
     @RequestMapping(value = "/public/bankanalysis3")
-    public String bankAnalysis3(Model model){
-        logger.debug(String.format("Visited /public/bankanalysis3"));
+    public String bankAnalysis3(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/bankanalysis3" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Banking Stocks Analysis - Small Cap");
         return "public/bankanalysis3";
     }
 
-    @RequestMapping(value = "/public/blog1")
-    public String blog1(Model model){
-        logger.debug(String.format("Visited /public/blog1"));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
-        model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Notes on Financial Shenanigans");
-        return "/public/blog1";
-    }
-
     @RequestMapping(value = "/public/stockbubblechart")
-    public String stockBubbleChart(Model model){
-        logger.debug(String.format("Visited /public/stockbubblechart"));
+    public String stockBubbleChart(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/stockbubblechart" + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = new PublicApi().getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Stock Bubble Chart");

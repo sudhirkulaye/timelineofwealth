@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Properties;
@@ -37,7 +38,8 @@ public class MOSLPDFExtractor {
                 String pdfLink = annotationTag.substring(annotationTag.indexOf("http"),annotationTag.indexOf(" >>"));
 //
                 // Download the PDF document from the link
-                URL website = new URL(pdfLink);
+//                pdfLink = URLEncoder.encode(pdfLink, "UTF-8");
+                URL website = new URL(pdfLink.replaceAll(" ", "%20"));
                 ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 
                 // check for existing file

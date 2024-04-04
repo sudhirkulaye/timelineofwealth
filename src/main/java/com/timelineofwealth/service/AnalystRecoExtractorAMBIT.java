@@ -18,44 +18,6 @@ import java.util.regex.Pattern;
 public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
     protected String BROKER = "AMBIT";
-    protected String CMP;
-    protected String TP;
-    protected String MCAP;
-    protected String CMPPATTERN;
-    protected String TPPATTERN;
-    protected String MCAPPATTERN;
-    protected String RATINGPATTERN;
-
-    protected String INCOME_STATEMENT_PAGE;
-    protected String RATIO_PAGE;
-    protected String VALUATION_PAGE;
-
-    protected String HEADER_ROW_NAME;
-    protected String REVENUE_ROW_NAME;
-    protected String EBITDA_ROW_NAME;
-    protected String DEPRECIATION_ROW_NAME;
-
-    protected String EBITDAMARGIN_ROW_NAME;
-    protected String ROCE_ROW_NAME;
-
-    protected String AUM_ROW_NAME;
-    protected String CREDITCOSTS_ROW_NAME;
-    protected String GNPA_ROW_NAME;
-    protected String NNPA_ROW_NAME;
-
-    protected String EVBYEBITDA_ROW_NAME;
-
-    protected String Y0;
-    protected String Y1;
-    protected String Y2;
-
-    protected String MILLIONS_OR_BILLIONS;
-    protected String MILLIONS_OR_BILLIONS_FLAG;
-
-    protected String RESEARCHANALYST1;
-    protected String RESEARCHANALYST2;
-
-    protected String QUARTER;
 
     protected String DATEPATTERN = "\\d{1,2}\\s*+(January|Jan|February|Feb|March|Mar|April|Apr|May|June|Jun|July|Jul|August|Aug|September|Sep|October|Oct|November|Nov|December|Dec)\\s*+\\d{2,4}";
     protected String DATEPATTERN_1 = "(January|Jan|February|Feb|March|Mar|April|Apr|May|June|Jun|July|Jul|August|Aug|September|Sep|October|Oct|November|Nov|December|Dec)\\s*\\d{1,2},?\\s*\\d{2,4}";
@@ -63,119 +25,24 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
     protected String DATEFORMAT = "dd MMMMM yyyy";
     protected String DATEFORMAT_1 = "MMMMM dd yyyy";
 
-    protected String pageContentFirst = null;
-    protected String[] linesFirstPage = null;
+    public ReportParameters getReportParameters(String reportFilePath, ReportDataExtractConfig rdec, boolean isFinancialReport) {
 
-    protected String pageContentIncomeStmt = null;
-    protected String[] linesIncomeStmt = null;
-
-    protected String pageContentRatio = null;
-    protected String[] linesRatio = null;
-
-    protected String pageContentValuation = null;
-    protected String[] linesValuation = null;
-
-    protected String dateString = "";
-    protected BigDecimal mcap = new BigDecimal("0");
-    protected String cmp = "0";
-    protected String rating = "";
-    protected String targetPrice = "0";
-    protected String analystNames = "";
-
-    protected String headerFirstPage = "";
-    protected String[] headerColumnsFirstPage = null;
-    protected String headerIncomeStmt = "";
-    protected String[] headerColumnsIncomeStmt = null;
-    protected String headerRatio = "";
-    protected String[] headerColumnsRatio = null;
-    protected String headerValuation = "";
-    protected String[] headerColumnsValuation = null;
-
-    protected Integer headerFirstPageLineNumber = null;
-    protected Integer valuationPageNumber = null;
-    protected Integer headerIncomeStmtLineNumber = null;
-    protected Integer headerRatioLineNumber = null;
-    protected Integer headerValuationLineNumber = null;
-    protected Integer revenueLineNumber = null;
-    protected Integer ebitdaLineNumber = null;
-    protected Integer y0ColumnNumberOnIncStmt = null, y1ColumnNumberOnIncStmt = null, y2ColumnNumberOnIncStmt = null;
-    protected Integer y0ColumnNumberOnRatio = null, y1ColumnNumberOnRatio = null, y2ColumnNumberOnRatio = null;
-
-    protected BigDecimal y0EBITDANumber = null, y1EBITDANumber = null, y2EBITDANumber = null;
-    protected BigDecimal y0DepreciationNumber = null, y1DepreciationNumber = null, y2DepreciationNumber = null;
-
-    protected ReportParameters reportParameters = new ReportParameters();
-
-    protected PdfReader pdfReader = null;
-
-    protected void setConstants(ReportDataExtractConfig rdec) {
-        CMP = rdec.getCMP();
-        TP = rdec.getTP();
-        MCAP = rdec.getMCAP();
-        CMPPATTERN = rdec.getCMPPATTERN();
-        TPPATTERN = rdec.getTPPATTERN();
-        MCAPPATTERN = rdec.getMCAPPATTERN();
-        RATINGPATTERN = rdec.getRATINGPATTERN();
-
-        INCOME_STATEMENT_PAGE = rdec.getINCOME_STATEMENT_PAGE();
-        RATIO_PAGE = rdec.getRATIO_PAGE();
-        VALUATION_PAGE = rdec.getVALUATION_PAGE();
-
-        HEADER_ROW_NAME = rdec.getHEADER_ROW_NAME();
-        REVENUE_ROW_NAME = rdec.getREVENUE_ROW_NAME();
-        EBITDA_ROW_NAME = rdec.getEBITDA_ROW_NAME();
-        DEPRECIATION_ROW_NAME = rdec.getDEPRECIATION_ROW_NAME();
-
-        EBITDAMARGIN_ROW_NAME = rdec.getEBITDAMARGIN_ROW_NAME();
-        ROCE_ROW_NAME = rdec.getROCE_ROW_NAME();
-
-        AUM_ROW_NAME = rdec.getAUM_ROW_NAME();
-        CREDITCOSTS_ROW_NAME = rdec.getCREDITCOSTS_ROW_NAME();
-        GNPA_ROW_NAME = rdec.getGNPA_ROW_NAME();
-        NNPA_ROW_NAME = rdec.getNNPA_ROW_NAME();
-
-        EVBYEBITDA_ROW_NAME = rdec.getEVBYEBITDA_ROW_NAME();
-
-        Y0 = rdec.getY0();
-        Y1 = rdec.getY1();
-        Y2 = rdec.getY2();
-
-        MILLIONS_OR_BILLIONS = rdec.getMILLIONS_OR_BILLIONS();
-        MILLIONS_OR_BILLIONS_FLAG = "M";
-
-        RESEARCHANALYST1 = rdec.getRESEARCHANALYST1();
-        RESEARCHANALYST2 = rdec.getRESEARCHANALYST2();
-
-        QUARTER = rdec.getQUARTER();
-
-        reportParameters.setQuarter(QUARTER);
-        reportParameters.setBroker(BROKER);
-    }
-
-    public ReportParameters getReportParameters(String reportFilePath, ReportDataExtractConfig rdec) {
-        String outPutString;
-
-        boolean isFinancialReport = false;
         try {
             //Set Constants
             setConstants(rdec);
+            reportParameters.setBroker(BROKER);
 
             // Open PDF document
             pdfReader = new PdfReader(reportFilePath);
 
-            loadPages(pdfReader, rdec);
+            loadPages(pdfReader, rdec, isFinancialReport);
             setReportDate(reportFilePath, rdec);
             setMarketCap(rdec);
             setCMP(rdec);
             setRatings(rdec);
             setTargetPrice(rdec);
             setAnalystNames(rdec);
-            // set isFinancialReport
-            if (EBITDA_ROW_NAME.contains("PAT")|| EBITDA_ROW_NAME.toLowerCase().contains("profit after tax") ) {
-                isFinancialReport = true;
-            } else {
-                isFinancialReport = false;
-            }
+
             setHeaderColumns(rdec, isFinancialReport);
             setRevenue(rdec, isFinancialReport);
             if(!isFinancialReport)
@@ -188,10 +55,14 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             setEVBYEBITRatio(rdec, isFinancialReport);
 
             if(isFinancialReport) {
-                setAUM(rdec);
-                setCreditCost(rdec);
-                setGNPA(rdec);
-                setNNPA(rdec);
+                if(AUM_ROW_NAME != null && !AUM_ROW_NAME.isEmpty())
+                    setAUM(rdec);
+                if(CREDITCOSTS_ROW_NAME != null && !CREDITCOSTS_ROW_NAME.isEmpty())
+                    setCreditCost(rdec);
+                if(GNPA_ROW_NAME != null && !GNPA_ROW_NAME.isEmpty())
+                    setGNPA(rdec);
+                if(NNPA_ROW_NAME != null && !NNPA_ROW_NAME.isEmpty())
+                    setNNPA(rdec);
             }
 
         } catch (IOException e) {
@@ -204,15 +75,14 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         return reportParameters;
     }
 
-    protected void loadPages(PdfReader pdfReader, ReportDataExtractConfig rdec){
+    protected void loadPages(PdfReader pdfReader, ReportDataExtractConfig rdec, boolean isFinancialReport){
         //Get the number of pages in pdf.
         int noOfPages = pdfReader.getNumberOfPages();
 
         try {
-
-            // Load First Page
-            pageContentFirst = PdfTextExtractor.getTextFromPage(pdfReader, 1);
-            linesFirstPage = pageContentFirst.split("\n");
+            // Load Reco Page
+            pageContentReco = PdfTextExtractor.getTextFromPage(pdfReader, 1);
+            linesRecoPage = pageContentReco.split("\n");
 
             // Load Income Statement Page
             int incomeStatementPageNo = -1, incomeStatementPageNoSecond = -1;
@@ -228,6 +98,16 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             } else
                 System.out.println("########## Income Statement Page not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 
+            // Load Margin Page
+            int marginPageNo = -1;
+            marginPageNo = getPageNumberForMatchingPattern(pdfReader, incomeStatementPageNo, noOfPages, MARGIN_PAGE, rdec, BROKER);
+            if (marginPageNo > 1) {
+                System.out.print("Margin Page No. : " + marginPageNo + " / ");
+                pageContentMargin = PdfTextExtractor.getTextFromPage(pdfReader, marginPageNo);
+                linesMargin = pageContentMargin.split("\n");
+            } else
+                System.out.println("##########Margin Page not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+
             // Find Ratio Page No.
             int ratioPageNo = -1;
             ratioPageNo = getPageNumberForMatchingPattern(pdfReader,  incomeStatementPageNo, noOfPages, RATIO_PAGE, rdec, BROKER);
@@ -240,7 +120,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
             // Find Valuation Page No.
             int valuationPageNo = -1;
-            valuationPageNo = getPageNumberForMatchingPattern(pdfReader,  incomeStatementPageNo, noOfPages, rdec.getVALUATION_PAGE(), rdec, BROKER);
+            valuationPageNo = getPageNumberForMatchingPattern(pdfReader,  incomeStatementPageNo, noOfPages, VALUATION_PAGE, rdec, BROKER);
             if (valuationPageNo > 0) {
                 System.out.println("Valuation Page No. : " + valuationPageNo);
                 valuationPageNumber = new Integer(valuationPageNo);
@@ -248,6 +128,42 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                 linesValuation = pageContentValuation.split("\n");
             } else
                 System.out.println("########## Valuation Page not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+
+            // Find AUM Page No.
+            if(isFinancialReport && AUM_PAGE != null && !AUM_PAGE.isEmpty()) {
+                int aumPageNo = -1;
+                aumPageNo = getPageNumberForMatchingPattern(pdfReader, incomeStatementPageNo, noOfPages, AUM_PAGE, rdec, BROKER);
+                if (aumPageNo > 1) {
+                    System.out.print("AUM Page No. : " + aumPageNo + " / ");
+                    pageContentAUM = PdfTextExtractor.getTextFromPage(pdfReader, aumPageNo);
+                    linesAUM = pageContentAUM.split("\n");
+                } else
+                    System.out.println("########## AUM Page not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+            }
+
+            // Find Credit Cost Page No.
+            if(isFinancialReport && CREDITCOSTS_PAGE != null && !CREDITCOSTS_PAGE.isEmpty()) {
+                int creditCostPageNo = -1;
+                creditCostPageNo = getPageNumberForMatchingPattern(pdfReader, incomeStatementPageNo, noOfPages, CREDITCOSTS_PAGE, rdec, BROKER);
+                if (creditCostPageNo > 1) {
+                    System.out.print("Credit Cost Page No. : " + creditCostPageNo + " / ");
+                    pageContentCreditCost = PdfTextExtractor.getTextFromPage(pdfReader, creditCostPageNo);
+                    linesCreditCost = pageContentCreditCost.split("\n");
+                } else
+                    System.out.println("########## Credit Cost Page not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+            }
+
+            // Find NPA Page No.
+            int npaPageNo = -1;
+            if(isFinancialReport && NPA_PAGE != null && !NPA_PAGE.isEmpty()) {
+                npaPageNo = getPageNumberForMatchingPattern(pdfReader, incomeStatementPageNo, noOfPages, NPA_PAGE, rdec, BROKER);
+                if (npaPageNo > 1) {
+                    System.out.println("NPA Page No. : " + npaPageNo + " / ");
+                    pageContentNPA = PdfTextExtractor.getTextFromPage(pdfReader, npaPageNo);
+                    linesNPA = pageContentNPA.split("\n");
+                } else
+                    System.out.println("########## NPA Page not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+            }
         } catch (IOException e){
             System.out.println("########## Exception in loadPages " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
         }
@@ -255,14 +171,14 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
     public void setReportDate(String reportFilePath, ReportDataExtractConfig rdec){
         // Extract report date
-        int lineNumber = linesFirstPage.length-1;
+        int lineNumber = linesRecoPage.length-1;
         try {
             long dateLastModified = new File(reportFilePath).lastModified();
             String dateString_1 = "";
 
-            while (lineNumber > linesFirstPage.length-10 && dateString.isEmpty()) {
-                dateString = getReportDate(linesFirstPage[lineNumber], dateLastModified, DATEPATTERN, DATEFORMAT, rdec, BROKER);
-                dateString_1 = getReportDate(linesFirstPage[lineNumber], dateLastModified, DATEPATTERN_1, DATEFORMAT_1, rdec, BROKER);
+            while (lineNumber > linesRecoPage.length-10 && dateString.isEmpty()) {
+                dateString = getReportDate(linesRecoPage[lineNumber], dateLastModified, DATEPATTERN, DATEFORMAT, rdec, BROKER);
+                dateString_1 = getReportDate(linesRecoPage[lineNumber], dateLastModified, DATEPATTERN_1, DATEFORMAT_1, rdec, BROKER);
                 if(dateString.isEmpty() && !dateString_1.isEmpty())
                     dateString = dateString_1;
                 lineNumber--;
@@ -274,7 +190,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                 lineNumber = secondPageLines.length-1;
                 while (lineNumber > secondPageLines.length-10 && dateString.isEmpty()) {
                     dateString = getReportDate(secondPageLines[lineNumber], dateLastModified, DATEPATTERN, DATEFORMAT, rdec, BROKER);
-                    dateString_1 = getReportDate(linesFirstPage[lineNumber], dateLastModified, DATEPATTERN_1, DATEFORMAT_1, rdec, BROKER);
+                    dateString_1 = getReportDate(linesRecoPage[lineNumber], dateLastModified, DATEPATTERN_1, DATEFORMAT_1, rdec, BROKER);
                     if(dateString.isEmpty() && !dateString_1.isEmpty())
                         dateString = dateString_1;
                     lineNumber--;
@@ -296,8 +212,8 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         double mcapNumber = 0;
         int mcapLineNumber = -1;
         boolean isMCapLineFound = false;
-        for (int i = 0; i < linesFirstPage.length; i++) {
-            if(!isMCapLineFound && linesFirstPage[i].contains(MCAP)) {
+        for (int i = 0; i < linesRecoPage.length; i++) {
+            if(!isMCapLineFound && linesRecoPage[i].contains(MCAP)) {
                 mcapLineNumber = i;
                 isMCapLineFound = true;
             }
@@ -306,7 +222,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         }
         try {
             if (mcapLineNumber != -1) {
-                mcapNumber = getMCapFromBillion(linesFirstPage[mcapLineNumber], rdec, 2, BROKER);
+                mcapNumber = getMCapFromBillion(linesRecoPage[mcapLineNumber], rdec, 2, BROKER);
                 mcap = new BigDecimal(mcapNumber).setScale(0, RoundingMode.HALF_UP);
             } else {
                 mcapNumber = 0;
@@ -323,8 +239,8 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
     protected void setCMP(ReportDataExtractConfig rdec){
         int cmpLineNumber = -1;
         boolean isCMPLineFound = false;
-        for (int i = 0; i < linesFirstPage.length; i++) {
-            if (!isCMPLineFound && linesFirstPage[i].contains(CMP)){
+        for (int i = 0; i < linesRecoPage.length; i++) {
+            if (!isCMPLineFound && linesRecoPage[i].contains(CMP)){
                 cmpLineNumber = i;
                 isCMPLineFound = true;
             }
@@ -333,7 +249,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         }
         try {
             if (cmpLineNumber != -1) {
-                cmp = "" + getCMP(linesFirstPage[cmpLineNumber], rdec, 1, BROKER);
+                cmp = "" + getCMP(linesRecoPage[cmpLineNumber], rdec, 1, BROKER);
             } else {
                 cmp = "0";
                 System.out.println("\n########## CMP line not found for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
@@ -342,15 +258,15 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             cmp = "0";
             System.out.println("\n########## Exception in setting CMP, setting to 0 for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
         }
-        reportParameters.setPrice(new BigDecimal(cmp.replace(",", "")).setScale(0, RoundingMode.HALF_UP) );
+        reportParameters.setPrice(new BigDecimal(cmp.replaceAll(",", "")).setScale(0, RoundingMode.HALF_UP) );
         System.out.print("CMP : " + cmp + " ");
     }
 
     protected void setTargetPrice(ReportDataExtractConfig rdec){
         int targetPriceLineNumber = -1;
         boolean isTPLineFound = false;
-        for (int i = 0; i < linesFirstPage.length; i++) {
-            if (!isTPLineFound && linesFirstPage[i].contains(TP)){
+        for (int i = 0; i < linesRecoPage.length; i++) {
+            if (!isTPLineFound && linesRecoPage[i].contains(TP)){
                 targetPriceLineNumber = i;
                 isTPLineFound = true;
             }
@@ -360,7 +276,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         try {
             // Extract Target Price
             if (targetPriceLineNumber != -1) {
-                targetPrice = "" + getTP(linesFirstPage[targetPriceLineNumber], rdec, 1, BROKER);
+                targetPrice = "" + getTP(linesRecoPage[targetPriceLineNumber], rdec, 1, BROKER);
             } else {
                 targetPrice = "0";
                 System.out.println("\n########## Target Price line not found for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
@@ -369,16 +285,16 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             targetPrice = "0";
             System.out.println("\n########## Exception in setting Target Price, setting to 0 for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
         }
-        reportParameters.setTarget(new BigDecimal(targetPrice.replace(",", "")).setScale(0, RoundingMode.HALF_UP));
+        reportParameters.setTarget(new BigDecimal(targetPrice.replaceAll(",", "")).setScale(0, RoundingMode.HALF_UP));
         System.out.print("Target Price : " + targetPrice + " ");
     }
 
     protected void setRatings(ReportDataExtractConfig rdec){
         boolean isRatingsFound = false;
         Pattern ratingPattern = Pattern.compile(RATINGPATTERN);
-        for (int i = 0; i < linesFirstPage.length; i++) {
+        for (int i = 0; i < linesRecoPage.length; i++) {
             try {
-                Matcher m = ratingPattern.matcher(linesFirstPage[i].trim());
+                Matcher m = ratingPattern.matcher(linesRecoPage[i].trim());
                 if(!isRatingsFound && m.find()) {
                     rating = capitalizeFirstChar(m.group(1));
                     isRatingsFound = true;
@@ -396,13 +312,13 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
     protected void setAnalystNames(ReportDataExtractConfig rdec){
         // Extract Analyst Names
-        analystNames = getAnalyst(analystNames, pageContentFirst, rdec, -1);
+        analystNames = getAnalyst(analystNames, pageContentReco, rdec, -1);
         reportParameters.setAnalystsNames(analystNames);
         System.out.println("Analysts Names : " + analystNames);
     }
 
     protected void setHeaderColumns(ReportDataExtractConfig rdec, boolean isFinancialReport){
-        // Get Header Line No. from the Inc.
+        // Get Header Line No. from the Inc. Stmt. page
         int headerLineNo = -1, tableHeadLineNo = -1;
         try {
             tableHeadLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, 0, INCOME_STATEMENT_PAGE,rdec, BROKER);
@@ -427,13 +343,13 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         tableHeadLineNo = -1;
         try {
             tableHeadLineNo = getLineNumberForMatchingPattern(linesRatio, 0, RATIO_PAGE, rdec, BROKER);
-            headerLineNo = getLineNumberForMatchingPattern(linesRatio, tableHeadLineNo + 1, HEADER_ROW_NAME, rdec, BROKER);
+            headerLineNo = getLineNumberForMatchingPattern(linesRatio, tableHeadLineNo + 1, RATIO_HEADER_ROW_NAME, rdec, BROKER);
             if(headerLineNo < 0) {
-                headerLineNo = getLineNumberForMatchingPattern(linesRatio, 0, HEADER_ROW_NAME, rdec, BROKER);
+                headerLineNo = getLineNumberForMatchingPattern(linesRatio, 0, RATIO_HEADER_ROW_NAME, rdec, BROKER);
             }
             if (headerLineNo > 1) {
                 headerRatio = linesRatio[headerLineNo];
-                headerColumnsRatio = getDataColumnsForHeader(headerRatio, HEADER_ROW_NAME);
+                headerColumnsRatio = getDataColumnsForHeader(headerRatio, RATIO_HEADER_ROW_NAME);
                 headerRatioLineNumber = new Integer(headerLineNo);
                 System.out.println("Ratio Header Count : " + headerColumnsRatio.length + " / Line : " + linesRatio[headerLineNo]);
             } else {
@@ -447,47 +363,153 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             System.out.println("########## Exception in setting Ratio Header for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
         }
 
+        // Get Header Line No. from the Margin Page
+        headerLineNo = -1;
+        try {
+            tableHeadLineNo = getLineNumberForMatchingPattern(linesMargin, 0, MARGIN_PAGE,rdec, BROKER);
+            headerLineNo = getLineNumberForMatchingPattern(linesMargin, tableHeadLineNo, MARGIN_HEADER_ROW_NAME,rdec, BROKER);
+            if(headerLineNo < 0) {
+                headerLineNo = getLineNumberForMatchingPattern(linesMargin, 0, MARGIN_HEADER_ROW_NAME,rdec, BROKER);
+            }
+            if (headerLineNo > 1) {
+                headerMargin = linesMargin[headerLineNo];
+                headerColumnsMargin = getDataColumnsForHeader(headerMargin, MARGIN_HEADER_ROW_NAME);
+                headerMarginLineNumber = new Integer(headerLineNo);
+                System.out.println("Margin Header Count : " + headerColumnsMargin.length + " / Line : " + linesMargin[headerLineNo]);
+            } else {
+                // in case header is not available fetch the header from income statement
+                headerMargin = headerRatio;
+                headerColumnsMargin = headerColumnsRatio;
+                headerMarginLineNumber = null;
+                System.out.println("$$$$$$$$$$ Setting Margin Header same as Ratio Header ");
+            }
+        } catch (Exception e) {
+            System.out.println("########## Exception in setting Margin Header for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+        }
+
         // Get Header Line No. from the Inc. Valuation Page
         headerLineNo = -1;
         tableHeadLineNo = -1;
         try {
             tableHeadLineNo = getLineNumberForMatchingPattern(linesValuation, 0, VALUATION_PAGE, rdec, BROKER);
-            headerLineNo = getLineNumberForMatchingPattern(linesValuation, tableHeadLineNo + 1, HEADER_ROW_NAME, rdec, true, BROKER);
+            headerLineNo = getLineNumberForMatchingPattern(linesValuation, tableHeadLineNo + 1, VALUATION_HEADER_ROW_NAME, rdec, true, BROKER);
             if(headerLineNo < 0) {
-                headerLineNo = getLineNumberForMatchingPattern(linesValuation, 0, HEADER_ROW_NAME, rdec, BROKER);
+                headerLineNo = getLineNumberForMatchingPattern(linesValuation, 0, VALUATION_HEADER_ROW_NAME, rdec, BROKER);
             }
 
             if (headerLineNo > 1) {
                 headerValuation = linesValuation[headerLineNo];
-                headerColumnsValuation = getDataColumnsForHeader(headerValuation, HEADER_ROW_NAME);
+                headerColumnsValuation = getDataColumnsForHeader(headerValuation, VALUATION_HEADER_ROW_NAME
+                );
                 headerValuationLineNumber = new Integer(headerLineNo);
                 System.out.println("Valuation Header Count : " + headerColumnsValuation.length + " / Line : " + linesValuation[headerLineNo]);
             } else {
                 // in case header is not avialble fetch the header from income statement
-                headerRatio = headerIncomeStmt;
-                headerColumnsRatio = headerColumnsIncomeStmt;
+                headerValuation = headerRatio;
+                headerColumnsValuation = headerColumnsRatio;
                 headerValuationLineNumber = null;
                 System.out.println("$$$$$$$$$$ Setting Valuation Header same as Ratio Header ");
             }
 
-            // Get Header Line No. for the first page
+        } catch (Exception e){
+            System.out.println("########## Exception in setting Valuation Page Header for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+        }
+
+        // Get Header Line No. for the first page
+        headerLineNo = -1;
+        try {
+            headerLineNo = getLineNumberForMatchingPattern(linesRecoPage, 1, "(?i).*((Forecasts\\/Valuations))",rdec, true, BROKER);
+            if (headerLineNo > 1) {
+                headerRecoPage = linesRecoPage[headerLineNo].replace("`", "");
+                headerColumnsRecoPage = getDataColumnsForHeader(headerRecoPage, "(?i).*((Forecasts\\/Valuations))");
+                headerFirstPageLineNumber = new Integer(headerLineNo);
+                System.out.println("Reco Page Header Count : " + headerColumnsIncomeStmt.length + " / Line : " + linesRecoPage[headerLineNo]);
+            } else {
+                System.out.println("$$$$$$$$$$ Reco Page Header Line not found for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+            }
+        } catch (Exception e) {
+            System.out.println("########## Exception in setting Reco Page Header for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+        }
+
+        // Get Header Line No. for AUM Page
+        if(isFinancialReport && AUM_PAGE != null && !AUM_PAGE.isEmpty()) {
             headerLineNo = -1;
             try {
-                headerLineNo = getLineNumberForMatchingPattern(linesFirstPage, 1, "(?i).*((Forecasts\\/Valuations))",rdec, true, BROKER);
+                tableHeadLineNo = getLineNumberForMatchingPattern(linesAUM, 0, AUM_PAGE, rdec, BROKER);
+                headerLineNo = getLineNumberForMatchingPattern(linesAUM, tableHeadLineNo + 1, AUM_HEADER_ROW_NAME, rdec, true, BROKER);
+                if(headerLineNo < 0) {
+                    headerLineNo = getLineNumberForMatchingPattern(linesAUM, 0, AUM_HEADER_ROW_NAME, rdec, BROKER);
+                }
+
                 if (headerLineNo > 1) {
-                    headerFirstPage = linesFirstPage[headerLineNo].replace("`", "");
-                    headerColumnsFirstPage = getDataColumnsForHeader(headerFirstPage, "(?i).*((Forecasts\\/Valuations))");
-                    headerFirstPageLineNumber = new Integer(headerLineNo);
-                    System.out.println("First Page Header Count : " + headerColumnsIncomeStmt.length + " / Line : " + linesFirstPage[headerLineNo]);
+                    headerAUM = linesAUM[headerLineNo];
+                    headerColumnsAUM = getDataColumnsForHeader(headerAUM, AUM_HEADER_ROW_NAME);
+                    headerAUMLineNumber = new Integer(headerLineNo);
+                    System.out.println("AUM Header Count : " + headerColumnsAUM.length + " / Line : " + linesAUM[headerLineNo]);
                 } else {
-                    System.out.println("$$$$$$$$$$ First Page Header Line not found for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+                    // in case header is not avialble fetch the header from income statement
+                    headerAUM = headerIncomeStmt;
+                    headerColumnsAUM = headerColumnsIncomeStmt;
+                    headerAUMLineNumber = null;
+                    System.out.println("$$$$$$$$$$ Setting AUM Header same as Inc. Stmt. Header ");
+                }
+
+            } catch (Exception e) {
+                System.out.println("########## Exception in setting AUM Header for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+            }
+        }
+
+        // Get Header Line No. for CreditCost Page
+        if(isFinancialReport && CREDITCOSTS_PAGE != null && !CREDITCOSTS_PAGE.isEmpty()) {
+            headerLineNo = -1;
+            try {
+                tableHeadLineNo = getLineNumberForMatchingPattern(linesCreditCost, 0, CREDITCOSTS_PAGE, rdec, BROKER);
+                headerLineNo = getLineNumberForMatchingPattern(linesCreditCost, tableHeadLineNo + 1, CREDITCOSTS_HEADER_ROW_NAME, rdec, true, BROKER);
+                if(headerLineNo < 0) {
+                    headerLineNo = getLineNumberForMatchingPattern(linesCreditCost, 0, CREDITCOSTS_HEADER_ROW_NAME, rdec, BROKER);
+                }
+                if (headerLineNo > 1) {
+                    headerCreditCosts = linesCreditCost[headerLineNo];
+                    headerColumnsCreditCosts = getDataColumnsForHeader(headerCreditCosts, CREDITCOSTS_HEADER_ROW_NAME);
+                    headerCreditCostLineNumber = new Integer(headerLineNo);
+                    System.out.println("CreditCost Header Count : " + headerColumnsCreditCosts.length + " / Line : " + linesCreditCost[headerLineNo]);
+                } else {
+                    // in case header is not avialble fetch the header from income statement
+                    headerCreditCosts = headerRatio;
+                    headerColumnsCreditCosts = headerColumnsRatio;
+                    headerCreditCostLineNumber = null;
+                    System.out.println("$$$$$$$$$$ Setting Credit Cost Header same as Ratio Header ");
                 }
             } catch (Exception e) {
-                System.out.println("########## Exception in setting First Page Header for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+                System.out.println("########## Exception in setting CreditCost Header for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
             }
+        }
 
-        } catch (Exception e){
-            System.out.println("########## Exception in setting First Page Header for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+        // Get Header Line No. for NPA Page
+        if(isFinancialReport && NPA_PAGE != null && !NPA_PAGE.isEmpty()) {
+            headerLineNo = -1;
+            try {
+                tableHeadLineNo = getLineNumberForMatchingPattern(linesNPA, 0, NPA_PAGE, rdec, BROKER);
+                headerLineNo = getLineNumberForMatchingPattern(linesNPA, tableHeadLineNo + 1, NPA_HEADER_ROW_NAME, rdec, true, BROKER);
+                if(headerLineNo < 0) {
+                    headerLineNo = getLineNumberForMatchingPattern(linesNPA, 0, NPA_HEADER_ROW_NAME, rdec, BROKER);
+                }
+                if (headerLineNo > 1) {
+                    headerNPA = linesCreditCost[headerLineNo];
+                    headerColumnsNPA = getDataColumnsForHeader(headerNPA, NPA_HEADER_ROW_NAME);
+                    headerNPALineNumber = new Integer(headerLineNo);
+                    System.out.println("CreditCost Header Count : " + headerColumnsNPA.length + " / Line : " + linesNPA[headerLineNo]);
+                } else {
+                    // in case header is not avialble fetch the header from income statement
+                    headerNPA = headerRatio;
+                    headerColumnsNPA = headerColumnsRatio;
+                    headerNPALineNumber = null;
+                    System.out.println("$$$$$$$$$$ Setting NPA Header same as Ratio Header ");
+                }
+
+            } catch (Exception e) {
+                System.out.println("########## Exception in setting NPA Header for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+            }
         }
     }
 
@@ -528,7 +550,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
                         if (y0Column >= 0) {
                             y0Revenue = revenueColumns[y0Column];
-                            y0RevenueNumber = Double.parseDouble(y0Revenue.replace(",", ""));
+                            y0RevenueNumber = Double.parseDouble(y0Revenue.replaceAll(",", ""));
                             if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                 y0RevenueNumber = y0RevenueNumber / 10;
                             } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
@@ -542,7 +564,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         }
                         if (y1Column >= 0) {
                             y1Revenue = revenueColumns[y1Column];
-                            y1RevenueNumber = Double.parseDouble(y1Revenue.replace(",", ""));
+                            y1RevenueNumber = Double.parseDouble(y1Revenue.replaceAll(",", ""));
                             if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                 y1RevenueNumber = y1RevenueNumber / 10;
                             } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
@@ -556,7 +578,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         }
                         if (y2Column >= 0) {
                             y2Revenue = revenueColumns[y2Column];
-                            y2RevenueNumber = Double.parseDouble(y2Revenue.replace(",", ""));
+                            y2RevenueNumber = Double.parseDouble(y2Revenue.replaceAll(",", ""));
                             if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                 y2RevenueNumber = y2RevenueNumber / 10;
                             } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
@@ -601,7 +623,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             int revenueLineNo = -1;
             int depreciationLineNo = -1;
             boolean isToSetEBIT = false, isEBITDAPresent = false, canImpliedDepreciationBeFound = false;
-            String ebitda = null, ebit = null, depreciation = null;
+            String ebitda = null, ebit = null, depreciation = null, ebitdaPattern = EBITDA_ROW_NAME;
             String[] ebitdaColumns = null, depreciationColumns = null, ebitColumns = null;
             int y0Column = -1, y1Column = -1, y2Column = -1;
             String y0EBITDA = "", y1EBITDA = "", y2EBITDA = "";
@@ -612,11 +634,13 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             String y0EBIT = "", y1EBIT = "", y2EBIT = "";
             double y0EBITNumber = 0, y1EBITNumber = 0, y2EBITNumber = 0;
 
+            ebitdaPattern = ebitdaPattern.replace("|\\s*EBITDA \\(underlying\\) |\\s*EBITDA|\\s*Adj\\. EBITDA", "");
+
             if (revenueLineNumber != null)
                 revenueLineNo = revenueLineNumber.intValue();
             // Get EBITDA Line No. form the Inc. Statement Page
             int ebitdaLineNo = -1;
-            ebitdaLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, revenueLineNo, EBITDA_ROW_NAME, rdec, BROKER);
+            ebitdaLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, revenueLineNo, ebitdaPattern, rdec, BROKER);
 
             if(ebitdaLineNo < 0) {
                 System.out.println("EBITDA line is not present for" + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
@@ -629,8 +653,8 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                     System.out.println("########## Depreciation line is not present for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
                     isToSetEBIT = true;
                 } else {
-                    ebitda = linesIncomeStmt[ebitdaLineNo].replace("(", "-").replace(")", "");
-                    ebitdaColumns = getDataColumnsForHeader(ebitda, EBITDA_ROW_NAME);
+                    ebitda = linesIncomeStmt[ebitdaLineNo].replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1");
+                    ebitdaColumns = getDataColumnsForHeader(ebitda, ebitdaPattern);
 
                     if(ebitdaColumns == null || (ebitdaColumns != null && ebitdaColumns.length != headerColumnsIncomeStmt.length && ebitdaColumns.length == 0)){
                         if(!linesIncomeStmt[ebitdaLineNo - 1].trim().equals(""))
@@ -638,7 +662,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         else if(!linesIncomeStmt[ebitdaLineNo + 1].trim().equals(""))
                             ebitda = linesIncomeStmt[ebitdaLineNo] + linesIncomeStmt[ebitdaLineNo + 1];
 
-                        ebitdaColumns = getDataColumnsForHeader(ebitda, EBITDA_ROW_NAME);
+                        ebitdaColumns = getDataColumnsForHeader(ebitda, ebitdaPattern);
                     }
 
                     depreciation = linesIncomeStmt[depreciationLineNo];
@@ -677,8 +701,8 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                         y0EBITDA = ebitdaColumns[y0Column];
                                         y0Depreciation = depreciationColumns[y0Column];
 
-                                        y0EBITDANo = Double.parseDouble(y0EBITDA.replace(",", "").replace("(", "-").replace(")", ""));
-                                        y0DepreciationNo = Double.parseDouble(y0Depreciation.replace(",", "").replace("(", "").replace(")", ""));
+                                        y0EBITDANo = Double.parseDouble(y0EBITDA.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
+                                        y0DepreciationNo = Double.parseDouble(y0Depreciation.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
                                         if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                             y0EBITDANo = y0EBITDANo / 10;
                                             y0DepreciationNo = y0DepreciationNo / 10;
@@ -697,8 +721,8 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                         y1EBITDA = ebitdaColumns[y1Column];
                                         y1Depreciation = depreciationColumns[y1Column];
 
-                                        y1EBITDANo = Double.parseDouble(y1EBITDA.replace(",", "").replace("(", "-").replace(")", ""));
-                                        y1DepreciationNo = Double.parseDouble(y1Depreciation.replace(",", "").replace("(", "").replace(")", ""));
+                                        y1EBITDANo = Double.parseDouble(y1EBITDA.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
+                                        y1DepreciationNo = Double.parseDouble(y1Depreciation.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
                                         if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                             y1EBITDANo = y1EBITDANo / 10;
                                             y1DepreciationNo = y1DepreciationNo / 10;
@@ -717,8 +741,8 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                         y2EBITDA = ebitdaColumns[y2Column];
                                         y2Depreciation = depreciationColumns[y2Column];
 
-                                        y2EBITDANo = Double.parseDouble(y2EBITDA.replace(",", "").replace("(", "-").replace(")", ""));
-                                        y2DepreciationNo = Double.parseDouble(y2Depreciation.replace(",", "").replace("(", "").replace(")", ""));
+                                        y2EBITDANo = Double.parseDouble(y2EBITDA.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
+                                        y2DepreciationNo = Double.parseDouble(y2Depreciation.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
                                         if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                             y2EBITDANo = y2EBITDANo / 10;
                                             y2DepreciationNo = y2DepreciationNo / 10;
@@ -759,13 +783,13 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if (ebitColumns != null && ebitColumns.length != 0) {
                             // evenif columns are not matching then call function getCorrectNumbers
                             if (ebitColumns.length != headerColumnsIncomeStmt.length) {
-                                ebitColumns = getDataColumnsForHeader(ebit.replace(",", "").trim(), "(?i)^((EBIT ))");
+                                ebitColumns = getDataColumnsForHeader(ebit.replaceAll(",", "").trim(), "(?i)^((EBIT ))");
                                 ebitColumns = getCorrectNumbers(ebitColumns);
                             }
                             if (ebitColumns.length == headerColumnsIncomeStmt.length) {
                                 if(isEBITDAPresent == true){
-                                    ebitda = linesIncomeStmt[ebitdaLineNo].replace("(", "-").replace(")", "");
-                                    ebitdaColumns = getDataColumnsForHeader(ebitda, EBITDA_ROW_NAME, headerColumnsIncomeStmt.length);
+                                    ebitda = linesIncomeStmt[ebitdaLineNo].replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1");
+                                    ebitdaColumns = getDataColumnsForHeader(ebitda, ebitdaPattern, headerColumnsIncomeStmt.length);
 
                                     if (ebitdaColumns != null && ebitdaColumns.length != 0) {
                                         if(ebitdaColumns.length == headerColumnsIncomeStmt.length) {
@@ -795,7 +819,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
                                 if (y0Column >= 0) {
                                     y0EBIT = ebitColumns[y0Column];
-                                    y0EBITNumber = Double.parseDouble(y0EBIT.replace(",", "").replace("(", "-").replace(")", ""));
+                                    y0EBITNumber = Double.parseDouble(y0EBIT.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
                                     if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                         y0EBITNumber = y0EBITNumber / 10;
                                     } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
@@ -803,7 +827,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                     }
                                     if (canImpliedDepreciationBeFound == true) {
                                         y0EBITDA = ebitdaColumns[y0Column];
-                                        y0EBITDANo = Double.parseDouble(y0EBITDA.replace(",", "").replace("(", "-").replace(")", ""));
+                                        y0EBITDANo = Double.parseDouble(y0EBITDA.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
                                         if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                             y0EBITDANo = y0EBITDANo / 10;
                                         } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
@@ -820,7 +844,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                 }
                                 if (y1Column >= 0) {
                                     y1EBIT = ebitColumns[y1Column];
-                                    y1EBITNumber = Double.parseDouble(y1EBIT.replace(",", "").replace("(", "-").replace(")", ""));
+                                    y1EBITNumber = Double.parseDouble(y1EBIT.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
                                     if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                         y1EBITNumber = y1EBITNumber / 10;
                                     } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
@@ -828,7 +852,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                     }
                                     if (canImpliedDepreciationBeFound == true) {
                                         y1EBITDA = ebitdaColumns[y1Column];
-                                        y1EBITDANo = Double.parseDouble(y1EBITDA.replace(",", "").replace("(", "-").replace(")", ""));
+                                        y1EBITDANo = Double.parseDouble(y1EBITDA.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
                                         if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                             y1EBITDANo = y1EBITDANo / 10;
                                         } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
@@ -845,7 +869,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                 }
                                 if (y2Column >= 0) {
                                     y2EBIT = ebitColumns[y2Column];
-                                    y2EBITNumber = Double.parseDouble(y2EBIT.replace(",", "").replace("(", "-").replace(")", ""));
+                                    y2EBITNumber = Double.parseDouble(y2EBIT.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
                                     if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                         y2EBITNumber = y2EBITNumber / 10;
                                     } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
@@ -853,7 +877,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                     }
                                     if (canImpliedDepreciationBeFound == true) {
                                         y2EBITDA = ebitdaColumns[y2Column];
-                                        y2EBITDANo = Double.parseDouble(y2EBITDA.replace(",", "").replace("(", "-").replace(")", ""));
+                                        y2EBITDANo = Double.parseDouble(y2EBITDA.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
                                         if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                             y2EBITDANo = y2EBITDANo / 10;
                                         } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
@@ -900,21 +924,23 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
     protected void setProfitForFinancials(ReportDataExtractConfig rdec){
         try {
             int revenueLineNo = -1;
-            String pat = null;
+            String pat = null, patPattern = EBITDA_ROW_NAME;
             String[] patColumns = null;
             int y0Column = -1, y1Column = -1, y2Column = -1;
             String y0PAT = "", y1PAT = "", y2PAT = "";
             double y0PATNumber = 0, y1PATNumber = 0, y2PATNumber = 0;
 
+            patPattern = patPattern.replace("|\\s*EBITDA \\(underlying\\) |\\s*EBITDA|\\s*Adj\\. EBITDA", "");
+
             if (revenueLineNumber != null)
                 revenueLineNo = revenueLineNumber.intValue();
             // Get EBITDA Line No. form the Inc. Statement Page
             int patLineNo = -1;
-            patLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, revenueLineNo, EBITDA_ROW_NAME, rdec, BROKER);
+            patLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, revenueLineNo, patPattern, rdec, BROKER);
 
             if(patLineNo > 0) {
-                pat = linesIncomeStmt[patLineNo].replace("(", "-").replace(")", "");
-                patColumns = getDataColumnsForHeader(pat, EBITDA_ROW_NAME);
+                pat = linesIncomeStmt[patLineNo].replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1");
+                patColumns = getDataColumnsForHeader(pat, patPattern);
 
 
                 if(patColumns == null || (patColumns != null && patColumns.length != headerColumnsIncomeStmt.length && patColumns.length == 0)){
@@ -923,7 +949,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                     else if(!linesIncomeStmt[patLineNo + 1].trim().equals(""))
                         pat = linesIncomeStmt[patLineNo] + linesIncomeStmt[patLineNo + 1];
 
-                    patColumns = getDataColumnsForHeader(pat, EBITDA_ROW_NAME);
+                    patColumns = getDataColumnsForHeader(pat, patPattern);
                 }
 
                 if (patColumns != null && patColumns.length != 0) {
@@ -947,7 +973,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
                         if (y0Column >= 0) {
                             y0PAT = patColumns[y0Column];
-                            y0PATNumber = Double.parseDouble(y0PAT.replace(",", "").replace("(", "-").replace(")", ""));
+                            y0PATNumber = Double.parseDouble(y0PAT.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
                             if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                 y0PATNumber = y0PATNumber / 10;
                             } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
@@ -961,7 +987,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if (y1Column >= 0) {
                             y1PAT = patColumns[y1Column];
 
-                            y1PATNumber = Double.parseDouble(y1PAT.replace(",", "").replace("(", "-").replace(")", ""));
+                            y1PATNumber = Double.parseDouble(y1PAT.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
                             if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                 y1PATNumber = y1PATNumber / 10;
                             } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
@@ -975,7 +1001,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if (y2Column >= 0) {
                             y2PAT = patColumns[y2Column];
 
-                            y2PATNumber = Double.parseDouble(y2PAT.replace(",", "").replace("(", "-").replace(")", ""));
+                            y2PATNumber = Double.parseDouble(y2PAT.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
                             if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                 y2PATNumber = y2PATNumber / 10;
                             } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
@@ -1018,7 +1044,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         String[] ebitdaMarginColumns = null;
         String y0EBITDAMargin = "0", y1EBITDAMargin = "0", y2EBITDAMargin = "0";
         int y0Column = -1, y1Column = -1, y2Column = -1;
-        boolean isMarginOnRatio = false;
+//        boolean isMarginOnRatio = false;
         try {
             if (ebitdaLineNumber != null)
                 ebitdaLineNo = ebitdaLineNumber.intValue();
@@ -1026,73 +1052,32 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                 ebitdaLineNo = revenueLineNumber.intValue();
 
             if(!isFinancialReport)
-                ebitdaMarginLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, ebitdaLineNo, EBITDAMARGIN_ROW_NAME, rdec, BROKER);
+                ebitdaMarginLineNo = getLineNumberForMatchingPattern(linesMargin, ebitdaLineNo, EBITDAMARGIN_ROW_NAME, rdec, BROKER);
             else
-                ebitdaMarginLineNo = getLineNumberForMatchingPattern(linesRatio, 0, EBITDAMARGIN_ROW_NAME, rdec, BROKER);
+                ebitdaMarginLineNo = getLineNumberForMatchingPattern(linesMargin, 0, EBITDAMARGIN_ROW_NAME, rdec, BROKER);
 
-            if (ebitdaMarginLineNo == -1 && !isFinancialReport) {
-                ebitdaMarginLineNo = getLineNumberForMatchingPattern(linesRatio, 0, EBITDAMARGIN_ROW_NAME,rdec, BROKER);
-                isMarginOnRatio = true;
-                if(ebitdaMarginLineNo>0)
-                    ebitdaMargin = linesRatio[ebitdaMarginLineNo];
-            } else if (!isFinancialReport) {
-                ebitdaMargin = linesIncomeStmt[ebitdaMarginLineNo].trim();
-            }
-
-            if (ebitdaMarginLineNo == -1 && isFinancialReport) {
-                ebitdaMarginLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, 0, EBITDAMARGIN_ROW_NAME,rdec, BROKER);
-                isMarginOnRatio = false;
-                if(ebitdaMarginLineNo>0)
-                    ebitdaMargin = linesIncomeStmt[ebitdaMarginLineNo];
-            } else if (isFinancialReport) {
-                ebitdaMargin = linesRatio[ebitdaMarginLineNo];
+            if (ebitdaMarginLineNo > 0) {
+                ebitdaMargin = linesMargin[ebitdaMarginLineNo].replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1");
             }
 
             if (ebitdaMargin != null) {
-
                 ebitdaMarginColumns = getDataColumnsForHeader(ebitdaMargin, EBITDAMARGIN_ROW_NAME);
 
-                if(isMarginOnRatio) {
-                    if (ebitdaMarginColumns.length != headerColumnsRatio.length && ebitdaMarginColumns.length == 0) {
-                        if (!linesRatio[ebitdaMarginLineNo + 1].trim().equals(""))
-                            ebitdaMargin = linesRatio[ebitdaMarginLineNo] + linesRatio[ebitdaMarginLineNo + 1];
-                        else if (!linesRatio[ebitdaMarginLineNo - 1].trim().equals(""))
-                            ebitdaMargin = linesRatio[ebitdaMarginLineNo] + linesRatio[ebitdaMarginLineNo - 1];
+                if (ebitdaMarginColumns.length != headerColumnsMargin.length && ebitdaMarginColumns.length == 0) {
+                    if (!headerColumnsMargin[ebitdaMarginLineNo + 1].trim().equals(""))
+                        ebitdaMargin = headerColumnsMargin[ebitdaMarginLineNo] + headerColumnsMargin[ebitdaMarginLineNo + 1];
+                    else if (!headerColumnsMargin[ebitdaMarginLineNo - 1].trim().equals(""))
+                        ebitdaMargin = headerColumnsMargin[ebitdaMarginLineNo] + headerColumnsMargin[ebitdaMarginLineNo - 1];
 
-                        ebitdaMarginColumns = getDataColumnsForHeader(ebitdaMargin, EBITDAMARGIN_ROW_NAME);
-                    }
-                } else {
-                    if (ebitdaMarginColumns.length != headerColumnsIncomeStmt.length && ebitdaMarginColumns.length == 0) {
-                        if (!headerColumnsIncomeStmt[ebitdaMarginLineNo + 1].trim().equals(""))
-                            ebitdaMargin = headerColumnsIncomeStmt[ebitdaMarginLineNo] + headerColumnsIncomeStmt[ebitdaMarginLineNo + 1];
-                        else if (!headerColumnsIncomeStmt[ebitdaMarginLineNo - 1].trim().equals(""))
-                            ebitdaMargin = headerColumnsIncomeStmt[ebitdaMarginLineNo] + headerColumnsIncomeStmt[ebitdaMarginLineNo - 1];
-
-                        ebitdaMarginColumns = getDataColumnsForHeader(ebitdaMargin, EBITDAMARGIN_ROW_NAME);
-                    }
+                    ebitdaMarginColumns = getDataColumnsForHeader(ebitdaMargin, EBITDAMARGIN_ROW_NAME);
                 }
 
                 // Find Y0, Y1 and Y2 Index position
-                if(!isMarginOnRatio) {
-                    if(y0ColumnNumberOnIncStmt != null && y1ColumnNumberOnIncStmt != null && y2ColumnNumberOnIncStmt != null) {
-                        y0Column = y0ColumnNumberOnIncStmt.intValue();
-                        y1Column = y1ColumnNumberOnIncStmt.intValue();
-                        y2Column = y2ColumnNumberOnIncStmt.intValue();
-                    } else {
-                        y0Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y0);
-                        y1Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y1);
-                        y2Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y2);
-                    }
-                } else {
-                    y0Column = getIndexOfTheYear(headerColumnsRatio, Y0);
-                    y1Column = getIndexOfTheYear(headerColumnsRatio, Y1);
-                    y2Column = getIndexOfTheYear(headerColumnsRatio, Y2);
-                    y0ColumnNumberOnRatio = new Integer(y0Column);
-                    y1ColumnNumberOnRatio = new Integer(y1Column);
-                    y2ColumnNumberOnRatio = new Integer(y2Column);
-                }
+                y0Column = getIndexOfTheYear(headerColumnsMargin, Y0);
+                y1Column = getIndexOfTheYear(headerColumnsMargin, Y1);
+                y2Column = getIndexOfTheYear(headerColumnsMargin, Y2);
 
-                System.out.print("Ratio Header : Y0 Index " + y0Column);
+                System.out.print("OPM Header : Y0 Index " + y0Column);
                 System.out.print(" Y1 Index " + y1Column);
                 System.out.print(" Y2 Index " + y2Column + "\n");
                 System.out.println("Profit Margin Line : " + Arrays.toString(ebitdaMarginColumns));
@@ -1100,11 +1085,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                 if (ebitdaMarginColumns.length != 0) {
                     if (y0Column >= 0) {
                         try {
-                            if (headerColumnsRatio.length != ebitdaMarginColumns.length && headerColumnsRatio.length > ebitdaMarginColumns.length) {
+                            if (headerColumnsMargin.length != ebitdaMarginColumns.length && headerColumnsMargin.length > ebitdaMarginColumns.length) {
                                 System.out.println("########## Header mismatch for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
-                                System.out.print(" Header Length " + headerColumnsRatio.length);
+                                System.out.print(" Header Length " + headerColumnsMargin.length);
                                 System.out.print(" OPM/NIM Length " + ebitdaMarginColumns.length + "\n");
-                                y0EBITDAMargin = ebitdaMarginColumns[y0Column - (headerColumnsRatio.length - ebitdaMarginColumns.length)].replace("%", "");
+                                y0EBITDAMargin = ebitdaMarginColumns[y0Column - (headerColumnsMargin.length - ebitdaMarginColumns.length)].replace("%", "");
                             } else {
                                 y0EBITDAMargin = ebitdaMarginColumns[y0Column].replace("%", "");
                             }
@@ -1119,8 +1104,8 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                     }
                     if (y1Column >= 0) {
                         try {
-                            if (headerColumnsRatio.length != ebitdaMarginColumns.length && headerColumnsRatio.length > ebitdaMarginColumns.length) {
-                                y1EBITDAMargin = ebitdaMarginColumns[y1Column - (headerColumnsRatio.length - ebitdaMarginColumns.length)].replace("%", "");
+                            if (headerColumnsMargin.length != ebitdaMarginColumns.length && headerColumnsMargin.length > ebitdaMarginColumns.length) {
+                                y1EBITDAMargin = ebitdaMarginColumns[y1Column - (headerColumnsMargin.length - ebitdaMarginColumns.length)].replace("%", "");
                             } else {
                                 y1EBITDAMargin = ebitdaMarginColumns[y1Column].replace("%", "");
                             }
@@ -1135,8 +1120,8 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                     }
                     if (y2Column >= 0) {
                         try {
-                            if (headerColumnsRatio.length != ebitdaMarginColumns.length && headerColumnsRatio.length > ebitdaMarginColumns.length) {
-                                y2EBITDAMargin = ebitdaMarginColumns[y2Column - (headerColumnsRatio.length - ebitdaMarginColumns.length)].replace("%", "");
+                            if (headerColumnsMargin.length != ebitdaMarginColumns.length && headerColumnsMargin.length > ebitdaMarginColumns.length) {
+                                y2EBITDAMargin = ebitdaMarginColumns[y2Column - (headerColumnsMargin.length - ebitdaMarginColumns.length)].replace("%", "");
                             } else {
                                 y2EBITDAMargin = ebitdaMarginColumns[y2Column].replace("%", "");
                             }
@@ -1171,72 +1156,41 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
     protected void setROCEOrROE(ReportDataExtractConfig rdec, boolean isFinancialReport){
         int roceLineNo = -1, roceLineNoSecond = -1, headerRatioLineNo = -1;
-        String roce = null;
+        String roce = null, rocePattern = ROCE_ROW_NAME;
         String[] roceColumns = null;
         String y0ROCE = "0", y1ROCE = "0", y2ROCE = "0";
         int y0Column = -1, y1Column = -1, y2Column = -1;
-        boolean isRoCEOnIncStmt = false;
 
         try {
+            if (isFinancialReport)
+                rocePattern = rocePattern.replaceAll("(?i)ROCE", "RoE");
+            else
+                rocePattern = rocePattern.replaceAll("(?i)ROAE", "ROCE").replaceAll("(?i)ROE", "ROCE");
+
             if (headerRatioLineNumber != null)
                 headerRatioLineNo = headerRatioLineNumber.intValue();
             else
                 headerRatioLineNo = 0;
 
-            if(!isFinancialReport) {
-                roceLineNo = getLineNumberForMatchingPattern(linesRatio, 0, ROCE_ROW_NAME, rdec, BROKER);
-                roceLineNoSecond = getLineNumberForMatchingPattern(linesRatio, roceLineNo + 1, ROCE_ROW_NAME, rdec, BROKER);
+            roceLineNo = getLineNumberForMatchingPattern(linesRatio, 0, rocePattern, rdec, BROKER);
+            roceLineNoSecond = getLineNumberForMatchingPattern(linesRatio, roceLineNo + 1, rocePattern, rdec, BROKER);
 
-                if (roceLineNo > 1 && roceLineNoSecond > 1 && linesRatio[roceLineNoSecond].toLowerCase().contains("post"))
-                    roceLineNo = roceLineNoSecond;
-
-                if(roceLineNo < 0) {
-                    roceLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, 0, ROCE_ROW_NAME, rdec, BROKER);
-                    roceLineNoSecond = getLineNumberForMatchingPattern(linesIncomeStmt, roceLineNo + 1, ROCE_ROW_NAME, rdec, BROKER);
-
-                    if (roceLineNo > 1 && roceLineNoSecond > 1 && linesIncomeStmt[roceLineNoSecond].toLowerCase().contains("post"))
-                        roceLineNo = roceLineNoSecond;
-
-                    if(roceLineNo > 0)
-                        isRoCEOnIncStmt = true;
-                }
-            } else {
-                roceLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, 0, ROCE_ROW_NAME, rdec, BROKER);
-                if (roceLineNo != -1) {
-                    roce = linesIncomeStmt[roceLineNo];
-                    isRoCEOnIncStmt = true;
-                }
-            }
+            if (roceLineNo > 1 && roceLineNoSecond > 1 && linesRatio[roceLineNoSecond].toLowerCase().contains("post"))
+                roceLineNo = roceLineNoSecond;
 
             if (roceLineNo > 1) {
-                if(!isRoCEOnIncStmt)
-                    roce = linesRatio[roceLineNo].trim();
-                else
-                    roce = linesIncomeStmt[roceLineNo].trim();
-
-                roceColumns = getDataColumnsForHeader(roce, ROCE_ROW_NAME);
+                roce = linesRatio[roceLineNo].trim().replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1");
+                roceColumns = getDataColumnsForHeader(roce, rocePattern);
 
                 // Find Y0, Y1 and Y2 Index position
-                if(isRoCEOnIncStmt) {
-                    if (y0ColumnNumberOnIncStmt != null && y1ColumnNumberOnIncStmt != null && y2ColumnNumberOnIncStmt != null) {
-                        y0Column = y0ColumnNumberOnIncStmt.intValue();
-                        y1Column = y1ColumnNumberOnIncStmt.intValue();
-                        y2Column = y2ColumnNumberOnIncStmt.intValue();
-                    } else {
-                        y0Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y0);
-                        y1Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y1);
-                        y2Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y2);
-                    }
+                if (y0ColumnNumberOnRatio != null && y1ColumnNumberOnRatio != null && y2ColumnNumberOnRatio != null) {
+                    y0Column = y0ColumnNumberOnRatio.intValue();
+                    y1Column = y1ColumnNumberOnRatio.intValue();
+                    y2Column = y2ColumnNumberOnRatio.intValue();
                 } else {
-                    if (y0ColumnNumberOnRatio != null && y1ColumnNumberOnRatio != null && y2ColumnNumberOnRatio != null) {
-                        y0Column = y0ColumnNumberOnRatio.intValue();
-                        y1Column = y1ColumnNumberOnRatio.intValue();
-                        y2Column = y2ColumnNumberOnRatio.intValue();
-                    } else {
-                        y0Column = getIndexOfTheYear(headerColumnsRatio, Y0);
-                        y1Column = getIndexOfTheYear(headerColumnsRatio, Y1);
-                        y2Column = getIndexOfTheYear(headerColumnsRatio, Y2);
-                    }
+                    y0Column = getIndexOfTheYear(headerColumnsRatio, Y0);
+                    y1Column = getIndexOfTheYear(headerColumnsRatio, Y1);
+                    y2Column = getIndexOfTheYear(headerColumnsRatio, Y2);
                 }
 
                 System.out.print("Ratio Header : Y0 Index " + y0Column);
@@ -1319,37 +1273,39 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
     protected void setEVBYEBITRatio(ReportDataExtractConfig rdec, boolean isFinancialReport){
         int evbyebitdaLineNumber = -1;
-        String evbyebitda = "";
+        String evbyebitda = "", evbyebitdaPattern = EVBYEBITDA_ROW_NAME;
         String y0EVBYEBITDA = "", y1EVBYEBITDA = "", y2EVBYEBITDA = "";
         double y0EVBYEBITDANumber = 0, y1EVBYEBITDANumber = 0, y2EVBYEBITDANumber = 0;
         double y0EVBYEBITNumber = 0, y1EVBYEBITNumber = 0, y2EVBYEBITNumber = 0;
         String[] evbyebitdaColumns = null;
         int y0Column = -1, y1Column = -1, y2Column = -1;
-        boolean isValuationOnFirstPage = false, isPriceToBookValue = false;
+        boolean isValuationOnRecoPage = false;
         try {
+
+            if (isFinancialReport)
+                evbyebitdaPattern = evbyebitdaPattern.replace("|\\s*EV\\/EBITDA \\(x\\)|\\s*EV\\/EBITDA", "");
+            else
+                evbyebitdaPattern = evbyebitdaPattern.replace("\\s*Consolidated P\\/B|\\s*P\\/BV \\(x\\)|\\s*P\\/BV|\\s*P\\/B Consol\\.|\\s*P\\/B|", "");
+
+
             if(valuationPageNumber != null && valuationPageNumber.intValue() == 1)
-                isValuationOnFirstPage = true;
+                isValuationOnRecoPage = true;
 
-            if(EVBYEBITDA_ROW_NAME.contains("EBIT"))
-                isPriceToBookValue = false;
+            if(!isValuationOnRecoPage)
+                evbyebitdaLineNumber = getLineNumberForMatchingPattern(linesValuation, 0, evbyebitdaPattern, rdec, BROKER);
             else
-                isPriceToBookValue = true;
-
-            if(!isValuationOnFirstPage)
-                evbyebitdaLineNumber = getLineNumberForMatchingPattern(linesValuation, 0, EVBYEBITDA_ROW_NAME, rdec, BROKER);
-            else
-                evbyebitdaLineNumber = getLineNumberForMatchingPattern(linesFirstPage, 0, EVBYEBITDA_ROW_NAME, rdec, BROKER);
+                evbyebitdaLineNumber = getLineNumberForMatchingPattern(linesRecoPage, 0, evbyebitdaPattern, rdec, BROKER);
 
             if (evbyebitdaLineNumber >= 0) {
-                if(!isValuationOnFirstPage)
-                    evbyebitda = linesValuation[evbyebitdaLineNumber];
+                if(!isValuationOnRecoPage)
+                    evbyebitda = linesValuation[evbyebitdaLineNumber].replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1");
                 else
-                    evbyebitda = linesFirstPage[evbyebitdaLineNumber];
+                    evbyebitda = linesRecoPage[evbyebitdaLineNumber].replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1");
 
-                evbyebitdaColumns = getDataColumnsForHeader(evbyebitda, EVBYEBITDA_ROW_NAME);
+                evbyebitdaColumns = getDataColumnsForHeader(evbyebitda, evbyebitdaPattern);
 
                 if(evbyebitdaColumns != null) {
-                    if ((!isValuationOnFirstPage && headerColumnsValuation.length != evbyebitdaColumns.length) || (isValuationOnFirstPage && headerColumnsFirstPage.length != evbyebitdaColumns.length)) {
+                    if ((!isValuationOnRecoPage && headerColumnsValuation.length != evbyebitdaColumns.length) || (isValuationOnRecoPage && headerColumnsRecoPage.length != evbyebitdaColumns.length)) {
                         Pattern pattern = Pattern.compile(HEADER_ROW_NAME);
                         Matcher matcher = pattern.matcher(headerValuation.trim());
                         if (matcher.find()) {
@@ -1362,14 +1318,14 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                     .toArray(String[]::new);
                         }
                     }
-                    if(!isValuationOnFirstPage) {
+                    if(!isValuationOnRecoPage) {
                         y0Column = getIndexOfTheYear(headerColumnsValuation, Y0);
                         y1Column = getIndexOfTheYear(headerColumnsValuation, Y1);
                         y2Column = getIndexOfTheYear(headerColumnsValuation, Y2);
                     } else {
-                        y0Column = getIndexOfTheYear(headerColumnsFirstPage, Y0);
-                        y1Column = getIndexOfTheYear(headerColumnsFirstPage, Y1);
-                        y2Column = getIndexOfTheYear(headerColumnsFirstPage, Y2);
+                        y0Column = getIndexOfTheYear(headerColumnsRecoPage, Y0);
+                        y1Column = getIndexOfTheYear(headerColumnsRecoPage, Y1);
+                        y2Column = getIndexOfTheYear(headerColumnsRecoPage, Y2);
                     }
                     System.out.print("Valuation Header : Y0 Index " + y0Column);
                     System.out.print(" Y1 Index " + y1Column);
@@ -1378,7 +1334,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
                     if (y0Column >= 0) {
                         try {
-                            if (!isValuationOnFirstPage && headerColumnsValuation.length != evbyebitdaColumns.length && headerColumnsValuation.length > evbyebitdaColumns.length) {
+                            if (!isValuationOnRecoPage && headerColumnsValuation.length != evbyebitdaColumns.length && headerColumnsValuation.length > evbyebitdaColumns.length) {
                                 y0EVBYEBITDA = evbyebitdaColumns[y0Column - (headerColumnsValuation.length - evbyebitdaColumns.length)].replace("nmf", "").replace("nm", "");
                             } else {
                                 y0EVBYEBITDA = evbyebitdaColumns[y0Column].replace("nmf", "").replace("nm", "");
@@ -1389,7 +1345,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                 y0EVBYEBITDA = "-" + y0EVBYEBITDA.replace("(", "").replace(")", "");
 
                             y0EVBYEBITDANumber = Double.parseDouble(y0EVBYEBITDA);
-                            if(!isPriceToBookValue) {
+                            if(!isFinancialReport) {
                                 if (y0EBITDANumber != null && y0DepreciationNumber != null) {
                                     if (y0EBITDANumber.doubleValue() > 0 && Math.abs(y0DepreciationNumber.doubleValue()) > 0 && y0EVBYEBITDANumber > 0) {
                                         y0EVBYEBITNumber = (y0EVBYEBITDANumber * y0EBITDANumber.doubleValue()) / (y0EBITDANumber.doubleValue() - Math.abs(y0DepreciationNumber.doubleValue()));
@@ -1406,13 +1362,13 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                 reportParameters.setY0EVBYEBIT(new BigDecimal(y0EVBYEBITDANumber).setScale(2, RoundingMode.HALF_UP));
                             }
                         } catch (Exception e) {
-                            System.out.println("########## Y0 Column Index not found Setting Y0 RoCE/RoE = 0 for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+                            System.out.println("########## Y0 Column Index not found Setting Y0 EV/EBITDA = 0 for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
                             reportParameters.setY0EVBYEBIT(new BigDecimal("0"));
                         }
                     }
                     if (y1Column >= 0) {
                         try {
-                            if (!isValuationOnFirstPage && headerColumnsValuation.length != evbyebitdaColumns.length && headerColumnsValuation.length > evbyebitdaColumns.length) {
+                            if (!isValuationOnRecoPage && headerColumnsValuation.length != evbyebitdaColumns.length && headerColumnsValuation.length > evbyebitdaColumns.length) {
                                 y1EVBYEBITDA = evbyebitdaColumns[y1Column - (headerColumnsValuation.length - evbyebitdaColumns.length)].replace("nmf", "").replace("nm", "");
                             } else {
                                 y1EVBYEBITDA = evbyebitdaColumns[y1Column].replace("nmf", "").replace("nm", "");
@@ -1423,7 +1379,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                 y1EVBYEBITDA = "-" + y1EVBYEBITDA.replace("(", "").replace(")", "");
 
                             y1EVBYEBITDANumber = Double.parseDouble(y1EVBYEBITDA);
-                            if(!isPriceToBookValue) {
+                            if(!isFinancialReport) {
                                 if (y1EBITDANumber != null && y1DepreciationNumber != null) {
                                     if (y1EBITDANumber.doubleValue() > 0 && Math.abs(y1DepreciationNumber.doubleValue()) > 0 && y1EVBYEBITDANumber > 0) {
                                         y1EVBYEBITNumber = (y1EVBYEBITDANumber * y1EBITDANumber.doubleValue()) / (y1EBITDANumber.doubleValue() - Math.abs(y1DepreciationNumber.doubleValue()));
@@ -1440,13 +1396,13 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                 reportParameters.setY1EVBYEBIT(new BigDecimal(y1EVBYEBITDANumber).setScale(2, RoundingMode.HALF_UP));
                             }
                         } catch (Exception e) {
-                            System.out.println("########## Y1 Column Index not found Setting Y1 RoCE/RoE = 0 for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+                            System.out.println("########## Y1 Column Index not found Setting Y1 EV/EBITDA = 0 for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
                             reportParameters.setY1EVBYEBIT(new BigDecimal("0"));
                         }
                     }
                     if (y2Column >= 0) {
                         try {
-                            if (!isValuationOnFirstPage && headerColumnsValuation.length != evbyebitdaColumns.length && headerColumnsValuation.length > evbyebitdaColumns.length) {
+                            if (!isValuationOnRecoPage && headerColumnsValuation.length != evbyebitdaColumns.length && headerColumnsValuation.length > evbyebitdaColumns.length) {
                                 y2EVBYEBITDA = evbyebitdaColumns[y2Column - (headerColumnsValuation.length - evbyebitdaColumns.length)].replace("nmf", "").replace("nm", "");
                             } else {
                                 y2EVBYEBITDA = evbyebitdaColumns[y2Column].replace("nmf", "").replace("nm", "");
@@ -1457,7 +1413,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                 y2EVBYEBITDA = "-" + y2EVBYEBITDA.replace("(", "").replace(")", "");
 
                             y2EVBYEBITDANumber = Double.parseDouble(y2EVBYEBITDA);
-                            if(!isPriceToBookValue) {
+                            if(!isFinancialReport) {
                                 if (y2EBITDANumber != null && y2DepreciationNumber != null) {
                                     if (y2EBITDANumber.doubleValue() > 0 && Math.abs(y2DepreciationNumber.doubleValue()) > 0 && y2EVBYEBITDANumber > 0) {
                                         y2EVBYEBITNumber = (y2EVBYEBITDANumber * y2EBITDANumber.doubleValue()) / (y2EBITDANumber.doubleValue() - Math.abs(y2DepreciationNumber.doubleValue()));
@@ -1474,7 +1430,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                 reportParameters.setY2EVBYEBIT(new BigDecimal(y2EVBYEBITDANumber).setScale(2, RoundingMode.HALF_UP));
                             }
                         } catch (Exception e) {
-                            System.out.println("########## Y2 Column Index not found Setting y2 RoCE/RoE = 0 for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+                            System.out.println("########## Y2 Column Index not found Setting y2 EV/EBITDA = 0 for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
                             reportParameters.setY2EVBYEBIT(new BigDecimal("0"));
                         }
                     }
@@ -1501,75 +1457,38 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         String y0AUM = "", y1AUM = "", y2AUM = "";
         double y0AUMNumber = 0, y1AUMNumber = 0, y2AUMNumber = 0;
         String MILLIONS_OR_BILLIONS_FLAG_OLD = MILLIONS_OR_BILLIONS_FLAG;
-        boolean isAUMOnRatioPage = false;
+
         try {
             // Get AUM Line No. form the Inc. Statement Page
-            aumLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, 0, AUM_ROW_NAME, rdec, BROKER);
-            if (aumLineNo < 0) {
-                aumLineNo = getLineNumberForMatchingPattern(linesRatio, 0, AUM_ROW_NAME, rdec, BROKER);
-                isAUMOnRatioPage = true;
-            }
+            aumLineNo = getLineNumberForMatchingPattern(linesAUM, 0, AUM_ROW_NAME, rdec, BROKER);
 
             if (aumLineNo > 1) {
-                if(!isAUMOnRatioPage)
-                    aum = linesIncomeStmt[aumLineNo];
-                else
-                    aum = linesRatio[aumLineNo];
-
+                aum = linesAUM[aumLineNo];
                 aumColumns = getDataColumnsForHeader(aum, AUM_ROW_NAME);
 
-                if(!isAUMOnRatioPage) {
-                    if (aumColumns != null && aumColumns.length != headerColumnsIncomeStmt.length && aumColumns.length == 0) {
-                        if (!linesIncomeStmt[aumLineNo - 1].trim().equals(""))
-                            aum = linesIncomeStmt[aumLineNo] + linesIncomeStmt[aumLineNo - 1];
-                        else if (!linesIncomeStmt[aumLineNo + 1].trim().equals(""))
-                            aum = linesIncomeStmt[aumLineNo] + linesIncomeStmt[aumLineNo + 1];
+                if (aumColumns != null && aumColumns.length != headerColumnsAUM.length && aumColumns.length == 0) {
+                    if (!linesAUM[aumLineNo - 1].trim().equals(""))
+                        aum = linesAUM[aumLineNo] + linesAUM[aumLineNo - 1];
+                    else if (!linesAUM[aumLineNo + 1].trim().equals(""))
+                        aum = linesAUM[aumLineNo] + linesAUM[aumLineNo + 1];
 
-                        aumColumns = getDataColumnsForHeader(aum, AUM_ROW_NAME);
-                    }
-                } else {
-                    if (aumColumns != null && aumColumns.length != headerColumnsRatio.length && aumColumns.length == 0) {
-                        if (!headerColumnsRatio[aumLineNo - 1].trim().equals(""))
-                            aum = headerColumnsRatio[aumLineNo] + headerColumnsRatio[aumLineNo - 1];
-                        else if (!headerColumnsRatio[aumLineNo + 1].trim().equals(""))
-                            aum = headerColumnsRatio[aumLineNo] + headerColumnsRatio[aumLineNo + 1];
-
-                        aumColumns = getDataColumnsForHeader(aum, AUM_ROW_NAME);
-                    }
+                    aumColumns = getDataColumnsForHeader(aum, AUM_ROW_NAME);
                 }
 
+                AUM_MILLIONS_OR_BILLIONS_FLAG = Pattern.compile(AUM_MILLIONS_OR_BILLIONS).matcher(pageContentAUM).find()? "B" : "M";
+                if (aum.contains("INR b"))
+                    AUM_MILLIONS_OR_BILLIONS_FLAG = "B";
+                if (aum.contains("INR m"))
+                    AUM_MILLIONS_OR_BILLIONS_FLAG = "M";
+
                 if(aumColumns != null && aumColumns.length != 0 ) {
-                    if((!isAUMOnRatioPage && aumColumns.length == headerColumnsIncomeStmt.length) || (isAUMOnRatioPage && aumColumns.length == headerColumnsRatio.length)) {
-
-                        if (aum.contains("INR b"))
-                            MILLIONS_OR_BILLIONS_FLAG = "B";
-                        if (aum.contains("INR m"))
-                            MILLIONS_OR_BILLIONS_FLAG = "M";
-
+                    if((aumColumns.length == headerColumnsAUM.length) || (aumColumns.length == headerColumnsAUM.length)) {
                         // Find Y0, Y1 and Y2 Index position
-                        if (!isAUMOnRatioPage) {
-                            if (y0ColumnNumberOnIncStmt != null && y1ColumnNumberOnIncStmt != null && y2ColumnNumberOnIncStmt != null) {
-                                y0Column = y0ColumnNumberOnIncStmt.intValue();
-                                y1Column = y1ColumnNumberOnIncStmt.intValue();
-                                y2Column = y2ColumnNumberOnIncStmt.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y2);
-                            }
-                        } else {
-                            if (y0ColumnNumberOnRatio != null && y1ColumnNumberOnRatio != null && y2ColumnNumberOnRatio != null) {
-                                y0Column = y0ColumnNumberOnRatio.intValue();
-                                y1Column = y1ColumnNumberOnRatio.intValue();
-                                y2Column = y2ColumnNumberOnRatio.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsRatio, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsRatio, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsRatio, Y2);
-                            }
-                        }
+                        y0Column = getIndexOfTheYear(headerColumnsAUM, Y0);
+                        y1Column = getIndexOfTheYear(headerColumnsAUM, Y1);
+                        y2Column = getIndexOfTheYear(headerColumnsAUM, Y2);
 
-                        System.out.print("Inc. Stmt. Header : Y0 Index " + y0Column);
+                        System.out.print("AUM Header : Y0 Index " + y0Column);
                         System.out.print(" Y1 Index " + y1Column);
                         System.out.print(" Y2 Index " + y2Column + "\n");
                         System.out.println("AUM Columns : " + Arrays.toString(aumColumns));
@@ -1577,10 +1496,10 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if (y0Column >= 0) {
                             try {
                                 y0AUM = aumColumns[y0Column];
-                                y0AUMNumber = Double.parseDouble(y0AUM.replace(",", ""));
-                                if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                y0AUMNumber = Double.parseDouble(y0AUM.replaceAll(",", ""));
+                                if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                     y0AUMNumber = y0AUMNumber / 10;
-                                } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
+                                } else if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
                                     y0AUMNumber = y0AUMNumber * 100;
                                 }
                                 reportParameters.setY0AUM(new BigDecimal(y0AUMNumber).setScale(2, RoundingMode.HALF_UP));
@@ -1595,10 +1514,10 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if (y1Column >= 0) {
                             try {
                                 y1AUM = aumColumns[y1Column];
-                                y1AUMNumber = Double.parseDouble(y1AUM.replace(",", ""));
-                                if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                y1AUMNumber = Double.parseDouble(y1AUM.replaceAll(",", ""));
+                                if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                     y1AUMNumber = y1AUMNumber / 10;
-                                } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
+                                } else if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
                                     y1AUMNumber = y1AUMNumber * 100;
                                 }
                                 reportParameters.setY1AUM(new BigDecimal(y1AUMNumber).setScale(2, RoundingMode.HALF_UP));
@@ -1613,10 +1532,10 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if (y2Column >= 0) {
                             try {
                                 y2AUM = aumColumns[y2Column];
-                                y2AUMNumber = Double.parseDouble(y2AUM.replace(",", ""));
-                                if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                y2AUMNumber = Double.parseDouble(y2AUM.replaceAll(",", ""));
+                                if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                     y2AUMNumber = y2AUMNumber / 10;
-                                } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
+                                } else if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
                                     y2AUMNumber = y2AUMNumber * 100;
                                 }
                                 reportParameters.setY2AUM(new BigDecimal(y2AUMNumber).setScale(2, RoundingMode.HALF_UP));
@@ -1629,48 +1548,19 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                             System.out.println("########## Y2 Column Index not found Setting Y2 AUM = 0 for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
                         }
                     } else {
-                        System.out.println("########## AUM Row Columns (" + aumColumns.length + ") and Header Row Columns ("+ headerColumnsIncomeStmt.length + ") are not same, so made the best judgement for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
-                        // Set million or billion flag
-                        if (aum.contains("INR b"))
-                            MILLIONS_OR_BILLIONS_FLAG = "B";
-                        if (aum.contains("INR m"))
-                            MILLIONS_OR_BILLIONS_FLAG = "M";
+                        System.out.println("########## AUM Row Columns (" + aumColumns.length + ") and Header Row Columns ("+ headerColumnsAUM.length + ") are not same, so made the best judgement for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
 
                         // Find Y0, Y1 and Y2 Index position
-                        if (!isAUMOnRatioPage) {
-                            if (y0ColumnNumberOnIncStmt != null && y1ColumnNumberOnIncStmt != null && y2ColumnNumberOnIncStmt != null) {
-                                y0Column = y0ColumnNumberOnIncStmt.intValue();
-                                y1Column = y1ColumnNumberOnIncStmt.intValue();
-                                y2Column = y2ColumnNumberOnIncStmt.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y2);
-                            }
-                        } else {
-                            if (y0ColumnNumberOnRatio != null && y1ColumnNumberOnRatio != null && y2ColumnNumberOnRatio != null) {
-                                y0Column = y0ColumnNumberOnRatio.intValue();
-                                y1Column = y1ColumnNumberOnRatio.intValue();
-                                y2Column = y2ColumnNumberOnRatio.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsRatio, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsRatio, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsRatio, Y2);
-                            }
-                        }
+                        y0Column = getIndexOfTheYear(headerColumnsAUM, Y0);
+                        y1Column = getIndexOfTheYear(headerColumnsAUM, Y1);
+                        y2Column = getIndexOfTheYear(headerColumnsAUM, Y2);
 
                         int adjustedY0Column = -1, adjustedY1Column = -1, adjustedY2Column = -1;
-                        if (!isAUMOnRatioPage) {
-                            adjustedY0Column = aumColumns.length - (headerColumnsIncomeStmt.length - y0Column);
-                            adjustedY1Column = aumColumns.length - (headerColumnsIncomeStmt.length - y0Column);
-                            adjustedY2Column = aumColumns.length - (headerColumnsIncomeStmt.length - y0Column);
-                        } else {
-                            adjustedY0Column = aumColumns.length - (headerColumnsRatio.length - y0Column);
-                            adjustedY1Column = aumColumns.length - (headerColumnsRatio.length - y0Column);
-                            adjustedY2Column = aumColumns.length - (headerColumnsRatio.length - y0Column);
-                        }
+                        adjustedY0Column = aumColumns.length - (headerColumnsAUM.length - y0Column);
+                        adjustedY1Column = aumColumns.length - (headerColumnsAUM.length - y1Column);
+                        adjustedY2Column = aumColumns.length - (headerColumnsAUM.length - y2Column);
 
-                        System.out.print("Inc. Stmt. Header : Y0 Index " + adjustedY0Column);
+                        System.out.print("AUM Header : Y0 Index " + adjustedY0Column);
                         System.out.print(" Y1 Index " + adjustedY1Column);
                         System.out.print(" Y2 Index " + adjustedY2Column + "\n");
                         System.out.println("AUM Columns : " + Arrays.toString(aumColumns));
@@ -1678,10 +1568,10 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if(adjustedY0Column >=0) {
                             try {
                                 y0AUM = aumColumns[adjustedY0Column];
-                                y0AUMNumber = Double.parseDouble(y0AUM.replace(",", ""));
-                                if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                y0AUMNumber = Double.parseDouble(y0AUM.replaceAll(",", ""));
+                                if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                     y0AUMNumber = y0AUMNumber / 10;
-                                } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
+                                } else if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
                                     y0AUMNumber = y0AUMNumber * 100;
                                 }
                                 reportParameters.setY0AUM(new BigDecimal(y0AUMNumber).setScale(2, RoundingMode.HALF_UP));
@@ -1696,10 +1586,10 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if(adjustedY1Column >= 0) {
                             try {
                                 y1AUM = aumColumns[adjustedY1Column];
-                                y1AUMNumber = Double.parseDouble(y1AUM.replace(",", ""));
-                                if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                y1AUMNumber = Double.parseDouble(y1AUM.replaceAll(",", ""));
+                                if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                     y1AUMNumber = y1AUMNumber / 10;
-                                } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
+                                } else if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
                                     y1AUMNumber = y1AUMNumber * 100;
                                 }
                                 reportParameters.setY1AUM(new BigDecimal(y1AUMNumber).setScale(2, RoundingMode.HALF_UP));
@@ -1714,10 +1604,10 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if(adjustedY2Column >= 0) {
                             try {
                                 y2AUM = aumColumns[adjustedY2Column];
-                                y2AUMNumber = Double.parseDouble(y2AUM.replace(",", ""));
-                                if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                y2AUMNumber = Double.parseDouble(y2AUM.replaceAll(",", ""));
+                                if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                     y2AUMNumber = y2AUMNumber / 10;
-                                } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
+                                } else if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
                                     y2AUMNumber = y2AUMNumber * 100;
                                 }
                                 reportParameters.setY2AUM(new BigDecimal(y2AUMNumber).setScale(2, RoundingMode.HALF_UP));
@@ -1759,70 +1649,32 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         String[] creditCostColumns = null;
         String y0CreditCost = "0", y1CreditCost = "0", y2CreditCost = "0";
         int y0Column = -1, y1Column = -1, y2Column = -1;
-        boolean isCreditCostOnIncStmt = false;
 
         try {
-            creditCostLineNo = getLineNumberForMatchingPattern(linesRatio, 0, CREDITCOSTS_ROW_NAME, rdec, BROKER);
-            if(creditCostLineNo < 0) {
-                creditCostLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, 0, CREDITCOSTS_ROW_NAME, rdec, BROKER);
-                isCreditCostOnIncStmt = true;
-            }
+            creditCostLineNo = getLineNumberForMatchingPattern(linesCreditCost, 0, CREDITCOSTS_ROW_NAME, rdec, BROKER);
 
             if (creditCostLineNo > 1) {
-                if(!isCreditCostOnIncStmt)
-                    creditCost = linesRatio[creditCostLineNo];
-                else
-                    creditCost = linesIncomeStmt[creditCostLineNo];
-
+                creditCost = linesCreditCost[creditCostLineNo].replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1");
                 creditCostColumns = getDataColumnsForHeader(creditCost, CREDITCOSTS_ROW_NAME);
 
-                if(!isCreditCostOnIncStmt) {
-                    if (creditCostColumns != null && creditCostColumns.length != headerColumnsRatio.length && creditCostColumns.length == 0) {
-                        if (!linesRatio[creditCostLineNo - 1].trim().equals(""))
-                            creditCost = linesRatio[creditCostLineNo] + linesRatio[creditCostLineNo - 1];
-                        else if (!linesRatio[creditCostLineNo + 1].trim().equals(""))
-                            creditCost = linesRatio[creditCostLineNo] + linesRatio[creditCostLineNo + 1];
+                if (creditCostColumns != null && creditCostColumns.length != headerColumnsCreditCosts.length && creditCostColumns.length == 0) {
+                    if (!linesCreditCost[creditCostLineNo - 1].trim().equals(""))
+                        creditCost = linesCreditCost[creditCostLineNo] + linesCreditCost[creditCostLineNo - 1];
+                    else if (!linesCreditCost[creditCostLineNo + 1].trim().equals(""))
+                        creditCost = linesCreditCost[creditCostLineNo] + linesCreditCost[creditCostLineNo + 1];
 
-                        creditCostColumns = getDataColumnsForHeader(creditCost, CREDITCOSTS_ROW_NAME);
-                    }
-                } else {
-                    if (creditCostColumns != null && creditCostColumns.length != headerColumnsIncomeStmt.length && creditCostColumns.length == 0) {
-                        if (!linesIncomeStmt[creditCostLineNo - 1].trim().equals(""))
-                            creditCost = linesIncomeStmt[creditCostLineNo] + linesIncomeStmt[creditCostLineNo - 1];
-                        else if (!linesIncomeStmt[creditCostLineNo + 1].trim().equals(""))
-                            creditCost = linesIncomeStmt[creditCostLineNo] + linesIncomeStmt[creditCostLineNo + 1];
-
-                        creditCostColumns = getDataColumnsForHeader(creditCost, CREDITCOSTS_ROW_NAME);
-                    }
+                    creditCostColumns = getDataColumnsForHeader(creditCost, CREDITCOSTS_ROW_NAME);
                 }
 
                 if(creditCostColumns!= null && creditCostColumns.length != 0) {
-                    if((!isCreditCostOnIncStmt && creditCostColumns.length == headerColumnsRatio.length) || (isCreditCostOnIncStmt && creditCostColumns.length == headerColumnsIncomeStmt.length)) {
+                    if(creditCostColumns.length == headerColumnsCreditCosts.length) {
 
                         // Find Y0, Y1 and Y2 Index position
-                        if(!isCreditCostOnIncStmt) {
-                            if (y0ColumnNumberOnRatio != null && y1ColumnNumberOnRatio != null && y2ColumnNumberOnRatio != null) {
-                                y0Column = y0ColumnNumberOnRatio.intValue();
-                                y1Column = y1ColumnNumberOnRatio.intValue();
-                                y2Column = y2ColumnNumberOnRatio.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsRatio, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsRatio, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsRatio, Y2);
-                            }
-                        } else {
-                            if (y0ColumnNumberOnIncStmt != null && y1ColumnNumberOnIncStmt != null && y2ColumnNumberOnIncStmt != null) {
-                                y0Column = y0ColumnNumberOnIncStmt.intValue();
-                                y1Column = y1ColumnNumberOnIncStmt.intValue();
-                                y2Column = y2ColumnNumberOnIncStmt.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y2);
-                            }
-                        }
+                        y0Column = getIndexOfTheYear(headerColumnsCreditCosts, Y0);
+                        y1Column = getIndexOfTheYear(headerColumnsCreditCosts, Y1);
+                        y2Column = getIndexOfTheYear(headerColumnsCreditCosts, Y2);
 
-                        System.out.print("Ratio Header : Y0 Index " + y0Column);
+                        System.out.print("Credit Cost Header : Y0 Index " + y0Column);
                         System.out.print(" Y1 Index " + y1Column);
                         System.out.print(" Y2 Index " + y2Column + "\n");
                         System.out.println("Credit Cost Line : " + Arrays.toString(creditCostColumns));
@@ -1864,41 +1716,19 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                             System.out.println("########## Y2 Column Index not found Setting Y2 Credit Cost = 0 for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
                         }
                     } else {
-                        System.out.println("########## Inc. Stmt Header column count (" + headerColumnsIncomeStmt.length + ") not matching with Credit Cost column count(" + creditCostColumns.length + "), used the best judgement for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+                        System.out.println("########## Credit Cost Header column count (" + headerColumnsCreditCosts.length + ") not matching with Credit Cost column count(" + creditCostColumns.length + "), used the best judgement for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
                         // Find Y0, Y1 and Y2 Index position
-                        if(!isCreditCostOnIncStmt) {
-                            if (y0ColumnNumberOnRatio != null && y1ColumnNumberOnRatio != null && y2ColumnNumberOnRatio != null) {
-                                y0Column = y0ColumnNumberOnRatio.intValue();
-                                y1Column = y1ColumnNumberOnRatio.intValue();
-                                y2Column = y2ColumnNumberOnRatio.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsRatio, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsRatio, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsRatio, Y2);
-                            }
-                        } else {
-                            if (y0ColumnNumberOnIncStmt != null && y1ColumnNumberOnIncStmt != null && y2ColumnNumberOnIncStmt != null) {
-                                y0Column = y0ColumnNumberOnIncStmt.intValue();
-                                y1Column = y1ColumnNumberOnIncStmt.intValue();
-                                y2Column = y2ColumnNumberOnIncStmt.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y2);
-                            }
-                        }
-                        int adjustedY0Column = -1, adjustedY1Column = -1, adjustedY2Column = -1;
-                        if(!isCreditCostOnIncStmt) {
-                            adjustedY0Column = creditCostColumns.length - (headerColumnsRatio.length - y0Column);
-                            adjustedY1Column = creditCostColumns.length - (headerColumnsRatio.length - y0Column);
-                            adjustedY2Column = creditCostColumns.length - (headerColumnsRatio.length - y0Column);
-                        } else {
-                            adjustedY0Column = creditCostColumns.length - (headerColumnsIncomeStmt.length - y0Column);
-                            adjustedY1Column = creditCostColumns.length - (headerColumnsIncomeStmt.length - y0Column);
-                            adjustedY2Column = creditCostColumns.length - (headerColumnsIncomeStmt.length - y0Column);
-                        }
+                        y0Column = getIndexOfTheYear(headerColumnsCreditCosts, Y0);
+                        y1Column = getIndexOfTheYear(headerColumnsCreditCosts, Y1);
+                        y2Column = getIndexOfTheYear(headerColumnsCreditCosts, Y2);
 
-                        System.out.print("Inc. Stmt. Header : Y0 Index " + adjustedY0Column);
+                        int adjustedY0Column = -1, adjustedY1Column = -1, adjustedY2Column = -1;
+
+                        adjustedY0Column = creditCostColumns.length - (headerColumnsCreditCosts.length - y0Column);
+                        adjustedY1Column = creditCostColumns.length - (headerColumnsCreditCosts.length - y1Column);
+                        adjustedY2Column = creditCostColumns.length - (headerColumnsCreditCosts.length - y2Column);
+
+                        System.out.print("Credit Cost Header : Y0 Index " + adjustedY0Column);
                         System.out.print(" Y1 Index " + adjustedY1Column);
                         System.out.print(" Y2 Index " + adjustedY2Column + "\n");
                         System.out.println("Credit Cost Columns : " + Arrays.toString(creditCostColumns));
@@ -1955,7 +1785,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             reportParameters.setY0CreditCost(new BigDecimal("0"));
             reportParameters.setY1CreditCost(new BigDecimal("0"));
             reportParameters.setY2CreditCost(new BigDecimal("0"));
-            System.out.println("E########## xception in setting Credit Cost for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+            System.out.println("E########## Exception in setting Credit Cost for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
         }
     }
 
@@ -1965,70 +1795,33 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         String[] gnpaColumns = null;
         String y0GNPA = "0", y1GNPA = "0", y2GNPA = "0";
         int y0Column = -1, y1Column = -1, y2Column = -1;
-        boolean isGNPAOnIncStmt = false;
 
         try {
-            gnpaLineNo = getLineNumberForMatchingPattern(linesRatio, 0, GNPA_ROW_NAME, rdec, BROKER);
-            if(gnpaLineNo < 0) {
-                gnpaLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, 0, GNPA_ROW_NAME, rdec, BROKER);
-                isGNPAOnIncStmt = true;
-            }
+            gnpaLineNo = getLineNumberForMatchingPattern(linesNPA, 0, GNPA_ROW_NAME, rdec, BROKER);
 
             if (gnpaLineNo > 1) {
-                if(!isGNPAOnIncStmt)
-                    gnpa = linesRatio[gnpaLineNo];
-                else
-                    gnpa = linesIncomeStmt[gnpaLineNo];
+                gnpa = linesNPA[gnpaLineNo];
 
                 gnpaColumns = getDataColumnsForHeader(gnpa, GNPA_ROW_NAME);
 
-                if(!isGNPAOnIncStmt) {
-                    if (gnpaColumns != null && gnpaColumns.length != headerColumnsRatio.length && gnpaColumns.length == 0) {
-                        if (!linesRatio[gnpaLineNo - 1].trim().equals(""))
-                            gnpa = linesRatio[gnpaLineNo] + linesRatio[gnpaLineNo - 1];
-                        else if (!linesRatio[gnpaLineNo + 1].trim().equals(""))
-                            gnpa = linesRatio[gnpaLineNo] + linesRatio[gnpaLineNo + 1];
+                if (gnpaColumns != null && gnpaColumns.length != headerColumnsNPA.length && gnpaColumns.length == 0) {
+                    if (!linesNPA[gnpaLineNo - 1].trim().equals(""))
+                        gnpa = linesNPA[gnpaLineNo] + linesNPA[gnpaLineNo - 1];
+                    else if (!linesNPA[gnpaLineNo + 1].trim().equals(""))
+                        gnpa = linesNPA[gnpaLineNo] + linesNPA[gnpaLineNo + 1];
 
-                        gnpaColumns = getDataColumnsForHeader(gnpa, GNPA_ROW_NAME);
-                    }
-                } else {
-                    if (gnpaColumns != null && gnpaColumns.length != headerColumnsIncomeStmt.length && gnpaColumns.length == 0) {
-                        if (!linesIncomeStmt[gnpaLineNo - 1].trim().equals(""))
-                            gnpa = linesIncomeStmt[gnpaLineNo] + linesIncomeStmt[gnpaLineNo - 1];
-                        else if (!linesIncomeStmt[gnpaLineNo + 1].trim().equals(""))
-                            gnpa = linesIncomeStmt[gnpaLineNo] + linesIncomeStmt[gnpaLineNo + 1];
-
-                        gnpaColumns = getDataColumnsForHeader(gnpa, GNPA_ROW_NAME);
-                    }
+                    gnpaColumns = getDataColumnsForHeader(gnpa, GNPA_ROW_NAME);
                 }
 
                 if(gnpaColumns!= null && gnpaColumns.length != 0) {
-                    if((!isGNPAOnIncStmt && gnpaColumns.length == headerColumnsRatio.length) || (isGNPAOnIncStmt && gnpaColumns.length == headerColumnsIncomeStmt.length)) {
+                    if(gnpaColumns.length == headerColumnsNPA.length) {
 
                         // Find Y0, Y1 and Y2 Index position
-                        if(!isGNPAOnIncStmt) {
-                            if (y0ColumnNumberOnRatio != null && y1ColumnNumberOnRatio != null && y2ColumnNumberOnRatio != null) {
-                                y0Column = y0ColumnNumberOnRatio.intValue();
-                                y1Column = y1ColumnNumberOnRatio.intValue();
-                                y2Column = y2ColumnNumberOnRatio.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsRatio, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsRatio, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsRatio, Y2);
-                            }
-                        } else {
-                            if (y0ColumnNumberOnIncStmt != null && y1ColumnNumberOnIncStmt != null && y2ColumnNumberOnIncStmt != null) {
-                                y0Column = y0ColumnNumberOnIncStmt.intValue();
-                                y1Column = y1ColumnNumberOnIncStmt.intValue();
-                                y2Column = y2ColumnNumberOnIncStmt.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y2);
-                            }
-                        }
+                        y0Column = getIndexOfTheYear(headerColumnsNPA, Y0);
+                        y1Column = getIndexOfTheYear(headerColumnsNPA, Y1);
+                        y2Column = getIndexOfTheYear(headerColumnsNPA, Y2);
 
-                        System.out.print("Ratio Header : Y0 Index " + y0Column);
+                        System.out.print("NPA Header : Y0 Index " + y0Column);
                         System.out.print(" Y1 Index " + y1Column);
                         System.out.print(" Y2 Index " + y2Column + "\n");
                         System.out.println("GNPA Line : " + Arrays.toString(gnpaColumns));
@@ -2070,41 +1863,19 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                             System.out.println("########## Y2 Column Index not found Setting Y2 GNPA = 0 for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
                         }
                     } else {
-                        System.out.println("Inc. Stmt Header column count (" + headerColumnsIncomeStmt.length + ") not matching with GNPA column count(" + gnpaColumns.length + "), used the best judgement for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+                        System.out.println("########## NPA Header column count (" + headerColumnsNPA.length + ") not matching with GNPA column count(" + gnpaColumns.length + "), used the best judgement for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
                         // Find Y0, Y1 and Y2 Index position
-                        if(!isGNPAOnIncStmt) {
-                            if (y0ColumnNumberOnRatio != null && y1ColumnNumberOnRatio != null && y2ColumnNumberOnRatio != null) {
-                                y0Column = y0ColumnNumberOnRatio.intValue();
-                                y1Column = y1ColumnNumberOnRatio.intValue();
-                                y2Column = y2ColumnNumberOnRatio.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsRatio, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsRatio, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsRatio, Y2);
-                            }
-                        } else {
-                            if (y0ColumnNumberOnIncStmt != null && y1ColumnNumberOnIncStmt != null && y2ColumnNumberOnIncStmt != null) {
-                                y0Column = y0ColumnNumberOnIncStmt.intValue();
-                                y1Column = y1ColumnNumberOnIncStmt.intValue();
-                                y2Column = y2ColumnNumberOnIncStmt.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y2);
-                            }
-                        }
-                        int adjustedY0Column = -1, adjustedY1Column = -1, adjustedY2Column = -1;
-                        if(!isGNPAOnIncStmt) {
-                            adjustedY0Column = gnpaColumns.length - (headerColumnsRatio.length - y0Column);
-                            adjustedY1Column = gnpaColumns.length - (headerColumnsRatio.length - y0Column);
-                            adjustedY2Column = gnpaColumns.length - (headerColumnsRatio.length - y0Column);
-                        } else {
-                            adjustedY0Column = gnpaColumns.length - (headerColumnsIncomeStmt.length - y0Column);
-                            adjustedY1Column = gnpaColumns.length - (headerColumnsIncomeStmt.length - y0Column);
-                            adjustedY2Column = gnpaColumns.length - (headerColumnsIncomeStmt.length - y0Column);
-                        }
+                        y0Column = getIndexOfTheYear(headerColumnsNPA, Y0);
+                        y1Column = getIndexOfTheYear(headerColumnsNPA, Y1);
+                        y2Column = getIndexOfTheYear(headerColumnsNPA, Y2);
 
-                        System.out.print("Inc. Stmt. Header : Y0 Index " + adjustedY0Column);
+                        int adjustedY0Column = -1, adjustedY1Column = -1, adjustedY2Column = -1;
+
+                        adjustedY0Column = gnpaColumns.length - (headerColumnsNPA.length - y0Column);
+                        adjustedY1Column = gnpaColumns.length - (headerColumnsNPA.length - y1Column);
+                        adjustedY2Column = gnpaColumns.length - (headerColumnsNPA.length - y2Column);
+
+                        System.out.print("NPA Header : Y0 Index " + adjustedY0Column);
                         System.out.print(" Y1 Index " + adjustedY1Column);
                         System.out.print(" Y2 Index " + adjustedY2Column + "\n");
                         System.out.println("GNPA Columns : " + Arrays.toString(gnpaColumns));
@@ -2171,70 +1942,33 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         String[] nnpaColumns = null;
         String y0NNPA = "0", y1NNPA = "0", y2NNPA = "0";
         int y0Column = -1, y1Column = -1, y2Column = -1;
-        boolean isNNPAOnIncStmt = false;
 
         try {
-            nnpaLineNo = getLineNumberForMatchingPattern(linesRatio, 0, NNPA_ROW_NAME, rdec, BROKER);
-            if(nnpaLineNo < 0) {
-                nnpaLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, 0, NNPA_ROW_NAME, rdec, BROKER);
-                isNNPAOnIncStmt = true;
-            }
+            nnpaLineNo = getLineNumberForMatchingPattern(linesNPA, 0, NNPA_ROW_NAME, rdec, BROKER);
 
             if (nnpaLineNo > 1) {
-                if(!isNNPAOnIncStmt)
-                    nnpa = linesRatio[nnpaLineNo];
-                else
-                    nnpa = linesIncomeStmt[nnpaLineNo];
+                nnpa = linesNPA[nnpaLineNo];
 
                 nnpaColumns = getDataColumnsForHeader(nnpa, NNPA_ROW_NAME);
 
-                if(!isNNPAOnIncStmt) {
-                    if (nnpaColumns != null && nnpaColumns.length != headerColumnsRatio.length && nnpaColumns.length == 0) {
-                        if (!linesRatio[nnpaLineNo - 1].trim().equals(""))
-                            nnpa = linesRatio[nnpaLineNo] + linesRatio[nnpaLineNo - 1];
-                        else if (!linesRatio[nnpaLineNo + 1].trim().equals(""))
-                            nnpa = linesRatio[nnpaLineNo] + linesRatio[nnpaLineNo + 1];
+                if (nnpaColumns != null && nnpaColumns.length != headerColumnsNPA.length && nnpaColumns.length == 0) {
+                    if (!linesNPA[nnpaLineNo - 1].trim().equals(""))
+                        nnpa = linesNPA[nnpaLineNo] + linesNPA[nnpaLineNo - 1];
+                    else if (!linesNPA[nnpaLineNo + 1].trim().equals(""))
+                        nnpa = linesNPA[nnpaLineNo] + linesNPA[nnpaLineNo + 1];
 
-                        nnpaColumns = getDataColumnsForHeader(nnpa, NNPA_ROW_NAME);
-                    }
-                } else {
-                    if (nnpaColumns != null && nnpaColumns.length != headerColumnsIncomeStmt.length && nnpaColumns.length == 0) {
-                        if (!linesIncomeStmt[nnpaLineNo - 1].trim().equals(""))
-                            nnpa = linesIncomeStmt[nnpaLineNo] + linesIncomeStmt[nnpaLineNo - 1];
-                        else if (!linesIncomeStmt[nnpaLineNo + 1].trim().equals(""))
-                            nnpa = linesIncomeStmt[nnpaLineNo] + linesIncomeStmt[nnpaLineNo + 1];
-
-                        nnpaColumns = getDataColumnsForHeader(nnpa, NNPA_ROW_NAME);
-                    }
+                    nnpaColumns = getDataColumnsForHeader(nnpa, NNPA_ROW_NAME);
                 }
 
                 if(nnpaColumns!= null && nnpaColumns.length != 0) {
-                    if((!isNNPAOnIncStmt && nnpaColumns.length == headerColumnsRatio.length) || (isNNPAOnIncStmt && nnpaColumns.length == headerColumnsIncomeStmt.length)) {
+                    if(nnpaColumns.length == headerColumnsNPA.length) {
 
                         // Find Y0, Y1 and Y2 Index position
-                        if(!isNNPAOnIncStmt) {
-                            if (y0ColumnNumberOnRatio != null && y1ColumnNumberOnRatio != null && y2ColumnNumberOnRatio != null) {
-                                y0Column = y0ColumnNumberOnRatio.intValue();
-                                y1Column = y1ColumnNumberOnRatio.intValue();
-                                y2Column = y2ColumnNumberOnRatio.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsRatio, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsRatio, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsRatio, Y2);
-                            }
-                        } else {
-                            if (y0ColumnNumberOnIncStmt != null && y1ColumnNumberOnIncStmt != null && y2ColumnNumberOnIncStmt != null) {
-                                y0Column = y0ColumnNumberOnIncStmt.intValue();
-                                y1Column = y1ColumnNumberOnIncStmt.intValue();
-                                y2Column = y2ColumnNumberOnIncStmt.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y2);
-                            }
-                        }
+                        y0Column = getIndexOfTheYear(headerColumnsNPA, Y0);
+                        y1Column = getIndexOfTheYear(headerColumnsNPA, Y1);
+                        y2Column = getIndexOfTheYear(headerColumnsNPA, Y2);
 
-                        System.out.print("Ratio Header : Y0 Index " + y0Column);
+                        System.out.print("NPA Header : Y0 Index " + y0Column);
                         System.out.print(" Y1 Index " + y1Column);
                         System.out.print(" Y2 Index " + y2Column + "\n");
                         System.out.println("NNPA Line : " + Arrays.toString(nnpaColumns));
@@ -2276,41 +2010,18 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                             System.out.println("########## Y2 Column Index not found Setting Y2 NNPA = 0 for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
                         }
                     } else {
-                        System.out.println("########## Inc. Stmt Header column count (" + headerColumnsIncomeStmt.length + ") not matching with NNPA column count(" + nnpaColumns.length + "), used the best judgement for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
+                        System.out.println("########## NPA Header column count (" + headerColumnsNPA.length + ") not matching with NNPA column count(" + nnpaColumns.length + "), used the best judgement for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
                         // Find Y0, Y1 and Y2 Index position
-                        if(!isNNPAOnIncStmt) {
-                            if (y0ColumnNumberOnRatio != null && y1ColumnNumberOnRatio != null && y2ColumnNumberOnRatio != null) {
-                                y0Column = y0ColumnNumberOnRatio.intValue();
-                                y1Column = y1ColumnNumberOnRatio.intValue();
-                                y2Column = y2ColumnNumberOnRatio.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsRatio, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsRatio, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsRatio, Y2);
-                            }
-                        } else {
-                            if (y0ColumnNumberOnIncStmt != null && y1ColumnNumberOnIncStmt != null && y2ColumnNumberOnIncStmt != null) {
-                                y0Column = y0ColumnNumberOnIncStmt.intValue();
-                                y1Column = y1ColumnNumberOnIncStmt.intValue();
-                                y2Column = y2ColumnNumberOnIncStmt.intValue();
-                            } else {
-                                y0Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y0);
-                                y1Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y1);
-                                y2Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y2);
-                            }
-                        }
-                        int adjustedY0Column = -1, adjustedY1Column = -1, adjustedY2Column = -1;
-                        if(!isNNPAOnIncStmt) {
-                            adjustedY0Column = nnpaColumns.length - (headerColumnsRatio.length - y0Column);
-                            adjustedY1Column = nnpaColumns.length - (headerColumnsRatio.length - y0Column);
-                            adjustedY2Column = nnpaColumns.length - (headerColumnsRatio.length - y0Column);
-                        } else {
-                            adjustedY0Column = nnpaColumns.length - (headerColumnsIncomeStmt.length - y0Column);
-                            adjustedY1Column = nnpaColumns.length - (headerColumnsIncomeStmt.length - y0Column);
-                            adjustedY2Column = nnpaColumns.length - (headerColumnsIncomeStmt.length - y0Column);
-                        }
+                        y0Column = getIndexOfTheYear(headerColumnsNPA, Y0);
+                        y1Column = getIndexOfTheYear(headerColumnsNPA, Y1);
+                        y2Column = getIndexOfTheYear(headerColumnsNPA, Y2);
 
-                        System.out.print("Inc. Stmt. Header : Y0 Index " + adjustedY0Column);
+                        int adjustedY0Column = -1, adjustedY1Column = -1, adjustedY2Column = -1;
+                        adjustedY0Column = nnpaColumns.length - (headerColumnsNPA.length - y0Column);
+                        adjustedY1Column = nnpaColumns.length - (headerColumnsNPA.length - y1Column);
+                        adjustedY2Column = nnpaColumns.length - (headerColumnsNPA.length - y2Column);
+
+                        System.out.print("NPA Header : Y0 Index " + adjustedY0Column);
                         System.out.print(" Y1 Index " + adjustedY1Column);
                         System.out.print(" Y2 Index " + adjustedY2Column + "\n");
                         System.out.println("NNPA Columns : " + Arrays.toString(nnpaColumns));

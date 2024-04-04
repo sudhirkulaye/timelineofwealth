@@ -24,8 +24,8 @@ public class TodoListPDF {
         // Get the current year
         int year = Year.now().getValue();
         // Check if the current year is 2023. If not, set the year to 2023
-        if (year != 2023) {
-            year = 2023;
+        if (year != 2024) {
+            year = 2024;
         }
 
         Map<LocalDate, List<String>> dailyTodoMap = getDailyToDoMap(year);

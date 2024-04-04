@@ -135,11 +135,30 @@ select * from stock_price_movement a where ticker = 'DMART';
 
 -- Query to find out market Cap & CMP at the time of Quarter Result
 select name, date, "~", round((market_cap/1000),3) MCap, " / ",  cmp from daily_data_s a 
-where a.date = (select min(date) from daily_data_s where date > '2022-01-27') and 
-name like 'CMS%' order by date desc;
+where a.date = (select min(date) from daily_data_s where date > '2022-11-13') and 
+name like 'GMM%' order by date desc;
 
 select a.name, date, "~", round(market_cap,-1) MCap, " / ",  round(cmp, 0) from daily_data_s a, stock_universe b
-where a.date = (select min(date) from daily_data_s where date > '2023-06-29') and a.name = b.ticker and b.ticker = 'SPICEJET' order by date desc;
+where a.date = (select min(date) from daily_data_s where date > '2023-11-08') and a.name = b.ticker and b.ticker = 'ELGIEQUIP' order by date desc;
+
+select 'INDEX', 
+ b.ticker, b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, b.latest_price, 0, 0, 
+ (return_1D / 100), (return_1W / 100), (return_2W / 100), (return_1M / 100), (return_2M / 100), (return_3M / 100), (return_6M / 100), (return_9M / 100), (return_YTD / 100), (return_1Y / 100), (up_52w_min / 100), (down_52w_max / 100), (return_2Y / 100), (return_3Y / 100), 
+ 1w_min, 1w_max, 2w_min, 2w_max, 1m_min, 1m_max, 2m_min, 2m_max, 3m_min, 3m_max, 6m_min, 6m_max
+from stock_universe b, subindustry c, stock_price_movement d
+where b.ticker in ('NIFTYBEES', 'JUNIORBEES', 'BANKBEES') and 
+b.subindustryid = c.subindustryid and 
+(b.is_bse500 = 1 or b.is_nse500 = 1) and
+b.ticker = d.ticker;
+
+SELECT 
+ IF(is_sensex = 1, 'SENSEX', IF(is_nifty50 = 1, 'NIFTY', IF(is_nse100 = 1 OR is_bse100 = 1, 'NSE-BSE100', IF(is_nse200 = 1 OR is_bse200 = 1, 'NSE-BSE200', 'NSE-BSE500')))) index1,
+ b.ticker, b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, a.cmp, a.market_cap, last_result_date,
+ (return_1D / 100), (return_1W / 100), (return_2W / 100), (return_1M / 100), (return_2M / 100), (return_3M / 100), (return_6M / 100), (return_9M / 100), (return_YTD / 100), (return_1Y / 100), (up_52w_min / 100), (down_52w_max / 100), (return_2Y / 100), (return_3Y / 100),
+ 1w_min, 1w_max, 2w_min, 2w_max, 1m_min, 1m_max, 2m_min, 2m_max, 3m_min, 3m_max, 6m_min, 6m_max
+FROM daily_data_s a, stock_universe b, subindustry c, stock_price_movement d
+WHERE a.date = (SELECT date_today FROM setup_dates) AND a.name = b.ticker AND b.subindustryid = c.subindustryid AND (b.is_bse500 = 1 OR b.is_nse500 = 1) AND b.ticker = d.ticker
+ORDER BY sector_name_display , industry_name_display , sub_industry_name_display , market_cap DESC;
 
 select ticker, latest_price from stock_universe a where (a.is_nse500 = 1 or a.is_bse500 = 1) order by marketcap desc;
 

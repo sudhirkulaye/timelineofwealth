@@ -17,6 +17,8 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
 
+import static com.timelineofwealth.service.CreateFolderStructureForIndustry.updateMCapAndPrice;
+
 public class UpdateQuarterlyExcels {
 
     private static final String OLD_FOLDER = "Old";
@@ -74,6 +76,8 @@ public class UpdateQuarterlyExcels {
                 changeDataSheet(oldFileRenamed, newFile);
             }
         }
+        CreateFolderStructureForIndustry.updateMCapAndPrice();
+        ConsolidatedResultTracker.updateResultTrackerExcel();
     }
 
     private static File renameAndMoveToOld(String destinationPath, String sourceFile) {
@@ -144,7 +148,7 @@ public class UpdateQuarterlyExcels {
                 String strData = "";
                 if (oldCol != 0) {
                     if(!isFirstColumnCopied) {
-                        for (int rownum = 51; rownum <= 219; rownum++) {
+                        for (int rownum = 3; rownum <= 219; rownum++) {
                             oldDatarow = oldWs.getRow(rownum);
                             if (oldDatarow != null) {
                                 oldDataCell = oldDatarow.getCell(0);
@@ -160,18 +164,25 @@ public class UpdateQuarterlyExcels {
                                 // Get the comment from the old sheet cell
                                 Comment comment = oldDataCell.getCellComment();
                                 if(comment != null && comment.getString() != null && !comment.getString().toString().isEmpty()) {
-                                    // Create a drawing object in the destination sheet
-                                    XSSFDrawing drawing = ws.createDrawingPatriarch();
-                                    // Create a comment object using the drawing object
-                                    XSSFComment newComment = drawing.createCellComment(drawing.createAnchor(0, 0, 0, 0, 4, 2, 6, 5));
-                                    // Set the comment text
-                                    newComment.setString(comment.getString());
-                                    // Set the author of the comment
-                                    newComment.setAuthor(comment.getAuthor());
-                                    // Set the cell reference of the comment
-                                    newComment.setAddress(ws.getRow(rownum).getCell(0).getAddress());
-                                    // Set the comment to the destination sheet cell
-                                    ws.getRow(rownum).getCell(0).setCellComment(newComment);
+                                    try {
+                                        // Create a drawing object in the destination sheet
+                                        XSSFDrawing drawing = ws.createDrawingPatriarch();
+                                        // Create a single anchor outside the loop
+                                        XSSFClientAnchor anchor = drawing.createAnchor(0, 0, 0, 0, 4, 2, 6, 5);
+                                        // Create a comment object using the drawing object
+                                        XSSFComment newComment = drawing.createCellComment(anchor);
+                                        // Set the comment text
+                                        newComment.setString(comment.getString());
+                                        // Set the author of the comment
+                                        newComment.setAuthor(comment.getAuthor());
+                                        // Set the cell reference of the comment
+                                        newComment.setAddress(ws.getRow(rownum).getCell(0).getAddress());
+                                        // Set the comment to the destination sheet cell
+                                        ws.getRow(rownum).getCell(0).setCellComment(newComment);
+                                    } catch (Exception e) {
+                                        System.out.println("Exception in copying comment... Please check.");
+                                        e.printStackTrace();
+                                    }
                                 }
                             }
                         }
@@ -371,23 +382,30 @@ public class UpdateQuarterlyExcels {
                                     ws.getRow(rownum).getCell(0).setCellStyle(newCellStyle);
 
                                     // Get the comment from the old sheet cell
-                                    /*Comment comment = oldDataCell.getCellComment();
+                                    Comment comment = oldDataCell.getCellComment();
                                     if(comment != null && comment.getString() != null && !comment.getString().toString().isEmpty()) {
-                                        // Create a drawing object in the destination sheet
-                                        XSSFDrawing drawing = ws.createDrawingPatriarch();
-                                        // Create a comment object using the drawing object
-                                        XSSFComment newComment = drawing.createCellComment(drawing.createAnchor(0, 0, 0, 0, 4, 2, 6, 5));
-                                        // Set the comment text
-                                        newComment.setString(comment.getString());
-                                        // Set the author of the comment
-                                        newComment.setAuthor(comment.getAuthor());
-                                        // Set the cell reference of the comment
-                                        if (ws.getRow(rownum).getCell(0).getAddress() != null) {
-                                            newComment.setAddress(ws.getRow(rownum).getCell(0).getAddress());
-                                            // Set the comment to the destination sheet cell
-                                            ws.getRow(rownum).getCell(0).setCellComment(newComment);
+                                        try {
+                                            // Create a drawing object in the destination sheet
+                                            XSSFDrawing drawing = ws.createDrawingPatriarch();
+                                            // Create a single anchor outside the loop
+                                            XSSFClientAnchor anchor = drawing.createAnchor(0, 0, 0, 0, 4, 2, 6, 5);
+                                            // Create a comment object using the drawing object
+                                            XSSFComment newComment = drawing.createCellComment(anchor);
+                                            // Set the comment text
+                                            newComment.setString(comment.getString());
+                                            // Set the author of the comment
+                                            newComment.setAuthor(comment.getAuthor());
+                                            // Set the cell reference of the comment
+                                            if (ws.getRow(rownum) != null && ws.getRow(rownum).getCell(0) != null && ws.getRow(rownum).getCell(0).getAddress() != null) {
+                                                newComment.setAddress(ws.getRow(rownum).getCell(0).getAddress());
+                                                // Set the comment to the destination sheet cell
+                                                ws.getRow(rownum).getCell(0).setCellComment(newComment);
+                                            }
+                                        } catch (Exception e){
+                                            System.out.println("Exception in copying comment... Please check.");
+                                            e.printStackTrace();
                                         }
-                                    }*/
+                                    }
                                 }
                             }
                         }
@@ -586,7 +604,7 @@ public class UpdateQuarterlyExcels {
                     double data = 0.0;
                     String strData = "";
                     if (!isFirstColumnCopied) {
-                        for (int rownum = 102; rownum <= oldWs.getLastRowNum(); rownum++) {
+                        for (int rownum = 3; rownum <= oldWs.getLastRowNum(); rownum++) {
                             oldDatarow = oldWs.getRow(rownum);
                             if (oldDatarow != null) {
                                 oldDataCell = oldDatarow.getCell(0);
@@ -606,12 +624,15 @@ public class UpdateQuarterlyExcels {
                                     ws.getRow(rownum).getCell(0).setCellStyle(newCellStyle);
 
                                     // Get the comment from the old sheet cell
-                                        Comment comment = oldDataCell.getCellComment();
-                                        if(comment != null && comment.getString() != null && !comment.getString().toString().isEmpty()) {
+                                    Comment comment = oldDataCell.getCellComment();
+                                    if(comment != null && comment.getString() != null && !comment.getString().toString().isEmpty()) {
+                                        try {
                                             // Create a drawing object in the destination sheet
                                             XSSFDrawing drawing = ws.createDrawingPatriarch();
+                                            // Create a single anchor outside the loop
+                                            XSSFClientAnchor anchor = drawing.createAnchor(0, 0, 0, 0, 4, 2, 6, 5);
                                             // Create a comment object using the drawing object
-                                            XSSFComment newComment = drawing.createCellComment(drawing.createAnchor(0, 0, 0, 0, 4, 2, 6, 5));
+                                            XSSFComment newComment = drawing.createCellComment(anchor);
                                             // Set the comment text
                                             newComment.setString(comment.getString());
                                             // Set the author of the comment
@@ -620,7 +641,11 @@ public class UpdateQuarterlyExcels {
                                             newComment.setAddress(ws.getRow(rownum).getCell(0).getAddress());
                                             // Set the comment to the destination sheet cell
                                             ws.getRow(rownum).getCell(0).setCellComment(newComment);
+                                        } catch (Exception e){
+                                            System.out.println("Exception in copying comment... Please check.");
+                                            e.printStackTrace();
                                         }
+                                    }
                                 }
                             }
                         }
@@ -771,21 +796,28 @@ public class UpdateQuarterlyExcels {
                             ws.getRow(rownum).getCell(0).setCellStyle(newCellStyle);
 
                             // Get the comment from the old sheet cell
-                            /*Comment comment = oldDataCell.getCellComment();
+                            Comment comment = oldDataCell.getCellComment();
                             if(comment != null && comment.getString() != null && !comment.getString().toString().isEmpty()) {
-                                // Create a drawing object in the destination sheet
-                                XSSFDrawing drawing = ws.createDrawingPatriarch();
-                                // Create a comment object using the drawing object
-                                XSSFComment newComment = drawing.createCellComment(drawing.createAnchor(0, 0, 0, 0, 4, 2, 6, 5));
-                                // Set the comment text
-                                newComment.setString(comment.getString());
-                                // Set the author of the comment
-                                newComment.setAuthor(comment.getAuthor());
-                                // Set the cell reference of the comment
-                                newComment.setAddress(ws.getRow(rownum).getCell(0).getAddress());
-                                // Set the comment to the destination sheet cell
-                                ws.getRow(rownum).getCell(0).setCellComment(newComment);
-                            }*/
+                                try {
+                                    // Create a drawing object in the destination sheet
+                                    XSSFDrawing drawing = ws.createDrawingPatriarch();
+                                    // Create a single anchor outside the loop
+                                    XSSFClientAnchor anchor = drawing.createAnchor(0, 0, 0, 0, 4, 2, 6, 5);
+                                    // Create a comment object using the drawing object
+                                    XSSFComment newComment = drawing.createCellComment(anchor);
+                                    // Set the comment text
+                                    newComment.setString(comment.getString());
+                                    // Set the author of the comment
+                                    newComment.setAuthor(comment.getAuthor());
+                                    // Set the cell reference of the comment
+                                    newComment.setAddress(ws.getRow(rownum).getCell(0).getAddress());
+                                    // Set the comment to the destination sheet cell
+                                    ws.getRow(rownum).getCell(0).setCellComment(newComment);
+                                } catch (Exception e){
+                                    System.out.println("Exception in copying comment... Please check.");
+                                    e.printStackTrace();
+                                }
+                            }
                         }
                         isFirstColumnCopied = true;
                     }
@@ -954,21 +986,30 @@ public class UpdateQuarterlyExcels {
                                     ws.getRow(rownum).getCell(0).setCellStyle(newCellStyle);
 
                                     // Get the comment from the old sheet cell
-                                       /* Comment comment = oldDataCell.getCellComment();
-                                        if(comment != null && comment.getString() != null && !comment.getString().toString().isEmpty()) {
+                                    Comment comment = oldDataCell.getCellComment();
+                                    if(comment != null && comment.getString() != null && !comment.getString().toString().isEmpty()) {
+                                        try {
                                             // Create a drawing object in the destination sheet
                                             XSSFDrawing drawing = ws.createDrawingPatriarch();
+                                            // Create a single anchor outside the loop
+                                            XSSFClientAnchor anchor = drawing.createAnchor(0, 0, 0, 0, 4, 2, 6, 5);
                                             // Create a comment object using the drawing object
-                                            XSSFComment newComment = drawing.createCellComment(drawing.createAnchor(0, 0, 0, 0, 4, 2, 6, 5));
+                                            XSSFComment newComment = drawing.createCellComment(anchor);
                                             // Set the comment text
                                             newComment.setString(comment.getString());
                                             // Set the author of the comment
                                             newComment.setAuthor(comment.getAuthor());
                                             // Set the cell reference of the comment
-                                            newComment.setAddress(ws.getRow(rownum).getCell(0).getAddress());
-                                            // Set the comment to the destination sheet cell
-                                            ws.getRow(rownum).getCell(0).setCellComment(newComment);
-                                        }*/
+                                            if (ws.getRow(rownum) != null && ws.getRow(rownum).getCell(0) != null && ws.getRow(rownum).getCell(0).getAddress() != null) {
+                                                newComment.setAddress(ws.getRow(rownum).getCell(0).getAddress());
+                                                // Set the comment to the destination sheet cell
+                                                ws.getRow(rownum).getCell(0).setCellComment(newComment);
+                                            }
+                                        } catch (Exception e) {
+                                            System.out.println("Exception in copying comment... Please check.");
+                                            e.printStackTrace();
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1200,7 +1241,7 @@ public class UpdateQuarterlyExcels {
 
             //Copy Header from the old file
             XSSFRow newHeaderRow = ws.getRow(0);
-            XSSFRow oldHeaderRow = ws.getRow(0);
+            XSSFRow oldHeaderRow = oldWs.getRow(0);
             if (newHeaderRow.getLastCellNum() == oldHeaderRow.getLastCellNum()) {
                 for (int i = 0; i <= newHeaderRow.getLastCellNum(); i++) {
                     XSSFCell oldCell = oldHeaderRow.getCell(i);
@@ -1208,6 +1249,7 @@ public class UpdateQuarterlyExcels {
                     if (oldCell!= null) {
                         if(newCell == null)
                             newHeaderRow.createCell(i);
+                        newCell = newHeaderRow.getCell(i);
                         newCell.setCellValue(oldCell.getStringCellValue());
                     }
                 }

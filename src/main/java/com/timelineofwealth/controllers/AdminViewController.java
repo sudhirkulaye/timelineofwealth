@@ -567,7 +567,6 @@ public class AdminViewController {
                 dailyDataS.setKey(new DailyDataS.DailyDataSKey());
                 dailyDataS.getKey().setDate(date); // set as date
                 dailyDataS.setRank(i);
-
                 if(row.getCell(2).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(2).getCellType() == Cell.CELL_TYPE_STRING && !row.getCell(2).getStringCellValue().trim().isEmpty())
                     dailyDataS.getKey().setName((String) row.getCell(2).getStringCellValue());
                 else if (row.getCell(1).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(1).getCellType() == Cell.CELL_TYPE_STRING)
@@ -1021,6 +1020,7 @@ public class AdminViewController {
                     sqlDate = (java.sql.Date) object[1];
                 }
                 if (sqlDate != null) {
+                    downloadEODFiles.setIndexValuationRepository(indexValuationRepository);
                     returnvalue = downloadEODFiles.downloadAndSaveNSEIndexData(sqlDate);
                     if (returnvalue < 0) {
                         System.out.println("Failed to upload NSE Index Data successfully.");
@@ -1477,6 +1477,16 @@ public class AdminViewController {
                 IndexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 3);
                 IndexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 5);
                 IndexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 10);
+
+                Date maxNiftyDate, maxBSEMidCapDate, maxBSESmallCapDate;
+                maxNiftyDate = indexValuationRepository.findMaxKeyDateForKeyTicker("NIFTY");
+                maxBSEMidCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("BSEMidCap");
+                maxBSESmallCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("BSESmallCap");
+
+                IndexService.setDateLastUpdatedForIndexStats("NIFTY", maxNiftyDate);
+                IndexService.setDateLastUpdatedForIndexStats("BSEMidCap", maxBSEMidCapDate);
+                IndexService.setDateLastUpdatedForIndexStats("BSESmallCap", maxBSESmallCapDate);
+
 
             } catch (Exception e) {
                 model.addAttribute("message", "Failed to compute index statistics.");

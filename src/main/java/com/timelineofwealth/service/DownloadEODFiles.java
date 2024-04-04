@@ -1033,8 +1033,8 @@ public class DownloadEODFiles {
 
             // Create a custom RequestConfig with a timeout of 60 seconds (60000 milliseconds)
             RequestConfig requestConfig = RequestConfig.custom()
-                    .setSocketTimeout(60000) // Socket timeout (data retrieval)
-                    .setConnectTimeout(60000) // Connection timeout (establishing a connection)
+                    .setSocketTimeout(180000) // Socket timeout (data retrieval)
+                    .setConnectTimeout(180000) // Connection timeout (establishing a connection)
                     .build();
 
             // Create a CloseableHttpClient with the custom RequestConfig
@@ -1048,11 +1048,14 @@ public class DownloadEODFiles {
 
             try {
                 // Execute the HTTP request
+                System.out.println("Before executing URL "+ url);
                 CloseableHttpResponse response = httpClient.execute(httpGet);
+                System.out.println("Captured response of URL.");
 
                 // Check if the response status code is 200 (OK)
                 if (response.getStatusLine().getStatusCode() == 200) {
                     //Save the file
+                    System.out.println("Captured response is 200.");
                     byte[] content = EntityUtils.toByteArray(response.getEntity());
 
                     // Construct the full download path
@@ -1128,8 +1131,9 @@ public class DownloadEODFiles {
                 // Ensure the response is closed to release resources
                 response.close();
             } catch (Exception e) {
+                e.printStackTrace();
                 // Handle any exceptions, such as timeouts
-                System.out.println("Time out occurred while to download NSE Index Data file.");
+                System.out.println("Time out occurred while to download NSE Index Data file. " + e.getMessage());
                 return -1;
             } finally {
                 // Close the HttpClient to release resources

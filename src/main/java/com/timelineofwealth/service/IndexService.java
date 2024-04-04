@@ -426,6 +426,14 @@ public class IndexService {
         }
     }
 
+    public static void setDateLastUpdatedForIndexStats(String ticker, Date date){
+        List<IndexStatistics> existingRecords = indexStatisticsRepository.findOneByTicker(ticker);
+        if (existingRecords != null && !existingRecords.isEmpty()) {
+            existingRecords.get(0).setLastUpdated(date);
+            indexStatisticsRepository.save(existingRecords.get(0));
+        }
+    }
+
     private static void saveIndexStatisticsForPeriod(String ticker, IndexStatistics statistics, int period) {
         // Save the statistics entity to the index_statistics table
         // You can implement this method based on your data access logic.

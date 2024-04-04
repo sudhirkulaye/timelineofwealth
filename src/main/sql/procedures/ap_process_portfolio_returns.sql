@@ -2345,7 +2345,7 @@ BEGIN
       AND b.returns_year = var_curr_year;
 
       UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b, portfolio c
-      SET    returns_twrr_two_year = ((returns_twrr_ytd + 1)*(returns_twrr_one_year + 1)) - 1
+      SET    returns_twrr_two_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1
       WHERE  a.memberid = b.memberid AND b.memberid = c.memberid
       AND a.portfolioid = b.portfolioid AND b.portfolioid = c.portfolioid
       AND c.status = 'Active'
