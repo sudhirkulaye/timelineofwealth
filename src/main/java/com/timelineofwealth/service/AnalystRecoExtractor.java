@@ -12,9 +12,10 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
+import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -30,14 +31,142 @@ public class AnalystRecoExtractor {
     private String kotakAanalystNames = "";
     private String[] brokers = {"MOSL", "AMBIT", "AXIS","ICICIDIRECT", "PL", "KOTAK"};
 
+    protected String QUARTER;
+    protected String RECO_PAGE;
+    protected String CMP;
+    protected String TP;
+    protected String MCAP;
+    protected String CMPPATTERN;
+    protected String TPPATTERN;
+    protected String MCAPPATTERN;
+    protected String RATINGPATTERN;
+
+    protected String INCOME_STATEMENT_PAGE;
+    protected String MILLIONS_OR_BILLIONS_FLAG;
+    protected String MILLIONS_OR_BILLIONS;
+    protected String HEADER_ROW_NAME;
+    protected String REVENUE_ROW_NAME;
+    protected String EBITDA_ROW_NAME;
+    protected String DEPRECIATION_ROW_NAME;
+
+    protected String MARGIN_PAGE;
+    protected String MARGIN_HEADER_ROW_NAME;
+    protected String EBITDAMARGIN_ROW_NAME;
+
+    protected String RATIO_PAGE;
+    protected String RATIO_HEADER_ROW_NAME;
+    protected String ROCE_ROW_NAME;
+
+    protected String VALUATION_PAGE;
+    protected String VALUATION_HEADER_ROW_NAME;
+    protected String EVBYEBITDA_ROW_NAME;
+
+    protected String Y0;
+    protected String Y1;
+    protected String Y2;
+
+    protected String RESEARCHANALYST1;
+    protected String RESEARCHANALYST2;
+
+    protected String AUM_PAGE;
+    protected String AUM_HEADER_ROW_NAME;
+    protected String AUM_ROW_NAME;
+    protected String AUM_MILLIONS_OR_BILLIONS_FLAG;
+    protected String AUM_MILLIONS_OR_BILLIONS;
+
+    protected String CREDITCOSTS_PAGE;
+    protected String CREDITCOSTS_HEADER_ROW_NAME;
+    protected String CREDITCOSTS_ROW_NAME;
+
+    protected String NPA_PAGE;
+    protected String NPA_HEADER_ROW_NAME;
+    protected String GNPA_ROW_NAME;
+    protected String NNPA_ROW_NAME;
+
+    protected String pageContentReco = null;
+    protected String[] linesRecoPage = null;
+
+    protected String pageContentIncomeStmt = null;
+    protected String[] linesIncomeStmt = null;
+
+    protected String pageContentMargin = null;
+    protected String[] linesMargin = null;
+
+    protected String pageContentRatio = null;
+    protected String[] linesRatio = null;
+
+    protected String pageContentValuation = null;
+    protected String[] linesValuation = null;
+
+    protected String pageContentAUM = null;
+    protected String[] linesAUM = null;
+
+    protected String pageContentCreditCost = null;
+    protected String[] linesCreditCost = null;
+
+    protected String pageContentNPA = null;
+    protected String[] linesNPA = null;
+
+    protected String dateString = "";
+    protected BigDecimal mcap = new BigDecimal("0");
+    protected String cmp = "0";
+    protected String rating = "";
+    protected String targetPrice = "0";
+    protected String analystNames = "";
+
+    protected String headerRecoPage = "";
+    protected String[] headerColumnsRecoPage = null;
+    protected String headerIncomeStmt = "";
+    protected String[] headerColumnsIncomeStmt = null;
+    protected String headerMargin = "";
+    protected String[] headerColumnsMargin = null;
+    protected String headerRatio = "";
+    protected String[] headerColumnsRatio = null;
+    protected String headerValuation = "";
+    protected String[] headerColumnsValuation = null;
+    protected String headerAUM = "";
+    protected String[] headerColumnsAUM = null;
+    protected String headerCreditCosts = "";
+    protected String[] headerColumnsCreditCosts = null;
+    protected String headerNPA = "";
+    protected String[] headerColumnsNPA = null;
+
+
+    protected Integer headerRecoPageLineNumber = null;
+    protected Integer valuationPageNumber = null;
+    protected Integer headerFirstPageLineNumber = null;
+    protected Integer headerIncomeStmtLineNumber = null;
+    protected Integer headerMarginLineNumber = null;
+    protected Integer headerRatioLineNumber = null;
+    protected Integer headerValuationLineNumber = null;
+    protected Integer headerAUMLineNumber = null;
+    protected Integer headerCreditCostLineNumber = null;
+    protected Integer headerNPALineNumber = null;
+    protected Integer revenueLineNumber = null;
+    protected Integer ebitdaLineNumber = null;
+    protected Integer y0ColumnNumberOnIncStmt = null, y1ColumnNumberOnIncStmt = null, y2ColumnNumberOnIncStmt = null;
+    protected Integer y0ColumnNumberOnRatio = null, y1ColumnNumberOnRatio = null, y2ColumnNumberOnRatio = null;
+
+    protected BigDecimal y0EBITDANumber = null, y1EBITDANumber = null, y2EBITDANumber = null;
+    protected BigDecimal y0DepreciationNumber = null, y1DepreciationNumber = null, y2DepreciationNumber = null;
+
+    protected ReportParameters reportParameters = new ReportParameters();
+
+    protected PdfReader pdfReader = null;
+
     private Map<String, ReportDataExtractConfig> configMap = new HashMap<>();
 
     public static void main(String[] args) {
+        boolean isFinancialReport = false;
 
         try {
             // Load config file
             Properties prop = new Properties();
-            FileInputStream input = new FileInputStream("C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\reportconfig.properties");
+            String reportConfigFileVersion = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\reportconfig.properties";
+            // Define the output file path
+            String reportExtractFile = "";
+
+            FileInputStream input = new FileInputStream(reportConfigFileVersion);
             prop.load(input);
             input.close();
 
@@ -81,6 +210,11 @@ public class AnalystRecoExtractor {
                     Date dateLastModfied = new Date(file.lastModified());
 
                     file.getClass();
+                    if(reportFilePath.contains("Financials-"))
+                        isFinancialReport = true;
+                    else
+                        isFinancialReport = false;
+
 
                     // Load ReportDataConfig Parameters for the ticker
                     ReportDataExtractConfig reportDataExtractConfig = analystRecoExtractor.getReportDataExtractConfig(reportDataExtractConfigFilePath, quarter, ticker, brokerName);
@@ -90,11 +224,67 @@ public class AnalystRecoExtractor {
 
                     // Call getReportParameters
                     int currentFile = i + 1;
-                    System.out.println("\n\n ********** New File ********* \n\n");
+                    System.out.println("\n\n ********** New File ********* \n");
                     System.out.println("Begin Updating File No. " + currentFile + " --> " +quarter + "_" + ticker + "_" + brokerName);
-                    ReportParameters reportParameters = extractor.getReportParameters(reportFilePath, reportDataExtractConfig);
+                    ReportParameters reportParameters = extractor.getReportParameters(reportFilePath, reportDataExtractConfig, isFinancialReport);
                     // Call saveReportParameters
-                    extractor.saveReportParameters(reportParameters, excelFilePath);
+                    // Define the content to append
+                    String tickerValue = (ticker != null) ? ticker : "";
+                    String quarterValue = (quarter != null) ? quarter : "";
+                    String reportDateValue = (reportParameters.getReportDate() != null) ? reportParameters.getReportDate() : "";
+                    String mcapValue = (reportParameters.getMcap() != null) ? reportParameters.getMcap().toString()  : "";
+                    String priceValue = (reportParameters.getPrice() != null) ? reportParameters.getPrice().toString()  : "";
+                    String targetValue = (reportParameters.getTarget() != null) ? reportParameters.getTarget().toString()  : "";
+
+                    String contentToAppend = tickerValue + "\t" + quarterValue + "\t" + reportDateValue + "\t" +
+                            mcapValue + "\t" + priceValue + "\t" + "0.0\t" + brokerName + "\t" +
+                            reportParameters.getRating() + "\t" + targetValue + "\t0.0\t" +
+                            ((reportParameters.getY0Revenue() != null) ? reportParameters.getY0Revenue() : "") + "\t" +
+                            ((reportParameters.getY1Revenue() != null) ? reportParameters.getY1Revenue() : "") + "\t" +
+                            ((reportParameters.getY2Revenue() != null) ? reportParameters.getY2Revenue() : "") + "\t" +
+                            ((reportParameters.getRevenueChange() != null) ? reportParameters.getRevenueChange() : "") + "\t" +
+                            "=" + ((reportParameters.getY0EBIT() != null) ? reportParameters.getY0EBIT() : "") + "\t=" +
+                            ((reportParameters.getY1EBIT() != null) ? reportParameters.getY1EBIT() : "") + "\t=" +
+                            ((reportParameters.getY2EBIT() != null) ? reportParameters.getY2EBIT() : "") + "\t" +
+                            ((reportParameters.getEbitChange() != null) ? reportParameters.getEbitChange() : "") + "\t" +
+                            ((reportParameters.getY0OPM() != null) ? reportParameters.getY0OPM() : "") + "\t" +
+                            ((reportParameters.getY1OPM() != null) ? reportParameters.getY1OPM() : "") + "\t" +
+                            ((reportParameters.getY2OPM() != null) ? reportParameters.getY2OPM() : "") + "\t" +
+                            ((reportParameters.getY0ROCE() != null) ? reportParameters.getY0ROCE() : "") + "\t" +
+                            ((reportParameters.getY1ROCE() != null) ? reportParameters.getY1ROCE() : "") + "\t" +
+                            ((reportParameters.getY2ROCE() != null) ? reportParameters.getY2ROCE() : "") + "\t" +
+                            ((reportParameters.getY0EVBYEBIT() != null) ? reportParameters.getY0EVBYEBIT() : "") + "\t" +
+                            ((reportParameters.getY1EVBYEBIT() != null) ? reportParameters.getY1EVBYEBIT() : "") + "\t" +
+                            ((reportParameters.getY2EVBYEBIT() != null) ? reportParameters.getY2EVBYEBIT() : "") + "\t" +
+                            ((reportParameters.getY0AUM() != null) ? reportParameters.getY0AUM() : "") + "\t" +
+                            ((reportParameters.getY1AUM() != null) ? reportParameters.getY1AUM() : "") + "\t" +
+                            ((reportParameters.getY2AUM() != null) ? reportParameters.getY2AUM() : "") + "\t0.0\t" +
+                            ((reportParameters.getY0CreditCost() != null) ? reportParameters.getY0CreditCost() : "") + "\t" +
+                            ((reportParameters.getY1CreditCost() != null) ? reportParameters.getY1CreditCost() : "") + "\t" +
+                            ((reportParameters.getY2CreditCost() != null) ? reportParameters.getY2CreditCost() : "") + "\t" +
+                            ((reportParameters.getY0GNPA() != null) ? reportParameters.getY0GNPA() : "") + "\t" +
+                            ((reportParameters.getY1GNPA() != null) ? reportParameters.getY1GNPA() : "") + "\t" +
+                            ((reportParameters.getY2GNPA() != null) ? reportParameters.getY2GNPA() : "") + "\t" +
+                            ((reportParameters.getY0NNPA() != null) ? reportParameters.getY0NNPA() : "") + "\t" +
+                            ((reportParameters.getY1NNPA() != null) ? reportParameters.getY1NNPA() : "") + "\t" +
+                            ((reportParameters.getY2NNPA() != null) ? reportParameters.getY2NNPA() : "") + "\t" +
+                            ((reportParameters.getAnalystsNames() != null) ? reportParameters.getAnalystsNames() : "");
+
+                    System.out.println(contentToAppend);
+                    // Append content to file
+                    if(reportExtractFile.isEmpty()){
+                        Path path = Paths.get(excelFilePath);
+                        String basePath = path.getParent().toString();
+                        reportExtractFile = basePath + "\\ReportExtract.txt";
+                    }
+
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(reportExtractFile, true))) {
+                        writer.newLine(); // Start on a new line
+                        writer.write(contentToAppend);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+//                    extractor.saveReportParameters(reportParameters, excelFilePath);
                 }
             }
         } catch (Exception e) {
@@ -103,10 +293,66 @@ public class AnalystRecoExtractor {
         }
     }
 
-    protected ReportParameters getReportParameters(String reportFilePath, ReportDataExtractConfig reportDataExtractConfig) {
+    protected ReportParameters getReportParameters(String reportFilePath, ReportDataExtractConfig reportDataExtractConfig, boolean isFinancialReport) {
         return null;
     }
 
+    protected void setConstants(ReportDataExtractConfig rdec) {
+        QUARTER = rdec.getQUARTER();
+        RECO_PAGE = rdec.getRECO_PAGE();
+        CMP = rdec.getCMP();
+        TP = rdec.getTP();
+        MCAP = rdec.getMCAP();
+        CMPPATTERN = rdec.getCMPPATTERN();
+        TPPATTERN = rdec.getTPPATTERN();
+        MCAPPATTERN = rdec.getMCAPPATTERN();
+        RATINGPATTERN = rdec.getRATINGPATTERN();
+
+        INCOME_STATEMENT_PAGE = rdec.getINCOME_STATEMENT_PAGE();
+        MILLIONS_OR_BILLIONS = rdec.getMILLIONS_OR_BILLIONS();
+        MILLIONS_OR_BILLIONS_FLAG = "M";
+        HEADER_ROW_NAME = rdec.getHEADER_ROW_NAME();
+        REVENUE_ROW_NAME = rdec.getREVENUE_ROW_NAME();
+        EBITDA_ROW_NAME = rdec.getEBITDA_ROW_NAME();
+        DEPRECIATION_ROW_NAME = rdec.getDEPRECIATION_ROW_NAME();
+
+        MARGIN_PAGE = rdec.getMARGIN_PAGE();
+        MARGIN_HEADER_ROW_NAME = rdec.getMARGIN_HEADER_ROW_NAME();
+        EBITDAMARGIN_ROW_NAME = rdec.getEBITDAMARGIN_ROW_NAME();
+
+        RATIO_PAGE = rdec.getRATIO_PAGE();
+        RATIO_HEADER_ROW_NAME = rdec.getRATIO_HEADER_ROW_NAME();
+        ROCE_ROW_NAME = rdec.getROCE_ROW_NAME();
+
+        VALUATION_PAGE = rdec.getVALUATION_PAGE();
+        VALUATION_HEADER_ROW_NAME = rdec.getVALUATION_HEADER_ROW_NAME();
+        EVBYEBITDA_ROW_NAME = rdec.getEVBYEBITDA_ROW_NAME();
+
+        Y0 = rdec.getY0();
+        Y1 = rdec.getY1();
+        Y2 = rdec.getY2();
+
+        RESEARCHANALYST1 = rdec.getRESEARCHANALYST1();
+        RESEARCHANALYST2 = rdec.getRESEARCHANALYST2();
+
+        AUM_PAGE = rdec.getAUM_PAGE();
+        AUM_HEADER_ROW_NAME = rdec.getAUM_HEADER_ROW_NAME();
+        AUM_ROW_NAME = rdec.getAUM_ROW_NAME();
+        AUM_MILLIONS_OR_BILLIONS = rdec.getAUM_MILLIONS_OR_BILLIONS();
+        AUM_MILLIONS_OR_BILLIONS_FLAG = "M";
+
+        CREDITCOSTS_PAGE = rdec.getCREDITCOSTS_PAGE();
+        CREDITCOSTS_HEADER_ROW_NAME = rdec.getCREDITCOSTS_HEADER_ROW_NAME();
+        CREDITCOSTS_ROW_NAME = rdec.getCREDITCOSTS_ROW_NAME();
+
+        NPA_PAGE = rdec.getNPA_PAGE();
+        NPA_HEADER_ROW_NAME = rdec.getNPA_HEADER_ROW_NAME();
+        GNPA_ROW_NAME = rdec.getGNPA_ROW_NAME();
+        NNPA_ROW_NAME = rdec.getNNPA_ROW_NAME();
+
+        reportParameters.setQuarter(QUARTER);
+
+    }
 
     protected void saveReportParameters(ReportParameters reportParameters, String excelFileToBeUpdated) {
         try {
@@ -272,7 +518,6 @@ public class AnalystRecoExtractor {
         }
     }
 
-
     private void loadAnalystNames(String analystNamesFilePath){
         if (kotakAanalystNames.isEmpty() && moslAnalystNames.isEmpty() && ambitAnalystNames.isEmpty() && plAnalystNames.isEmpty()) {
             try {
@@ -356,29 +601,27 @@ public class AnalystRecoExtractor {
 
     private void loadReportDataExtractConfig(String reportDataExtractConfigFilePath){
         try {
+            // Open the new workbook
+            FileInputStream file = new FileInputStream(new File(reportDataExtractConfigFilePath));
+            XSSFWorkbook wb = new XSSFWorkbook(file);
+
             for (String broker : brokers){
                 ReportDataExtractConfig reportDataExtractConfig = null;
-                // Open the new workbook
-                FileInputStream file = new FileInputStream(new File(reportDataExtractConfigFilePath));
-                XSSFWorkbook wb = new XSSFWorkbook(file);
                 XSSFSheet ws = wb.getSheet(broker);
-
                 XSSFRow headerRow = ws.getRow(0);
 
                 for(int i = 1; i <= ws.getLastRowNum(); i++) {
                     XSSFRow dataRow = ws.getRow(i);
-                    if (dataRow != null) {
+                    if (dataRow != null && dataRow.getCell(0) != null && dataRow.getCell(1) != null) {
                         String ticker = dataRow.getCell(0).getStringCellValue();
                         String quarter = dataRow.getCell(1).getStringCellValue();
                         reportDataExtractConfig = loadReportDataExtractConfig(reportDataExtractConfigFilePath, quarter, ticker, broker);
                         configMap.put(quarter + "_" + ticker + "_" + broker, reportDataExtractConfig);
                     }
                 }
-
-                wb.close();
-                file.close();
             }
-
+            wb.close();
+            file.close();
         } catch (Exception e) {
             System.out.println("Exception in loadReportDataExtractConfig " + e.getMessage());
             e.printStackTrace();
@@ -423,6 +666,7 @@ public class AnalystRecoExtractor {
 
             int tickerColumnPosition = 0;
             int quarterColumnPosition = 1;
+            int RECO_PAGEColumnPosition = -1;
             int CMPColumnPosition = -1;
             int TPColumnPosition = -1;
             int MCAPColumnPosition = -1;
@@ -432,35 +676,51 @@ public class AnalystRecoExtractor {
             int RATINGPATTERNPostion = -1;
 
             int INCOME_STATEMENT_PAGEColumnPosition = -1;
-            int RATIO_PAGEColumnPosition = -1;
-            int VALUATION_PAGEColumnPosition = -1;
-
+            int MILLIONS_OR_BILLIONSColumnPosition = -1;
             int HEADER_ROW_NAMEColumnPosition = -1;
             int REVENUE_ROW_NAMEColumnPosition = -1;
             int EBITDA_ROW_NAMEColumnPosition = -1;
             int DEPRECIATION_ROW_NAMEColumnPosition = -1;
 
+            int MARGIN_PAGEColumnPosition = -1;
+            int MARGIN_HEADER_ROW_NAMEColumnPosition = -1;
             int EBITDAMARGIN_ROW_NAMEColumnPosition = -1;
+
+            int RATIO_PAGEColumnPosition = -1;
+            int RATIO_HEADER_ROW_NAMEColumnPosition = -1;
             int ROCE_ROW_NAMEColumnPosition = -1;
 
+            int VALUATION_PAGEColumnPosition = -1;
+            int VALUATION_HEADER_ROW_NAMEColumnPosition = -1;
             int EVBYEBITDA_ROW_NAMEColumnPosition = -1;
 
             int Y0ColumnPosition = -1;
             int Y1ColumnPosition = -1;
             int Y2ColumnPosition = -1;
 
-            int MILLIONS_OR_BILLIONSColumnPosition = -1;
             int RESEARCHANALYST1ColumnPosition = -1;
             int RESEARCHANALYST2ColumnPosition = -1;
 
+            int AUM_PAGEColumnPosition = -1;
+            int AUM_HEADER_ROW_NAMEColumnPosition = -1;
             int AUMColumnPosition  = -1;
+            int AUM_MILLIONS_OR_BILLIONSColumnPosition = -1;
+
+            int CREDITCOSTS_PAGEColumnPosition = -1;
+            int CREDITCOSTS_HEADER_ROW_NAMEColumnPosition = -1;
             int CREDITCOSTSColumnPosition = -1;
+
+            int NPA_PAGEColumnPosition = -1;
+            int NPA_HEADER_ROW_NAMEColumnPosition = -1;
             int GNPAColumnPosition = -1;
             int NNPAColumnPosition = -1;
 
             // Read header row to get the column index of MCAP header
             for (int i = 2; i < headerRow.getLastCellNum(); i++) {
                 XSSFCell headerCell = headerRow.getCell(i);
+                if (headerCell.getStringCellValue().equals("RECO_PAGE")) {
+                    RECO_PAGEColumnPosition = i;
+                }
                 if (headerCell.getStringCellValue().equals("CMP")) {
                     CMPColumnPosition = i;
                 }
@@ -486,13 +746,9 @@ public class AnalystRecoExtractor {
                 if (headerCell.getStringCellValue().equals("INCOME_STATEMENT_PAGE")) {
                     INCOME_STATEMENT_PAGEColumnPosition = i;
                 }
-                if (headerCell.getStringCellValue().equals("RATIO_PAGE")) {
-                    RATIO_PAGEColumnPosition = i;
+                if (headerCell.getStringCellValue().equals("MILLIONS_OR_BILLIONS")) {
+                    MILLIONS_OR_BILLIONSColumnPosition = i;
                 }
-                if (headerCell.getStringCellValue().equals("VALUATION_PAGE")) {
-                    VALUATION_PAGEColumnPosition = i;
-                }
-
                 if (headerCell.getStringCellValue().equals("HEADER_ROW_NAME")) {
                     HEADER_ROW_NAMEColumnPosition = i;
                 }
@@ -505,11 +761,32 @@ public class AnalystRecoExtractor {
                 if (headerCell.getStringCellValue().equals("DEPRECIATION_ROW_NAME")) {
                     DEPRECIATION_ROW_NAMEColumnPosition = i;
                 }
+
+                if (headerCell.getStringCellValue().equals("MARGIN_PAGE")) {
+                    MARGIN_PAGEColumnPosition = i;
+                }
+                if (headerCell.getStringCellValue().equals("MARGIN_HEADER_ROW_NAME")){
+                    MARGIN_HEADER_ROW_NAMEColumnPosition = i;
+                }
                 if (headerCell.getStringCellValue().equals("EBITDAMARGIN_ROW_NAME")) {
                     EBITDAMARGIN_ROW_NAMEColumnPosition = i;
                 }
+
+                if (headerCell.getStringCellValue().equals("RATIO_PAGE")) {
+                    RATIO_PAGEColumnPosition = i;
+                }
+                if (headerCell.getStringCellValue().equals("RATIO_HEADER_ROW_NAME")){
+                    RATIO_HEADER_ROW_NAMEColumnPosition = i;
+                }
                 if (headerCell.getStringCellValue().equals("ROCE_ROW_NAME")) {
                     ROCE_ROW_NAMEColumnPosition = i;
+                }
+
+                if (headerCell.getStringCellValue().equals("VALUATION_PAGE")) {
+                    VALUATION_PAGEColumnPosition = i;
+                }
+                if (headerCell.getStringCellValue().equals("VALUATION_HEADER_ROW_NAME")){
+                    VALUATION_HEADER_ROW_NAMEColumnPosition = i;
                 }
                 if (headerCell.getStringCellValue().equals("EVBYEBITDA_ROW_NAME")) {
                     EVBYEBITDA_ROW_NAMEColumnPosition = i;
@@ -525,10 +802,6 @@ public class AnalystRecoExtractor {
                     Y2ColumnPosition = i;
                 }
 
-                if (headerCell.getStringCellValue().equals("MILLIONS_OR_BILLIONS")) {
-                    MILLIONS_OR_BILLIONSColumnPosition = i;
-                }
-
                 if (headerCell.getStringCellValue().equals("RESEARCHANALYST1")) {
                     RESEARCHANALYST1ColumnPosition = i;
                 }
@@ -536,98 +809,197 @@ public class AnalystRecoExtractor {
                     RESEARCHANALYST2ColumnPosition = i;
                 }
 
+                if (headerCell.getStringCellValue().equals("AUM_PAGE")) {
+                    AUM_PAGEColumnPosition = i;
+                }
+                if (headerCell.getStringCellValue().equals("AUM_HEADER_ROW_NAME")){
+                    AUM_HEADER_ROW_NAMEColumnPosition = i;
+                }
                 if (headerCell.getStringCellValue().equals("AUM_ROW_NAME")) {
                     AUMColumnPosition = i;
                 }
+                if (headerCell.getStringCellValue().equals("AUM_MILLIONS_OR_BILLIONS")) {
+                    AUM_MILLIONS_OR_BILLIONSColumnPosition = i;
+                }
 
+                if (headerCell.getStringCellValue().equals("CREDITCOSTS_PAGE")) {
+                    CREDITCOSTS_PAGEColumnPosition = i;
+                }
+                if (headerCell.getStringCellValue().equals("CREDITCOSTS_HEADER_ROW_NAME")){
+                    CREDITCOSTS_HEADER_ROW_NAMEColumnPosition = i;
+                }
                 if (headerCell.getStringCellValue().equals("CREDITCOSTS_ROW_NAME")) {
                     CREDITCOSTSColumnPosition = i;
                 }
 
+                if (headerCell.getStringCellValue().equals("NPA_PAGE")) {
+                    NPA_PAGEColumnPosition = i;
+                }
+                if (headerCell.getStringCellValue().equals("NPA_HEADER_ROW_NAME")){
+                    NPA_HEADER_ROW_NAMEColumnPosition = i;
+                }
                 if (headerCell.getStringCellValue().equals("GNPA_ROW_NAME")) {
                     GNPAColumnPosition = i;
                 }
-
                 if (headerCell.getStringCellValue().equals("NNPA_ROW_NAME")) {
                     NNPAColumnPosition = i;
                 }
-
             }
-
 
             XSSFRow dataRow = ws.getRow(quarterTickerRowNumber);
             if (dataRow != null) {
                 reportDataExtractConfig = new ReportDataExtractConfig();
-                if (CMPColumnPosition != -1) {
+                if (RECO_PAGEColumnPosition != -1 && dataRow.getCell(RECO_PAGEColumnPosition) != null) {
+                    reportDataExtractConfig.setRECO_PAGE(dataRow.getCell(RECO_PAGEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setRECO_PAGE("");
+                }
+                if (CMPColumnPosition != -1 && dataRow.getCell(CMPColumnPosition) != null) {
                     reportDataExtractConfig.setCMP(dataRow.getCell(CMPColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setCMP("");
                 }
-                if (TPColumnPosition != -1) {
+                if (TPColumnPosition != -1 && dataRow.getCell(TPColumnPosition) != null) {
                     reportDataExtractConfig.setTP(dataRow.getCell(TPColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setTP("");
                 }
-                if (MCAPColumnPosition != -1) {
+                if (MCAPColumnPosition != -1 && dataRow.getCell(MCAPColumnPosition) != null) {
                     reportDataExtractConfig.setMCAP(dataRow.getCell(MCAPColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setMCAP("");
                 }
-                if (CMPPATTERNColumnPosition != -1) {
+                if (CMPPATTERNColumnPosition != -1 && dataRow.getCell(CMPPATTERNColumnPosition) != null) {
                     reportDataExtractConfig.setCMPPATTERN(dataRow.getCell(CMPPATTERNColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setCMPPATTERN("");
                 }
-                if (TPPATTERNColumnPosition != -1) {
+                if (TPPATTERNColumnPosition != -1 && dataRow.getCell(TPPATTERNColumnPosition) != null) {
                     reportDataExtractConfig.setTPPATTERN(dataRow.getCell(TPPATTERNColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setTPPATTERN("");
                 }
-                if (MCAPPATTERNColumnPosition != -1) {
+                if (MCAPPATTERNColumnPosition != -1 && dataRow.getCell(MCAPPATTERNColumnPosition) != null) {
                     reportDataExtractConfig.setMCAPPATTERN(dataRow.getCell(MCAPPATTERNColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setMCAPPATTERN("");
                 }
-                if (RATINGPATTERNPostion != -1) {
+                if (RATINGPATTERNPostion != -1 && dataRow.getCell(RATINGPATTERNPostion) != null) {
                     reportDataExtractConfig.setRATINGPATTERN(dataRow.getCell(RATINGPATTERNPostion).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setRATINGPATTERN("");
                 }
 
-                if (INCOME_STATEMENT_PAGEColumnPosition != -1) {
+                if (INCOME_STATEMENT_PAGEColumnPosition != -1 && dataRow.getCell(INCOME_STATEMENT_PAGEColumnPosition) != null) {
                     reportDataExtractConfig.setINCOME_STATEMENT_PAGE(dataRow.getCell(INCOME_STATEMENT_PAGEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setINCOME_STATEMENT_PAGE("");
                 }
-                if (RATIO_PAGEColumnPosition != -1) {
-                    reportDataExtractConfig.setRATIO_PAGE(dataRow.getCell(RATIO_PAGEColumnPosition).getStringCellValue());
+                if (MILLIONS_OR_BILLIONSColumnPosition != -1 && dataRow.getCell(MILLIONS_OR_BILLIONSColumnPosition) != null) {
+                    reportDataExtractConfig.setMILLIONS_OR_BILLIONS(dataRow.getCell(MILLIONS_OR_BILLIONSColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setMILLIONS_OR_BILLIONS("");
                 }
-                if (VALUATION_PAGEColumnPosition != -1) {
-                    reportDataExtractConfig.setVALUATION_PAGE(dataRow.getCell(VALUATION_PAGEColumnPosition).getStringCellValue());
-                }
-
-                if (HEADER_ROW_NAMEColumnPosition != -1) {
+                if (HEADER_ROW_NAMEColumnPosition != -1 && dataRow.getCell(HEADER_ROW_NAMEColumnPosition) != null) {
                     reportDataExtractConfig.setHEADER_ROW_NAME(dataRow.getCell(HEADER_ROW_NAMEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setHEADER_ROW_NAME("");
                 }
-                if (REVENUE_ROW_NAMEColumnPosition != -1) {
+                if (REVENUE_ROW_NAMEColumnPosition != -1 && dataRow.getCell(REVENUE_ROW_NAMEColumnPosition) != null) {
                     reportDataExtractConfig.setREVENUE_ROW_NAME(dataRow.getCell(REVENUE_ROW_NAMEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setREVENUE_ROW_NAME("");
                 }
-                if (EBITDA_ROW_NAMEColumnPosition != -1) {
+                if (EBITDA_ROW_NAMEColumnPosition != -1 && dataRow.getCell(EBITDA_ROW_NAMEColumnPosition) != null) {
                     reportDataExtractConfig.setEBITDA_ROW_NAME(dataRow.getCell(EBITDA_ROW_NAMEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setEBITDA_ROW_NAME("");
                 }
                 if (DEPRECIATION_ROW_NAMEColumnPosition != -1) {
-                    reportDataExtractConfig.setDEPRECIATION_ROW_NAME(dataRow.getCell(DEPRECIATION_ROW_NAMEColumnPosition).getStringCellValue());
+                    if(dataRow.getCell(DEPRECIATION_ROW_NAMEColumnPosition) != null)
+                        reportDataExtractConfig.setDEPRECIATION_ROW_NAME(dataRow.getCell(DEPRECIATION_ROW_NAMEColumnPosition).getStringCellValue());
+                    else
+                        reportDataExtractConfig.setDEPRECIATION_ROW_NAME ("");
                 }
 
-                if (EBITDAMARGIN_ROW_NAMEColumnPosition != -1) {
+                if (MARGIN_PAGEColumnPosition != -1 && dataRow.getCell(MARGIN_PAGEColumnPosition) != null) {
+                    reportDataExtractConfig.setMARGIN_PAGE(dataRow.getCell(MARGIN_PAGEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setMARGIN_PAGE("");
+                }
+                if (MARGIN_HEADER_ROW_NAMEColumnPosition != -1 && dataRow.getCell(MARGIN_HEADER_ROW_NAMEColumnPosition) != null) {
+                    reportDataExtractConfig.setMARGIN_HEADER_ROW_NAME(dataRow.getCell(MARGIN_HEADER_ROW_NAMEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setMARGIN_HEADER_ROW_NAME("");
+                }
+                if (EBITDAMARGIN_ROW_NAMEColumnPosition != -1 && dataRow.getCell(EBITDAMARGIN_ROW_NAMEColumnPosition) != null) {
                     reportDataExtractConfig.setEBITDAMARGIN_ROW_NAME(dataRow.getCell(EBITDAMARGIN_ROW_NAMEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setEBITDAMARGIN_ROW_NAME("");
                 }
-                if (ROCE_ROW_NAMEColumnPosition != -1) {
+
+                if (RATIO_PAGEColumnPosition != -1 && dataRow.getCell(RATIO_PAGEColumnPosition) != null) {
+                    reportDataExtractConfig.setRATIO_PAGE(dataRow.getCell(RATIO_PAGEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setRATIO_PAGE("");
+                }
+                if (RATIO_HEADER_ROW_NAMEColumnPosition != -1 && dataRow.getCell(RATIO_HEADER_ROW_NAMEColumnPosition) != null) {
+                    reportDataExtractConfig.setRATIO_HEADER_ROW_NAME(dataRow.getCell(RATIO_HEADER_ROW_NAMEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setRATIO_HEADER_ROW_NAME("");
+                }
+                if (ROCE_ROW_NAMEColumnPosition != -1 && dataRow.getCell(ROCE_ROW_NAMEColumnPosition) != null) {
                     reportDataExtractConfig.setROCE_ROW_NAME(dataRow.getCell(ROCE_ROW_NAMEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setROCE_ROW_NAME("");
                 }
 
-                if (EVBYEBITDA_ROW_NAMEColumnPosition != -1) {
+                if (VALUATION_PAGEColumnPosition != -1 && dataRow.getCell(VALUATION_PAGEColumnPosition) != null) {
+                    reportDataExtractConfig.setVALUATION_PAGE(dataRow.getCell(VALUATION_PAGEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setVALUATION_PAGE("");
+                }
+                if (VALUATION_HEADER_ROW_NAMEColumnPosition != -1 && dataRow.getCell(VALUATION_HEADER_ROW_NAMEColumnPosition) != null) {
+                    reportDataExtractConfig.setVALUATION_HEADER_ROW_NAME(dataRow.getCell(VALUATION_HEADER_ROW_NAMEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setVALUATION_HEADER_ROW_NAME("");
+                }
+                if (EVBYEBITDA_ROW_NAMEColumnPosition != -1 && dataRow.getCell(EVBYEBITDA_ROW_NAMEColumnPosition) != null) {
                     reportDataExtractConfig.setEVBYEBITDA_ROW_NAME(dataRow.getCell(EVBYEBITDA_ROW_NAMEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setEVBYEBITDA_ROW_NAME("");
                 }
 
-                if (Y0ColumnPosition != -1) {
+                if (Y0ColumnPosition != -1 && dataRow.getCell(Y0ColumnPosition) != null) {
                     reportDataExtractConfig.setY0(dataRow.getCell(Y0ColumnPosition).getStringCellValue().replaceAll("\"", ""));
+                } else {
+                    reportDataExtractConfig.setY0("");
                 }
-                if (Y1ColumnPosition != -1) {
+                if (Y1ColumnPosition != -1 && dataRow.getCell(Y1ColumnPosition) != null) {
                     reportDataExtractConfig.setY1(dataRow.getCell(Y1ColumnPosition).getStringCellValue().replaceAll("\"", ""));
+                } else {
+                    reportDataExtractConfig.setY1("");
                 }
-                if (Y2ColumnPosition != -1) {
+                if (Y2ColumnPosition != -1 && dataRow.getCell(Y2ColumnPosition) != null) {
                     reportDataExtractConfig.setY2(dataRow.getCell(Y2ColumnPosition).getStringCellValue().replaceAll("\"", ""));
+                } else {
+                    reportDataExtractConfig.setY2("");
                 }
 
-                if (MILLIONS_OR_BILLIONSColumnPosition != -1) {
-                    reportDataExtractConfig.setMILLIONS_OR_BILLIONS(dataRow.getCell(MILLIONS_OR_BILLIONSColumnPosition).getStringCellValue());
+                if (AUM_PAGEColumnPosition != -1) {
+                    try {
+                        reportDataExtractConfig.setAUM_PAGE(dataRow.getCell(AUM_PAGEColumnPosition).getStringCellValue());
+                    } catch (Exception e) {
+                        reportDataExtractConfig.setAUM_PAGE("");
+                    }
                 }
-
+                if (AUM_HEADER_ROW_NAMEColumnPosition != -1) {
+                    try {
+                        reportDataExtractConfig.setAUM_HEADER_ROW_NAME(dataRow.getCell(AUM_HEADER_ROW_NAMEColumnPosition).getStringCellValue());
+                    } catch (Exception e) {
+                        reportDataExtractConfig.setAUM_HEADER_ROW_NAME("");
+                    }
+                }
                 if (AUMColumnPosition != -1) {
                     try {
                         reportDataExtractConfig.setAUM_ROW_NAME(dataRow.getCell(AUMColumnPosition).getStringCellValue());
@@ -635,11 +1007,48 @@ public class AnalystRecoExtractor {
                         reportDataExtractConfig.setAUM_ROW_NAME("");
                     }
                 }
+                if (AUM_MILLIONS_OR_BILLIONSColumnPosition != -1) {
+                    try {
+                        reportDataExtractConfig.setAUM_MILLIONS_OR_BILLIONS(dataRow.getCell(AUM_MILLIONS_OR_BILLIONSColumnPosition).getStringCellValue());
+                    } catch (Exception e) {
+                        reportDataExtractConfig.setAUM_MILLIONS_OR_BILLIONS("");
+                    }
+                }
+
+                if (CREDITCOSTS_PAGEColumnPosition != -1) {
+                    try {
+                        reportDataExtractConfig.setCREDITCOSTS_PAGE(dataRow.getCell(CREDITCOSTS_PAGEColumnPosition).getStringCellValue());
+                    } catch (Exception e) {
+                        reportDataExtractConfig.setCREDITCOSTS_PAGE("");
+                    }
+                }
+                if (CREDITCOSTS_HEADER_ROW_NAMEColumnPosition != -1) {
+                    try {
+                        reportDataExtractConfig.setCREDITCOSTS_HEADER_ROW_NAME(dataRow.getCell(CREDITCOSTS_HEADER_ROW_NAMEColumnPosition).getStringCellValue());
+                    } catch (Exception e) {
+                        reportDataExtractConfig.setCREDITCOSTS_HEADER_ROW_NAME("");
+                    }
+                }
                 if (CREDITCOSTSColumnPosition != -1) {
                     try {
                         reportDataExtractConfig.setCREDITCOSTS_ROW_NAME(dataRow.getCell(CREDITCOSTSColumnPosition).getStringCellValue());
                     } catch (Exception e) {
                         reportDataExtractConfig.setCREDITCOSTS_ROW_NAME("");
+                    }
+                }
+
+                if (NPA_PAGEColumnPosition != -1) {
+                    try {
+                        reportDataExtractConfig.setNPA_PAGE(dataRow.getCell(NPA_PAGEColumnPosition).getStringCellValue());
+                    } catch (Exception e) {
+                        reportDataExtractConfig.setNPA_PAGE("");
+                    }
+                }
+                if (NPA_HEADER_ROW_NAMEColumnPosition != -1) {
+                    try {
+                        reportDataExtractConfig.setNPA_HEADER_ROW_NAME(dataRow.getCell(NPA_HEADER_ROW_NAMEColumnPosition).getStringCellValue());
+                    } catch (Exception e) {
+                        reportDataExtractConfig.setNPA_HEADER_ROW_NAME("");
                     }
                 }
                 if (GNPAColumnPosition != -1) {
@@ -727,9 +1136,9 @@ public class AnalystRecoExtractor {
                 return new AnalystRecoExtractorKOTAK();
             case "PL":
                 return new AnalystRecoExtractorPL();
-            /*case "AXIS":
+            case "AXIS":
                 return new AnalystRecoExtractorAXIS();
-            case "ICICIDIRECT":
+            /*case "ICICIDIRECT":
                 return new AnalystRecoExtractorICICIDIRECT();
              */
             default:
@@ -783,6 +1192,10 @@ public class AnalystRecoExtractor {
     }
 
     protected double getMCapFromBillion(String mcapLine, ReportDataExtractConfig rdec, int group, String broker) {
+        return getMCapFromBillion(mcapLine, rdec, group, broker,false);
+    }
+
+    protected double getMCapFromBillion(String mcapLine, ReportDataExtractConfig rdec, int group, String broker, boolean isMCapInCr) {
         String mcap = "";
         double mcapNumber = 0;
         if (mcapLine != null && !mcapLine.isEmpty()) {
@@ -791,7 +1204,10 @@ public class AnalystRecoExtractor {
             Matcher mcapMatcher = mcapPattern.matcher(mcapLine);
             if (mcapMatcher.find()) {
                 mcap = mcapMatcher.group(group).replace(",", "");
-                mcapNumber = Double.parseDouble(mcap) * 100;
+                if(!isMCapInCr)
+                    mcapNumber = Double.parseDouble(mcap) * 100;
+                else
+                    mcapNumber = Double.parseDouble(mcap);
             }
         } else {
             System.out.println("\n\n ********** Exception ********* \n\nSetting MCap as zero. Error in parsing MCap from  Source file " + rdec.getQUARTER() + "_" + rdec.getTICKER() + "_" + rdec.getBROKER() + "\n\n ********** Exception ********* \n\n" );

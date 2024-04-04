@@ -21,6 +21,8 @@ public class FileCopier {
         String javaWorkspace = "\\02workspace\\timelineofwealth";
         String pythonWorkspace = "\\02workspace\\PythonDev";
 
+        //*********************************************** From HP to Redmi ***********************************************
+
         String localMyDocuments = "C:\\MyDocuments\\";
         String redMIMyDocuments = "\\\\redmibook15\\MyDocuments";
 
@@ -31,9 +33,28 @@ public class FileCopier {
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q2";
 //        String dstFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q2";
 
-        //Move latest Excels redmi to temp
-//        String srcFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2024Q2";
-//        String dstFolder = "C:\\temp";
+        //Move Daily Data from HP to Redmi
+//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
+//        String dstFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
+
+        //*********************************************** From redmi to HP ***********************************************
+        //Move latest reports redmi to HP
+//        String srcFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
+
+        //Move latest Excels from redmi to HP
+//        String srcFolder = "\\\\redmibook15\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
+
+        //Move latest Code from redmi to HP
+//        String srcFolder = "\\\\redmibook15\\03Business\\06ClientData\\PMS";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\06ClientData\\PMS";
+
+        //Move latest Code from redmi to HP
+//        String srcFolder = "\\\\redmibook15\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
+
+        //*********************************************** From Local Laptop to Parag's Laptop ***********************************************
 
 //        String srcFolder = localLaptop + reports;
 //        String dstFolder = paragLaptop + reports;
@@ -42,8 +63,14 @@ public class FileCopier {
 //        String dstFolder = paragLaptop + excels;
 
 //        String srcFolder = localLaptop + dailyData;
-//        String dstFolder = paragLaptop + dailyData;
+//        String dstFolder = paragLaptop +
 
+//        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
+//        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\PythonDev";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\PythonDev";
+//        String srcFolder = "C:\\MyDocuments\\03Business\\03DailyData";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\03DailyData";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2024Q2";

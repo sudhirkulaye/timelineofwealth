@@ -15,15 +15,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
+public class AnalystRecoExtractorAXIS extends AnalystRecoExtractor {
 
-    protected String BROKER = "AMBIT";
+    protected String BROKER = "AXIS";
 
     protected String DATEPATTERN = "\\d{1,2}\\s*+(January|Jan|February|Feb|March|Mar|April|Apr|May|June|Jun|July|Jul|August|Aug|September|Sep|October|Oct|November|Nov|December|Dec)\\s*+\\d{2,4}";
-    protected String DATEPATTERN_1 = "(January|Jan|February|Feb|March|Mar|April|Apr|May|June|Jun|July|Jul|August|Aug|September|Sep|October|Oct|November|Nov|December|Dec)\\s*\\d{1,2},?\\s*\\d{2,4}";
-
     protected String DATEFORMAT = "dd MMMMM yyyy";
-    protected String DATEFORMAT_1 = "MMMMM dd yyyy";
 
     public ReportParameters getReportParameters(String reportFilePath, ReportDataExtractConfig rdec, boolean isFinancialReport) {
 
@@ -85,11 +82,8 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
             linesRecoPage = pageContentReco.split("\n");
 
             // Load Income Statement Page
-            int incomeStatementPageNo = -1, incomeStatementPageNoSecond = -1;
+            int incomeStatementPageNo = -1;
             incomeStatementPageNo = getPageNumberForMatchingPattern(pdfReader, 2, noOfPages, INCOME_STATEMENT_PAGE, rdec, BROKER);
-            incomeStatementPageNoSecond = getPageNumberForMatchingPattern(pdfReader,  incomeStatementPageNo+1, noOfPages, INCOME_STATEMENT_PAGE, rdec, BROKER);
-            if (incomeStatementPageNo > 1 && incomeStatementPageNoSecond > 1 && PdfTextExtractor.getTextFromPage(pdfReader, incomeStatementPageNo).toLowerCase().contains("quarterly"))
-                incomeStatementPageNo = incomeStatementPageNoSecond;
 
             if (incomeStatementPageNo > 1) {
                 System.out.print("Inc. Statement Page No. : " + incomeStatementPageNo + " / ");
@@ -171,30 +165,14 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
     public void setReportDate(String reportFilePath, ReportDataExtractConfig rdec){
         // Extract report date
-        int lineNumber = linesRecoPage.length-1;
+        int lineNumber = 0;
         try {
             long dateLastModified = new File(reportFilePath).lastModified();
             String dateString_1 = "";
 
-            while (lineNumber > linesRecoPage.length-10 && dateString.isEmpty()) {
+            while (lineNumber < linesRecoPage.length && dateString.isEmpty()) {
                 dateString = getReportDate(linesRecoPage[lineNumber], dateLastModified, DATEPATTERN, DATEFORMAT, rdec, BROKER);
-                dateString_1 = getReportDate(linesRecoPage[lineNumber], dateLastModified, DATEPATTERN_1, DATEFORMAT_1, rdec, BROKER);
-                if(dateString.isEmpty() && !dateString_1.isEmpty())
-                    dateString = dateString_1;
-                lineNumber--;
-            }
-            if(dateString.isEmpty()) {
-                // if date is not on the second page last or second last line
-                String secondPageContent = PdfTextExtractor.getTextFromPage(pdfReader, 2);
-                String[] secondPageLines = secondPageContent.split("\n");
-                lineNumber = secondPageLines.length-1;
-                while (lineNumber > secondPageLines.length-10 && dateString.isEmpty()) {
-                    dateString = getReportDate(secondPageLines[lineNumber], dateLastModified, DATEPATTERN, DATEFORMAT, rdec, BROKER);
-                    dateString_1 = getReportDate(linesRecoPage[lineNumber], dateLastModified, DATEPATTERN_1, DATEFORMAT_1, rdec, BROKER);
-                    if(dateString.isEmpty() && !dateString_1.isEmpty())
-                        dateString = dateString_1;
-                    lineNumber--;
-                }
+                lineNumber++;
             }
             // if date not found then set it to last modified date
             if (dateString.isEmpty()){
@@ -222,7 +200,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         }
         try {
             if (mcapLineNumber != -1) {
-                mcapNumber = getMCapFromBillion(linesRecoPage[mcapLineNumber], rdec, 2, BROKER);
+                mcapNumber = getMCapFromBillion(linesRecoPage[mcapLineNumber], rdec, 1, BROKER, true);
                 mcap = new BigDecimal(mcapNumber).setScale(0, RoundingMode.HALF_UP);
             } else {
                 mcapNumber = 0;
@@ -276,7 +254,12 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         try {
             // Extract Target Price
             if (targetPriceLineNumber != -1) {
-                targetPrice = "" + getTP(linesRecoPage[targetPriceLineNumber], rdec, 1, BROKER);
+                targetPrice = "0";
+                for(int i = targetPriceLineNumber; i < targetPriceLineNumber + 10 && targetPrice.equals("0"); i++) {
+                    try {
+                        targetPrice = "" + Integer.parseInt(linesRecoPage[i].trim());
+                    } catch (Exception e) {}
+                }
             } else {
                 targetPrice = "0";
                 System.out.println("\n########## Target Price line not found for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
@@ -319,10 +302,9 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
     protected void setHeaderColumns(ReportDataExtractConfig rdec, boolean isFinancialReport){
         // Get Header Line No. from the Inc. Stmt. page
-        int headerLineNo = -1, tableHeadLineNo = -1;
+        int headerLineNo = -1;
         try {
-            tableHeadLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, 0, INCOME_STATEMENT_PAGE,rdec, BROKER);
-            headerLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, tableHeadLineNo, HEADER_ROW_NAME,rdec, BROKER);
+            headerLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, 0, HEADER_ROW_NAME,rdec, BROKER);
             if(headerLineNo < 0) {
                 headerLineNo = getLineNumberForMatchingPattern(linesIncomeStmt, 0, HEADER_ROW_NAME,rdec, BROKER);
             }
@@ -340,10 +322,8 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
         // Get Header Line No. from the Inc. Ratio Page
         headerLineNo = -1;
-        tableHeadLineNo = -1;
         try {
-            tableHeadLineNo = getLineNumberForMatchingPattern(linesRatio, 0, RATIO_PAGE, rdec, BROKER);
-            headerLineNo = getLineNumberForMatchingPattern(linesRatio, tableHeadLineNo + 1, RATIO_HEADER_ROW_NAME, rdec, BROKER);
+            headerLineNo = getLineNumberForMatchingPattern(linesRatio, 0, RATIO_HEADER_ROW_NAME, rdec, BROKER);
             if(headerLineNo < 0) {
                 headerLineNo = getLineNumberForMatchingPattern(linesRatio, 0, RATIO_HEADER_ROW_NAME, rdec, BROKER);
             }
@@ -366,8 +346,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         // Get Header Line No. from the Margin Page
         headerLineNo = -1;
         try {
-            tableHeadLineNo = getLineNumberForMatchingPattern(linesMargin, 0, MARGIN_PAGE,rdec, BROKER);
-            headerLineNo = getLineNumberForMatchingPattern(linesMargin, tableHeadLineNo, MARGIN_HEADER_ROW_NAME,rdec, BROKER);
+            headerLineNo = getLineNumberForMatchingPattern(linesMargin, 0, MARGIN_HEADER_ROW_NAME,rdec, BROKER);
             if(headerLineNo < 0) {
                 headerLineNo = getLineNumberForMatchingPattern(linesMargin, 0, MARGIN_HEADER_ROW_NAME,rdec, BROKER);
             }
@@ -389,10 +368,8 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
 
         // Get Header Line No. from the Inc. Valuation Page
         headerLineNo = -1;
-        tableHeadLineNo = -1;
         try {
-            tableHeadLineNo = getLineNumberForMatchingPattern(linesValuation, 0, VALUATION_PAGE, rdec, BROKER);
-            headerLineNo = getLineNumberForMatchingPattern(linesValuation, tableHeadLineNo + 1, VALUATION_HEADER_ROW_NAME, rdec, true, BROKER);
+            headerLineNo = getLineNumberForMatchingPattern(linesValuation, 0, VALUATION_HEADER_ROW_NAME, rdec, true, BROKER);
             if(headerLineNo < 0) {
                 headerLineNo = getLineNumberForMatchingPattern(linesValuation, 0, VALUATION_HEADER_ROW_NAME, rdec, BROKER);
             }
@@ -435,8 +412,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         if(isFinancialReport && AUM_PAGE != null && !AUM_PAGE.isEmpty()) {
             headerLineNo = -1;
             try {
-                tableHeadLineNo = getLineNumberForMatchingPattern(linesAUM, 0, AUM_PAGE, rdec, BROKER);
-                headerLineNo = getLineNumberForMatchingPattern(linesAUM, tableHeadLineNo + 1, AUM_HEADER_ROW_NAME, rdec, true, BROKER);
+                headerLineNo = getLineNumberForMatchingPattern(linesAUM, 0, AUM_HEADER_ROW_NAME, rdec, true, BROKER);
                 if(headerLineNo < 0) {
                     headerLineNo = getLineNumberForMatchingPattern(linesAUM, 0, AUM_HEADER_ROW_NAME, rdec, BROKER);
                 }
@@ -463,8 +439,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         if(isFinancialReport && CREDITCOSTS_PAGE != null && !CREDITCOSTS_PAGE.isEmpty()) {
             headerLineNo = -1;
             try {
-                tableHeadLineNo = getLineNumberForMatchingPattern(linesCreditCost, 0, CREDITCOSTS_PAGE, rdec, BROKER);
-                headerLineNo = getLineNumberForMatchingPattern(linesCreditCost, tableHeadLineNo + 1, CREDITCOSTS_HEADER_ROW_NAME, rdec, true, BROKER);
+                headerLineNo = getLineNumberForMatchingPattern(linesCreditCost, 0, CREDITCOSTS_HEADER_ROW_NAME, rdec, true, BROKER);
                 if(headerLineNo < 0) {
                     headerLineNo = getLineNumberForMatchingPattern(linesCreditCost, 0, CREDITCOSTS_HEADER_ROW_NAME, rdec, BROKER);
                 }
@@ -489,8 +464,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         if(isFinancialReport && NPA_PAGE != null && !NPA_PAGE.isEmpty()) {
             headerLineNo = -1;
             try {
-                tableHeadLineNo = getLineNumberForMatchingPattern(linesNPA, 0, NPA_PAGE, rdec, BROKER);
-                headerLineNo = getLineNumberForMatchingPattern(linesNPA, tableHeadLineNo + 1, NPA_HEADER_ROW_NAME, rdec, true, BROKER);
+                headerLineNo = getLineNumberForMatchingPattern(linesNPA, 0, NPA_HEADER_ROW_NAME, rdec, true, BROKER);
                 if(headerLineNo < 0) {
                     headerLineNo = getLineNumberForMatchingPattern(linesNPA, 0, NPA_HEADER_ROW_NAME, rdec, BROKER);
                 }
@@ -535,7 +509,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                 if(revenueColumns != null && revenueColumns.length != 0 ) {
                     if(revenueColumns.length == headerColumnsIncomeStmt.length) {
                         // Set million or billion flag
-                        MILLIONS_OR_BILLIONS_FLAG = Pattern.compile(MILLIONS_OR_BILLIONS).matcher(pageContentIncomeStmt).find()? "B" : "M";
+//                        MILLIONS_OR_BILLIONS_FLAG = Pattern.compile(MILLIONS_OR_BILLIONS).matcher(pageContentIncomeStmt).find()? "B" : "M";
                         // Find Y0, Y1 and Y2 Index position
                         y0Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y0);
                         y1Column = getIndexOfTheYear(headerColumnsIncomeStmt, Y1);
@@ -551,11 +525,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if (y0Column >= 0) {
                             y0Revenue = revenueColumns[y0Column];
                             y0RevenueNumber = Double.parseDouble(y0Revenue.replaceAll(",", ""));
-                            if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                            /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                 y0RevenueNumber = y0RevenueNumber / 10;
                             } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                 y0RevenueNumber = y0RevenueNumber * 100;
-                            }
+                            }*/
                             reportParameters.setY0Revenue(new BigDecimal(y0RevenueNumber).setScale(2, RoundingMode.HALF_UP));
                             y0ColumnNumberOnIncStmt = new Integer(y0Column);
                         } else {
@@ -565,11 +539,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if (y1Column >= 0) {
                             y1Revenue = revenueColumns[y1Column];
                             y1RevenueNumber = Double.parseDouble(y1Revenue.replaceAll(",", ""));
-                            if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                            /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                 y1RevenueNumber = y1RevenueNumber / 10;
                             } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                 y1RevenueNumber = y1RevenueNumber * 100;
-                            }
+                            }*/
                             reportParameters.setY1Revenue(new BigDecimal(y1RevenueNumber).setScale(2, RoundingMode.HALF_UP));
                             y1ColumnNumberOnIncStmt = new Integer(y1Column);
                         } else {
@@ -579,11 +553,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if (y2Column >= 0) {
                             y2Revenue = revenueColumns[y2Column];
                             y2RevenueNumber = Double.parseDouble(y2Revenue.replaceAll(",", ""));
-                            if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                            /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                 y2RevenueNumber = y2RevenueNumber / 10;
                             } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                 y2RevenueNumber = y2RevenueNumber * 100;
-                            }
+                            }*/
                             reportParameters.setY2Revenue(new BigDecimal(y2RevenueNumber).setScale(2, RoundingMode.HALF_UP));
                             y2ColumnNumberOnIncStmt = new Integer(y2Column);
                         } else {
@@ -681,7 +655,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if (depreciationColumns != null && depreciationColumns.length != 0) {
                             if(ebitdaColumns.length == headerColumnsIncomeStmt.length) {
                                 if (depreciationColumns.length == headerColumnsIncomeStmt.length) {
-                                    MILLIONS_OR_BILLIONS_FLAG = Pattern.compile(MILLIONS_OR_BILLIONS).matcher(pageContentIncomeStmt).find() ? "B" : "M";
+//                                    MILLIONS_OR_BILLIONS_FLAG = Pattern.compile(MILLIONS_OR_BILLIONS).matcher(pageContentIncomeStmt).find() ? "B" : "M";
 
                                     if(y0ColumnNumberOnIncStmt != null && y1ColumnNumberOnIncStmt != null && y2ColumnNumberOnIncStmt != null) {
                                         y0Column = y0ColumnNumberOnIncStmt.intValue();
@@ -702,14 +676,14 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                         y0Depreciation = depreciationColumns[y0Column];
 
                                         y0EBITDANo = Double.parseDouble(y0EBITDA.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                                        y0DepreciationNo = Double.parseDouble(y0Depreciation.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                                        if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                        y0DepreciationNo = Math.abs(Double.parseDouble(y0Depreciation.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1")));
+                                        /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                             y0EBITDANo = y0EBITDANo / 10;
                                             y0DepreciationNo = y0DepreciationNo / 10;
                                         } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                             y0EBITDANo = y0EBITDANo * 100;
                                             y0DepreciationNo = y0DepreciationNo * 100;
-                                        }
+                                        }*/
                                         y0EBITDANumber = new BigDecimal(y0EBITDANo);
                                         y0DepreciationNumber = new BigDecimal(y0DepreciationNo);
                                         reportParameters.setY0EBIT(y0EBITDANo + "-" + y0DepreciationNo);
@@ -722,14 +696,14 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                         y1Depreciation = depreciationColumns[y1Column];
 
                                         y1EBITDANo = Double.parseDouble(y1EBITDA.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                                        y1DepreciationNo = Double.parseDouble(y1Depreciation.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                                        if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                        y1DepreciationNo = Math.abs(Double.parseDouble(y1Depreciation.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1")));
+                                        /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                             y1EBITDANo = y1EBITDANo / 10;
                                             y1DepreciationNo = y1DepreciationNo / 10;
                                         } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                             y1EBITDANo = y1EBITDANo * 100;
                                             y1DepreciationNo = y1DepreciationNo * 100;
-                                        }
+                                        }*/
                                         y1EBITDANumber = new BigDecimal(y1EBITDANo);
                                         y1DepreciationNumber = new BigDecimal(y1DepreciationNo);
                                         reportParameters.setY1EBIT(y1EBITDANo + "-" + y1DepreciationNo);
@@ -742,14 +716,14 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                         y2Depreciation = depreciationColumns[y2Column];
 
                                         y2EBITDANo = Double.parseDouble(y2EBITDA.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                                        y2DepreciationNo = Double.parseDouble(y2Depreciation.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                                        if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                        y2DepreciationNo = Math.abs(Double.parseDouble(y2Depreciation.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1")));
+                                        /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                             y2EBITDANo = y2EBITDANo / 10;
                                             y2DepreciationNo = y2DepreciationNo / 10;
                                         } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                             y2EBITDANo = y2EBITDANo * 100;
                                             y2DepreciationNo = y2DepreciationNo * 100;
-                                        }
+                                        }*/
                                         y2EBITDANumber = new BigDecimal(y2EBITDANo);
                                         y2DepreciationNumber = new BigDecimal(y2DepreciationNo);
                                         reportParameters.setY2EBIT(y2EBITDANo + "-" + y2DepreciationNo);
@@ -798,7 +772,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                     }
                                 }
 
-                                MILLIONS_OR_BILLIONS_FLAG = Pattern.compile(MILLIONS_OR_BILLIONS).matcher(pageContentIncomeStmt).find() ? "B" : "M";
+//                                MILLIONS_OR_BILLIONS_FLAG = Pattern.compile(MILLIONS_OR_BILLIONS).matcher(pageContentIncomeStmt).find() ? "B" : "M";
                                 //handling a case of VBL where headers are at two places
                                     /*if(revenueColumns.length == ebitdaColumns.length && revenueColumns.length < headerColumns.length) {
                                         headerColumns = getDataColumnsForHeader(header, "(?i)^((\\s*Key metrics/assumptions))");
@@ -820,19 +794,19 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                 if (y0Column >= 0) {
                                     y0EBIT = ebitColumns[y0Column];
                                     y0EBITNumber = Double.parseDouble(y0EBIT.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                                    if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                    /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                         y0EBITNumber = y0EBITNumber / 10;
                                     } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                         y0EBITNumber = y0EBITNumber * 100;
-                                    }
+                                    }*/
                                     if (canImpliedDepreciationBeFound == true) {
                                         y0EBITDA = ebitdaColumns[y0Column];
                                         y0EBITDANo = Double.parseDouble(y0EBITDA.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                                        if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                        /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                             y0EBITDANo = y0EBITDANo / 10;
                                         } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                             y0EBITDANo = y0EBITDANo * 100;
-                                        }
+                                        }*/
                                         y0DepreciationNo = y0EBITDANo - y0EBITNumber;
                                         reportParameters.setY0EBIT(y0EBITDANo + "-" + y0DepreciationNo);
                                     } else {
@@ -845,19 +819,19 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                 if (y1Column >= 0) {
                                     y1EBIT = ebitColumns[y1Column];
                                     y1EBITNumber = Double.parseDouble(y1EBIT.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                                    if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                    /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                         y1EBITNumber = y1EBITNumber / 10;
                                     } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                         y1EBITNumber = y1EBITNumber * 100;
-                                    }
+                                    }*/
                                     if (canImpliedDepreciationBeFound == true) {
                                         y1EBITDA = ebitdaColumns[y1Column];
                                         y1EBITDANo = Double.parseDouble(y1EBITDA.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                                        if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                        /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                             y1EBITDANo = y1EBITDANo / 10;
                                         } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                             y1EBITDANo = y1EBITDANo * 100;
-                                        }
+                                        }*/
                                         y1DepreciationNo = y1EBITDANo - y1EBITNumber;
                                         reportParameters.setY1EBIT(y1EBITDANo + "-" + y1DepreciationNo);
                                     } else {
@@ -870,19 +844,19 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                                 if (y2Column >= 0) {
                                     y2EBIT = ebitColumns[y2Column];
                                     y2EBITNumber = Double.parseDouble(y2EBIT.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                                    if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                    /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                         y2EBITNumber = y2EBITNumber / 10;
                                     } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                         y2EBITNumber = y2EBITNumber * 100;
-                                    }
+                                    }*/
                                     if (canImpliedDepreciationBeFound == true) {
                                         y2EBITDA = ebitdaColumns[y2Column];
                                         y2EBITDANo = Double.parseDouble(y2EBITDA.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                                        if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                        /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                             y2EBITDANo = y2EBITDANo / 10;
                                         } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                             y2EBITDANo = y2EBITDANo * 100;
-                                        }
+                                        }*/
                                         y2DepreciationNo = y2EBITDANo - y2EBITNumber;
                                         reportParameters.setY2EBIT(y2EBITDANo + "-" + y2DepreciationNo);
                                     } else {
@@ -955,7 +929,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                 if (patColumns != null && patColumns.length != 0) {
                     if(patColumns.length == headerColumnsIncomeStmt.length) {
                         // Set million or billion flag
-                        MILLIONS_OR_BILLIONS_FLAG = Pattern.compile(MILLIONS_OR_BILLIONS).matcher(pageContentIncomeStmt).find()? "B" : "M";
+//                        MILLIONS_OR_BILLIONS_FLAG = Pattern.compile(MILLIONS_OR_BILLIONS).matcher(pageContentIncomeStmt).find()? "B" : "M";
 
                         if(y0ColumnNumberOnIncStmt != null && y1ColumnNumberOnIncStmt != null && y2ColumnNumberOnIncStmt != null) {
                             y0Column = y0ColumnNumberOnIncStmt.intValue();
@@ -974,11 +948,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                         if (y0Column >= 0) {
                             y0PAT = patColumns[y0Column];
                             y0PATNumber = Double.parseDouble(y0PAT.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                            if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                            /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                 y0PATNumber = y0PATNumber / 10;
                             } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                 y0PATNumber = y0PATNumber * 100;
-                            }
+                            }*/
                             reportParameters.setY0EBIT("" + y0PATNumber);
                         } else {
                             reportParameters.setY0EBIT(null);
@@ -988,11 +962,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                             y1PAT = patColumns[y1Column];
 
                             y1PATNumber = Double.parseDouble(y1PAT.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                            if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                            /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                 y1PATNumber = y1PATNumber / 10;
                             } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                 y1PATNumber = y1PATNumber * 100;
-                            }
+                            }*/
                             reportParameters.setY1EBIT("" + y1PATNumber);
                         } else {
                             reportParameters.setY1EBIT(null);
@@ -1002,11 +976,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                             y2PAT = patColumns[y2Column];
 
                             y2PATNumber = Double.parseDouble(y2PAT.replaceAll(",", "").replaceAll( "\\((\\d+\\.\\d+)\\)", "-$1"));
-                            if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                            /*if (MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                 y2PATNumber = y2PATNumber / 10;
                             } else if (MILLIONS_OR_BILLIONS_FLAG.equals("B")){
                                 y2PATNumber = y2PATNumber * 100;
-                            }
+                            }*/
                             reportParameters.setY2EBIT("" + y2PATNumber);
                         } else {
                             reportParameters.setY2EBIT(null);
@@ -1456,7 +1430,7 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
         String[] aumColumns = null;
         String y0AUM = "", y1AUM = "", y2AUM = "";
         double y0AUMNumber = 0, y1AUMNumber = 0, y2AUMNumber = 0;
-        String MILLIONS_OR_BILLIONS_FLAG_OLD = MILLIONS_OR_BILLIONS_FLAG;
+//        String MILLIONS_OR_BILLIONS_FLAG_OLD = MILLIONS_OR_BILLIONS_FLAG;
 
         try {
             // Get AUM Line No. form the Inc. Statement Page
@@ -1475,11 +1449,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                     aumColumns = getDataColumnsForHeader(aum, AUM_ROW_NAME);
                 }
 
-                AUM_MILLIONS_OR_BILLIONS_FLAG = Pattern.compile(AUM_MILLIONS_OR_BILLIONS).matcher(pageContentAUM).find()? "B" : "M";
-                if (aum.contains("INR b"))
+//                AUM_MILLIONS_OR_BILLIONS_FLAG = Pattern.compile(AUM_MILLIONS_OR_BILLIONS).matcher(pageContentAUM).find()? "B" : "M";
+                /*if (aum.contains("INR b"))
                     AUM_MILLIONS_OR_BILLIONS_FLAG = "B";
                 if (aum.contains("INR m"))
-                    AUM_MILLIONS_OR_BILLIONS_FLAG = "M";
+                    AUM_MILLIONS_OR_BILLIONS_FLAG = "M";*/
 
                 if(aumColumns != null && aumColumns.length != 0 ) {
                     if((aumColumns.length == headerColumnsAUM.length) || (aumColumns.length == headerColumnsAUM.length)) {
@@ -1497,11 +1471,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                             try {
                                 y0AUM = aumColumns[y0Column];
                                 y0AUMNumber = Double.parseDouble(y0AUM.replaceAll(",", ""));
-                                if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                /*if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                     y0AUMNumber = y0AUMNumber / 10;
                                 } else if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
                                     y0AUMNumber = y0AUMNumber * 100;
-                                }
+                                }*/
                                 reportParameters.setY0AUM(new BigDecimal(y0AUMNumber).setScale(2, RoundingMode.HALF_UP));
                             } catch (Exception e) {
                                 reportParameters.setY0AUM(new BigDecimal("0"));
@@ -1515,11 +1489,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                             try {
                                 y1AUM = aumColumns[y1Column];
                                 y1AUMNumber = Double.parseDouble(y1AUM.replaceAll(",", ""));
-                                if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                /*if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                     y1AUMNumber = y1AUMNumber / 10;
                                 } else if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
                                     y1AUMNumber = y1AUMNumber * 100;
-                                }
+                                }*/
                                 reportParameters.setY1AUM(new BigDecimal(y1AUMNumber).setScale(2, RoundingMode.HALF_UP));
                             } catch (Exception e) {
                                 reportParameters.setY1AUM(new BigDecimal("0"));
@@ -1533,11 +1507,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                             try {
                                 y2AUM = aumColumns[y2Column];
                                 y2AUMNumber = Double.parseDouble(y2AUM.replaceAll(",", ""));
-                                if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                /*if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                     y2AUMNumber = y2AUMNumber / 10;
                                 } else if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
                                     y2AUMNumber = y2AUMNumber * 100;
-                                }
+                                }*/
                                 reportParameters.setY2AUM(new BigDecimal(y2AUMNumber).setScale(2, RoundingMode.HALF_UP));
                             } catch (Exception e) {
                                 reportParameters.setY2AUM(new BigDecimal("0"));
@@ -1569,11 +1543,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                             try {
                                 y0AUM = aumColumns[adjustedY0Column];
                                 y0AUMNumber = Double.parseDouble(y0AUM.replaceAll(",", ""));
-                                if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                /*if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                     y0AUMNumber = y0AUMNumber / 10;
                                 } else if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
                                     y0AUMNumber = y0AUMNumber * 100;
-                                }
+                                }*/
                                 reportParameters.setY0AUM(new BigDecimal(y0AUMNumber).setScale(2, RoundingMode.HALF_UP));
                             } catch (Exception e) {
                                 reportParameters.setY0AUM(new BigDecimal("0"));
@@ -1587,11 +1561,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                             try {
                                 y1AUM = aumColumns[adjustedY1Column];
                                 y1AUMNumber = Double.parseDouble(y1AUM.replaceAll(",", ""));
-                                if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                /*if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                     y1AUMNumber = y1AUMNumber / 10;
                                 } else if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
                                     y1AUMNumber = y1AUMNumber * 100;
-                                }
+                                }*/
                                 reportParameters.setY1AUM(new BigDecimal(y1AUMNumber).setScale(2, RoundingMode.HALF_UP));
                             } catch (Exception e) {
                                 reportParameters.setY1AUM(new BigDecimal("0"));
@@ -1605,11 +1579,11 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                             try {
                                 y2AUM = aumColumns[adjustedY2Column];
                                 y2AUMNumber = Double.parseDouble(y2AUM.replaceAll(",", ""));
-                                if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
+                                /*if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("M")) {
                                     y2AUMNumber = y2AUMNumber / 10;
                                 } else if (AUM_MILLIONS_OR_BILLIONS_FLAG.equals("B")) {
                                     y2AUMNumber = y2AUMNumber * 100;
-                                }
+                                }*/
                                 reportParameters.setY2AUM(new BigDecimal(y2AUMNumber).setScale(2, RoundingMode.HALF_UP));
                             } catch (Exception e) {
                                 reportParameters.setY2AUM(new BigDecimal("0"));
@@ -1633,9 +1607,9 @@ public class AnalystRecoExtractorAMBIT extends AnalystRecoExtractor {
                 reportParameters.setY2AUM(new BigDecimal("0"));
                 System.out.println("########## AUM Line not found for for " + QUARTER + "_" + rdec.getTICKER() + "_" + BROKER);
             }
-            MILLIONS_OR_BILLIONS_FLAG = MILLIONS_OR_BILLIONS_FLAG_OLD;
+//            MILLIONS_OR_BILLIONS_FLAG = MILLIONS_OR_BILLIONS_FLAG_OLD;
         } catch (Exception e){
-            MILLIONS_OR_BILLIONS_FLAG = MILLIONS_OR_BILLIONS_FLAG_OLD;
+//            MILLIONS_OR_BILLIONS_FLAG = MILLIONS_OR_BILLIONS_FLAG_OLD;
             reportParameters.setY0AUM(new BigDecimal("0"));
             reportParameters.setY1AUM(new BigDecimal("0"));
             reportParameters.setY2AUM(new BigDecimal("0"));

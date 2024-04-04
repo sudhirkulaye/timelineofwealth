@@ -1,6 +1,5 @@
-
 DELIMITER $$
-CREATE  PROCEDURE `ap_calculate_irr`(INOUT out_irr DECIMAL(20, 4),
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_calculate_irr`(INOUT out_irr DECIMAL(20, 4),
                                                    IN  in_memberid INT,
                                                    IN  in_portfolioid INT,
                                                    IN  in_min_date DATE)
@@ -112,7 +111,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE  PROCEDURE `ap_process_benchmark_returns`( /*
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_process_benchmark_returns`( /*
     IN pi_memberid   INT,
     IN pi_portfolioid    INT*/
 )
@@ -429,6 +428,7 @@ BEGIN
 					WHERE  benchmarkid = var_benchmarkid
                     AND year = var_year;
                 END IF;
+
                 UPDATE benchmark_twrr_monthly
                 SET    returns_fin_year = ((returns_fin_year + 1)*(returns_mar_ending_quarter + 1)) - 1
                 WHERE benchmarkid = var_benchmarkid
@@ -677,6 +677,9 @@ BEGIN
 
 				UPDATE benchmark_twrr_monthly a
 				SET    a.returns_calendar_year = ((returns_mar_ending_quarter + 1) * (returns_jun_ending_quarter + 1) * (returns_sep_ending_quarter + 1) * (returns_dec_ending_quarter + 1)) - 1;
+
+ --  INSERT INTO log_table
+ -- VALUES      (now(), concat('ap_process_benchmark_returns 2 MF: ', ' var_benchmarkid ', var_benchmarkid, ' var_year ', var_year));
 
 				SELECT count(1) INTO var_count
                 FROM benchmark_twrr_monthly
@@ -951,7 +954,7 @@ BEGIN
       AND b.year = var_curr_year;
 
       UPDATE benchmark_twrr_summary a, benchmark_twrr_monthly b
-      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_dec_ending_quarter + 1)*(returns_nov + 1)*(returns_dec + 1)) - 1,
+      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_nov + 1)*(returns_dec + 1)) - 1,
              returns_twrr_one_year = ((returns_twrr_ytd + 1)*(returns_dec_ending_quarter + 1)*(returns_sep_ending_quarter + 1)*(returns_jun + 1)*(returns_may + 1)) - 1,
              returns_twrr_two_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1,
              returns_twrr_three_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1,
@@ -1021,7 +1024,7 @@ BEGIN
       AND b.year = var_curr_year;
 
       UPDATE benchmark_twrr_summary a, benchmark_twrr_monthly b
-      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_dec_ending_quarter + 1)*(returns_dec + 1)) - 1,
+      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_dec + 1)) - 1,
              returns_twrr_one_year = ((returns_twrr_ytd + 1)*(returns_dec_ending_quarter + 1)*(returns_sep_ending_quarter + 1)*(returns_jun + 1)) - 1,
              returns_twrr_two_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1,
              returns_twrr_three_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1,
@@ -1514,7 +1517,7 @@ BEGIN
       AND b.year = var_curr_year;
 
       UPDATE benchmark_twrr_summary a, benchmark_twrr_monthly b
-      SET    returns_twrr_two_year = ((returns_twrr_ytd + 1)*(returns_twrr_one_year + 1)) - 1,
+      SET    returns_twrr_two_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1,
              returns_twrr_three_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1,
              returns_twrr_five_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1,
              returns_twrr_ten_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1
@@ -1601,8 +1604,25 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE  PROCEDURE `ap_process_eod`()
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_process_eod`()
 BEGIN
+
+    DECLARE var_finished INT DEFAULT 0;
+    DECLARE var_result_date DATE;
+
+    DECLARE result_date_cursor CURSOR FOR
+    SELECT distinct result_date
+    FROM   stock_quarter
+	WHERE result_date not in (select date from daily_data_s)
+    AND result_date > '2010-01-01'
+    ORDER BY result_date;
+
+	DECLARE CONTINUE HANDLER
+	FOR NOT FOUND
+		SET var_finished = 1;
+
+	SET SQL_SAFE_UPDATES          = 0;
+
 	INSERT INTO log_table
 	VALUES      (now(), 'ap_process_eod: Begin');
 
@@ -1653,7 +1673,7 @@ BEGIN
 	when scheme_name_full like 'Shriram %' then 'Shriram'
 	when scheme_name_full like 'IIFCL %' then 'IIFCL'
 	when scheme_name_full like 'IL&FS %' then 'IL&FS'
-	when scheme_name_full like 'Mahindra %' then 'Mahindra' end where fund_house = 'XXX';
+	when scheme_name_full like 'Mahindra %' then 'Mahindra' else 'XXX' end where fund_house = 'XXX';
 
 	update mutual_fund_universe a set a.direct_regular = 'Regular' where direct_regular is null or direct_regular = '' or direct_regular not like '%Direct%';
 	update mutual_fund_universe a set a.dividend_growth = 'Growth' where dividend_growth is null or dividend_growth = '' and a.isin_div_payout_or_isin_growth = 'XXX';
@@ -1685,6 +1705,25 @@ BEGIN
 	update wealth_details a, stock_universe b set a.short_name = b.short_name, a.subindustryid = b.subindustryid, a.asset_classid = b.asset_classid where a.ticker = b.ticker;
 	update sip a, mutual_fund_universe b set a.scheme_name = b.scheme_name_part where a.scheme_code = b.scheme_code;
 
+    -- update result_date as a next working dates
+    OPEN result_date_cursor;
+	SET var_finished = 0;
+
+  FETCH_DATA:
+	LOOP
+		FETCH result_date_cursor INTO var_result_date;
+		IF var_finished = 1
+		THEN
+		  LEAVE fetch_data;
+		END IF;
+
+        UPDATE stock_quarter
+        SET result_date = (select min(date) from daily_data_s where date > var_result_date)
+        WHERE result_date = var_result_date;
+
+	END LOOP fetch_data;
+    CLOSE result_date_cursor;
+
     call ap_process_benchmark_returns();
 
     COMMIT;
@@ -1695,7 +1734,487 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE  PROCEDURE `ap_process_mf_returns`()
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_process_mf_calendar_returns`()
+BEGIN
+
+  DECLARE var_finished, var_count, var_scheme_code INT DEFAULT 0;
+  DECLARE var_nav_end_date, var_nav_start_date DECIMAL(20,3);
+  DECLARE var_date_today, var_end_date, var_start_date DATE;
+
+  DECLARE mutual_fund_stats_cursor CURSOR FOR
+    SELECT scheme_code
+    FROM   mutual_fund_stats
+    ORDER BY scheme_code;
+
+  DECLARE CONTINUE HANDLER
+  FOR NOT FOUND
+    SET var_finished = 1;
+
+  SET SQL_SAFE_UPDATES          = 0;
+
+  INSERT INTO log_table
+  VALUES      (now(), 'ap_process_mf_calendar_returns: Begin');
+
+  SELECT date_today
+  INTO   var_date_today
+  FROM   setup_dates;
+
+  OPEN mutual_fund_stats_cursor;
+
+  SET var_finished = 0;
+
+  FETCH_DATA: LOOP
+
+    FETCH mutual_fund_stats_cursor INTO var_scheme_code;
+    IF var_finished = 1 THEN
+      LEAVE FETCH_DATA;
+    END IF;
+
+	/*INSERT INTO log_table
+	VALUES      (now(), concat('ap_process_mf_calendar_returns: var_scheme_code - ', var_scheme_code));*/
+
+    -- Calculate total_returns_y0 (YTD returns)
+    SELECT MAX(date) INTO var_end_date
+    FROM mutual_fund_nav_history
+    WHERE scheme_code = var_scheme_code
+    AND date <= var_date_today;
+
+    SELECT MAX(date) INTO var_start_date
+    FROM mutual_fund_nav_history
+    WHERE scheme_code = var_scheme_code
+    AND date < DATE_SUB(var_date_today, INTERVAL 1 YEAR);
+
+    IF(var_end_date IS NOT NULL AND var_start_date IS NOT NULL) THEN
+		SELECT nav INTO var_nav_end_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_end_date;
+
+		SELECT nav INTO var_nav_start_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_start_date;
+
+		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y0 = ((var_nav_end_date / var_nav_start_date) - 1)*100
+		  WHERE scheme_code = var_scheme_code;
+		ELSE
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y0 = 0
+		  WHERE scheme_code = var_scheme_code;
+		END IF;
+	ELSE
+		UPDATE mutual_fund_stats
+		SET total_returns_y0 = 0
+		WHERE scheme_code = var_scheme_code;
+    END IF;
+
+	-- Calculate total_returns_y1 (returns on the calendar year before the current year)
+	SELECT MAX(date) INTO var_end_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= var_date_today
+	AND YEAR(date) < YEAR(var_date_today);
+
+	SELECT MAX(date) INTO var_start_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 1 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 1;
+
+	IF(var_end_date IS NOT NULL AND var_start_date IS NOT NULL) THEN
+		SELECT nav INTO var_nav_end_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_end_date;
+
+		SELECT nav INTO var_nav_start_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_start_date;
+
+		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y1 = ((var_nav_end_date / var_nav_start_date) - 1)*100
+		  WHERE scheme_code = var_scheme_code;
+		ELSE
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y1 = 0
+		  WHERE scheme_code = var_scheme_code;
+		END IF;
+	ELSE
+		UPDATE mutual_fund_stats
+		SET total_returns_y1 = 0
+		WHERE scheme_code = var_scheme_code;
+    END IF;
+
+	-- Calculate total_returns_y2 (returns on the calendar year two years before the current year)
+	SELECT MAX(date) INTO var_end_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 1 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 1;
+
+	SELECT MAX(date) INTO var_start_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 2 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 2;
+
+	IF(var_end_date IS NOT NULL AND var_start_date IS NOT NULL) THEN
+		SELECT nav INTO var_nav_end_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_end_date;
+
+		SELECT nav INTO var_nav_start_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_start_date;
+
+		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y2 = ((var_nav_end_date / var_nav_start_date) - 1)*100
+		  WHERE scheme_code = var_scheme_code;
+		ELSE
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y2 = 0
+		  WHERE scheme_code = var_scheme_code;
+		END IF;
+	ELSE
+		UPDATE mutual_fund_stats
+		SET total_returns_y2 = 0
+		WHERE scheme_code = var_scheme_code;
+    END IF;
+
+	-- Calculate total_returns_y3 (returns on the calendar year three years before the current year)
+	SELECT MAX(date) INTO var_end_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 2 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 2;
+
+	SELECT MAX(date) INTO var_start_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 3 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 3;
+
+	IF(var_end_date IS NOT NULL AND var_start_date IS NOT NULL) THEN
+		SELECT nav INTO var_nav_end_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_end_date;
+
+		SELECT nav INTO var_nav_start_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_start_date;
+
+		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y3 = ((var_nav_end_date / var_nav_start_date) - 1)*100
+		  WHERE scheme_code = var_scheme_code;
+		ELSE
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y3 = 0
+		  WHERE scheme_code = var_scheme_code;
+		END IF;
+	ELSE
+		UPDATE mutual_fund_stats
+		SET total_returns_y3 = 0
+		WHERE scheme_code = var_scheme_code;
+    END IF;
+
+	-- Calculate total_returns_y4 (returns on the calendar year three years before the current year)
+	SELECT MAX(date) INTO var_end_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 3 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 3;
+
+	SELECT MAX(date) INTO var_start_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 4 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 4;
+
+	IF(var_end_date IS NOT NULL AND var_start_date IS NOT NULL) THEN
+		SELECT nav INTO var_nav_end_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_end_date;
+
+		SELECT nav INTO var_nav_start_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_start_date;
+
+		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y4 = ((var_nav_end_date / var_nav_start_date) - 1)*100
+		  WHERE scheme_code = var_scheme_code;
+		ELSE
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y4 = 0
+		  WHERE scheme_code = var_scheme_code;
+		END IF;
+	ELSE
+		UPDATE mutual_fund_stats
+		SET total_returns_y4 = 0
+		WHERE scheme_code = var_scheme_code;
+    END IF;
+
+	-- Calculate total_returns_y5 (returns on the calendar year three years before the current year)
+	SELECT MAX(date) INTO var_end_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 4 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 4;
+
+	SELECT MAX(date) INTO var_start_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 5 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 5;
+
+	IF(var_end_date IS NOT NULL AND var_start_date IS NOT NULL) THEN
+		SELECT nav INTO var_nav_end_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_end_date;
+
+		SELECT nav INTO var_nav_start_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_start_date;
+
+		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y5 = ((var_nav_end_date / var_nav_start_date) - 1)*100
+		  WHERE scheme_code = var_scheme_code;
+		ELSE
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y5 = 0
+		  WHERE scheme_code = var_scheme_code;
+		END IF;
+	ELSE
+		UPDATE mutual_fund_stats
+		SET total_returns_y5 = 0
+		WHERE scheme_code = var_scheme_code;
+    END IF;
+
+	-- Calculate total_returns_y6 (returns on the calendar year three years before the current year)
+	SELECT MAX(date) INTO var_end_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 5 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 5;
+
+	SELECT MAX(date) INTO var_start_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 6 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 6;
+
+	IF(var_end_date IS NOT NULL AND var_start_date IS NOT NULL) THEN
+		SELECT nav INTO var_nav_end_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_end_date;
+
+		SELECT nav INTO var_nav_start_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_start_date;
+
+		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y6 = ((var_nav_end_date / var_nav_start_date) - 1)*100
+		  WHERE scheme_code = var_scheme_code;
+		ELSE
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y6 = 0
+		  WHERE scheme_code = var_scheme_code;
+		END IF;
+	ELSE
+		UPDATE mutual_fund_stats
+		SET total_returns_y6 = 0
+		WHERE scheme_code = var_scheme_code;
+    END IF;
+
+	-- Calculate total_returns_y7 (returns on the calendar year three years before the current year)
+	SELECT MAX(date) INTO var_end_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 6 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 6;
+
+	SELECT MAX(date) INTO var_start_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 7 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 7;
+
+	IF(var_end_date IS NOT NULL AND var_start_date IS NOT NULL) THEN
+		SELECT nav INTO var_nav_end_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_end_date;
+
+		SELECT nav INTO var_nav_start_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_start_date;
+
+		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y7 = ((var_nav_end_date / var_nav_start_date) - 1)*100
+		  WHERE scheme_code = var_scheme_code;
+		ELSE
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y7 = 0
+		  WHERE scheme_code = var_scheme_code;
+		END IF;
+	ELSE
+		UPDATE mutual_fund_stats
+		SET total_returns_y7 = 0
+		WHERE scheme_code = var_scheme_code;
+    END IF;
+
+	-- Calculate total_returns_y8 (returns on the calendar year three years before the current year)
+	SELECT MAX(date) INTO var_end_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 7 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 7;
+
+	SELECT MAX(date) INTO var_start_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 8 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 8;
+
+	IF(var_end_date IS NOT NULL AND var_start_date IS NOT NULL) THEN
+		SELECT nav INTO var_nav_end_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_end_date;
+
+		SELECT nav INTO var_nav_start_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_start_date;
+
+		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y8 = ((var_nav_end_date / var_nav_start_date) - 1)*100
+		  WHERE scheme_code = var_scheme_code;
+		ELSE
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y8 = 0
+		  WHERE scheme_code = var_scheme_code;
+		END IF;
+	ELSE
+		UPDATE mutual_fund_stats
+		SET total_returns_y8 = 0
+		WHERE scheme_code = var_scheme_code;
+    END IF;
+
+	-- Calculate total_returns_y9 (returns on the calendar year three years before the current year)
+	SELECT MAX(date) INTO var_end_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 8 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 8;
+
+	SELECT MAX(date) INTO var_start_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 9 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 9;
+
+	IF(var_end_date IS NOT NULL AND var_start_date IS NOT NULL) THEN
+		SELECT nav INTO var_nav_end_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_end_date;
+
+		SELECT nav INTO var_nav_start_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_start_date;
+
+		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y9 = ((var_nav_end_date / var_nav_start_date) - 1)*100
+		  WHERE scheme_code = var_scheme_code;
+		ELSE
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y9 = 0
+		  WHERE scheme_code = var_scheme_code;
+		END IF;
+	ELSE
+		UPDATE mutual_fund_stats
+		SET total_returns_y9 = 0
+		WHERE scheme_code = var_scheme_code;
+    END IF;
+
+	-- Calculate total_returns_y10 (returns on the calendar year three years before the current year)
+	SELECT MAX(date) INTO var_end_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 9 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 9;
+
+	SELECT MAX(date) INTO var_start_date
+	FROM mutual_fund_nav_history
+	WHERE scheme_code = var_scheme_code
+	AND date <= DATE_SUB(var_date_today, INTERVAL 10 YEAR)
+	AND YEAR(date) < YEAR(var_date_today) - 10;
+
+	IF(var_end_date IS NOT NULL AND var_start_date IS NOT NULL) THEN
+		SELECT nav INTO var_nav_end_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_end_date;
+
+		SELECT nav INTO var_nav_start_date
+		FROM mutual_fund_nav_history
+		WHERE scheme_code = var_scheme_code
+		AND date = var_start_date;
+
+		IF var_nav_end_date IS NOT NULL AND var_nav_start_date IS NOT NULL THEN
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y10 = ((var_nav_end_date / var_nav_start_date) - 1)*100
+		  WHERE scheme_code = var_scheme_code;
+		ELSE
+		  UPDATE mutual_fund_stats
+		  SET total_returns_y10 = 0
+		  WHERE scheme_code = var_scheme_code;
+		END IF;
+	ELSE
+		UPDATE mutual_fund_stats
+		SET total_returns_y10 = 0
+		WHERE scheme_code = var_scheme_code;
+    END IF;
+
+  END LOOP FETCH_DATA;
+
+  CLOSE mutual_fund_stats_cursor;
+
+  INSERT INTO log_table
+  VALUES (now(), 'ap_process_mf_calendar_returns: End');
+
+  COMMIT;
+
+
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_process_mf_returns`()
 BEGIN
 
   DECLARE var_finished, var_count, var_scheme_code INT DEFAULT 0;
@@ -1725,7 +2244,7 @@ BEGIN
   SET var_date_1_yr_before = date_sub(var_date_today, INTERVAL 12 MONTH);
   SET var_date_3_yr_before = date_sub(var_date_today, INTERVAL 36 MONTH);
   SET var_date_5_yr_before = date_sub(var_date_today, INTERVAL 60 MONTH);
-  SET var_date_10_yr_before = date_sub(var_date_today, INTERVAL 72 MONTH); -- temp. setting to 6years
+  SET var_date_10_yr_before = date_sub(var_date_today, INTERVAL 120 MONTH);
   SET var_date_current_year_start = Makedate(Year(var_date_today), 1);
 
   OPEN mutual_fund_stats_cursor;
@@ -1876,7 +2395,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE  PROCEDURE `ap_process_mosl_transactions`()
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_process_mosl_transactions`()
 BEGIN
 
     DECLARE var_finished, var_count INT DEFAULT 0;
@@ -1897,6 +2416,7 @@ BEGIN
     SELECT b.memberid, a.moslcode, a.portfolioid, date, script_name, sell_buy, sum(quantity), sum(amount), sum(brokerage), sum(txn_charges), sum(service_tax), sum(stamp_duty), sum(stt_ctt)
     FROM  mosl_transaction a, moslcode_memberid b
     WHERE (is_processed = NULL OR is_processed = 'N')
+    AND a.quantity > 0
     AND a.moslcode = b.moslcode
     GROUP BY b.memberid, a.moslcode, date, script_name, sell_buy
     ORDER BY date, a.moslcode, sell_buy, order_no, trade_no, script_name;
@@ -2228,7 +2748,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE  PROCEDURE `ap_process_portfolio_returns`( /*
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_process_portfolio_returns`( /*
     IN pi_memberid   INT,
     IN pi_portfolioid    INT*/
 )
@@ -3158,7 +3678,7 @@ BEGIN
       AND b.returns_year = var_curr_year;
 
       UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b, portfolio c
-      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_dec_ending_quarter + 1)*(returns_nov + 1)*(returns_dec + 1)) - 1
+      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_nov + 1)*(returns_dec + 1)) - 1
       WHERE  a.memberid = b.memberid AND b.memberid = c.memberid
       AND a.portfolioid = b.portfolioid AND b.portfolioid = c.portfolioid
       AND c.status = 'Active'
@@ -3333,7 +3853,7 @@ BEGIN
       AND b.returns_year = var_curr_year;
 
       UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b, portfolio c
-      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_dec_ending_quarter + 1)*(returns_dec + 1)) - 1
+      SET    returns_twrr_half_year = ((returns_twrr_ytd + 1)*(returns_dec + 1)) - 1
       WHERE  a.memberid = b.memberid AND b.memberid = c.memberid
       AND a.portfolioid = b.portfolioid AND b.portfolioid = c.portfolioid
       AND c.status = 'Active'
@@ -4574,7 +5094,7 @@ BEGIN
       AND b.returns_year = var_curr_year;
 
       UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b, portfolio c
-      SET    returns_twrr_two_year = ((returns_twrr_ytd + 1)*(returns_twrr_one_year + 1)) - 1
+      SET    returns_twrr_two_year = ((returns_twrr_ytd + 1)*(returns_calendar_year + 1)) - 1
       WHERE  a.memberid = b.memberid AND b.memberid = c.memberid
       AND a.portfolioid = b.portfolioid AND b.portfolioid = c.portfolioid
       AND c.status = 'Active'
@@ -4691,6 +5211,11 @@ BEGIN
 
   END CASE;
 
+  UPDATE portfolio_twrr_summary a SET returns_twrr_two_year = POWER((1 +  returns_twrr_two_year), 0.5) - 1 WHERE returns_twrr_two_year <> 0;
+  UPDATE portfolio_twrr_summary a SET returns_twrr_three_year = POWER((1 +  returns_twrr_three_year), (1/3)) - 1 WHERE returns_twrr_three_year <> 0;
+  UPDATE portfolio_twrr_summary a SET returns_twrr_five_year = POWER((1 +  returns_twrr_five_year), 0.2) - 1 WHERE returns_twrr_five_year <> 0;
+  UPDATE portfolio_twrr_summary a SET returns_twrr_ten_year = POWER((1 +  returns_twrr_ten_year), 0.1) - 1 WHERE returns_twrr_ten_year <> 0;
+
   IF (MONTH(var_date_today) > 3)
   THEN
     UPDATE portfolio_twrr_summary a, portfolio_twrr_monthly b
@@ -4760,7 +5285,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE  PROCEDURE `ap_process_sip_history`(IN in_memberid INT, IN in_sipid INT)
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_process_sip_history`(IN in_memberid INT, IN in_sipid INT)
 BEGIN
 
   DECLARE var_finished, var_count, var_scheme_code, var_sip_freq, var_deduction_day INT DEFAULT 0;
@@ -4906,7 +5431,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE  PROCEDURE `ap_process_sips`()
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_process_sips`()
 BEGIN
   DECLARE var_finished, var_count, var_memberid, var_sipid, var_scheme_code INT DEFAULT 0;
 
@@ -5174,7 +5699,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE  PROCEDURE `ap_process_stat_calculation`()
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_process_stat_calculation`()
 BEGIN
 
   -- DECLARE var_ticker, var_ticker_b VARCHAR(30);
@@ -5211,7 +5736,7 @@ BEGIN
   -- Update rank and marketcap data in stock universe
   UPDATE stock_universe a, daily_data_s b
   SET a.marketcap = b.market_cap, a.marketcap_rank = rank, a.pe_ttm = b.pe_ttm
-  WHERE a.ticker5 = b.name
+  WHERE a.ticker = b.name
   AND b.date = var_date_today;
 
   -- Find any new Stock Entry
@@ -5241,7 +5766,7 @@ BEGIN
   ( SELECT nse_ticker, '','','','','', nse_ticker, '', isin_code, nse_ticker, nse_ticker,
       CASE when nse_ticker like '%GOLD%' then '502010' when nse_ticker like '%NIF%' then '401010'
            when nse_ticker like '%JUNIOR%' then '401030' when nse_ticker like '%ETF%' then '401010' else '406040' END,
-      '', 0, close_price, date, 0,0,0,0,0,0,0,0,0,0,0,0, '', date
+      '', 0, close_price, date, 0,0,0,0,0,0,0,0,0,0,0,0,0, '', date
       FROM nse_price_history a
       WHERE date = var_date_today
       AND a.series = 'EQ'
@@ -5261,6 +5786,7 @@ BEGIN
 
   -- Compute Mutual Fund Stats
   call ap_process_mf_returns();
+  call ap_process_mf_calendar_returns();
 
   -- Compute Stock Pirce Returns
   call ap_process_stock_returns();
@@ -5276,11 +5802,13 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE  PROCEDURE `ap_process_stock_returns`()
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_process_stock_returns`()
 BEGIN
 
   DECLARE var_finished, var_count INT DEFAULT 0;
-  DECLARE var_price_today, var_price_history, var_52w_min, var_52w_max DECIMAL(20,3);
+  DECLARE var_price_today, var_price_history, var_52w_min, var_52w_max,
+		  var_price_1w_min, var_price_1w_max, var_price_2w_min, var_price_2w_max, var_price_1m_min, var_price_1m_max,
+		  var_price_2m_min, var_price_2m_max, var_price_3m_min, var_price_3m_max, var_price_6m_min, var_price_6m_max DECIMAL(20,3);
   DECLARE var_date_today, var_date_last_trading_day, var_date_current_year_start,
 		  var_date_1_w_before, var_date_2_w_before, var_date_1_mt_before,
           var_date_2_mt_before, var_date_3_mt_before, var_date_6_mt_before, var_date_9_mt_before,
@@ -5315,7 +5843,9 @@ BEGIN
   SET CMP = 0, 52w_min = 0, 52w_max = 0, up_52w_min = 0, down_52w_max = 0,
       return_1D = 0, return_1W = 0, return_2W = 0, return_1M = 0, return_2M = 0,
       return_3M = 0, return_6M = 0, return_9M = 0, return_1Y = 0, return_2Y = 0,
-      return_3Y = 0, return_5Y = 0, return_10Y = 0, return_YTD = 0;
+      return_3Y = 0, return_5Y = 0, return_10Y = 0, return_YTD = 0,
+      1w_min = 0, 1w_max = 0, 2w_min = 0, 2w_max = 0, 1m_min = 0, 1m_max = 0,
+      2m_min = 0, 1m_max = 0, 3m_min = 0, 3m_max = 0, 6m_min = 0, 6m_max = 0;
 
   SET var_date_1_w_before = date_sub(var_date_today, INTERVAL 7 DAY);
   SET var_date_2_w_before = date_sub(var_date_today, INTERVAL 14 DAY);
@@ -5371,6 +5901,79 @@ BEGIN
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
 			date = var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_1w_min
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_1_w_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_1w_max
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_1_w_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_2w_min
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_2_w_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_2w_max
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_2_w_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_1m_min
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_1_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_1m_max
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_1_mt_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_2m_min
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_2_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_2m_max
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_2_mt_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_3m_min
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_3_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_3m_max
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_3_mt_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_6m_min
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_6_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_6m_max
+			FROM nse_price_history
+			WHERE nse_ticker = var_ticker AND
+			date between var_date_6_mt_before and var_date_today;
+
         END IF;
     ELSE
 		SELECT count(1)
@@ -5385,11 +5988,89 @@ BEGIN
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
 			date = var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_1w_min
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_1_w_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_1w_max
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_1_w_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_2w_min
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_2_w_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_2w_max
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_2_w_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_1m_min
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_1_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_1m_max
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_1_mt_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_2m_min
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_2_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_2m_max
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_2_mt_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_3m_min
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_3_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_3m_max
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_3_mt_before and var_date_today;
+
+			SELECT min(close_price)
+			INTO var_price_6m_min
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_6_mt_before and var_date_today;
+
+			SELECT max(close_price)
+			INTO var_price_6m_max
+			FROM bse_price_history
+			WHERE bse_ticker = var_ticker AND
+			date between var_date_6_mt_before and var_date_today;
+
         END IF;
     END IF;
 
     UPDATE stock_price_movement
-    SET CMP = var_price_today
+    SET CMP = var_price_today, 1w_min = var_price_1w_min, 1w_max = var_price_1w_max,
+    2w_min = var_price_2w_min, 2w_max = var_price_2w_max,
+    1m_min = var_price_1m_min, 1m_max = var_price_1m_max,
+    2m_min = var_price_2m_min, 2m_max = var_price_2m_max,
+    3m_min = var_price_3m_min, 3m_max = var_price_3m_max,
+    6m_min = var_price_6m_min, 6m_max = var_price_6m_max
     WHERE ticker = var_ticker;
 
     SET var_price_history = 0;
@@ -6128,7 +6809,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE  PROCEDURE `ap_process_stock_returns_history`()
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_process_stock_returns_history`()
 BEGIN
 
   DECLARE var_finished, var_count INT DEFAULT 0;
@@ -6437,7 +7118,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE  PROCEDURE `ap_set_market_cap_rank`(
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_set_market_cap_rank`(
    IN pi_date_today       DATE,
    IN pi_date_prior   DATE)
 BEGIN
@@ -6468,7 +7149,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE  PROCEDURE `ap_update_wealth_data`()
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_update_wealth_data`()
 BEGIN
 
   DECLARE var_date_today DATE;
@@ -6722,5 +7403,63 @@ BEGIN
 
   commit;
 
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `populate_table_row_count`()
+BEGIN
+  DECLARE done INT DEFAULT FALSE;
+
+  DECLARE tablename VARCHAR(64);
+
+  DECLARE cur1 CURSOR FOR
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = 'timelineofwealth'
+    ORDER BY table_name;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+  TRUNCATE TABLE dummy_user_table_row_count;
+
+  OPEN cur1;
+
+  read_loop: LOOP
+    FETCH cur1 INTO tablename;
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+
+    SET @sql = CONCAT('INSERT INTO dummy_user_table_row_count (table_name, row_count) SELECT ''', tablename, ''', COUNT(1) FROM ', tablename);
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+  END LOOP;
+
+  CLOSE cur1;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `update_daily_data_s_name`()
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE var_ticker VARCHAR(255);
+    DECLARE var_ticker4 VARCHAR(255);
+    DECLARE cur CURSOR FOR SELECT ticker, ticker4 FROM stock_universe;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO var_ticker, var_ticker4;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        UPDATE daily_data_s SET name = var_ticker WHERE name = var_ticker4;
+    END LOOP;
+
+    CLOSE cur;
 END$$
 DELIMITER ;
