@@ -175,7 +175,7 @@ public class AnalystRecoExtractor {
             String analystNamesFilePath = prop.getProperty("AnalystNamesFilePath");
             AnalystRecoExtractor analystRecoExtractor = new AnalystRecoExtractor();
             analystRecoExtractor.loadAnalystNames(analystNamesFilePath);
-            analystRecoExtractor.loadReportDataExtractConfig(reportDataExtractConfigFilePath);
+//            analystRecoExtractor.loadReportDataExtractConfig(reportDataExtractConfigFilePath);
 
             // Load list of reportPaths and corresponding excelPaths
             ArrayList<String> reportFilePaths = new ArrayList<String>();
@@ -217,7 +217,9 @@ public class AnalystRecoExtractor {
 
 
                     // Load ReportDataConfig Parameters for the ticker
-                    ReportDataExtractConfig reportDataExtractConfig = analystRecoExtractor.getReportDataExtractConfig(reportDataExtractConfigFilePath, quarter, ticker, brokerName);
+                    // ReportDataExtractConfig reportDataExtractConfig = analystRecoExtractor.getReportDataExtractConfig(reportDataExtractConfigFilePath, quarter, ticker, brokerName);
+                    //Fix: Dont load all parameters but load only one that is required
+                    ReportDataExtractConfig reportDataExtractConfig = analystRecoExtractor.loadReportDataExtractConfig(reportDataExtractConfigFilePath, quarter, ticker, brokerName);
 
                     // get Subclass based on broker
                     AnalystRecoExtractor extractor = getExtractor(brokerName);
@@ -599,24 +601,24 @@ public class AnalystRecoExtractor {
         }
     }
 
-    private void loadReportDataExtractConfig(String reportDataExtractConfigFilePath){
+    /*private void loadReportDataExtractConfig(String reportDataExtractConfigFilePath, String forBroker, String forTicker){
         try {
             // Open the new workbook
             FileInputStream file = new FileInputStream(new File(reportDataExtractConfigFilePath));
             XSSFWorkbook wb = new XSSFWorkbook(file);
 
-            for (String broker : brokers){
-                ReportDataExtractConfig reportDataExtractConfig = null;
-                XSSFSheet ws = wb.getSheet(broker);
-                XSSFRow headerRow = ws.getRow(0);
+            ReportDataExtractConfig reportDataExtractConfig = null;
+            XSSFSheet ws = wb.getSheet(forBroker);
+            XSSFRow headerRow = ws.getRow(0);
 
-                for(int i = 1; i <= ws.getLastRowNum(); i++) {
-                    XSSFRow dataRow = ws.getRow(i);
-                    if (dataRow != null && dataRow.getCell(0) != null && dataRow.getCell(1) != null) {
-                        String ticker = dataRow.getCell(0).getStringCellValue();
-                        String quarter = dataRow.getCell(1).getStringCellValue();
-                        reportDataExtractConfig = loadReportDataExtractConfig(reportDataExtractConfigFilePath, quarter, ticker, broker);
-                        configMap.put(quarter + "_" + ticker + "_" + broker, reportDataExtractConfig);
+            for(int i = 1; i <= ws.getLastRowNum(); i++) {
+                XSSFRow dataRow = ws.getRow(i);
+                if (dataRow != null && dataRow.getCell(0) != null && dataRow.getCell(1) != null) {
+                    String ticker = dataRow.getCell(0).getStringCellValue();
+                    String quarter = dataRow.getCell(1).getStringCellValue();
+                    if(ticker.equals(forTicker) || ticker.equals("DEFAULT")) {
+                        reportDataExtractConfig = loadReportDataExtractConfig(reportDataExtractConfigFilePath, quarter, ticker, forBroker);
+                        configMap.put(quarter + "_" + ticker + "_" + forBroker, reportDataExtractConfig);
                     }
                 }
             }
@@ -626,7 +628,7 @@ public class AnalystRecoExtractor {
             System.out.println("Exception in loadReportDataExtractConfig " + e.getMessage());
             e.printStackTrace();
         }
-    }
+    }*/
 
     private ReportDataExtractConfig loadReportDataExtractConfig(String reportDataExtractConfigFilePath, String quarter, String ticker, String brokerName) {
         ReportDataExtractConfig reportDataExtractConfig = null;
@@ -1110,10 +1112,10 @@ public class AnalystRecoExtractor {
     private ReportDataExtractConfig getReportDataExtractConfig(String reportDataExtractConfigFilePath, String quarter, String ticker, String brokerName) {
         ReportDataExtractConfig reportDataExtractConfig = null;
 
-        if (this.configMap.isEmpty()) {
+        /*if (this.configMap.isEmpty()) {
             // load configMap
             loadReportDataExtractConfig(reportDataExtractConfigFilePath);
-        }
+        }*/
         if (this.configMap.containsKey(quarter + "_" + ticker + "_" + brokerName)) {
             reportDataExtractConfig = configMap.get(quarter + "_" + ticker + "_" + brokerName);
             return reportDataExtractConfig;
