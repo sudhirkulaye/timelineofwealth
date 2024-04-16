@@ -29,7 +29,7 @@ public class CreateFolderStructureForIndustry {
         //4. File Name and Corresponding Folder Name
 //        listFileNameAndSectorFolder();
         //5. updateResultTrackerExcel in ResultTracker.xlsx
-//        ConsolidatedResultTracker.updateResultTrackerExcel();
+        ConsolidatedResultTracker.updateResultTrackerExcel();
         //6. CreateAutoSalesTable
         createAutoSalesTable();
         //7. Update todays downloaded excels' MCap & Price Data (Note chang path for each new quarter)
@@ -38,8 +38,8 @@ public class CreateFolderStructureForIndustry {
 
     public static void createFolderStructure(String[] argv) throws IOException {
 //        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q1";
-        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
-        String destinationPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q3";
+        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q3";
+        String destinationPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q4";
 
         File sourceDirectory = new File(sourcePath);
 
@@ -294,7 +294,7 @@ public class CreateFolderStructureForIndustry {
     }
 
     public static void updateMCapAndPrice() {
-        String folderPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2024Q3";
+        String folderPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2024Q4";
         File folder = new File(folderPath);
 
         // Get the list of files modified or created today

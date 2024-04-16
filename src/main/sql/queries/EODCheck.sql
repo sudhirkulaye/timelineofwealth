@@ -21,6 +21,8 @@ select * from daily_data_s where date = (select date_today from setup_dates) ord
 
 -- proceed EOD
 call ap_update_wealth_data();
+-- *** Unlock Users ****
+update user set active = 1 where email in ('admin', 'sudhirkulaye', 'sudhir.kulaye@gmail.com');
 -- *** Report Download patch ***
 UPDATE portfolio_holdings SET rate = '1', total_cost = '1', net_rate = '1', cmp = '1', market_value = '1' WHERE ticker = 'MOSL_CASH'  and total_cost = 0 and rate = 0 and net_rate = 0 and market_value = 0;
 -- *** Download data patch *******

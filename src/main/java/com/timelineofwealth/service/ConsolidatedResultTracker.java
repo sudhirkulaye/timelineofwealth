@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class ConsolidatedResultTracker {
 
-    static String QUARTER = "Q3"; // Update this for each new quarter
+    static String QUARTER = "Q4"; // Update this for each new quarter
     static String YEAR = "24"; // Update this for each new year
     static String TRACKER_FILE_PATH = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert\\ResultTracker.xlsx";
     static String QUARTE_REXCEL_Folder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\20" + YEAR + QUARTER;

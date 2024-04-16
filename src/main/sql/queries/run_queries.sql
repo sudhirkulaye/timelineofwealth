@@ -151,6 +151,32 @@ b.subindustryid = c.subindustryid and
 (b.is_bse500 = 1 or b.is_nse500 = 1) and
 b.ticker = d.ticker;
 
+-- Stocks which have appreciated recently and trading above max fair price
+select a.ticker, b.marketcap, b.latest_price, a.min_mcap, a.min_fair_price, a.max_mcap, a.max_fair_price, (a.max_fair_price/b.latest_price - 1) up, (b.latest_price/a.min_fair_price - 1) down, 
+c.1m_max, c.3m_max, c.6m_max, c.52w_max, case when c.52w_max>b.latest_price then 'Not at 52W High' else 'At 52W High' END as high_status,
+c.return_2W, c.return_1M, c.return_2M, return_3M, return_6M
+from stock_valuation a, stock_universe b, stock_price_movement c
+where 
+a.ticker = b.ticker and 
+a.ticker = c.ticker and 
+a.quarter = 'FY24Q3' and
+(a.max_fair_price/b.latest_price - 1)  < 0 and return_1M > 10 and
+a.min_fair_price < a.max_fair_price and b.is_fno = 1
+order by return_1M desc;
+
+-- Stocks which have either split/corrected recently and trading below min fair price
+select a.ticker, b.marketcap, b.latest_price, a.min_mcap, a.min_fair_price, a.max_mcap, a.max_fair_price, (a.max_fair_price/b.latest_price - 1) up, (b.latest_price/a.min_fair_price - 1) down, 
+c.1m_max, c.3m_max, c.6m_max, c.52w_max, case when c.52w_max>b.latest_price then 'Not at 52W High' else 'At 52W High' END as high_status,
+c.return_2W, c.return_1M, c.return_2M, return_3M, return_6M
+from stock_valuation a, stock_universe b, stock_price_movement c
+where 
+a.ticker = b.ticker and 
+a.ticker = c.ticker and 
+a.quarter = 'FY24Q3' and
+(b.latest_price/a.min_fair_price - 1)  < 0 and return_1M > -10 and
+a.min_fair_price < a.max_fair_price and b.is_fno = 1
+order by return_1M;
+
 SELECT 
  IF(is_sensex = 1, 'SENSEX', IF(is_nifty50 = 1, 'NIFTY', IF(is_nse100 = 1 OR is_bse100 = 1, 'NSE-BSE100', IF(is_nse200 = 1 OR is_bse200 = 1, 'NSE-BSE200', 'NSE-BSE500')))) index1,
  b.ticker, b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, a.cmp, a.market_cap, last_result_date,

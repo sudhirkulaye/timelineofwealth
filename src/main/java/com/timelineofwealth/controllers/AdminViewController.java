@@ -10,6 +10,7 @@ import com.timelineofwealth.repositories.*;
 import com.timelineofwealth.service.*;
 import org.apache.poi.ss.formula.eval.NotImplementedFunctionException;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -783,7 +784,143 @@ public class AdminViewController {
     }
 
     @RequestMapping(value=("/admin/uploadmosltxnstatus"),headers=("content-type=multipart/*"),method= RequestMethod.POST)
-    public String uploadMOSLTxnStatus (Model model, @RequestParam("file") MultipartFile file){
+    public String uploadMOSLTxnStatus(Model model, @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            model.addAttribute("message", "Please select a file to upload");
+            return "admin/uploadmosltxn";
+        }
+
+        try {
+            List<MOSLTransaction> moslTransactions = new ArrayList<>();
+            XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+            XSSFSheet worksheet = workbook.getSheetAt(0);
+
+            // Extract column headers from the first row
+            XSSFRow headerRow = worksheet.getRow(0);
+            Map<String, Integer> columnIndexMap = new HashMap<>();
+            for (int i = 0; i < headerRow.getLastCellNum(); i++) {
+                XSSFCell cell = headerRow.getCell(i);
+                String columnHeader = cell.getStringCellValue().trim();
+                columnIndexMap.put(columnHeader, i);
+            }
+
+            for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+                MOSLTransaction moslTransaction = new MOSLTransaction();
+                XSSFRow row = worksheet.getRow(i);
+
+                moslTransaction.setKey(new MOSLTransaction.MOSLTransactionKey());
+
+                // Retrieve data dynamically based on column header
+                moslTransaction.getKey().setMoslCode(getStringValue(row, columnIndexMap, "CLIENTCODE"));
+                moslTransaction.setExchange(getStringValue(row, columnIndexMap, "EXCHANGE"));
+                moslTransaction.getKey().setDate(getDateValue(row, columnIndexMap, "TRADE DATE"));
+                moslTransaction.getKey().setScriptName(getStringValue(row, columnIndexMap, "SCRIP NAME"));
+                String buySell = getStringValue(row, columnIndexMap, "SELL/BUY");
+                if(buySell.equals("S"))
+                    buySell = "Sell";
+                if(buySell.equals("B"))
+                    buySell = "Buy";
+                moslTransaction.getKey().setSellBuy(buySell);
+                moslTransaction.setQuantity(getBigDecimalValue(row, columnIndexMap, "TRADE QTY").abs());
+                moslTransaction.setRate(getBigDecimalValue(row, columnIndexMap, "MARKET PRICE"));
+                moslTransaction.setAmount(getBigDecimalValue(row, columnIndexMap, "MARKET AMOUNT"));
+                moslTransaction.setBrokerage(getBigDecimalValue(row, columnIndexMap, "BROKERAGE"));
+                moslTransaction.setTxnCharges(getBigDecimalValue(row, columnIndexMap, "TRANSACTION CHARGES"));
+                moslTransaction.setServiceTax(getBigDecimalValue(row, columnIndexMap, "GST"));
+                moslTransaction.setStampDuty(getBigDecimalValue(row, columnIndexMap, "STAMP DUTY"));
+                moslTransaction.setSttCtt(getBigDecimalValue(row, columnIndexMap, "STT/CTT"));
+                moslTransaction.setNetRate(getBigDecimalValue(row, columnIndexMap, "NET RATE"));
+                moslTransaction.setNetAmount(getBigDecimalValue(row, columnIndexMap, "NET AMOUNT"));
+                moslTransaction.getKey().setOrderNo(getStringValue(row, columnIndexMap, "ORDER NO"));
+                moslTransaction.getKey().setTradeNo(getStringValue(row, columnIndexMap, "TRADE NO"));
+                moslTransaction.setIsProcessed("N");
+                BigDecimal portfolioid = getBigDecimalValue(row, columnIndexMap, "PORTFOLIO ID");
+                if(portfolioid != null)
+                    moslTransaction.getKey().setPortfolioid(portfolioid.intValue());
+                else
+                    moslTransaction.getKey().setPortfolioid(1);
+                // Add mapping for other fields
+                moslTransactions.add(moslTransaction);
+            }
+
+            moslTransactionRepository.saveAll(moslTransactions);
+
+            // Call stored procedure
+            StoredProcedureQuery storedProcedure = entityManager.createStoredProcedureQuery(AP_PROCESS_MOSL_TRANSACTIONS);
+            boolean result = storedProcedure.execute();
+            if (!result) {
+                model.addAttribute("message", "Successfully uploaded transactions in the file " + file.getOriginalFilename());
+            } else {
+                model.addAttribute("message", "Failed to upload transactions successfully. Check log_table.");
+            }
+
+        } catch (IOException e) {
+            model.addAttribute("error", "Exception in Processing the file.");
+            e.printStackTrace();
+        }
+        return "admin/uploadmosltxn";
+    }
+    // Helper methods to retrieve cell values based on column header
+    private String getStringValue(XSSFRow row, Map<String, Integer> columnIndexMap, String columnHeader) {
+        Integer index = columnIndexMap.get(columnHeader);
+        if (index != null) {
+            XSSFCell cell = row.getCell(index);
+            if (cell != null) {
+                if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                    // Convert numeric value to string
+                    return String.valueOf(cell.getNumericCellValue());
+                } else if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
+                    // Retrieve string value
+                    return cell.getStringCellValue().trim();
+                } else {
+                    // Handle other cell types if necessary
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Date getDateValue(XSSFRow row, Map<String, Integer> columnIndexMap, String columnHeader) {
+        Integer index = columnIndexMap.get(columnHeader);
+        Date date = null;
+        if (index != null) {
+            XSSFCell cell = row.getCell(index);
+            if (cell != null && DateUtil.isCellDateFormatted(cell)) {
+                // Retrieve date value if cell is formatted as date
+                java.util.Date utilDate = cell.getDateCellValue();
+                // Convert java.util.Date to java.sql.Date
+                date = new Date(utilDate.getTime());
+            }
+        }
+        return date;
+    }
+
+    private BigDecimal getBigDecimalValue(XSSFRow row, Map<String, Integer> columnIndexMap, String columnHeader) {
+        Integer index = columnIndexMap.get(columnHeader);
+        if (index != null) {
+            XSSFCell cell = row.getCell(index);
+            if (cell != null) {
+                // Parse BigDecimal value
+                BigDecimal value;
+                if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                    value = BigDecimal.valueOf(cell.getNumericCellValue()).abs();
+                } else if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
+                    try {
+                        value = new BigDecimal(cell.getStringCellValue().trim()).abs();
+                    } catch (NumberFormatException e) {
+                        value = null; // Handle invalid number format
+                    }
+                } else {
+                    value = null; // Handle other cell types
+                }
+                return value;
+            }
+        }
+        return null;
+    }
+
+    /*public String uploadMOSLTxnStatus (Model model, @RequestParam("file") MultipartFile file){
         if (file.isEmpty()) {
             model.addAttribute("message", "Please select a file to upload");
             return "admin/uploadmosltxn";
@@ -918,7 +1055,9 @@ public class AdminViewController {
             e.printStackTrace();
         }
         return "admin/uploadmosltxn";
-    }
+    }*/
+
+
 
     @RequestMapping(value = "/admin/eodprocs")
     public String eodProcs(Model model, @AuthenticationPrincipal UserDetails userDetails){
