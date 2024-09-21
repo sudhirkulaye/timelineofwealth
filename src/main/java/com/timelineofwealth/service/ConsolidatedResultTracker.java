@@ -11,8 +11,8 @@ import java.io.IOException;
 
 public class ConsolidatedResultTracker {
 
-    static String QUARTER = "Q4"; // Update this for each new quarter
-    static String YEAR = "24"; // Update this for each new year
+    static String QUARTER = "Q1"; // Update this for each new quarter
+    static String YEAR = "25"; // Update this for each new year
     static String TRACKER_FILE_PATH = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert\\ResultTracker.xlsx";
     static String QUARTE_REXCEL_Folder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\20" + YEAR + QUARTER;
 
@@ -23,54 +23,63 @@ public class ConsolidatedResultTracker {
     // Tracker workbook cell locations
     static Integer TICKER_LOCATION = 1;
     static Integer FOLDER_LOCATION = 2;
-    static Integer MOSL_REPORT_STATUS_LOCATION = 6;
-    static Integer AMBIT_REPORT_STATUS_LOCATION = 7;
-    static Integer AXIS_REPORT_STATUS_LOCATION = 8;
-    static Integer ICICIDIRECT_REPORT_STATUS_LOCATION = 9;
-    static Integer PL_REPORT_STATUS_LOCATION = 10;
-    static Integer KOTAK_REPORT_STATUS_LOCATION = 11;
+    static Integer MOSL_REPORT_STATUS_LOCATION = 7;
+    static Integer AMBIT_REPORT_STATUS_LOCATION = 8;
+    static Integer AXIS_REPORT_STATUS_LOCATION = 9;
+    static Integer ICICIDIRECT_REPORT_STATUS_LOCATION = 10;
+    static Integer PL_REPORT_STATUS_LOCATION = 11;
+    static Integer KOTAK_REPORT_STATUS_LOCATION = 12;
 
-    static Integer RESULT_PRICE_LOCATION = 13;
+    static Integer RESULT_PRICE_LOCATION = 15;
 
-    static Integer TTM_REV_TREND_LOCATION = 16;
-    static Integer TTM_NOPLAT_TREND_LOCATION = 17;
-    static Integer TTM_SUBSIDIARY_TREND_LOCATION = 18;
-    static Integer REV_G_Q0_RATIO_LOCATION = 19;
-    static Integer REV_G_Q1_RATIO_LOCATION = 20;
-    static Integer REV_G_Q2_RATIO_LOCATION = 21;
-    static Integer REV_G_Q3_RATIO_LOCATION = 22;
-    static Integer REV_G_Q4_RATIO_LOCATION = 23;
-    static Integer NOPLAT_G_Q0_RATIO_LOCATION = 24;
-    static Integer NOPLAT_G_Q1_RATIO_LOCATION = 25;
-    static Integer NOPLAT_G_Q2_RATIO_LOCATION = 26;
-    static Integer NOPLAT_G_Q3_RATIO_LOCATION = 27;
-    static Integer NOPLAT_G_Q4_RATIO_LOCATION = 28;
-    static Integer OPM_Q0_RATIO_LOCATION = 29;
-    static Integer OPM_Q1_RATIO_LOCATION = 30;
-    static Integer OPM_Q2_RATIO_LOCATION = 31;
-    static Integer OPM_Q3_RATIO_LOCATION = 32;
-    static Integer OPM_Q4_RATIO_LOCATION = 33;
-    static Integer MOSL_RECO_LOCATION = 34;
-    static Integer AMBIT_RECO_LOCATION = 35;
-    static Integer AXIS_RECO_LOCATION = 36;
-    static Integer ICICIDIRECT_RECO_LOCATION = 37;
-    static Integer PL_RECO_LOCATION = 38;
-    static Integer KOTAK_RECO_LOCATION = 39;
-    static Integer AUM0_LOCATION = 40;
-    static Integer AUM_G_Q0_RATIO_LOCATION = 41;
-    static Integer AUM_G_Q1_RATIO_LOCATION = 42;
-    static Integer AUM_G_Q2_RATIO_LOCATION = 43;
-    static Integer AUM_G_Q3_RATIO_LOCATION = 44;
-    static Integer AUM_G_Q4_RATIO_LOCATION = 45;
-    static Integer GNPA_TREND_LOCATION = 46;
-    static Integer NNPA_TREND_LOCATION = 47;
-    static Integer GNPA_RATIO_TREND_LOCATION = 48;
-    static Integer NNPA_RATIO_TREND_LOCATION = 49;
-    static Integer SLIPPAGES_TREND_LOCATION = 50;
+    static Integer MIN_VAKYATUIB_PRICE_LOCATION = 19;
+    static Integer MAX_VAKYATUIB_PRICE_LOCATION = 21;
+
+    static Integer TTM_REV_TREND_LOCATION = 23;
+    static Integer TTM_NOPLAT_TREND_LOCATION = 24;
+    static Integer TTM_SUBSIDIARY_TREND_LOCATION = 25;
+    static Integer REV_G_Q0_RATIO_LOCATION = 26;
+    static Integer REV_G_Q1_RATIO_LOCATION = 27;
+    static Integer REV_G_Q2_RATIO_LOCATION = 28;
+    static Integer REV_G_Q3_RATIO_LOCATION = 29;
+    static Integer REV_G_Q4_RATIO_LOCATION = 30;
+    static Integer NOPLAT_G_Q0_RATIO_LOCATION = 31;
+    static Integer NOPLAT_G_Q1_RATIO_LOCATION = 32;
+    static Integer NOPLAT_G_Q2_RATIO_LOCATION = 33;
+    static Integer NOPLAT_G_Q3_RATIO_LOCATION = 34;
+    static Integer NOPLAT_G_Q4_RATIO_LOCATION = 35;
+    static Integer OPM_Q0_RATIO_LOCATION = 36;
+    static Integer OPM_Q1_RATIO_LOCATION = 37;
+    static Integer OPM_Q2_RATIO_LOCATION = 38;
+    static Integer OPM_Q3_RATIO_LOCATION = 39;
+    static Integer OPM_Q4_RATIO_LOCATION = 40;
+    static Integer MOSL_RECO_LOCATION = 41;
+    static Integer AMBIT_RECO_LOCATION = 42;
+    static Integer AXIS_RECO_LOCATION = 43;
+    static Integer ICICIDIRECT_RECO_LOCATION = 44;
+    static Integer PL_RECO_LOCATION = 45;
+    static Integer KOTAK_RECO_LOCATION = 46;
+    static Integer AUM0_LOCATION = 47;
+    static Integer AUM_G_Q0_RATIO_LOCATION = 48;
+    static Integer AUM_G_Q1_RATIO_LOCATION = 49;
+    static Integer AUM_G_Q2_RATIO_LOCATION = 50;
+    static Integer AUM_G_Q3_RATIO_LOCATION = 51;
+    static Integer AUM_G_Q4_RATIO_LOCATION = 52;
+    static Integer GNPA_TREND_LOCATION = 53;
+    static Integer NNPA_TREND_LOCATION = 54;
+    static Integer GNPA_RATIO_TREND_LOCATION = 55;
+    static Integer NNPA_RATIO_TREND_LOCATION = 56;
+    static Integer SLIPPAGES_TREND_LOCATION = 57;
 
     //Ticker workbook QuarterP&L sheet cell locations
     static Integer LATEST_QUARTER_RESULT_PRICE_ROW = 13;
     static Integer LATEST_QUARTER_RESULT_PRICE_COLUMN = 17;
+
+    //Ticker workbook ValuationHistory sheet cell locations
+    static Integer LATEST_NONFIN_VALUATIO_ROW = 1;
+    static Integer LATEST_FIN_VALUATIO_ROW = 31;
+    static Integer LATEST_MIN_VALUATIO_COLUMN = 25;
+    static Integer LATEST_MAX_VALUATIO_COLUMN = 26;
 
     //Ticker workbook AnalystReco sheet cell locations
     static Integer RECO_COLUMN = 6;
@@ -138,6 +147,8 @@ public class ConsolidatedResultTracker {
                 Cell plReportStatusCell = row.getCell(PL_REPORT_STATUS_LOCATION);
                 Cell kotakReportStatusCell = row.getCell(KOTAK_REPORT_STATUS_LOCATION);
                 Cell priceCell = row.getCell(RESULT_PRICE_LOCATION);
+                Cell minValuationPriceCell = row.getCell(MIN_VAKYATUIB_PRICE_LOCATION);
+                Cell maxValuationPriceCell = row.getCell(MAX_VAKYATUIB_PRICE_LOCATION);
                 Cell ttmRevTrendCell = row.getCell(TTM_REV_TREND_LOCATION);
                 Cell ttmNoplatTrendCell = row.getCell(TTM_NOPLAT_TREND_LOCATION);
                 Cell revGQ0RatioCell = row.getCell(REV_G_Q0_RATIO_LOCATION);
@@ -210,8 +221,26 @@ public class ConsolidatedResultTracker {
                             throw new Exception("AnalystReco not found for " + ticker);
                         }
 
+                        Sheet valuationHistorySheet = tickerWorkbook.getSheet("ValuationHistory");
+                        if (valuationHistorySheet == null) {
+                            throw new Exception("ValuationHistory not found for " + ticker);
+                        }
+
                         trackerFileEvaluator = trackerWorkbook.getCreationHelper().createFormulaEvaluator();
                         tickerFileEvaluator = tickerWorkbook.getCreationHelper().createFormulaEvaluator();
+
+                        // update Revenue Trend, NOPLAT and OPM and Revenue growth
+                        CellValue cellValue = trackerFileEvaluator.evaluate(folderCell);
+                        String folder = null;
+                        boolean isFinancialTicker = false;
+
+                        try {
+                            folder = cellValue.getStringValue();
+                            if (folder.startsWith("Financials"))
+                                isFinancialTicker = true;
+                        } catch (Exception e) {
+                            folder = null;
+                        }
 
                         // update price data
                         if (priceCell == null ||
@@ -234,6 +263,60 @@ public class ConsolidatedResultTracker {
                                     priceCell.setCellValue(price);
                             } else {
                                 System.out.println("priceDataCell null for " + ticker);
+                            }
+                        }
+
+                        // update MIN Valuation Price data
+                        if (minValuationPriceCell == null ||
+                                (minValuationPriceCell != null && (minValuationPriceCell.getCellTypeEnum() == CellType.BLANK || minValuationPriceCell.getNumericCellValue() == 0)) ||
+                                IS_OVERRIDE_PRICE_DATA == true) {
+
+                            if (minValuationPriceCell == null) {
+                                minValuationPriceCell = row.createCell(MIN_VAKYATUIB_PRICE_LOCATION, CellType.NUMERIC);
+                            }
+                            Cell minValuationPriceDataCell = null;
+
+                            try {
+                                if(!isFinancialTicker)
+                                    minValuationPriceDataCell = valuationHistorySheet.getRow(LATEST_NONFIN_VALUATIO_ROW).getCell(LATEST_MIN_VALUATIO_COLUMN);
+                                else
+                                    minValuationPriceDataCell = valuationHistorySheet.getRow(LATEST_FIN_VALUATIO_ROW).getCell(LATEST_MIN_VALUATIO_COLUMN);
+                            } catch (Exception e) {
+                                System.out.println("Exception in getting the latest Min Valuation Price CELL for " + ticker);
+                            }
+                            if (minValuationPriceDataCell != null) {
+                                double minValuationprice = getNumberValueFromCell(minValuationPriceDataCell, tickerFileEvaluator);
+                                if (minValuationprice > 0)
+                                    minValuationPriceCell.setCellValue(minValuationprice);
+                            } else {
+                                System.out.println("minValuationPriceDataCell null for " + ticker);
+                            }
+                        }
+
+                        // update MAX Valuation Price data
+                        if (maxValuationPriceCell == null ||
+                                (maxValuationPriceCell != null && (maxValuationPriceCell.getCellTypeEnum() == CellType.BLANK || maxValuationPriceCell.getNumericCellValue() == 0)) ||
+                                IS_OVERRIDE_PRICE_DATA == true) {
+
+                            if (maxValuationPriceCell == null) {
+                                maxValuationPriceCell = row.createCell(MAX_VAKYATUIB_PRICE_LOCATION, CellType.NUMERIC);
+                            }
+                            Cell maxValuationPriceDataCell = null;
+
+                            try {
+                                if(!isFinancialTicker)
+                                    maxValuationPriceDataCell = valuationHistorySheet.getRow(LATEST_NONFIN_VALUATIO_ROW).getCell(LATEST_MAX_VALUATIO_COLUMN);
+                                else
+                                    maxValuationPriceDataCell = valuationHistorySheet.getRow(LATEST_FIN_VALUATIO_ROW).getCell(LATEST_MAX_VALUATIO_COLUMN);
+                            } catch (Exception e) {
+                                System.out.println("Exception in getting the latest Max Valuation Price CELL for " + ticker);
+                            }
+                            if (maxValuationPriceDataCell != null) {
+                                double maxValuationprice = getNumberValueFromCell(maxValuationPriceDataCell, tickerFileEvaluator);
+                                if (maxValuationprice > 0)
+                                    maxValuationPriceCell.setCellValue(maxValuationprice);
+                            } else {
+                                System.out.println("maxValuationPriceDataCell null for " + ticker);
                             }
                         }
 
@@ -295,19 +378,6 @@ public class ConsolidatedResultTracker {
                             } else if (IS_OVERRIDE_RECO_DATA) {
                                 setReco(ticker, trackerWorkbook, analystRecoSheet, kotakRecoCell, 100);
                             }
-                        }
-
-                        // update Revenue Trend, NOPLAT and OPM and Revenue growth
-                        CellValue cellValue = trackerFileEvaluator.evaluate(folderCell);
-                        String folder = null;
-                        boolean isFinancialTicker = false;
-
-                        try {
-                            folder = cellValue.getStringValue();
-                            if (folder.startsWith("Financials"))
-                                isFinancialTicker = true;
-                        } catch (Exception e) {
-                            folder = null;
                         }
 
                         if (!isFinancialTicker) {
@@ -423,7 +493,7 @@ public class ConsolidatedResultTracker {
                                 }
                             } catch (Exception e) {
                                 System.out.println("Exception in setting NNPA% Trend for ticker " + ticker);
-                                e.printStackTrace();
+//                                e.printStackTrace();
                             }
                         }
                         tickerFileInputStream.close();

@@ -33,7 +33,7 @@ and a.memberid = b.memberid
 and a.memberid = c.memberid
 and c.moslcode != 'H20613'
 and a.memberid = d.memberid
-and b.compositeid in (1) -- (1,2,3,4,7) -- change to 1: for INTRO strategy 2: FOCUS-FIVE
+and b.compositeid in (1,2,3,4,7) -- (1,2,3,4,7) -- change to 1: for INTRO strategy 2: FOCUS-FIVE
 GROUP BY a.memberid, a.portfolioid, a.ticker 
 ORDER BY b.compositeid, memberid, portfolioid,sum(a.market_value) desc; 
 
@@ -169,11 +169,11 @@ truncate log_table;
 -- DELETE from mosl_transaction where moslcode = 'H20488'; 
 -- update mosl_transaction set script_name = '516030' where script_name = 'YASHPAKKA';
 select * from mosl_transaction where is_processed = 'N' order by date desc;
-select * from mosl_transaction where /*quantity < 0 and*/ date >= '2024-04-01' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
-select moslcode, date, script_name, sell_buy, sum(quantity), sum(brokerage), sum(net_amount) from mosl_transaction where date >= '2024-04-01' and moslcode in ('H1') and script_name not in ('MOSL_CASH', 'LIQUIDBEES') group by moslcode, date, script_name, sell_buy order by moslcode, date desc, script_name;
+select * from mosl_transaction where /*quantity < 0 and*/ date >= '2024-08-01' and script_name not in ('MOSL_CASH', 'LIQUIDBEES') AND moslcode not in ('-H20404', '-1') and is_processed != '-Y' order by date, moslcode;
+select moslcode, date, script_name, sell_buy, sum(quantity), sum(brokerage), sum(net_amount) from mosl_transaction where date >= '2024-01-01' and moslcode in ('H1', '-H20404', '-1') and script_name not in ('MOSL_CASH', 'LIQUIDBEES') group by moslcode, date, script_name, sell_buy order by moslcode, date desc, script_name;
 -- update mosl_transaction set portfolioid = 1 where date = '2019-11-18';
 select * from portfolio_holdings a where a.memberid in (1) order by portfolioid, asset_classid, ticker, buy_date;
-select * from portfolio_historical_holdings a where a.memberid in (1) and sell_date > '2023-12-01' order by sell_date desc, ticker;
+select * from portfolio_historical_holdings a where a.memberid in (1) and sell_date >= '2024-07-03' order by sell_date desc, ticker;
 select * from portfolio_historical_holdings a where sell_date >= '2021-11-26';
 select b.moslcode, a.memberid, a.portfolioid, a.ticker, a.total_cost, a.cmp, a.market_value, b.net_amount 
 from portfolio_holdings a, moslcode_memberid c, mosl_transaction b
@@ -185,8 +185,8 @@ and b.script_name = 'MOSL_CASH' and a.ticker = 'MOSL_CASH' and b.is_processed = 
 -- DELETE from mosl_transaction where moslcode = 'H22295';
 select * from moslcode_memberid a where moslcode = 'H22295';
 SELECT * from portfolio a where a. memberid = 1 and portfolioid = 1;
-select * from portfolio_cashflow a where a. memberid = 1003 and portfolioid = 1;
-select * from portfolio_holdings a where a. memberid in (1072,1073) order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
+select * from portfolio_cashflow a where a. memberid = 1000 and portfolioid = 1;
+select * from portfolio_holdings a where a. memberid in (1026) order by a.memberid, a.portfolioid, a.asset_classid, a.ticker, a.buy_date;
 SELECT * from portfolio_value_history a where a.date >= '2023-10-01' and a.memberid in (1) order by memberid, portfolioid, date desc; 
 SELECT * from portfolio_returns_calculation_support a where a. memberid = 1026 and portfolioid = 1 ORDER BY a.memberid, a.portfolioid, a.date;
 select * from portfolio_twrr_monthly a where a.memberid IN (1026, 1, 1003, 1001, 1024);

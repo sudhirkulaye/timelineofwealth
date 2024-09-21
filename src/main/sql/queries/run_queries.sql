@@ -141,16 +141,6 @@ name like 'GMM%' order by date desc;
 select a.name, date, "~", round(market_cap,-1) MCap, " / ",  round(cmp, 0) from daily_data_s a, stock_universe b
 where a.date = (select min(date) from daily_data_s where date > '2023-11-08') and a.name = b.ticker and b.ticker = 'ELGIEQUIP' order by date desc;
 
-select 'INDEX', 
- b.ticker, b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, b.latest_price, 0, 0, 
- (return_1D / 100), (return_1W / 100), (return_2W / 100), (return_1M / 100), (return_2M / 100), (return_3M / 100), (return_6M / 100), (return_9M / 100), (return_YTD / 100), (return_1Y / 100), (up_52w_min / 100), (down_52w_max / 100), (return_2Y / 100), (return_3Y / 100), 
- 1w_min, 1w_max, 2w_min, 2w_max, 1m_min, 1m_max, 2m_min, 2m_max, 3m_min, 3m_max, 6m_min, 6m_max
-from stock_universe b, subindustry c, stock_price_movement d
-where b.ticker in ('NIFTYBEES', 'JUNIORBEES', 'BANKBEES') and 
-b.subindustryid = c.subindustryid and 
-(b.is_bse500 = 1 or b.is_nse500 = 1) and
-b.ticker = d.ticker;
-
 -- Stocks which have appreciated recently and trading above max fair price
 select a.ticker, b.marketcap, b.latest_price, a.min_mcap, a.min_fair_price, a.max_mcap, a.max_fair_price, (a.max_fair_price/b.latest_price - 1) up, (b.latest_price/a.min_fair_price - 1) down, 
 c.1m_max, c.3m_max, c.6m_max, c.52w_max, case when c.52w_max>b.latest_price then 'Not at 52W High' else 'At 52W High' END as high_status,
@@ -176,6 +166,16 @@ a.quarter = 'FY24Q3' and
 (b.latest_price/a.min_fair_price - 1)  < 0 and return_1M > -10 and
 a.min_fair_price < a.max_fair_price and b.is_fno = 1
 order by return_1M;
+
+select 'INDEX', 
+ b.ticker, b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, b.latest_price, 0, 0, 
+ (return_1D / 100), (return_1W / 100), (return_2W / 100), (return_1M / 100), (return_2M / 100), (return_3M / 100), (return_6M / 100), (return_9M / 100), (return_YTD / 100), (return_1Y / 100), (up_52w_min / 100), (down_52w_max / 100), (return_2Y / 100), (return_3Y / 100), 
+ 1w_min, 1w_max, 2w_min, 2w_max, 1m_min, 1m_max, 2m_min, 2m_max, 3m_min, 3m_max, 6m_min, 6m_max
+from stock_universe b, subindustry c, stock_price_movement d
+where b.ticker in ('NIFTYBEES', 'JUNIORBEES', 'BANKBEES') and 
+b.subindustryid = c.subindustryid and 
+(b.is_bse500 = 1 or b.is_nse500 = 1) and
+b.ticker = d.ticker;
 
 SELECT 
  IF(is_sensex = 1, 'SENSEX', IF(is_nifty50 = 1, 'NIFTY', IF(is_nse100 = 1 OR is_bse100 = 1, 'NSE-BSE100', IF(is_nse200 = 1 OR is_bse200 = 1, 'NSE-BSE200', 'NSE-BSE500')))) index1,
@@ -216,4 +216,24 @@ b.subindustryid = c.subindustryid and
 (b.is_bse500 = 1 or b.is_nse500 = 1) and
 b.ticker = d.ticker
 order by market_cap desc;
+
+# Stock price analysis for python project StockPriceAnalysis
+select date, open_price, high_price, low_price, close_price, total_traded_quantity from nse_price_history a where nse_ticker = 'MAHSEAMLES' order by date;
+
+SELECT 
+    a.date as Date, a.close_price, b.close_price, c.close_price, d.close_price
+FROM
+    nse_price_history a,
+    nse_price_history b,
+    nse_price_history c, 
+    nse_price_history d 
+WHERE
+    a.date = b.date
+		AND b.date = c.date
+        AND c.date = d.date
+        AND a.nse_ticker = 'RATNAMANI'
+        AND b.nse_ticker = 'APLAPOLLO'
+        AND c.nse_ticker = 'MAHSEAMLES'
+        AND d.nse_ticker = 'VENUSPIPES'
+ORDER BY date;
 

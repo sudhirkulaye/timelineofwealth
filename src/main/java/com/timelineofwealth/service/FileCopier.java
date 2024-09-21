@@ -24,12 +24,8 @@ public class FileCopier {
         //*********************************************** From HP to Redmi ***********************************************
 
         // Move Jupyter Notes projects to 02workspace
-//        String srcFolder = "C:\\Users\\Sudhir Kulaye\\CFAPythonLearning";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\02workspace\\CFAPythonLearning";
-
-        // Move Jupyter Notes projects to 02workspace
-//        String srcFolder = "C:\\Users\\Sudhir Kulaye\\ScreenerExcelsCharts";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\02workspace\\ScreenerExcelsCharts";
+//        String srcFolder = "C:\\Users\\Sudhir Kulaye\\JupyterProjects";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
 
         String localMyDocuments = "C:\\MyDocuments\\";
         String redMIMyDocuments = "\\\\REDMIBOOK15\\MyDocuments";
@@ -46,6 +42,11 @@ public class FileCopier {
 //        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
 
         //*********************************************** From redmi to HP ***********************************************
+
+        //Move latest DailyData redmi to HP
+//        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\03DailyData";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\03DailyData";
+
         //Move latest reports redmi to HP
 //        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
 //        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
@@ -81,8 +82,8 @@ public class FileCopier {
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql";
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\PythonDev";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\PythonDev";
+//        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\03DailyData";
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\03DailyData";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments";
@@ -99,6 +100,46 @@ public class FileCopier {
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports";
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports";
+
+
+        //*********************************************** From Parag's Laptop to Local Laptop ***********************************************
+
+//        String srcFolder = localLaptop + reports;
+//        String dstFolder = paragLaptop + reports;
+
+//        String srcFolder = localLaptop + excels;
+//        String dstFolder = paragLaptop + excels;
+
+//        String srcFolder = localLaptop + dailyData;
+//        String dstFolder = paragLaptop +
+
+//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\03DailyData";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\03DailyData";
+
+//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2025Q1";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2025Q1";
+
+//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
+
+//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert";
+
+//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Charts";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Charts";
+
+//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
+
+//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
+
+//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
+
+//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports";
+
 
 //        String srcFolder = "C:\\MyDocuments\\02UsefulSoftwares\\EditPlus 3";
 //        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\02UsefulSoftwares\\EditPlus 3";
@@ -177,6 +218,7 @@ public class FileCopier {
                     }
                 }
                 if (!found) {
+                    System.out.println("Deleteing File " + dstFile);
                     dstFile.delete();
                 }
             }
