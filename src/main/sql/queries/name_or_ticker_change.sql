@@ -7,6 +7,9 @@ select * from daily_data_s a where date >= '2023-01-10' and name like '%Nuvoco%'
 select * from stock_price_movement_history where ticker = 'NIITTECH';
 select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 
+-- UPDATE `timelineofwealth`.`stock_universe` SET `ticker` = 'UNITDSPR', `ticker5` = 'UNITDSPR', `nse_code` = 'UNITDSPR', `name` = 'Aegis Logistics Ltd', `ticker_old` = 'MCDOWELL-N' WHERE (`ticker` = 'MCDOWELL-N');
+-- UPDATE `timelineofwealth`.`stock_universe` SET `ticker` = 'AEGISLOG', `ticker5` = 'AEGISLOG', `nse_code` = 'AEGISLOG', `name` = 'Aegis Logistics Ltd', `ticker_old` = 'AEGISCHEM' WHERE (`ticker` = 'AEGISCHEM');
+-- UPDATE `timelineofwealth`.`stock_universe` SET `ticker` = 'LTF', `ticker4` = 'L&T Finance Ltd', `ticker5` = 'LTF', `nse_code` = 'LTF', `name` = 'L&T Finance Ltd', `ticker_old` = 'L&TFH' WHERE (`ticker` = 'L&TFH');
 -- UPDATE stock_universe SET ticker = '532301', ticker5 = '532301', ticker_old = 'TATACOFFEE' WHERE (ticker = 'TATACOFFEE');
 -- UPDATE stock_universe SET ticker = 'WELSPUNLIV', ticker4 = 'Welspun Living', ticker5 = 'WELSPUNLIV', nse_code = 'WELSPUNLIV', short_name = 'Welspun Living', name = 'Welspun Living Ltd.', ticker_old = 'WELSPUNIND' WHERE (ticker = 'WELSPUNIND');
 -- UPDATE stock_universe SET ticker = 'ARE&M', ticker4 = 'Amara Raja Ener.', ticker5 = 'ARE&M', nse_code = 'ARE&M', name = 'Amara Raja Energy & Mobility Ltd', ticker_old = 'AMARAJABAT' WHERE (ticker = 'AMARAJABAT');
@@ -54,6 +57,11 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- UPDATE stock_universe SET ticker = 'ATGL', ticker_old = 'ADANIGAS' WHERE (ticker = 'ADANIGAS');
 -- UPDATE stock_universe SET ticker = 'JUBLPHARMA', ticker_old = 'JUBILANT' WHERE (ticker = 'JUBILANT');
 
+
+-- update daily_data_s set name = 'XXX'  where name = 'XXX';
+-- update daily_data_s set name = 'UNITDSPR'  where name = 'MCDOWELL-N';
+-- update daily_data_s set name = 'AEGISLOG'  where name = 'AEGISCHEM';
+-- update daily_data_s set name = 'LTF'  where name = 'L&TFH';
 -- update daily_data_s set name = '532301'  where name = 'TATACOFFEE';
 -- update daily_data_s set name = 'WELSPUNLIV' where name = 'WELSPUNIND';
 -- update daily_data_s set name = 'ARE&M' where name = 'AMARAJABAT';
@@ -86,6 +94,9 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update daily_data_s set name = 'Dhani Services' where name = 'Indiabulls Vent.';
 
 -- update nse_price_history a set nse_ticker = 'XXX' where nse_ticker = 'XXX';
+-- update nse_price_history a set nse_ticker = 'UNITDSPR' where nse_ticker = 'MCDOWELL-N';
+-- update nse_price_history a set nse_ticker = 'AEGISLOG' where nse_ticker = 'AEGISCHEM';
+-- update nse_price_history a set nse_ticker = 'LTF' where nse_ticker = 'L&TFH';
 -- update nse_price_history a set nse_ticker = '532301' where nse_ticker = 'TATACOFFEE';
 -- update nse_price_history a set nse_ticker = 'WELSPUNLIV' where nse_ticker = 'WELSPUNIND';
 -- update nse_price_history a set nse_ticker = 'ARE&M' where nse_ticker = 'AMARAJABAT';
@@ -114,6 +125,9 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update nse_price_history a set nse_ticker = 'TATACONSUM' where nse_ticker = 'TATAGLOBAL';
 
 -- update stock_price_movement set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_price_movement set ticker = 'UNITDSPR' where ticker = 'MCDOWELL-N';
+-- update stock_price_movement set ticker = 'AEGISLOG' where ticker = 'AEGISCHEM';
+-- update stock_price_movement set ticker = 'LTF' where ticker = 'L&TFH';
 -- update stock_price_movement set ticker = '532301' where ticker = 'TATACOFFEE';
 -- update stock_price_movement set ticker = 'WELSPUNLIV' where ticker = 'WELSPUNIND';
 -- update stock_price_movement set ticker = 'ARE&M' where ticker = 'AMARAJABAT';
@@ -143,6 +157,9 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update stock_price_movement set ticker = 'DHANI' where ticker = 'IBVENTURES' and date < '2020-11-06';
 
 -- update stock_price_movement_history set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_price_movement_history set ticker = 'UNITDSPR' where ticker = 'MCDOWELL-N';
+-- update stock_price_movement_history set ticker = 'AEGISLOG' where ticker = 'AEGISCHEM';
+-- update stock_price_movement_history set ticker = 'LTF' where ticker = 'L&TFH';
 -- update stock_price_movement_history set ticker = '532301' where ticker = 'TATACOFFEE';
 -- update stock_price_movement_history set ticker = 'WELSPUNLIV' where ticker = 'WELSPUNIND';
 -- update stock_price_movement_history set ticker = 'ARE&M' where ticker = 'AMARAJABAT';
@@ -172,6 +189,9 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update stock_price_movement_history set ticker = 'DHANI' where ticker = 'IBVENTURES' and date < '2020-11-06';
 
 -- update stock_quarter set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_quarter set ticker = 'UNITDSPR' where ticker = 'MCDOWELL-N';
+-- update stock_quarter set ticker = 'AEGISLOG' where ticker = 'AEGISCHEM';
+-- update stock_quarter set ticker = 'LTF' where ticker = 'L&TFH';
 -- update stock_quarter set ticker = '532301' where ticker = 'TATACOFFEE';
 -- update stock_quarter set ticker = 'WELSPUNLIV' where ticker = 'WELSPUNIND';
 -- update stock_quarter set ticker = 'ARE&M' where ticker = 'AMARAJABAT';
@@ -199,6 +219,9 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update stock_quarter set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
 -- update stock_pnl set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_pnl set ticker = 'UNITDSPR' where ticker = 'MCDOWELL-N';
+-- update stock_pnl set ticker = 'AEGISLOG' where ticker = 'AEGISCHEM';
+-- update stock_pnl set ticker = 'LTF' where ticker = 'L&TFH';
 -- update stock_pnl set ticker = '532301' where ticker = 'TATACOFFEE';
 -- update stock_pnl set ticker = 'WELSPUNLIV' where ticker = 'WELSPUNIND';
 -- update stock_pnl set ticker = 'ARE&M' where ticker = 'AMARAJABAT';
@@ -226,6 +249,9 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update stock_pnl set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
 -- update stock_cashflow set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_cashflow set ticker = 'UNITDSPR' where ticker = 'MCDOWELL-N';
+-- update stock_cashflow set ticker = 'AEGISLOG' where ticker = 'AEGISCHEM';
+-- update stock_cashflow set ticker = 'LTF' where ticker = 'L&TFH';
 -- update stock_cashflow set ticker = '532301' where ticker = 'TATACOFFEE';
 -- update stock_cashflow set ticker = 'WELSPUNLIV' where ticker = 'WELSPUNIND';
 -- update stock_cashflow set ticker = 'ARE&M' where ticker = 'AMARAJABAT';
@@ -253,6 +279,9 @@ select * from stock_universe a where nse_code <> ticker and nse_code <>"";
 -- update stock_cashflow set ticker = 'DHANI' where ticker = 'IBVENTURES';
 
 -- update stock_balancesheet set ticker = 'XXX' where ticker = 'XXX';
+-- update stock_balancesheet set ticker = 'UNITDSPR' where ticker = 'MCDOWELL-N';
+-- update stock_balancesheet set ticker = 'AEGISLOG' where ticker = 'AEGISCHEM';
+-- update stock_balancesheet set ticker = 'LTF' where ticker = 'L&TFH';
 -- update stock_balancesheet set ticker = '532301' where ticker = 'TATACOFFEE';
 -- update stock_balancesheet set ticker = 'WELSPUNLIV' where ticker = 'WELSPUNIND';
 -- update stock_balancesheet set ticker = 'ARE&M' where ticker = 'AMARAJABAT';

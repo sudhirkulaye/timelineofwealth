@@ -105,9 +105,9 @@ public class DownloadEODFiles {
             returnValue = downloadAndUploadBSEBhavCopy(properties);
             if (returnValue < 0)
                 return returnValue;
-            returnValue = downloadAndUploadNSEBhavCopy(properties);
+            /*returnValue = downloadAndUploadNSEBhavCopy(properties);
             if (returnValue < 0)
-                return returnValue;
+                return returnValue;*/
             returnValue = downloadAndUploadMutualFundNAV(properties);
             if (returnValue < 0)
                 return returnValue;
@@ -126,8 +126,9 @@ public class DownloadEODFiles {
         String nseBhavCopyZipFileName = properties.getProperty("nsebhavcopyzipfilename");
         String nseBhavCopyZipFileExtractPath = properties.getProperty("nsebhavcopyzipfileextractpath");
 
-        String filename = getNSEURL(getDateFromBseBhavCopy(properties));
-        String href = nseDomain + filename;
+        String filename = getNSEURL(properties);
+        String href = nseDomain + "/" + filename;
+
         System.out.println(href);
         URL downloadUrl = new URL(href);
         InputStream inputStream = downloadUrl.openStream();
@@ -177,14 +178,13 @@ public class DownloadEODFiles {
                 .method(Connection.Method.GET)
                 .execute();
 
+        //download bse bhavcopy to bseBhavCopyZipFileExtractPath i.e. "C:\MyDocuments\03Business\03DailyData\BseData"
         InputStream inputStream = response.bodyStream();
-        FileOutputStream outputStream = new FileOutputStream(bseBhavCopyZipFileName); //"C:/MyDocuments/03Business/03DailyData/bse_bhavcopy.zip"
+        FileOutputStream outputStream = new FileOutputStream(bseBhavCopyZipFileExtractPath + downloadUrl.substring(downloadUrl.lastIndexOf("/")+1));
         outputStream.getChannel().transferFrom(Channels.newChannel(inputStream), 0, Long.MAX_VALUE);
         outputStream.close();
 
-        // Create a new input stream from the downloaded file
-        FileInputStream fileInputStream = new FileInputStream(bseBhavCopyZipFileName);
-        ZipInputStream zipInputStream = new ZipInputStream(fileInputStream);
+        /*ZipInputStream zipInputStream = new ZipInputStream(fileInputStream);
         ZipEntry zipEntry;
         String fileName = "";
         while ((zipEntry = zipInputStream.getNextEntry()) != null) {
@@ -198,8 +198,8 @@ public class DownloadEODFiles {
             fileOutputStream.close();
         }
         zipInputStream.closeEntry();
-        zipInputStream.close();
-        return uploadBseDailyPriceData(bseBhavCopyZipFileExtractPath + fileName);
+        zipInputStream.close();*/
+        return uploadBseDailyPriceData(bseBhavCopyZipFileExtractPath + downloadUrl.substring(downloadUrl.lastIndexOf("/")+1));
     }
 
     public int downloadAndUploadMutualFundNAV(Properties properties) throws IOException {
@@ -336,9 +336,37 @@ public class DownloadEODFiles {
         return formattedDateString;
     }
 
-    private String getDateFromBseBhavCopy(Properties properties) {
+    private static File getLatestFileFromDir(String dirPath) {
+        File dir = new File(dirPath);
+        File[] files = dir.listFiles();
+
+        if (files == null || files.length == 0) {
+            return null;
+        }
+
+        File lastModifiedFile = files[0];
+        for (int i = 1; i < files.length; i++) {
+            if (lastModifiedFile.lastModified() < files[i].lastModified()) {
+                lastModifiedFile = files[i];
+            }
+        }
+
+        return lastModifiedFile;
+    }
+
+    /*private String getDateFromBseBhavCopy(Properties properties) {
         String zipFilePath = properties.getProperty("bsebhavcopyzipfilename");
         String formattedDateString = "";
+
+        String directoryPath = properties.getProperty("bsebhavcopyzipfileextractpath");
+
+        File latestModifiedFile = getLatestFileFromDir(directoryPath);
+        if (latestModifiedFile != null) {
+            latestModifiedFile.getName();
+
+        } else {
+            System.out.println("Latest BSE Bhav Copy not found");
+        }
 
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFilePath))) {
             ZipEntry entry = zis.getNextEntry();
@@ -353,7 +381,7 @@ public class DownloadEODFiles {
             e.printStackTrace();
         }
         return formattedDateString;
-    }
+    }*/
 
     private String getMonthNumber(String monthString) {
         switch (monthString) {
@@ -386,10 +414,12 @@ public class DownloadEODFiles {
         }
     }
 
-    private String getNSEURL(String date){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate localDate = LocalDate.parse(date, formatter);
-        String url = String.format("/%d/%s/cm%sbhav.csv.zip", localDate.getYear(), localDate.getMonth().toString().substring(0, 3).toUpperCase(), localDate.format(DateTimeFormatter.ofPattern("ddMMMyyyy")).toUpperCase());
+    private String getNSEURL(Properties properties){
+        File bseBhavCopyFile = getLatestFileFromDir(properties.getProperty("bsebhavcopyzipfileextractpath"));
+        String url = bseBhavCopyFile.getName().replace("BSE", "NSE")+".zip";
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+//        LocalDate localDate = LocalDate.parse(date, formatter);
+//        String url = String.format("/%d/%s/cm%sbhav.csv.zip", localDate.getYear(), localDate.getMonth().toString().substring(0, 3).toUpperCase(), localDate.format(DateTimeFormatter.ofPattern("ddMMMyyyy")).toUpperCase());
 //        System.out.println(url);
         return url;
     }
@@ -802,10 +832,20 @@ public class DownloadEODFiles {
                 dailyDataS.getKey().setDate(date); // set as date
                 dailyDataS.setRank(i);
 
-                if(row.getCell(2).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(2).getCellType() == Cell.CELL_TYPE_STRING && !row.getCell(2).getStringCellValue().trim().isEmpty())
-                    dailyDataS.getKey().setName((String) row.getCell(2).getStringCellValue());
-                else if (row.getCell(1).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(1).getCellType() == Cell.CELL_TYPE_STRING)
-                    dailyDataS.getKey().setName((String) row.getCell(1).getStringCellValue());
+                if(row.getCell(2)!= null && row.getCell(2).getCellType() != Cell.CELL_TYPE_BLANK && !row.getCell(2).getStringCellValue().trim().isEmpty())
+                    if (row.getCell(2).getCellType() == Cell.CELL_TYPE_STRING )
+                        dailyDataS.getKey().setName((String) row.getCell(2).getStringCellValue());
+                    else {
+                        int bse_ticker = (int) row.getCell(2).getNumericCellValue();
+                        dailyDataS.getKey().setName("" + bse_ticker);
+                    }
+                else if (row.getCell(1)!= null && row.getCell(1).getCellType() != Cell.CELL_TYPE_BLANK)
+                    if (row.getCell(1).getCellType() == Cell.CELL_TYPE_STRING)
+                        dailyDataS.getKey().setName((String) row.getCell(1).getStringCellValue());
+                    else {
+                        int bse_ticker = (int)row.getCell(1).getNumericCellValue();
+                        dailyDataS.getKey().setName("" + bse_ticker);
+                    }
                 else
                     continue;
 

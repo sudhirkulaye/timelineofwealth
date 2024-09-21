@@ -4,11 +4,19 @@ Commit;
 -- Stock Split, Bonus
 select * from stock_split_probability a where a.is_processed = 'YES' order by date desc;
 select * from stock_split_probability a where a.is_processed != 'YES' order by date desc;
-select a.* from stock_split_probability a, stock_universe b where a.ticker = b.ticker and (b.is_nse500 = 1 or b.is_bse500 = 1) and a.is_processed != 'YES' order by date desc;
+select a.* from stock_split_probability a, stock_universe b where a.ticker = b.ticker and (b.is_nse500 = 1 or b.is_bse500 = 1) and a.is_processed != 'YES' order by date;
 -- For 1:1 Bonus update price as 1/2
 -- FOr 1:2 Bonus update price as 2/3 and so on (i.e. Newly Issued Bonus Stocks / (sum of newly issued stocks + original stocks)
 -- For 2:10 Stock Split update price as (New FV/Old FV) i.e. (2/10) or (1/5)
 
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:2' WHERE (ticker = 'OIL') and (date = '2024-07-02');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:2' WHERE (ticker = 'HINDPETRO') and (date = '2024-06-21');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'BPCL') and (date = '2024-06-21');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Demerger' WHERE (ticker = 'SANOFI') and (date = '2024-06-13');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 3:1' WHERE (ticker = 'MOTILALOFS') and (date = '2024-06-10');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 3:1' WHERE (ticker = 'INOXWIND') and (date = '2024-05-24');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 5:10' WHERE (ticker = 'BDL') and (date = '2024-05-24');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 2:10' WHERE (ticker = 'CANBK') and (date = '2024-05-15');
 -- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 5:10' WHERE (ticker = 'PERSISTENT') and (date = '2024-03-28');
 -- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'GAEL') and (date = '2024-03-15');
 -- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1, Stock Split Ratio 1:2' WHERE (ticker = 'CGCL') and (date = '2024-03-05');
@@ -97,7 +105,7 @@ select a.* from stock_split_probability a, stock_universe b where a.ticker = b.t
 -- update rest of the stocks as ignored
 -- update stock_split_probability set is_processed = 'YES', note = 'Ignored' where is_processed = 'NO' and ticker not in (select ticker from stock_universe where is_nse500 = 1 or is_bse500 = 1);
 
-SELECT date, close_price, a.* from nse_price_history a where a.nse_ticker = 'PERSISTENT' and date <= '2024-03-28' order by date desc;
+SELECT date, close_price, a.* from nse_price_history a where a.nse_ticker = 'PERSISTENT' and date <= '2024-05-15' order by date desc;
 SELECT date, close_price from bse_price_history a where a.bse_ticker = '000000' and date <= '2019-12-05' order by date desc;
 select * from stock_price_movement_history a where a.ticker = 'TTKPRESTIG' and date >= '2021-12-14';
 SELECT * from wealth_details a where ticker = 'SAFARI';
@@ -114,6 +122,14 @@ update portfolio_holdings set quantity = quantity * 2, rate = rate * (1/2), net_
 -- Copy this below and then replace ticker XXX to right one and replace date and most imp. replace fraction
 update nse_price_history a set close_price = close_price * ( 1 / 1	) where a.nse_ticker = 'XXX' and date < 'XXXX-XX-XX' ;
 
+update nse_price_history a set close_price = close_price * ( 2 / 3	) where a.nse_ticker = 'OIL' and date < '2024-07-02' ;
+update nse_price_history a set close_price = close_price * ( 2 / 3	) where a.nse_ticker = 'HINDPETRO' and date < '2024-06-21' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2	) where a.nse_ticker = 'BPCL' and date < '2024-06-21' ;
+update nse_price_history a set close_price = close_price * ( 1 / 1	) where a.nse_ticker = 'SANOFI' and date < '2024-06-13' ;
+update nse_price_history a set close_price = close_price * ( 1 / 4	) where a.nse_ticker = 'MOTILALOFS' and date < '2024-06-10' ;
+update nse_price_history a set close_price = close_price * ( 1 / 4	) where a.nse_ticker = 'INOXWIND' and date < '2024-05-24' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2	) where a.nse_ticker = 'BDL' and date < '2024-05-24' ;
+update nse_price_history a set close_price = close_price * ( 1 / 5	) where a.nse_ticker = 'CANBK' and date < '2024-05-15' ;
 update nse_price_history a set close_price = close_price * ( 5 / 10	) where a.nse_ticker = 'PERSISTENT' and date < '2024-03-28' ;
 update nse_price_history a set close_price = close_price * ( 1 / 2	) where a.nse_ticker = 'GAEL' and date < '2024-03-15' ;
 update nse_price_history a set close_price = close_price * ( 1 / 4	) where a.nse_ticker = 'CGCL' and date < '2024-03-05' ;
@@ -213,6 +229,14 @@ update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse
 -- Copy this below and then replace ticker XXX to right one and replace date and most imp. replace fraction
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 1 ) where b.ticker = 'XXX' and b.ticker5 = a.name  and date < 'XXXX-XX-XX' ;
 
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 / 3 ) where b.ticker = 'OIL' and b.ticker5 = a.name  and date < '2024-07-02' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 / 3 ) where b.ticker = 'HINDPETRO' and b.ticker5 = a.name  and date < '2024-06-21' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'BPCL' and b.ticker5 = a.name  and date < '2024-06-21' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 1 ) where b.ticker = 'SANOFI' and b.ticker5 = a.name  and date < '2024-06-13' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 4 ) where b.ticker = 'MOTILALOFS' and b.ticker5 = a.name  and date < '2024-06-10' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 4 ) where b.ticker = 'INOXWIND' and b.ticker5 = a.name  and date < '2024-05-24' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'BDL' and b.ticker5 = a.name  and date < '2024-05-24' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 5 ) where b.ticker = 'CANBK' and b.ticker5 = a.name  and date < '2024-05-15' ;
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 5 / 10 ) where b.ticker = 'PERSISTENT' and b.ticker5 = a.name  and date < '2024-03-28' ;
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'GAEL' and b.ticker5 = a.name  and date < '2024-03-15' ;
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 4 ) where b.ticker = 'CGCL' and b.ticker5 = a.name  and date < '2024-03-05' ;
