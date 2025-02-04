@@ -8,11 +8,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLConnection;
 import java.sql.Date;
 
 @Controller
@@ -230,6 +234,18 @@ public class PublicViewController {
         return "public/stocklist";
     }
 
+    @RequestMapping(value = "/public/research")
+    public String research(HttpServletRequest request, Model model){
+        String ipAddress = request.getRemoteAddr();
+        String browser = request.getHeader("User-Agent");
+        String os = System.getProperty("os.name");
+        logger.debug(String.format("Visited /public/research" + ipAddress + ", browser - " + browser + ", OS - " + os));
+        dateToday = new PublicApi().getSetupDates().getDateToday();
+        model.addAttribute("dateToday", dateToday);
+        model.addAttribute("title", "Research");
+        return "public/research";
+    }
+
     @RequestMapping(value = "/public/stockanalysis/{ticker}")
     public String stockAnalysis(HttpServletRequest request, @PathVariable("ticker") String ticker, Model model){
         String ipAddress = request.getRemoteAddr();
@@ -339,5 +355,37 @@ public class PublicViewController {
         return "/public/stockbubblechart";
     }
 
+    @RequestMapping(value = "/public/downloadresearch/{ticker}")
+    public void downloadresearch(@PathVariable String ticker, Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        logger.debug(String.format("/public/downloadresearch/ %s", ticker));
+
+        String fileName = ticker+".pdf";
+
+        logger.debug(String.format("Downloading file %s", fileName));
+        File file = new File("C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\FinancialModelling\\download\\"+ticker+".pdf" );
+        final int BUFFER_SIZE = 4095;
+        if(file.exists()){
+            try {
+                //FileInputStream inputStream = new FileInputStream(file);
+                InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+
+                String mimeType = URLConnection.guessContentTypeFromName(file.getName());// context.getMimeType(fullPath);
+                if (mimeType == null) {
+                    //unknown mimetype so set the mimetype to application/octet-stream
+                    mimeType = "application/octet-stream";
+                }
+                response.setContentType(mimeType);
+                //response.setHeader("content-disposition","inline; filename="+fileName);
+                response.setHeader("content-disposition", String.format("attachment; filename=\"" + file.getName() + "\""));
+                response.setContentLength((int) file.length());
+
+                OutputStream outputStream = response.getOutputStream();
+                FileCopyUtils.copy(inputStream, response.getOutputStream());
+
+            } catch (Exception e) {
+                logger.debug(String.format("Error in downloading file %s", fileName));
+            }
+        }
+    }
 
 }

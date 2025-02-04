@@ -82,8 +82,8 @@ public class FileCopier {
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql";
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
+//        //String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
+//        //String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\03DailyData";
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\03DailyData";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments";
@@ -116,8 +116,8 @@ public class FileCopier {
 //        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\03DailyData";
 //        String dstFolder = "C:\\MyDocuments\\03Business\\03DailyData";
 
-//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2025Q1";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2025Q1";
+//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2025Q2";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2025Q2";
 
 //        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
 //        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
