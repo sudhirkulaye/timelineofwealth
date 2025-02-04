@@ -73,6 +73,7 @@ public class UpdateQuarterlyExcels {
                 copyValuationHistorySheet(oldFileRenamed, newFile);
                 copyAnalystRecoSheet(oldFileRenamed, newFile);
                 copyHistoryAndRatioSheet(oldFileRenamed, newFile);
+                copyReports(oldFileRenamed, newFile);
                 changeDataSheet(oldFileRenamed, newFile);
             }
         }
@@ -1532,6 +1533,75 @@ public class UpdateQuarterlyExcels {
             oldWb.close();
             String fileName = newFile.getAbsoluteFile().toString();
             System.out.println("Copied History&Ratio Sheet for " + fileName.substring(fileName.lastIndexOf("\\")));
+        } catch (Exception e) {
+            System.out.println("Exception while copying History&Ratio Sheet for " + newFile.getAbsoluteFile().toString().substring(newFile.getAbsoluteFile().toString().lastIndexOf("\\")));
+            e.printStackTrace();
+        }
+    }
+
+    private static void copyReports(File oldFileRenamed, File newFile) {
+        try {
+            // Open the new workbook
+            XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(newFile));
+            XSSFSheet ws = wb.getSheet("Reports");
+
+            // Open the old workbook
+            XSSFWorkbook oldWb = new XSSFWorkbook(new FileInputStream(oldFileRenamed));
+            XSSFSheet oldWs = oldWb.getSheet("Reports");
+
+            // Ensure the target sheet is cleared
+            if (ws != null) {
+                int lastRow = ws.getLastRowNum();
+                for (int i = 0; i <= lastRow; i++) {
+                    ws.removeRow(ws.getRow(i));
+                }
+            } else {
+                ws = wb.createSheet("Reports");
+            }
+
+            // Copy rows from oldWs to ws
+            if (oldWs != null) {
+                for (int rowIndex = 0; rowIndex <= oldWs.getLastRowNum(); rowIndex++) {
+                    XSSFRow oldRow = oldWs.getRow(rowIndex);
+                    XSSFRow newRow = ws.createRow(rowIndex);
+
+                    if (oldRow != null) {
+                        for (int colIndex = 0; colIndex < oldRow.getLastCellNum(); colIndex++) {
+                            XSSFCell oldCell = oldRow.getCell(colIndex);
+                            XSSFCell newCell = newRow.createCell(colIndex);
+
+                            if (oldCell != null) {
+                                // Copy cell value
+                                switch (oldCell.getCellType()) {
+                                    case Cell.CELL_TYPE_STRING:
+                                        newCell.setCellValue(oldCell.getStringCellValue());
+                                        break;
+                                    case Cell.CELL_TYPE_NUMERIC:
+                                        newCell.setCellValue(oldCell.getNumericCellValue());
+                                        break;
+                                    default:
+                                        newCell.setCellValue(oldCell.toString());
+                                        break;
+                                }
+
+                                // Copy cell style
+                                XSSFCellStyle newCellStyle = wb.createCellStyle();
+                                newCellStyle.cloneStyleFrom(oldCell.getCellStyle());
+                                newCell.setCellStyle(newCellStyle);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Save the workbook
+            FileOutputStream fileOut = new FileOutputStream(newFile);
+            wb.write(fileOut);
+            fileOut.close();
+            wb.close();
+            oldWb.close();
+            String fileName = newFile.getAbsoluteFile().toString();
+            System.out.println("Copied Reports Sheet for " + fileName.substring(fileName.lastIndexOf("\\")));
         } catch (Exception e) {
             System.out.println("Exception while copying History&Ratio Sheet for " + newFile.getAbsoluteFile().toString().substring(newFile.getAbsoluteFile().toString().lastIndexOf("\\")));
             e.printStackTrace();
