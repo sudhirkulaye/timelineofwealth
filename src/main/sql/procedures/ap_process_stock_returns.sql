@@ -33,8 +33,8 @@ BEGIN
   FROM   setup_dates;
 
   INSERT INTO stock_price_movement (ticker)
-  (SELECT ticker FROM stock_universe WHERE (is_bse500 = 1 OR is_nse500 = 1) AND
-   ticker NOT IN (SELECT ticker FROM stock_price_movement));
+    (select name from daily_data_s a where date = (select date_today from setup_dates) AND
+     name NOT IN (SELECT ticker FROM stock_price_movement));
 
   UPDATE stock_price_movement
   SET CMP = 0, 52w_min = 0, 52w_max = 0, up_52w_min = 0, down_52w_max = 0,

@@ -117,6 +117,48 @@ public class DailyDataS implements Serializable{
     private BigDecimal investedCapital;
     @Column(name = "roic")
     private BigDecimal roic;
+    // Added 2025-03-13
+    @Column(name = "return_1D")
+    private BigDecimal return1D;
+    @Column(name = "return_1W")
+    private BigDecimal return1W;
+    @Column(name = "return_1M")
+    private BigDecimal return1M;
+    @Column(name = "return_3M")
+    private BigDecimal return3M;
+    @Column(name = "return_6M")
+    private BigDecimal return6M;
+    @Column(name = "return_1Y")
+    private BigDecimal return1Y;
+    @Column(name = "up_52w_min")
+    private BigDecimal up52wMin;
+    @Column(name = "down_52w_max")
+    private BigDecimal down52wMax;
+    @Column(name = "volume_1D")
+    private BigDecimal volume1D;
+    @Column(name = "volume_1W")
+    private BigDecimal volume1W;
+    @Column(name = "dma_50")
+    private BigDecimal dma50;
+    @Column(name = "dma_200")
+    private BigDecimal dma200;
+    @Column(name = "rsi")
+    private BigDecimal rsi;
+    @Column(name = "total_assets")
+    private BigDecimal totalAssets;
+    @Column(name = "net_block")
+    private BigDecimal netBlock;
+    @Column(name = "working_capital")
+    private BigDecimal workingCapital;
+    @Column(name = "inventory")
+    private BigDecimal inventory;
+    @Column(name = "trade_receivables")
+    private BigDecimal tradeReceivables;
+    @Column(name = "trade_payables")
+    private BigDecimal tradePayables;
+    @Column(name = "shares_outstanding_cr")
+    private BigDecimal sharesOutstandingCr;
+
 
 
     public DailyDataSKey getKey() {
@@ -419,5 +461,146 @@ public class DailyDataS implements Serializable{
     public void setRoic(BigDecimal roic) {
         this.roic = roic;
     }
+
+    public BigDecimal getReturn1D() {
+        return return1D;
+    }
+    public void setReturn1D(BigDecimal return1D) {
+        this.return1D = return1D;
+    }
+
+    public BigDecimal getReturn1W() {
+        return return1W;
+    }
+    public void setReturn1W(BigDecimal return1W) {
+        this.return1W = return1W;
+    }
+
+    public BigDecimal getReturn1M() {
+        return return1M;
+    }
+    public void setReturn1M(BigDecimal return1M) {
+        this.return1M = return1M;
+    }
+
+    public BigDecimal getReturn3M() {
+        return return3M;
+    }
+    public void setReturn3M(BigDecimal return3M) {
+        this.return3M = return3M;
+    }
+
+    public BigDecimal getReturn6M() {
+        return return6M;
+    }
+    public void setReturn6M(BigDecimal return6M) {
+        this.return6M = return6M;
+    }
+
+    public BigDecimal getReturn1Y() {
+        return return1Y;
+    }
+    public void setReturn1Y(BigDecimal return1Y) {
+        this.return1Y = return1Y;
+    }
+
+    public BigDecimal getUp52wMin() {
+        return up52wMin;
+    }
+    public void setUp52wMin(BigDecimal up52wMin) {
+        this.up52wMin = up52wMin;
+    }
+
+    public BigDecimal getDown52wMax() {
+        return down52wMax;
+    }
+    public void setDown52wMax(BigDecimal down52wMax) {
+        this.down52wMax = down52wMax;
+    }
+
+    public BigDecimal getVolume1D() {
+        return volume1D;
+    }
+    public void setVolume1D(BigDecimal volume1D) {
+        this.volume1D = volume1D;
+    }
+
+    public BigDecimal getVolume1W() {
+        return volume1W;
+    }
+    public void setVolume1W(BigDecimal volume1W) {
+        this.volume1W = volume1W;
+    }
+
+    public BigDecimal getDma50() {
+        return dma50;
+    }
+    public void setDma50(BigDecimal dma50) {
+        this.dma50 = dma50;
+    }
+
+    public BigDecimal getDma200() {
+        return dma200;
+    }
+    public void setDma200(BigDecimal dma200) {
+        this.dma200 = dma200;
+    }
+
+    public BigDecimal getRsi() {
+        return rsi;
+    }
+    public void setRsi(BigDecimal rsi) {
+        this.rsi = rsi;
+    }
+
+    public BigDecimal getTotalAssets() {
+        return totalAssets;
+    }
+    public void setTotalAssets(BigDecimal totalAssets) {
+        this.totalAssets = totalAssets;
+    }
+
+    public BigDecimal getNetBlock() {
+        return netBlock;
+    }
+    public void setNetBlock(BigDecimal netBlock) {
+        this.netBlock = netBlock;
+    }
+
+    public BigDecimal getWorkingCapital() {
+        return workingCapital;
+    }
+    public void setWorkingCapital(BigDecimal workingCapital) {
+        this.workingCapital = workingCapital;
+    }
+
+    public BigDecimal getInventory() {
+        return inventory;
+    }
+    public void setInventory(BigDecimal inventory) {
+        this.inventory = inventory;
+    }
+
+    public BigDecimal getTradeReceivables() {
+        return tradeReceivables;
+    }
+    public void setTradeReceivables(BigDecimal tradeReceivables) {
+        this.tradeReceivables = tradeReceivables;
+    }
+
+    public BigDecimal getTradePayables() {
+        return tradePayables;
+    }
+    public void setTradePayables(BigDecimal tradePayables) {
+        this.tradePayables = tradePayables;
+    }
+
+    public BigDecimal getSharesOutstandingCr() {
+        return sharesOutstandingCr;
+    }
+    public void setSharesOutstandingCr(BigDecimal sharesOutstandingCr) {
+        this.sharesOutstandingCr = sharesOutstandingCr;
+    }
+
 
 }

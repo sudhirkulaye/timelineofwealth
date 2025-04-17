@@ -8,8 +8,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.*;
@@ -21,77 +25,142 @@ import static com.timelineofwealth.service.CreateFolderStructureForIndustry.upda
 
 public class UpdateQuarterlyExcels {
 
-    private static final String OLD_FOLDER = "Old";
-    private static final int HEADER_ROW = 3;
-    private static final int START_ROW = 4;
-    private static final int END_ROW = 12;
-    private static final int NUM_COLUMNS = 7;
+//    private static final String OLD_FOLDER = "Old";
+//    private static final int HEADER_ROW = 3;
+//    private static final int START_ROW = 4;
+//    private static final int END_ROW = 12;
+//    private static final int NUM_COLUMNS = 7;
+
+    private static final String BASE_PATH = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
 
     public static void main(String[] args) throws IOException, EncryptedDocumentException {
         Properties prop = new Properties();
-        FileInputStream input = new FileInputStream("C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis\\config.properties");
+        FileInputStream input = new FileInputStream(BASE_PATH + "\\Analysis\\config.properties");
         prop.load(input);
         input.close();
 
-        String sourcePath = prop.getProperty("SourcePath").replace("&#58;", ":");
-        boolean fileCopyFlag = prop.getProperty("FileCopyFlag").equalsIgnoreCase("true") ? true : false;
-        boolean fileContentCopyFlag = prop.getProperty("FileContentCopyFlag").equalsIgnoreCase("true") ? true : false;
-        ArrayList<String> sourceFiles = new ArrayList<String>();
-        ArrayList<String> destinationPaths = new ArrayList<String>();
-        int count = 1;
-        while (true) {
-            String sourceFile = prop.getProperty("SourceFile" + count);
-            if (sourceFile == null) {
-                break;
-            }
-            sourceFiles.add(sourceFile.replace("&#58;", ":"));
-            destinationPaths.add(prop.getProperty("DestinationPath" + count));
-            count++;
+        String filesToBeUpdated = prop.getProperty("FilesToBeUpdated", "0Days").trim();
+        int days = extractDurationInDays(filesToBeUpdated);
+        int minutes = extractDurationInMinutes(filesToBeUpdated);
+
+        String latestFolder = getLatestQuarterFolder();
+        String previousFolder = getPreviousQuarter(latestFolder);
+
+        File latestDir = new File(BASE_PATH + File.separator + latestFolder);
+        File previousDir = new File(BASE_PATH + File.separator + previousFolder);
+
+        if (!latestDir.exists() || !previousDir.exists()) {
+            System.out.println("Required folders not found.");
+            return;
         }
 
-        for (int i = 0; i < sourceFiles.size(); i++) {
-            String sourceFile = sourceFiles.get(i);
-            String destinationPath = destinationPaths.get(i);
-            int fileNumber = i+1;
-            File oldFileRenamed = null, newFile = null;
-            if(fileCopyFlag){
-                oldFileRenamed = renameAndMoveToOld(destinationPath, sourceFile);
-                newFile = copyLatestFileToDestination(sourcePath, destinationPath, sourceFile);
+        List<File> filesToProcess = getRecentlyModifiedFiles(latestDir, days, minutes);
+
+        for (File newFile : filesToProcess) {
+            String newFileName = newFile.getName();
+            if (!newFileName.endsWith(".xlsx")) continue;
+
+            String ticker = newFileName.split("_")[0];
+            String oldFileName = ticker + "_FY" + previousFolder.substring(2) + ".xlsx";
+            File oldFile = new File(previousDir, oldFileName);
+
+            if (!oldFile.exists()) {
+                System.out.println("Old file " + oldFileName + " not found in " + previousFolder);
+                continue;
             }
-            if(oldFileRenamed == null) {
-                String strOldFileName = prop.getProperty("OldFileName" + fileNumber).replace("&#58;", ":");
-                oldFileRenamed = new File(strOldFileName);
-            }
-            if (fileContentCopyFlag == true) {
-                if(newFile == null) {
-                    String strOldFileName = prop.getProperty("NewFileName" + fileNumber).replace("&#58;", ":");
-                    newFile = new File(strOldFileName);
-                }
-                copyQuarterPAndLSheet(oldFileRenamed, newFile);
-                copyAnnualResultsSheet(oldFileRenamed, newFile);
-                copySegmentAnalysisSheet(oldFileRenamed, newFile);
-                copyValuationHistorySheet(oldFileRenamed, newFile);
-                copyAnalystRecoSheet(oldFileRenamed, newFile);
-                copyHistoryAndRatioSheet(oldFileRenamed, newFile);
-                copyReports(oldFileRenamed, newFile);
-                changeDataSheet(oldFileRenamed, newFile);
-            }
+
+            copyQuarterPAndLSheet(oldFile, newFile);
+            copyAnnualResultsSheet(oldFile, newFile);
+            copySegmentAnalysisSheet(oldFile, newFile);
+            copyValuationHistorySheet(oldFile, newFile);
+            copyAnalystRecoSheet(oldFile, newFile);
+            copyHistoryAndRatioSheet(oldFile, newFile);
+            copyReports(oldFile, newFile);
+            changeDataSheet(oldFile, newFile);
         }
-        CreateFolderStructureForIndustry.updateMCapAndPrice();
-        ConsolidatedResultTracker.updateResultTrackerExcel();
+
+        CreateFolderStructureForIndustry.updateMCapAndPrice(latestFolder);
+        ConsolidatedResultTracker.updateResultTrackerExcel(latestFolder);
     }
 
-    private static File renameAndMoveToOld(String destinationPath, String sourceFile) {
-        String fileName = sourceFile.split("_")[0];
-        File oldFile = new File(destinationPath + File.separator + fileName + ".xlsx");
-        File oldFileRenamed = null;
-        if (oldFile.exists()) {
-            String date = new SimpleDateFormat("yyyyMMdd").format(new Date(oldFile.lastModified()));
-            oldFileRenamed = new File(destinationPath + File.separator + OLD_FOLDER + File.separator + fileName + "_" + date + ".xlsx");
-            oldFile.renameTo(oldFileRenamed);
+    private static int extractDurationInDays(String str) {
+        if (str.endsWith("Days")) {
+            return Integer.parseInt(str.replace("Days", ""));
         }
-        return oldFileRenamed;
+        return 0;
     }
+
+    private static int extractDurationInMinutes(String str) {
+        if (str.endsWith("Min") || str.endsWith("Mins")) {
+            return Integer.parseInt(str.replaceAll("Min[s]?", ""));
+        }
+        return 0;
+    }
+
+    private static List<File> getRecentlyModifiedFiles(File folder, int days, int minutes) {
+        long now = System.currentTimeMillis();
+        long threshold;
+
+        if (days > 0) {
+            threshold = now - days * 24L * 60 * 60 * 1000;
+        } else if (minutes > 0) {
+            threshold = now - minutes * 60L * 1000;
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            threshold = calendar.getTimeInMillis();
+        }
+
+        return Arrays.stream(Objects.requireNonNull(folder.listFiles((dir, name) -> name.endsWith(".xlsx"))))
+                .filter(file -> {
+                    try {
+                        FileTime fileTime = Files.getLastModifiedTime(file.toPath());
+                        return fileTime.toMillis() >= threshold;
+                    } catch (IOException e) {
+                        return false;
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    private static String getLatestQuarterFolder() {
+        File base = new File(BASE_PATH);
+        String[] folders = base.list((dir, name) -> name.matches("\\d{4}Q[1-4]"));
+        if (folders == null || folders.length < 2)
+            throw new IllegalStateException("Not enough quarter folders");
+        Arrays.sort(folders);
+        return folders[folders.length - 1];
+    }
+
+    private static String getPreviousQuarter(String latest) {
+        Pattern p = Pattern.compile("(\\d{4})Q([1-4])");
+        Matcher m = p.matcher(latest);
+        if (!m.matches()) throw new IllegalArgumentException("Invalid quarter folder name: " + latest);
+
+        int year = Integer.parseInt(m.group(1));
+        int quarter = Integer.parseInt(m.group(2));
+
+        if (quarter == 1) {
+            return (year - 1) + "Q4";
+        } else {
+            return year + "Q" + (quarter - 1);
+        }
+    }
+
+//    private static File renameAndMoveToOld(String destinationPath, String sourceFile) {
+//        String fileName = sourceFile.split("_")[0];
+//        File oldFile = new File(destinationPath + File.separator + fileName + ".xlsx");
+//        File oldFileRenamed = null;
+//        if (oldFile.exists()) {
+//            String date = new SimpleDateFormat("yyyyMMdd").format(new Date(oldFile.lastModified()));
+//            oldFileRenamed = new File(destinationPath + File.separator + OLD_FOLDER + File.separator + fileName + "_" + date + ".xlsx");
+//            oldFile.renameTo(oldFileRenamed);
+//        }
+//        return oldFileRenamed;
+//    }
 
     private static File copyLatestFileToDestination(String sourcePath, String destinationPath, String sourceFile) {
         Path sourceFilePath = Paths.get(sourcePath, sourceFile);
