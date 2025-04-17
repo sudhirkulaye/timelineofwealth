@@ -170,9 +170,16 @@ BEGIN
   SET    market_value = cmp * quantity,
          net_profit = market_value - total_cost,
          holding_period = ROUND((DATEDIFF(var_date_today, buy_date) / 365.25), 2),
-         absolute_return = round((market_value / total_cost) - 1, 4),
-         annualized_return = round(pow((absolute_return + 1), (1 / holding_period)) - 1, 4)
-  WHERE asset_classid not in ('101010', '101020', '201010', '202010', '203010', '203020', '203050');
+         absolute_return = round((market_value / total_cost) - 1, 4) -- ,
+         -- annualized_return = round(pow((absolute_return + 1), (1 / holding_period)) - 1, 4)
+  WHERE asset_classid not in ('101010', '101020', '201010', '202010', '203010', '203020', '203050')
+  AND holding_period > 1;
+
+  UPDATE wealth_details
+  SET    annualized_return = round(pow((absolute_return + 1), (1 / holding_period)) - 1, 4)
+  WHERE asset_classid not in ('101010', '101020', '201010', '202010', '203010', '203020', '203050')
+  AND holding_period > 1
+  AND absolute_return > 0;
 
   UPDATE mutual_fund_universe a, mutual_fund_nav_history b
   SET a.latest_nav = b.nav

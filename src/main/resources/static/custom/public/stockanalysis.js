@@ -79,6 +79,9 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
     $scope.roic5Yr = 0.00;
     $scope.roic10Yr = 0.00;
 
+    $scope.stockPnlSales = [];
+    $scope.stockQuarterSales = [];
+
     showRecords();
 
     function showRecords(){
@@ -236,7 +239,7 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
 
         $scope.labelsYearsStockPnl = years;
         $scope.stockPnl = [];
-        $scope.stockPnl.push(sales);
+        //$scope.stockPnl.push(sales);
         $scope.stockPnl.push(noplat);
         //$scope.stockPnl.push(salesGrowth);
         $scope.stockPnl.push(margin);
@@ -283,11 +286,11 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                                        } };
 
         $scope.stockPnlDataOverride = [
-              {
-                label: "Sales",
-                yAxisID: 'y-axis-1',
-                type: 'bar'
-              },
+//              {
+//                label: "Sales",
+//                yAxisID: 'y-axis-1',
+//                type: 'bar'
+//              },
               {
                 label: "NOPLAT",
                 yAxisID: 'y-axis-1',
@@ -336,6 +339,30 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 type: 'line'
               },
         ];
+
+        $scope.stockPnlSales = [sales];
+
+        $scope.stockPnlSalesDataOverride = [
+          {
+            label: "Sales",
+            yAxisID: 'y-axis-1',
+            type: 'bar'
+          }
+        ];
+
+        $scope.chartOptionsStockPnlSales = {
+          scales: {
+            yAxes: [
+              {
+                id: 'y-axis-1',
+                type: 'linear',
+                display: true,
+                position: 'left',
+                ticks: { min: 0 }
+              }
+            ]
+          }
+        };
 
     }
 
@@ -501,7 +528,7 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
 
         $scope.labelsYearsStockQuarter = years;
         $scope.stockQuarter = [];
-        $scope.stockQuarter.push(sales);
+        //$scope.stockQuarter.push(sales);
         $scope.stockQuarter.push(noplat);
         $scope.stockQuarter.push(opm);
         //$scope.stockQuarter.push(salesGrowth);
@@ -527,11 +554,11 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                                        } };
 
         $scope.stockQuarterDataOverride = [
-              {
-                label: "Sales",
-                yAxisID: 'y-axis-1',
-                type: 'bar'
-              },
+//              {
+//                label: "Sales",
+//                yAxisID: 'y-axis-1',
+//                type: 'bar'
+//              },
               {
                 label: "NOPLAT",
                 yAxisID: 'y-axis-1',
@@ -548,6 +575,31 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
 //                type: 'line'
 //              },
         ];
+
+        $scope.stockQuarterSales = [sales];
+
+        $scope.stockQuarterSalesDataOverride = [
+          {
+            label: "Sales",
+            yAxisID: 'y-axis-1',
+            type: 'bar'
+          }
+        ];
+
+        $scope.chartOptionsStockQuarterSales = {
+          scales: {
+            yAxes: [
+              {
+                id: 'y-axis-1',
+                type: 'linear',
+                display: true,
+                position: 'left',
+                ticks: { min: 0 }
+              }
+            ]
+          }
+        };
+
 
     }
 

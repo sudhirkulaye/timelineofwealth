@@ -35,6 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -629,7 +631,7 @@ public class AdminViewController {
         return "admin/uploaddailydatas";
     }
 
-    @RequestMapping(value=("/admin/uploaddailydatasstatus"),headers=("content-type=multipart/*"),method= RequestMethod.POST)
+    /*@RequestMapping(value=("/admin/uploaddailydatasstatus"),headers=("content-type=multipart/*"),method= RequestMethod.POST)
     public String uploadDailyDataSStatus (Model model, @RequestParam("file") MultipartFile file){
         if (file.isEmpty()) {
             model.addAttribute("message", "Please select a file to upload");
@@ -865,6 +867,327 @@ public class AdminViewController {
             e.printStackTrace();
         }
         return "admin/uploaddailydatas";
+    }*/
+
+    @RequestMapping(value = "/admin/uploaddailydatasstatus", headers = "content-type=multipart/*", method = RequestMethod.POST)
+    public String uploadDailyDataStatus(Model model, @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            model.addAttribute("message", "Please select a file to upload");
+            return "admin/uploaddailydatas";
+        }
+
+        try {
+            List<DailyDataS> dailyDataSList;
+            String filename = file.getOriginalFilename();
+            String dateString = filename.substring(0, 8);
+            Date date = Date.valueOf(dateString.substring(0, 4) + "-" + dateString.substring(4, 6) + "-" + dateString.substring(6));
+
+            if (filename.endsWith(".xlsx") || filename.endsWith(".xls")) {
+                dailyDataSList = readExcelFile(file, date);
+            } else if (filename.endsWith(".csv")) {
+                dailyDataSList = readCsvFile(file, date);
+            } else {
+                model.addAttribute("message", "Unsupported file format");
+                return "admin/uploaddailydatas";
+            }
+
+            dailyDataSList.sort(Comparator.comparing(DailyDataS::getMarketCap).reversed());
+            dailyDataSRepository.saveAll(dailyDataSList);
+            model.addAttribute("message", "You successfully uploaded '" + filename + "'");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("message", "Failed to upload file: " + e.getMessage());
+        }
+
+        return "admin/uploaddailydatas";
+    }
+
+    public List<DailyDataS> readExcelFile(MultipartFile file, Date date) throws IOException {
+        List<DailyDataS> dataList = new ArrayList<>();
+        XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+        XSSFSheet sheet = workbook.getSheetAt(0);
+
+        Iterator<Row> rowIterator = sheet.iterator();
+        if (!rowIterator.hasNext()) return dataList;
+
+        // Read Header Row
+        Row headerRow = rowIterator.next();
+        Map<String, Integer> headerMap = new HashMap<>();
+        for (Cell cell : headerRow) {
+            String header = cell.getStringCellValue().trim().toLowerCase();
+            headerMap.put(header, cell.getColumnIndex());
+        }
+
+        int rank = 1;
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            DailyDataS daily = new DailyDataS();
+            daily.setKey(new DailyDataS.DailyDataSKey());
+            daily.getKey().setDate(date);
+            daily.setRank(rank++);
+
+            String name = getExcelValue(row, headerMap, "name");
+            if (name.isEmpty()) name = getExcelValue(row, headerMap, "bse code");
+            if (name.isEmpty()) continue;
+            daily.getKey().setName(name);
+
+            daily.setCmp(getExcelBigDecimal(row, headerMap, "Current Price"));
+            daily.setMarketCap(getExcelBigDecimal(row, headerMap, "Market Capitalization"));
+
+            String resultDateStr = getExcelValue(row, headerMap, "Last result date");
+            int resultDate = 0;
+            try {
+                resultDate = new BigDecimal(resultDateStr).intValue();
+            } catch (Exception e) {
+                resultDate = 0;
+            }
+            daily.setLastResultDate(resultDate);
+
+            // Same mappings as your CSV method — just replicate all fields exactly like in CSV code
+            daily.setNetProfit(getExcelBigDecimal(row, headerMap, "Net profit"));
+            daily.setSales(getExcelBigDecimal(row, headerMap, "Sales"));
+            daily.setYoyQuarterlySalesGrowth(getExcelBigDecimal(row, headerMap, "YOY Quarterly sales growth"));
+            daily.setYoyQuarterlyProfitGrowth(getExcelBigDecimal(row, headerMap, "YOY Quarterly profit growth"));
+            daily.setQoqSalesGrowth(getExcelBigDecimal(row, headerMap, "QoQ sales growth"));
+            daily.setQoqProfitGrowth(getExcelBigDecimal(row, headerMap, "QoQ profit growth"));
+            daily.setOpmLatestQuarter(getExcelBigDecimal(row, headerMap, "OPM latest quarter"));
+            daily.setOpmLastYear(getExcelBigDecimal(row, headerMap, "OPM last year"));
+            daily.setNpmLatestQuarter(getExcelBigDecimal(row, headerMap, "NPM latest quarter"));
+            daily.setNpmLastYear(getExcelBigDecimal(row, headerMap, "NPM last year"));
+            daily.setProfitGrowth3years(getExcelBigDecimal(row, headerMap, "Profit growth 3Years"));
+            daily.setSalesGrowth3years(getExcelBigDecimal(row, headerMap, "Sales growth 3Years"));
+            daily.setPeTtm(getExcelBigDecimal(row, headerMap, "Price to Earning"));
+            daily.setHistoricalPe3years(getExcelBigDecimal(row, headerMap, "Historical PE 3Years"));
+            daily.setPegRatio(getExcelBigDecimal(row, headerMap, "PEG Ratio"));
+            daily.setPbTtm(getExcelBigDecimal(row, headerMap, "Price to book value"));
+            daily.setEvToEbit(getExcelBigDecimal(row, headerMap, "Enterprise Value to EBIT"));
+            daily.setDividendPayout(getExcelBigDecimal(row, headerMap, "Dividend Payout Ratio"));
+            daily.setRoe(getExcelBigDecimal(row, headerMap, "Return on equity"));
+            daily.setAvgRoe3years(getExcelBigDecimal(row, headerMap, "Average return on equity 3Years"));
+            daily.setDebt(getExcelBigDecimal(row, headerMap, "Debt"));
+            daily.setDebtToEquity(getExcelBigDecimal(row, headerMap, "Debt to equity"));
+            daily.setDebt3yearsback(getExcelBigDecimal(row, headerMap, "Debt 3Years back"));
+            daily.setRoce(getExcelBigDecimal(row, headerMap, "Return on capital employed"));
+            daily.setAvgRoce3years(getExcelBigDecimal(row, headerMap, "Average return on capital employed 3Years"));
+            daily.setFcfS(getExcelBigDecimal(row, headerMap, "Free cash flow last year"));
+            daily.setSalesGrowth5years(getExcelBigDecimal(row, headerMap, "Sales growth 5Years"));
+            daily.setSalesGrowth10years(getExcelBigDecimal(row, headerMap, "Sales growth 10Years"));
+            daily.setNoplat(getExcelBigDecimal(row, headerMap, "NOPLAT"));
+            daily.setCapex(getExcelBigDecimal(row, headerMap, "Capex"));
+            daily.setFcff(getExcelBigDecimal(row, headerMap, "FCFF"));
+            daily.setInvestedCapital(getExcelBigDecimal(row, headerMap, "Invested Capital"));
+            daily.setRoic(getExcelBigDecimal(row, headerMap, "RoIC"));
+
+            // Additional fields
+            daily.setReturn1D(getExcelBigDecimal(row, headerMap, "Return over 1day"));
+            daily.setReturn1W(getExcelBigDecimal(row, headerMap, "Return over 1week"));
+            daily.setReturn1M(getExcelBigDecimal(row, headerMap, "Return over 1month"));
+            daily.setReturn3M(getExcelBigDecimal(row, headerMap, "Return over 3months"));
+            daily.setReturn6M(getExcelBigDecimal(row, headerMap, "Return over 6months"));
+            daily.setReturn1Y(getExcelBigDecimal(row, headerMap, "Return over 1year"));
+            daily.setUp52wMin(getExcelBigDecimal(row, headerMap, "Up from 52w low"));
+            daily.setDown52wMax(getExcelBigDecimal(row, headerMap, "Down from 52w high"));
+            daily.setVolume1D(getExcelBigDecimal(row, headerMap, "Volume"));
+            daily.setVolume1W(getExcelBigDecimal(row, headerMap, "Volume 1week average"));
+            daily.setDma50(getExcelBigDecimal(row, headerMap, "DMA 50"));
+            daily.setDma200(getExcelBigDecimal(row, headerMap, "DMA 200"));
+            daily.setRsi(getExcelBigDecimal(row, headerMap, "RSI"));
+            daily.setTotalAssets(getExcelBigDecimal(row, headerMap, "Total Assets"));
+            daily.setNetBlock(getExcelBigDecimal(row, headerMap, "Net Block"));
+            daily.setWorkingCapital(getExcelBigDecimal(row, headerMap, "Working Capital"));
+            daily.setInventory(getExcelBigDecimal(row, headerMap, "Inventory"));
+            daily.setTradeReceivables(getExcelBigDecimal(row, headerMap, "Trade Receivables"));
+            daily.setTradePayables(getExcelBigDecimal(row, headerMap, "Trade Payables"));
+            daily.setSharesOutstandingCr(getExcelBigDecimal(row, headerMap, "Number of equity shares"));
+
+            daily.setIndustry(getExcelValue(row, headerMap, "Industry"));
+            daily.setSubIndustry("");
+            daily.setSector("");
+
+            // Computed Ratios
+            if (daily.getNetProfit() != null && daily.getNetProfit().compareTo(BigDecimal.ZERO) != 0) {
+                daily.setMcapToNetprofit(daily.getMarketCap().divide(daily.getNetProfit(), 2, RoundingMode.HALF_UP));
+            } else {
+                daily.setMcapToNetprofit(BigDecimal.ZERO);
+            }
+
+            if (daily.getSales() != null && daily.getSales().compareTo(BigDecimal.ZERO) != 0) {
+                daily.setMcapToSales(daily.getMarketCap().divide(daily.getSales(), 2, RoundingMode.HALF_UP));
+            } else {
+                daily.setMcapToSales(BigDecimal.ZERO);
+            }
+
+            dataList.add(daily);
+        }
+
+        workbook.close();
+        return dataList;
+    }
+
+
+    public List<DailyDataS> readCsvFile(MultipartFile file, Date date) throws IOException {
+        List<DailyDataS> dataList = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8));
+
+        String headerLine = reader.readLine();
+        if (headerLine == null) return dataList;
+
+        String[] headers = headerLine.split(",", -1);
+        Map<String, Integer> headerMap = new HashMap<>();
+        for (int i = 0; i < headers.length; i++) {
+            headerMap.put(headers[i].trim().toLowerCase(), i);
+        }
+
+        String line;
+        int rank = 1;
+        while ((line = reader.readLine()) != null) {
+            String[] values = line.split(",", -1);
+            DailyDataS daily = new DailyDataS();
+            daily.setKey(new DailyDataS.DailyDataSKey());
+            daily.getKey().setDate(date);
+            daily.setRank(rank++);
+
+            String name = getCsvValue(values, headerMap, "NSE Code");
+            if (name.isEmpty()) name = getCsvValue(values, headerMap, "BSE Code");
+            if (name.isEmpty()) continue;
+            daily.getKey().setName(name);
+
+            daily.setCmp(getCsvBigDecimal(values, headerMap, "Current Price"));
+            daily.setMarketCap(getCsvBigDecimal(values, headerMap, "Market Capitalization"));
+            String resultDateStr = getCsvValue(values, headerMap, "Last result date");
+            int resultDate = 0;
+            try {
+                resultDate = new BigDecimal(resultDateStr).intValue(); // handle both int and float values
+            } catch (Exception e) {
+                resultDate = 0;
+            }
+            daily.setLastResultDate(resultDate);
+            daily.setNetProfit(getCsvBigDecimal(values, headerMap, "Net profit"));
+            daily.setSales(getCsvBigDecimal(values, headerMap, "Sales"));
+            daily.setYoyQuarterlySalesGrowth(getCsvBigDecimal(values, headerMap, "YOY Quarterly sales growth"));
+            daily.setYoyQuarterlyProfitGrowth(getCsvBigDecimal(values, headerMap, "YOY Quarterly profit growth"));
+            daily.setQoqSalesGrowth(getCsvBigDecimal(values, headerMap, "QoQ sales growth"));
+            daily.setQoqProfitGrowth(getCsvBigDecimal(values, headerMap, "QoQ profit growth"));
+            daily.setOpmLatestQuarter(getCsvBigDecimal(values, headerMap, "OPM latest quarter"));
+            daily.setOpmLastYear(getCsvBigDecimal(values, headerMap, "OPM last year"));
+            daily.setNpmLatestQuarter(getCsvBigDecimal(values, headerMap, "NPM latest quarter"));
+            daily.setNpmLastYear(getCsvBigDecimal(values, headerMap, "NPM last year"));
+            daily.setProfitGrowth3years(getCsvBigDecimal(values, headerMap, "Profit growth 3Years"));
+            daily.setSalesGrowth3years(getCsvBigDecimal(values, headerMap, "Sales growth 3Years"));
+            daily.setPeTtm(getCsvBigDecimal(values, headerMap, "Price to Earning"));
+            daily.setHistoricalPe3years(getCsvBigDecimal(values, headerMap, "Historical PE 3Years"));
+            daily.setPegRatio(getCsvBigDecimal(values, headerMap, "PEG Ratio"));
+            daily.setPbTtm(getCsvBigDecimal(values, headerMap, "Price to book value"));
+            daily.setEvToEbit(getCsvBigDecimal(values, headerMap, "Enterprise Value to EBIT"));
+            daily.setDividendPayout(getCsvBigDecimal(values, headerMap, "Dividend Payout Ratio"));
+            daily.setRoe(getCsvBigDecimal(values, headerMap, "Return on equity"));
+            daily.setAvgRoe3years(getCsvBigDecimal(values, headerMap, "Average return on equity 3Years"));
+            daily.setDebt(getCsvBigDecimal(values, headerMap, "Debt"));
+            daily.setDebtToEquity(getCsvBigDecimal(values, headerMap, "Debt to equity"));
+            daily.setDebt3yearsback(getCsvBigDecimal(values, headerMap, "Debt 3Years back"));
+            daily.setRoce(getCsvBigDecimal(values, headerMap, "Return on capital employed"));
+            daily.setAvgRoce3years(getCsvBigDecimal(values, headerMap, "Average return on capital employed 3Years"));
+            daily.setFcfS(getCsvBigDecimal(values, headerMap, "Free cash flow last year"));
+            daily.setSalesGrowth5years(getCsvBigDecimal(values, headerMap, "Sales growth 5Years"));
+            daily.setSalesGrowth10years(getCsvBigDecimal(values, headerMap, "Sales growth 10Years"));
+            daily.setNoplat(getCsvBigDecimal(values, headerMap, "NOPLAT"));
+            daily.setCapex(getCsvBigDecimal(values, headerMap, "Capex"));
+            daily.setFcff(getCsvBigDecimal(values, headerMap, "FCFF"));
+            daily.setInvestedCapital(getCsvBigDecimal(values, headerMap, "Invested Capital"));
+            daily.setRoic(getCsvBigDecimal(values, headerMap, "RoIC"));
+
+            // New additional fields
+            daily.setReturn1D(getCsvBigDecimal(values, headerMap, "Return over 1day"));
+            daily.setReturn1W(getCsvBigDecimal(values, headerMap, "Return over 1week"));
+            daily.setReturn1M(getCsvBigDecimal(values, headerMap, "Return over 1month"));
+            daily.setReturn3M(getCsvBigDecimal(values, headerMap, "Return over 3months"));
+            daily.setReturn6M(getCsvBigDecimal(values, headerMap, "Return over 6months"));
+            daily.setReturn1Y(getCsvBigDecimal(values, headerMap, "Return over 1year"));
+            daily.setUp52wMin(getCsvBigDecimal(values, headerMap, "Up from 52w low"));
+            daily.setDown52wMax(getCsvBigDecimal(values, headerMap, "Down from 52w high"));
+            daily.setVolume1D(getCsvBigDecimal(values, headerMap, "Volume"));
+            daily.setVolume1W(getCsvBigDecimal(values, headerMap, "Volume 1week average"));
+            daily.setDma50(getCsvBigDecimal(values, headerMap, "DMA 50"));
+            daily.setDma200(getCsvBigDecimal(values, headerMap, "DMA 200"));
+            daily.setRsi(getCsvBigDecimal(values, headerMap, "RSI"));
+            daily.setTotalAssets(getCsvBigDecimal(values, headerMap, "Total Assets"));
+            daily.setNetBlock(getCsvBigDecimal(values, headerMap, "Net Block"));
+            daily.setWorkingCapital(getCsvBigDecimal(values, headerMap, "Working Capital"));
+            daily.setInventory(getCsvBigDecimal(values, headerMap, "Inventory"));
+            daily.setTradeReceivables(getCsvBigDecimal(values, headerMap, "Trade Receivables"));
+            daily.setTradePayables(getCsvBigDecimal(values, headerMap, "Trade Payables"));
+            daily.setSharesOutstandingCr(getCsvBigDecimal(values, headerMap, "Number of equity shares"));
+
+            daily.setIndustry(getCsvValue(values, headerMap, "Industry"));
+            daily.setSubIndustry("");
+            daily.setSector("");
+
+            // Computed ratios
+            if (daily.getNetProfit() != null && daily.getNetProfit().compareTo(BigDecimal.ZERO) != 0) {
+                daily.setMcapToNetprofit(daily.getMarketCap().divide(daily.getNetProfit(), 2, RoundingMode.HALF_UP));
+            } else {
+                daily.setMcapToNetprofit(BigDecimal.ZERO);
+            }
+
+            if (daily.getSales() != null && daily.getSales().compareTo(BigDecimal.ZERO) != 0) {
+                daily.setMcapToSales(daily.getMarketCap().divide(daily.getSales(), 2, RoundingMode.HALF_UP));
+            } else {
+                daily.setMcapToSales(BigDecimal.ZERO);
+            }
+
+            dataList.add(daily);
+        }
+
+        return dataList;
+    }
+
+    private String getExcelValue(Row row, Map<String, Integer> map, String key) {
+        Integer index = map.get(key.toLowerCase());
+        if (index == null) return "";
+        Cell cell = row.getCell(index);
+        if (cell == null) return "";
+        switch (cell.getCellType()) {
+            case Cell.CELL_TYPE_STRING:
+                return cell.getStringCellValue().trim();
+            case Cell.CELL_TYPE_NUMERIC:
+                return BigDecimal.valueOf(cell.getNumericCellValue()).toPlainString();
+            default:
+                return "";
+        }
+    }
+
+    private BigDecimal getExcelBigDecimal(Row row, Map<String, Integer> map, String key) {
+        try {
+            String val = getExcelValue(row, map, key);
+            return val.isEmpty() ? BigDecimal.ZERO : new BigDecimal(val);
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
+    }
+
+    private int getExcelInt(Row row, Integer colIndex) {
+        if (colIndex == null || colIndex == -1 || row.getCell(colIndex) == null) return 0;
+        try {
+            Cell cell = row.getCell(colIndex);
+            return (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) ? (int) cell.getNumericCellValue() : 0;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private String getCsvValue(String[] row, Map<String, Integer> map, String key) {
+        Integer index = map.get(key.toLowerCase());
+        return (index != null && index < row.length) ? row[index].trim() : "";
+    }
+
+    private BigDecimal getCsvBigDecimal(String[] row, Map<String, Integer> map, String key) {
+        try {
+            String val = getCsvValue(row, map, key);
+            return val.isEmpty() ? BigDecimal.ZERO : new BigDecimal(val);
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
     }
 
     @RequestMapping(value = "/admin/uploadmosltxn")

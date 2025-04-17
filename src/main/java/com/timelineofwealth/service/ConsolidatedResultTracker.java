@@ -8,10 +8,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.Year;
+import java.util.Arrays;
 
 public class ConsolidatedResultTracker {
 
-    static String QUARTER = "Q3"; // Update this for each new quarter
+    static String QUARTER = "Q4"; // Update this for each new quarter
     static String YEAR = "25"; // Update this for each new year
     static String TRACKER_FILE_PATH = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert\\ResultTracker.xlsx";
     static String QUARTE_REXCEL_Folder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\20" + YEAR + QUARTER;
@@ -110,26 +112,35 @@ public class ConsolidatedResultTracker {
 
 
     public static void updateResultTrackerExcel() {
+        String basePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
+        File base = new File(basePath);
 
-        try {
-            FileInputStream trackerFileInputStream;
-            Workbook trackerWorkbook;
-            Sheet fySheet;
+        String[] folders = base.list((dir, name) -> name.matches("\\d{4}Q[1-4]"));
+        if (folders == null || folders.length == 0) {
+            throw new RuntimeException("No quarter folders found.");
+        }
 
-            try {
-                trackerFileInputStream = new FileInputStream(new File(TRACKER_FILE_PATH));
-                trackerWorkbook = new XSSFWorkbook(trackerFileInputStream);
-            } catch (Exception e){
-                throw new Exception("Tracker file not found. " + e.getMessage());
-            }
+        Arrays.sort(folders);
+        String latestFolder = folders[folders.length - 1];
 
-            try {
-                fySheet = trackerWorkbook.getSheet("FY" + YEAR + QUARTER);
-            } catch (Exception e){
-                throw new Exception("FY" + YEAR + QUARTER + " sheet not found in the Tracker file. " + e.getMessage());
-            }
+        System.out.println("Auto-detected latest folder: " + latestFolder);
+        updateResultTrackerExcel(latestFolder);
+    }
+
+
+    public static void updateResultTrackerExcel(String latestFolder) {
+
+        String YEAR = latestFolder.substring(2, 4);
+        String QUARTER = latestFolder.substring(5);
+        String TRACKER_FILE_PATH = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert\\ResultTracker.xlsx";
+        String QUARTER_EXCEL_FOLDER = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\" + latestFolder;
+
+        try (FileInputStream trackerFileInputStream = new FileInputStream(new File(TRACKER_FILE_PATH));
+             Workbook trackerWorkbook = new XSSFWorkbook(trackerFileInputStream)) {
+
+            Sheet fySheet = trackerWorkbook.getSheet("FY" + YEAR + "Q" + QUARTER);
             if (fySheet == null) {
-                throw new Exception("FY" + YEAR + QUARTER + " sheet is null.");
+                throw new RuntimeException("Sheet FY" + YEAR + QUARTER + " not found in tracker file.");
             }
 
             //processing rows in FY sheet
@@ -190,7 +201,7 @@ public class ConsolidatedResultTracker {
                     String ticker = tickerCell.getStringCellValue();
                     try {
                         //opern ticker quarter result file
-                        String tickerFilePath = QUARTE_REXCEL_Folder + "\\" + ticker + "_FY" + YEAR + QUARTER + ".xlsx";
+                        String tickerFilePath = QUARTE_REXCEL_Folder + "\\" + ticker + "_FY" + YEAR + "Q" + QUARTER + ".xlsx";
                         File tickerFile = null;
                         FileInputStream tickerFileInputStream = null;
                         Workbook tickerWorkbook = null;
@@ -504,15 +515,16 @@ public class ConsolidatedResultTracker {
                 }
             }
 
-            trackerFileInputStream.close();
-            // Save the updated tracker file
-            saveWorkbook(trackerWorkbook, TRACKER_FILE_PATH);
+//            trackerFileInputStream.close();
+//            // Save the updated tracker file
+//            saveWorkbook(trackerWorkbook, TRACKER_FILE_PATH);
+
+            try (FileOutputStream fos = new FileOutputStream(new File(TRACKER_FILE_PATH))) {
+                trackerWorkbook.write(fos);
+            }
+
         } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        } catch (Exception e){
-            e.printStackTrace();
-            System.out.println(e.getMessage());
+            throw new RuntimeException("Error updating result tracker: " + e.getMessage(), e);
         }
     }
 
@@ -769,26 +781,24 @@ public class ConsolidatedResultTracker {
         trackerRowTrendCell.setCellValue(trackerRowTrend);*/
     }
 
-    public static void setTrend(Row trackerRow, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator,  int rownumber, int y0CellNo, int trackerCellNumber, int unit, boolean isPercent) {
+    public static void setTrend(Row trackerRow, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator, int rownumber, int y0CellNo, int trackerCellNumber, int unit, boolean isPercent) {
 
-        Row tickerRow = quarterPnLSheet.getRow(rownumber);//19 for Revenue
-        String[] tickerRowValuesArray = new String[4];
+        Row tickerRow = quarterPnLSheet.getRow(rownumber); // e.g., 19 for Revenue
+        String[] tickerRowValuesArray = new String[5]; // Increased to 5 values
+
         if (tickerRow != null) {
-            for (int i = y0CellNo, j = 0; i >= (y0CellNo-3) || j <= 3; i--, j++) { //17 for Y0 and 14 for Y4
+            for (int i = y0CellNo, j = 0; i >= (y0CellNo - 4) && j <= 4; i--, j++) {
                 Cell ttmRevenueCell = tickerRow.getCell(i);
                 if (ttmRevenueCell != null) {
                     CellValue cellValue = tickerFileEvaluator.evaluate(ttmRevenueCell);
                     try {
-                        double tickerRowValue = 0; // in thousand cr. or lac cr.
+                        double tickerRowValue = 0;
                         if (!isPercent) {
-                            tickerRowValue = cellValue.getNumberValue() / unit; // in thousand cr.
-                            tickerRowValue = Math.round(tickerRowValue * 100);
-                            tickerRowValue = tickerRowValue / 100;
+                            tickerRowValue = cellValue.getNumberValue() / unit;
                         } else {
-                            tickerRowValue = cellValue.getNumberValue() * 100; // in thousand cr.
-                            tickerRowValue = Math.round(tickerRowValue * 100);
-                            tickerRowValue = tickerRowValue / 100;
+                            tickerRowValue = cellValue.getNumberValue() * 100;
                         }
+                        tickerRowValue = Math.round(tickerRowValue * 100) / 100.0;
                         tickerRowValuesArray[j] = "" + tickerRowValue;
                     } catch (Exception e) {
                         tickerRowValuesArray[j] = "";
@@ -796,27 +806,21 @@ public class ConsolidatedResultTracker {
                 }
             }
         }
-        String trackerRowTrend = "";
-        for (int i = 0; i <= 3; i++) {
-            if (i < 3) {
-                if(!isPercent) {
-                    trackerRowTrend = trackerRowTrend + tickerRowValuesArray[i] + " / ";
-                } else {
-                    trackerRowTrend = trackerRowTrend + tickerRowValuesArray[i] + "% / ";
-                }
-            }
-            else {
-                if(!isPercent) {
-                    trackerRowTrend = trackerRowTrend + tickerRowValuesArray[i];
-                } else {
-                    trackerRowTrend = trackerRowTrend + tickerRowValuesArray[i] + "%";
-                }
+
+        StringBuilder trackerRowTrend = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            if (tickerRowValuesArray[i] != null) {
+                trackerRowTrend.append(tickerRowValuesArray[i]);
+                if (isPercent) trackerRowTrend.append("%");
+                if (i < 4) trackerRowTrend.append(" / ");
             }
         }
+
         Cell trackerRowTrendCell = trackerRow.getCell(trackerCellNumber);
         if (trackerRowTrendCell == null)
             trackerRowTrendCell = trackerRow.createCell(trackerCellNumber, CellType.STRING);
-        trackerRowTrendCell.setCellValue(trackerRowTrend);
+
+        trackerRowTrendCell.setCellValue(trackerRowTrend.toString());
     }
 
     public static void setNumericValue(Row row, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator, int trackerCellLocation, int tickerRowNumber, int tickerCellNumber){
