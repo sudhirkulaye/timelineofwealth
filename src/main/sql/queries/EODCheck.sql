@@ -34,7 +34,6 @@ truncate table log_table;
 CALL populate_table_row_count();
 select * from dummy_user_table_row_count; 
 
-
 select * from setup_dates;
 select count(1), date from wealth_history
 where date >= (select date_start_current_month from setup_dates)

@@ -6,12 +6,12 @@ import com.timelineofwealth.entities.*;
 import com.timelineofwealth.service.CommonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "public/api/")
@@ -159,7 +159,6 @@ public class PublicApi {
         return CommonService.getIndexReturnStatistics("ALL");
     }
 
-
     @RequestMapping(value = "/getbenchmarktwrrsummary", method = RequestMethod.GET)
     public List<BenchmarkTwrrSummaryDTO> getBenchmarkTwrrSummary() {
         logger.debug(String.format("Call user/api/getbenchmarktwrrsummary/"));
@@ -172,4 +171,121 @@ public class PublicApi {
         logger.debug(String.format("Call user/api/getbenchmarktwrrmonthly/"));
         return CommonService.getBenchmarkTwrrMonthly();
     }
+
+    @RequestMapping(value = "/getpricehistory", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Map<String, Object>> getPriceHistory(@RequestParam List<String> tickers,
+                                                     @RequestParam(required = false, defaultValue = "ALL") String range,
+                                                     @RequestParam(required = false, defaultValue = "NIFTY") String index,
+                                                     @RequestParam(required = false) String from,
+                                                     @RequestParam(required = false) String to) {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        if ("custom".equalsIgnoreCase(range) && (from != null || to != null)) {
+            for (String ticker : tickers) {
+                List<Map<String, Object>> prices = CommonService.getPriceSeries(ticker, from, to);
+                Map<String, Object> stockMap = new HashMap<>();
+                stockMap.put("ticker", ticker);
+                stockMap.put("prices", prices);
+                result.add(stockMap);
+            }
+
+            List<Map<String, Object>> indexPrices = CommonService.getPriceSeries(index, from, to);
+            Map<String, Object> indexMap = new HashMap<>();
+            indexMap.put("ticker", index);
+            indexMap.put("prices", indexPrices);
+            result.add(indexMap);
+        } else {
+            for (String ticker : tickers) {
+                List<Map<String, Object>> prices = CommonService.getPriceSeries(ticker, range);
+                Map<String, Object> stockMap = new HashMap<>();
+                stockMap.put("ticker", ticker);
+                stockMap.put("prices", prices);
+                result.add(stockMap);
+            }
+
+            List<Map<String, Object>> indexPrices = CommonService.getPriceSeries(index, range);
+            Map<String, Object> indexMap = new HashMap<>();
+            indexMap.put("ticker", index);
+            indexMap.put("prices", indexPrices);
+            result.add(indexMap);
+        }
+
+        return result;
+    }
+
+    @RequestMapping(value = "/getmarketcaphistory", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Map<String, Object>> getMarketCapHistory(
+            @RequestParam List<String> tickers,
+            @RequestParam(required = false, defaultValue = "ALL") String range,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to
+    ) {
+        List<Map<String, Object>> output = new ArrayList<>();
+
+        for (String ticker : tickers) {
+            List<Map<String, Object>> series;
+
+            // Use from/to only when range is 'custom'
+            if ("custom".equalsIgnoreCase(range) && (from != null || to != null)) {
+                series = CommonService.getMarketCapSeries(ticker, "custom", from, to);
+            } else {
+                series = CommonService.getMarketCapSeries(ticker, range, null, null);
+            }
+
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("ticker", ticker);
+            entry.put("series", series);
+            output.add(entry);
+        }
+
+        return output;
+    }
+
+    @RequestMapping(value = "/getttmpehistory", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Map<String, Object>> getTtmPeHistory(
+            @RequestParam List<String> tickers,
+            @RequestParam(required = false, defaultValue = "NIFTY") String index,
+            @RequestParam(required = false, defaultValue = "ALL") String range,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to
+    ) {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (String ticker : tickers) {
+            List<Map<String, Object>> series;
+            if ("custom".equalsIgnoreCase(range) && (from != null || to != null)) {
+                series = CommonService.computeStockTtmPeSeries(ticker, from, to);
+            } else {
+                series = CommonService.computeStockTtmPeSeries(ticker, range);
+            }
+
+            if (!series.isEmpty()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("ticker", ticker);
+                row.put("series", series);
+                result.add(row);
+            }
+        }
+
+        // Handle index TTM PE similarly
+        List<Map<String, Object>> indexSeries;
+        if ("custom".equalsIgnoreCase(range) && (from != null || to != null)) {
+            indexSeries = CommonService.computeIndexTtmPeSeries(index, from, to);
+        } else {
+            indexSeries = CommonService.computeIndexTtmPeSeries(index, range);
+        }
+
+        if (!indexSeries.isEmpty()) {
+            Map<String, Object> row = new HashMap<>();
+            row.put("ticker", index);
+            row.put("series", indexSeries);
+            result.add(row);
+        }
+
+        return result;
+    }
+
 }

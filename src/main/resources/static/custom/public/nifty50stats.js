@@ -9,7 +9,7 @@ module.controller('IndexStatController', function($scope, $http, $filter, $local
     $scope.labelsDates = [];
     $scope.chartSeries = ['Index Trailing PE', 'Index Value'];
     $scope.newColors = ['#26B99A', '#03586A', '#1E947B', '#1a3c33', '#DCDCDC', '#46BFBD', '#FDB45C'];
-    $scope.chartDatasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
+    $scope.chartDatasetOverride = [{ yAxisID: 'y-axis-1', borderDash: [], borderWidth: 2, pointRadius: 0, tension: 0.4 }, { yAxisID: 'y-axis-2', borderDash: [], borderWidth: 2, pointRadius: 0, tension: 0.4 }];
     //$scope.chartOptions = { scales: { yAxes: [{ ticks: { min:0 } }] } };
     $scope.chartOptions = {
         scales: {

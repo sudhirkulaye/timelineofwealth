@@ -8,6 +8,7 @@ import com.timelineofwealth.entities.StockUniverse;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.List;
 
 public class NseBse500 implements Serializable {
 
@@ -67,7 +68,8 @@ public class NseBse500 implements Serializable {
     private String historicalRoic;
     private String secondAndTerminalStageAssumptions;
     private String otherIncGrowthAssumptions;
-
+    private List<CustomChartData> excelCharts;
+    private List<ReportNotes> reportNotes;
 
     public NseBse500(){}
     public NseBse500(StockUniverse stockUniverse){
@@ -506,5 +508,19 @@ public class NseBse500 implements Serializable {
     }
     public void setOtherIncGrowthAssumptions(String otherIncGrowthAssumptions) {
         this.otherIncGrowthAssumptions = otherIncGrowthAssumptions;
+    }
+
+    public List<CustomChartData> getExcelCharts() {
+        return excelCharts;
+    }
+    public void setExcelCharts(List<CustomChartData> excelCharts) {
+        this.excelCharts = excelCharts;
+    }
+
+    public List<ReportNotes> getReportNotes() {
+        return reportNotes;
+    }
+    public void setReportNotes(List<ReportNotes> reportNotes) {
+        this.reportNotes = reportNotes;
     }
 }
