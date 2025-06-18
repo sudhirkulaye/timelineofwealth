@@ -49,6 +49,12 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
     $scope.dataRecentPB = [];
     $scope.dataRecentEvToEbita = [];
     $scope.labelsRecentPE = [];
+    $scope.chartOptionsRecentPE = {};
+    $scope.chartRecentPEDatasetOverride = [];
+    $scope.chartOptionsRecentPB = {};
+    $scope.chartRecentPBDatasetOverride = [];
+    $scope.chartOptionsRecentEvToEbita = {};
+    $scope.chartRecentEvToEbitaDatasetOverride = [];
 
     $scope.priceMovements = [];
     $scope.dataPriceMovements = [];
@@ -84,66 +90,60 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
 
     showRecords();
 
-    function showRecords(){
-        $scope.stockPnl = new Array();
-        //console.log($scope.ticker);
-        var url = "/getstockdetails/"+$scope.ticker;
-        $http.get(urlBase + url).
-            then(function (response) {
+    function showRecords() {
+        $scope.stockPnl = [];
+
+        var url = "/getstockdetails/" + $scope.ticker;
+        $http.get(urlBase + url)
+            .then(function (response) {
                 if (response != undefined) {
                     $scope.stockDetails = response.data;
+                    renderExcelCharts();
+                    renderReportNotes();
                 } else {
                     $scope.stockDetails = [];
                 }
-            });
 
-        url = "/getstockquarter/"+$scope.ticker;
-        $http.get(urlBase + url).
-            then(function (response) {
+                // After getStockDetails done
+                url = "/getstockquarter/" + $scope.ticker;
+                return $http.get(urlBase + url);
+            })
+            .then(function (response) {
                 if (response != undefined) {
                     $scope.stockQuarter = response.data;
                     $scope.stockQuarterOriginal = response.data;
-                    url = "/getstockpnl/"+$scope.ticker;
-                    $http.get(urlBase + url).
-                        then(function (response) {
-                            if (response != undefined) {
-                                $scope.stockPnl = response.data;
-                                $scope.stockPnlOriginal = response.data;
-                                populateStockPnlChart();
-                            } else {
-                                $scope.stockPnl = [];
-                                $scope.stockPnlOriginal = [];
-                            }
-                        });
                     populateStockQuarterChart();
+
+                    // After getStockQuarter done
+                    url = "/getstockpnl/" + $scope.ticker;
+                    return $http.get(urlBase + url);
                 } else {
                     $scope.stockQuarter = [];
                     $scope.stockQuarterOriginal = [];
                 }
-        });
+            })
+            .then(function (response) {
+                if (response != undefined) {
+                    $scope.stockPnl = response.data;
+                    $scope.stockPnlOriginal = response.data;
+                    populateStockPnlChart();
+                } else {
+                    $scope.stockPnl = [];
+                    $scope.stockPnlOriginal = [];
+                }
 
-        url = "/getrecentvaluations/"+$scope.ticker;
-        $http.get(urlBase + url).
-            then(function (response) {
+                // Now call getrecentvaluations
+                url = "/getrecentvaluations/" + $scope.ticker;
+                return $http.get(urlBase + url);
+            })
+            .then(function (response) {
                 if (response != undefined) {
                     $scope.recentValuations = response.data;
                     populateStockRecentPE();
                 } else {
                     $scope.recentValuations = [];
                 }
-        });
-
-//        url = "/getpricemovements/"+$scope.ticker;
-//        $http.get(urlBase + url).
-//            then(function (response) {
-//                if (response != undefined) {
-//                    $scope.priceMovements = response.data;
-//                    populateStockPriceMovements();
-//                } else {
-//                    $scope.priceMovements = [];
-//                }
-//        });
-
+            });
     }
 
     function populateStockPnlChart() {
@@ -264,6 +264,18 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
         $scope.stockValuation = [];
         pe.push($scope.stockDetails.dailyDataS.peTtm);
         $scope.stockValuation.push(pe);
+
+        /*$scope.stockValuationDataOverride = [
+            {
+                label: "PE",
+                yAxisID: 'y-axis-1',
+                type: 'line',
+                borderDash: [],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.4
+            }
+        ];*/
 
 
         $scope.chartOptionsStockPnl = { scales: {
@@ -481,11 +493,104 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                                             ]
                                        } };
         $scope.chartMCapAndPriceDatasetOverride = [
-            { label: "MCap", yAxisID: 'y-axis-1', type: 'line' },
-            { label: "Price", yAxisID: 'y-axis-2', type: 'line' },
-            { label: "Result MCap", yAxisID: 'y-axis-1', type: 'line' }
+            {
+                label: "MCap",
+                yAxisID: 'y-axis-1',
+                type: 'line',
+                borderDash: [],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.4
+            },
+            {
+                label: "Price",
+                yAxisID: 'y-axis-2',
+                type: 'line',
+                borderDash: [],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.4
+            },
+            {
+                label: "Result MCap",
+                yAxisID: 'y-axis-1',
+                type: 'line'
+            }
         ];
         $scope.chartMCapAndPriceSeries = ['Market Cap', 'Price', 'Result MCap'];
+
+        $scope.chartOptionsRecentPE = {
+            scales: {
+                yAxes: [{
+                    id: 'y-axis-1',
+                    type: 'linear',
+                    position: 'left',
+                    ticks: {
+                        min: 0
+                    }
+                }]
+            }
+        };
+        $scope.chartRecentPEDatasetOverride = [
+            {
+                label: "TTM PE",
+                yAxisID: 'y-axis-1',
+                type: 'line',
+                borderDash: [],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.4
+            }
+        ];
+        $scope.chartOptionsRecentPB = {
+            scales: {
+                yAxes: [{
+                    id: 'y-axis-1',
+                    type: 'linear',
+                    position: 'left',
+                    ticks: {
+                        min: 0
+                    }
+                }]
+            }
+        };
+
+        $scope.chartRecentPBDatasetOverride = [
+            {
+                label: "TTM PB",
+                yAxisID: 'y-axis-1',
+                type: 'line',
+                borderDash: [],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.4
+            }
+        ];
+
+        $scope.chartOptionsRecentEvToEbita = {
+            scales: {
+                yAxes: [{
+                    id: 'y-axis-1',
+                    type: 'linear',
+                    position: 'left',
+                    ticks: {
+                        min: 0
+                    }
+                }]
+            }
+        };
+
+        $scope.chartRecentEvToEbitaDatasetOverride = [
+            {
+                label: "EV/EBITA",
+                yAxisID: 'y-axis-1',
+                type: 'line',
+                borderDash: [],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.4
+            }
+        ];
 
 
     }
@@ -567,7 +672,7 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
               {
                 label: "OPM%",
                 yAxisID: 'y-axis-2',
-                type: 'line'
+                type: 'line', borderDash: [], borderWidth: 2, pointRadius: 0, tension: 0.4
               },
 //              {
 //                label: "Op. Profit g%",
@@ -601,6 +706,231 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
         };
 
 
+    }
+
+    function renderExcelCharts() {
+        if ($scope.stockDetails.excelCharts && $scope.stockDetails.excelCharts.length > 0) {
+            let container = document.getElementById('dynamicCustomChartsContainer');
+            container.innerHTML = ""; // Clear previous charts
+
+            $scope.stockDetails.excelCharts.forEach(function (chartInfo, index) {
+
+                if (index % 2 === 0) {
+                    // Create new row every 2 charts
+                    rowDiv = document.createElement('div');
+                    rowDiv.className = 'row';
+                    container.appendChild(rowDiv);
+                }
+                // === Outer Column Wrapper ===
+                let wrapperColDiv = document.createElement('div');
+                wrapperColDiv.className = 'col-md-6 col-sm-12 col-xs-12';
+                wrapperColDiv.style.padding = "10px";
+
+                // === x_panel ===
+                let panel = document.createElement('div');
+                panel.className = 'x_panel';
+
+                // === x_title ===
+                let titleDiv = document.createElement('div');
+                titleDiv.className = 'x_title';
+
+                let titleH2 = document.createElement('h2');
+
+                let latestVal = null;
+                for (let i = chartInfo.values.length - 1; i >= 0; i--) {
+                    if (chartInfo.values[i] != null && isFinite(chartInfo.values[i])) {
+                        latestVal = chartInfo.values[i];
+                        break;
+                    }
+                }
+
+                // Format value
+                let formattedLatest = "";
+                if (latestVal != null) {
+                    if (Math.abs(latestVal) <= 1) {
+                        formattedLatest = (latestVal * 100).toFixed(1) + "%";
+                    } else if (Math.abs(latestVal) > 1000) {
+                        formattedLatest = Math.round(latestVal).toLocaleString('en-IN');
+                    } else {
+                        formattedLatest = latestVal.toFixed(1);
+                    }
+                }
+
+                // Title text with subtitle
+                titleH2.innerHTML = `${chartInfo.title} <small>(Field: ${chartInfo.fieldName}${formattedLatest ? `, Latest: ${formattedLatest}` : ''})</small>`;
+
+                titleDiv.appendChild(titleH2);
+
+                let toolbox = document.createElement('ul');
+                toolbox.className = 'nav navbar-right panel_toolbox';
+                toolbox.innerHTML = `
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">Settings 1</a></li>
+                            <li><a href="#">Settings 2</a></li>
+                        </ul>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+                `;
+                titleDiv.appendChild(toolbox);
+
+                let clearFix = document.createElement('div');
+                clearFix.className = 'clearfix';
+                titleDiv.appendChild(clearFix);
+
+                panel.appendChild(titleDiv);
+
+                // === x_content ===
+                let contentDiv = document.createElement('div');
+                contentDiv.className = 'x_content';
+
+                let canvas = document.createElement('canvas');
+                canvas.id = 'custom_chart_' + index;
+                canvas.style.height = "300px";
+                canvas.style.maxHeight = "300px";
+                contentDiv.appendChild(canvas);
+
+                panel.appendChild(contentDiv);
+                wrapperColDiv.appendChild(panel);
+                rowDiv.appendChild(wrapperColDiv);
+
+                // === Format Data ===
+                let formattedValues = chartInfo.values.map(function(val) {
+                    if (val == null) return null;
+                    if (Math.abs(val) <= 1) {
+                        return +(val * 100).toFixed(1); // percentage
+                    } else if (Math.abs(val) > 1000) {
+                        return Math.round(val); // big number
+                    } else {
+                        return +val.toFixed(1); // normal
+                    }
+                });
+
+                // === Create Chart ===
+                new Chart(canvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: chartInfo.labels,
+                        datasets: [{
+                            label: '',
+                            data: formattedValues,
+                            borderWidth: 2,
+                            borderColor: '#26B99A',
+                            backgroundColor: '#26B99A',
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: false
+                            },
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let val = context.raw;
+                                        if (val == null) return '';
+                                        if (Math.abs(val) >= 1000) {
+                                            return Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+                                        } else if (Math.abs(val) <= 100) {
+                                            return Number(val).toLocaleString('en-IN', { maximumFractionDigits: 1 });
+                                        } else {
+                                            return Number(val).toFixed(1);
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: {
+                                    callback: function(value) {
+                                        if (Math.abs(value) >= 1000) {
+                                            return Number(value).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+                                        } else if (Math.abs(value) <= 100) {
+                                            return Number(value).toLocaleString('en-IN', { maximumFractionDigits: 1 });
+                                        } else {
+                                            return Number(value).toFixed(1);
+                                        }
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    autoSkip: true,
+                                    maxTicksLimit: 10
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+    }
+
+    // === Extended: Display Notes Section for Each Ticker ===
+    function renderReportNotes() {
+        let container = document.getElementById("reportNotesContainer");
+        container.innerHTML = "";
+
+        let notes = $scope.stockDetails.reportNotes;
+        if (!notes || notes.length === 0) {
+            container.innerHTML = "<p>No notes available.</p>";
+            return;
+        }
+
+        // === Group notes by "ticker|date|documentSource"
+        let grouped = {};
+        notes.forEach(note => {
+            let mainKey = `${note.ticker}|${note.date}|${note.documentSource}`;
+            let subKey = `${note.documentSection}|${note.infoCategory}`;
+            if (!grouped[mainKey]) grouped[mainKey] = {};
+            if (!grouped[mainKey][subKey]) grouped[mainKey][subKey] = [];
+            grouped[mainKey][subKey].push(note);
+        });
+
+        Object.keys(grouped).forEach(mainKey => {
+            let [ticker, rawDate, documentSource] = mainKey.split("|");
+            let formattedDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : rawDate;
+
+            // === Big Bold Header ===
+            let h2 = document.createElement("h2");
+            h2.innerText = `${ticker} - ${formattedDate} - ${documentSource}`;
+            h2.style.fontWeight = "bold";
+            h2.style.marginTop = "30px";
+            container.appendChild(h2);
+
+            let subGroup = grouped[mainKey];
+            Object.keys(subGroup).forEach(subKey => {
+                let [docSection, infoCategory] = subKey.split("|");
+
+                // === Sub Header (smaller bold) ===
+                let h4 = document.createElement("h4");
+                h4.innerText = `${docSection} - ${infoCategory}`;
+                h4.style.fontWeight = "bold";
+                h4.style.marginTop = "15px";
+                h4.style.fontSize = "16px";
+                container.appendChild(h4);
+
+                // === Bullet List ===
+                subGroup[subKey].forEach(note => {
+                    let bullet = document.createElement("div");
+                    bullet.innerText = `${note.infoSubCategory}: ${note.information}`;
+                    bullet.style.marginLeft = "20px";
+                    bullet.style.fontSize = "14px";
+                    bullet.style.marginBottom = "4px";
+                    container.appendChild(bullet);
+                });
+            });
+        });
     }
 
 });

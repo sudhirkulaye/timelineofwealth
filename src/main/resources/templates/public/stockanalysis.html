@@ -108,6 +108,38 @@
                             <div class="x_panel">
                                 <div class="x_panel">
                                     <div class="x_title">
+                                        <h2>
+                                            Recent Market Capital and Price
+                                            <small>
+                                                (Latest: ₹{{stockDetails.dailyDataS.marketCap | number:0}} Cr, Price: ₹{{stockDetails.dailyDataS.cmp | number:2}})
+                                            </small>
+                                        </h2>
+                                        <ul class="nav navbar-right panel_toolbox">
+                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                            </li>
+                                            <li class="dropdown">
+                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                <ul class="dropdown-menu" role="menu">
+                                                    <li><a href="#">Settings 1</a>
+                                                    </li>
+                                                    <li><a href="#">Settings 2</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                            </li>
+                                        </ul>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="x_content">
+                                        <canvas id="recentmcapandprice"  class="chart chart-bar" chart-colors="newColors1" chart-options="chartOptionsMCapAndPrice"
+                                                chart-data="dataRecentMCapAndPrice" chart-dataset-override="chartMCapAndPriceDatasetOverride"  chart-labels="labelsRecentPE" chart-series="chartMCapAndPriceSeries" ></canvas>
+                                    </div>
+                                </div>
+                                <!-- Excel-based Dynamic Charts Will Appear Here -->
+                                <div id="dynamicCustomChartsContainer" style="margin-top: 30px;"></div>
+                                <!--<div class="x_panel">
+                                    <div class="x_title">
                                         <h2>Annual Sales <small>Consolidated Sales (or Standalone in case consolidated not available)</small></h2>
                                         <ul class="nav navbar-right panel_toolbox">
                                             <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
@@ -152,206 +184,186 @@
                                 <div class="x_content">
                                     <canvas id="pnlchart"  class="chart chart-bar" chart-colors="newColors1" chart-options="chartOptionsStockPnl"
                                             chart-data="stockPnl" chart-labels="labelsYearsStockPnl" chart-dataset-override="stockPnlDataOverride"  ></canvas>
+                                </div>-->
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-12">
+                                        <div class="x_panel">
+                                            <div class="x_title">
+                                                <h2>
+                                                    Valuation Levels
+                                                    <small>
+                                                        (Field: PE, Latest: {{stockDetails.dailyDataS.peTtm | number:2}}x)
+                                                    </small>
+                                                </h2>
+                                                <ul class="nav navbar-right panel_toolbox">
+                                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                                                    <li class="dropdown">
+                                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></a>
+                                                        <ul class="dropdown-menu"><li><a href="#">Settings 1</a></li><li><a href="#">Settings 2</a></li></ul>
+                                                    </li>
+                                                    <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+                                                </ul>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <canvas id="valuationchart" class="chart chart-line"
+                                                        chart-colors="newColors"
+                                                        chart-options="chartOptions"
+                                                        chart-data="stockValuation"
+                                                        chart-labels="labelsYearsStockValuation">
+                                                </canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 col-sm-12">
+                                        <div class="x_panel">
+                                            <div class="x_title">
+                                                <h2>
+                                                    Recent TTM PE
+                                                    <small>
+                                                        (Field: PE, Latest: {{stockDetails.dailyDataS.peTtm | number:2}}x)
+                                                    </small>
+                                                </h2>
+                                                <ul class="nav navbar-right panel_toolbox">...</ul>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <canvas id="recentpe" class="chart chart-line"
+                                                        chart-colors="newColors"
+                                                        chart-data="dataRecentPE"
+                                                        chart-labels="labelsRecentPE"
+                                                        chart-dataset-override="chartRecentPEDatasetOverride"
+                                                        chart-options="chartOptionsRecentPE">
+                                                </canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 col-sm-12">
+                                        <div class="x_panel">
+                                            <div class="x_title">
+                                                <h2>
+                                                    Recent TTM PB
+                                                    <small>(Field: PB, Latest: {{stockDetails.dailyDataS.pbTtm | number:2}}x)</small>
+                                                </h2>
+                                                <ul class="nav navbar-right panel_toolbox">...</ul>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <canvas id="recentpb" class="chart chart-line"
+                                                        chart-colors="newColors"
+                                                        chart-data="dataRecentPB"
+                                                        chart-labels="labelsRecentPE"
+                                                        chart-dataset-override="chartRecentPBDatasetOverride"
+                                                        chart-options="chartOptionsRecentPB">
+                                                </canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 col-sm-12">
+                                        <div class="x_panel">
+                                            <div class="x_title">
+                                                <h2>
+                                                    Recent TTM EV-to-EBITA
+                                                    <small>(Field: EV-to-EBITA, Latest: {{stockDetails.dailyDataS.evToEbit | number:2}}x)</small>
+                                                </h2>
+                                                <ul class="nav navbar-right panel_toolbox">...</ul>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <canvas id="recentevtoebita" class="chart chart-line"
+                                                        chart-colors="newColors"
+                                                        chart-data="dataRecentEvToEbita"
+                                                        chart-labels="labelsRecentPE"
+                                                        chart-dataset-override="chartRecentEvToEbitaDatasetOverride"
+                                                        chart-options="chartOptionsRecentEvToEbita">
+                                                </canvas>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                                <!--<div class="x_panel">
+                                    <div class="x_title">
+                                        <h2>Quarterly Sales <small>Consolidated Sales (or Standalone in case consolidated not available)</small></h2>
+                                        <ul class="nav navbar-right panel_toolbox">
+                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                                            <li class="dropdown">
+                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                                    <i class="fa fa-wrench"></i>
+                                                </a>
+                                                <ul class="dropdown-menu" role="menu">
+                                                    <li><a href="#">Settings 1</a></li>
+                                                    <li><a href="#">Settings 2</a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+                                        </ul>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="x_content">
+                                        <canvas id="quarterlysaleschart" class="chart chart-bar" chart-colors="newColors1"
+                                                chart-options="chartOptionsStockQuarterSales" chart-data="stockQuarterSales"
+                                                chart-labels="labelsYearsStockQuarter" chart-dataset-override="stockQuarterSalesDataOverride"></canvas>
+                                    </div>
+                                </div>
+                                <div class="x_panel">
+                                    <div class="x_title">
+                                        <h2>Quarterly NOPLAT <small>Consolidated NOPLAT (or Standalone in case consolidated not available)</small></h2>
+                                        <ul class="nav navbar-right panel_toolbox">
+                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                            </li>
+                                            <li class="dropdown">
+                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                <ul class="dropdown-menu" role="menu">
+                                                    <li><a href="#">Settings 1</a>
+                                                    </li>
+                                                    <li><a href="#">Settings 2</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                            </li>
+                                        </ul>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="x_content">
+                                        <canvas id="quarterchart"  class="chart chart-bar" chart-colors="newColors1" chart-options="chartOptionsStockQuarter"
+                                                chart-data="stockQuarter" chart-labels="labelsYearsStockQuarter" chart-dataset-override="stockQuarterDataOverride"  ></canvas>
+                                    </div>
+                                </div>
+                                <div class="x_panel">
+                                    <div class="x_title">
+                                        <h2>Growth Trend<small>3 yr, 5 yr and 10 yr priceChange growth trend</small></h2>
+                                        <ul class="nav navbar-right panel_toolbox">
+                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                            </li>
+                                            <li class="dropdown">
+                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                <ul class="dropdown-menu" role="menu">
+                                                    <li><a href="#">Settings 1</a>
+                                                    </li>
+                                                    <li><a href="#">Settings 2</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                            </li>
+                                        </ul>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="x_content">
+                                        <canvas id="growthchart"  class="chart chart-line" chart-colors="newColors1" chart-options="chartOptionsStockGrowth"
+                                                chart-data="stockGrowth" chart-labels="labelsYearsStockGrowth" chart-dataset-override="stockGrowthDataOverride" chart-series="chartStockGrowthSeries" ></canvas>
+                                    </div>
+                                </div>-->
                             <div class="x_panel">
                                 <div class="x_title">
-                                    <h2>Quarterly Sales <small>Consolidated Sales (or Standalone in case consolidated not available)</small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                                <i class="fa fa-wrench"></i>
-                                            </a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a></li>
-                                                <li><a href="#">Settings 2</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a></li>
-                                    </ul>
+                                    <h2>Notes from Con Call and Annual Reports</h2>
                                     <div class="clearfix"></div>
                                 </div>
-                                <div class="x_content">
-                                    <canvas id="quarterlysaleschart" class="chart chart-bar" chart-colors="newColors1"
-                                            chart-options="chartOptionsStockQuarterSales" chart-data="stockQuarterSales"
-                                            chart-labels="labelsYearsStockQuarter" chart-dataset-override="stockQuarterSalesDataOverride"></canvas>
-                                </div>
-                            </div>
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Quarterly NOPLAT <small>Consolidated NOPLAT (or Standalone in case consolidated not available)</small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="quarterchart"  class="chart chart-bar" chart-colors="newColors1" chart-options="chartOptionsStockQuarter"
-                                            chart-data="stockQuarter" chart-labels="labelsYearsStockQuarter" chart-dataset-override="stockQuarterDataOverride"  ></canvas>
-                                </div>
-                            </div>
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Recent Market Capital and Price<small>Last one year Market Capital and Price</small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="recentmcapandprice"  class="chart chart-bar" chart-colors="newColors1" chart-options="chartOptionsMCapAndPrice"
-                                            chart-data="dataRecentMCapAndPrice" chart-dataset-override="chartMCapAndPriceDatasetOverride"  chart-labels="labelsRecentPE" chart-series="chartMCapAndPriceSeries" ></canvas>
-                                </div>
-                            </div>
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Growth Trend<small>3 yr, 5 yr and 10 yr priceChange growth trend</small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="growthchart"  class="chart chart-line" chart-colors="newColors1" chart-options="chartOptionsStockGrowth"
-                                            chart-data="stockGrowth" chart-labels="labelsYearsStockGrowth" chart-dataset-override="stockGrowthDataOverride" chart-series="chartStockGrowthSeries" ></canvas>
-                                </div>
-                            </div>
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Valuation Levels<small>Price to Consolidated Earnings (or Standalone in case consolidated not available)</small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="valuationchart"  class="chart chart-line" chart-colors="newColors" chart-options="chartOptions"
-                                            chart-data="stockValuation" chart-labels="labelsYearsStockValuation" ></canvas>
-                                </div>
-                            </div>
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Recent TTM PE<small>Last one year TTM PE</small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="recentpe"  class="chart chart-line" chart-colors="newColors"
-                                            chart-data="dataRecentPE" chart-labels="labelsRecentPE" ></canvas>
-                                </div>
-                            </div>
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Recent TTM PB<small>Last one year TTM PB</small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="recentpb"  class="chart chart-line" chart-colors="newColors"
-                                            chart-data="dataRecentPB" chart-labels="labelsRecentPE" ></canvas>
-                                </div>
-                            </div>
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2>Recent TTM EV-to-EBITA<small>Last one year TTM EV-to-EBITA</small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="recentevtoebita"  class="chart chart-line" chart-colors="newColors"
-                                            chart-data="dataRecentEvToEbita" chart-labels="labelsRecentPE" ></canvas>
-                                </div>
+                                <div class="x_content" id="reportNotesContainer"></div>
                             </div>
                             <!--<div class="x_panel">-->
                                 <!--<div class="x_title">-->

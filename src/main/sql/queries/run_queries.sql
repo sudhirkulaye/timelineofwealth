@@ -221,19 +221,50 @@ order by market_cap desc;
 select date, open_price, high_price, low_price, close_price, total_traded_quantity from nse_price_history a where nse_ticker = 'MAHSEAMLES' order by date;
 
 SELECT 
-    a.date as Date, a.close_price, b.close_price, c.close_price, d.close_price
-FROM
-    nse_price_history a,
-    nse_price_history b,
-    nse_price_history c, 
-    nse_price_history d 
-WHERE
-    a.date = b.date
-		AND b.date = c.date
-        AND c.date = d.date
-        AND a.nse_ticker = 'RATNAMANI'
-        AND b.nse_ticker = 'APLAPOLLO'
-        AND c.nse_ticker = 'MAHSEAMLES'
-        AND d.nse_ticker = 'VENUSPIPES'
-ORDER BY date;
+    d.name,
+    d.return_1M,
+    d.return_3M,
+    d.rsi,
+    d.volume_1D,
+    d.volume_1W,
+    d.dma_50,
+    d.dma_200,
+    d.cmp,
+    d.up_52w_min,
+    d.down_52w_max,
+    d.return_1D,
+    d.return_1W,
+    su.is_fno
+FROM daily_data_s d
+JOIN stock_universe su ON d.name = su.ticker
+WHERE d.date = (SELECT MAX(date) FROM daily_data_s) -- latest snapshot
+  AND su.is_fno = 1
+  AND (
+        (
+          -- Oversold condition
+          (d.return_1M <= -10 OR d.return_3M <= -15) AND 
+          d.rsi < 40 AND 
+          d.cmp < d.dma_50 AND 
+          d.volume_1D > 1.2 * d.volume_1W
+        )
+        OR
+        (
+          -- Overbought condition
+          (d.return_1M >= 10 OR d.return_3M >= 15) AND 
+          d.rsi > 60 AND 
+          d.cmp > d.dma_50 AND 
+          d.volume_1D > 1.2 * d.volume_1W
+        )
+      )
+ORDER BY ABS(d.return_1M) DESC, d.volume_1D DESC
+LIMIT 50;
+
+
+SELECT COUNT(*) 
+FROM daily_data_s d
+WHERE d.date = (SELECT MAX(date) FROM daily_data_s)
+  AND (d.return_1M <= -10 OR d.return_3M <= -15)
+  AND d.rsi < 40
+  AND d.cmp < d.dma_50
+  AND d.volume_1D > 1.2 * d.volume_1W;
 
