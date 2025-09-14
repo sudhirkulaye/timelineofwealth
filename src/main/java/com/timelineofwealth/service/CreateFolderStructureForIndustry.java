@@ -34,12 +34,14 @@ public class CreateFolderStructureForIndustry {
 //        createAutoSalesTable();
         //7. Update todays downloaded excels' MCap & Price Data (Note chang path for each new quarter)
 //        updateMCapAndPrice();
+        //8. Consolidated quarter data
+//        ConsolidateQuarterData.main(argv);
     }
 
     public static void createFolderStructure(String[] argv) throws IOException {
 //        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q1";
-        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY25Q3";
-        String destinationPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY25Q4"; // "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
+        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY25Q4";
+        String destinationPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY26Q1"; // "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
 
         File sourceDirectory = new File(sourcePath);
 

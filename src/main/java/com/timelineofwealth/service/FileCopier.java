@@ -21,51 +21,69 @@ public class FileCopier {
         String javaWorkspace = "\\02workspace\\timelineofwealth";
         String pythonWorkspace = "\\02workspace\\PythonDev";
 
+        //*********************************************** From Local to OneDrive ***********************************************
+
+//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
+//        String dstFolder = "C:\\Users\\sudhi\\OneDrive\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
+
+//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
+//        String dstFolder = "C:\\Users\\sudhi\\OneDrive\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
+
+//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
+//        String dstFolder = "C:\\Users\\sudhi\\OneDrive\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
+
+//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
+//        String dstFolder = "C:\\Users\\sudhi\\OneDrive\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
+
         //*********************************************** From HP to Redmi ***********************************************
 
         // Move Jupyter Notes projects to 02workspace
 //        String srcFolder = "C:\\Users\\Sudhir Kulaye\\JupyterProjects";
 //        String dstFolder = "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
 
-        String localMyDocuments = "C:\\MyDocuments\\";
-        String redMIMyDocuments = "\\\\REDMIBOOK15\\MyDocuments";
-
-        String srcFolder = localMyDocuments; // localLaptop + researchAndAnalysis;
-        String dstFolder = redMIMyDocuments; // redMILaptop + researchAndAnalysis;
+        String srcFolder = "\\\\HPSpectre\\MyDocuments\\";
+        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\";
 
         //Move latest reports from HP to Redmi
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q2";
+//        String srcFolder = "\\\\HPSpectre\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q2";
 //        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q2";
 
         //Move Daily Data from HP to Redmii
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
+//        String srcFolder = "\\\\HPSpectre\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
 //        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
 
         //*********************************************** From redmi to HP ***********************************************
 
+        // Move Jupyter Notes projects to 02workspace
+//        String srcFolder = "C:\\Users\\sudhi\\JupyterProjects";
+//        String dstFolder = "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
+
+//        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\";
+//        String dstFolder = "\\\\HPSpectre\\MyDocuments\\";
+
         //Move latest DailyData redmi to HP
 //        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\03DailyData";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\03DailyData";
+//        String dstFolder = "\\\\HPSpectre\\03Business\\03DailyData";
 
         //Move latest reports redmi to HP
 //        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
+//        String dstFolder = "\\\\HPSpectre\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
 
         //Move latest Excels from redmi to HP
 //        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
+//        String dstFolder = "\\\\HPSpectre\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
 
         //Move latest Code from redmi to HP
 //        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\06ClientData\\PMS";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\06ClientData\\PMS";
+//        String dstFolder = "\\\\HPSpectre\\03Business\\06ClientData\\PMS";
 
         //Move latest JAVA Code from redmi to HP
 //        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
+//        String dstFolder = "\\\\HPSpectre\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
 
         //Move latest SQL Code from redmi to HP
 //        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql";
+//        String dstFolder = "\\\\HPSpectre\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql";
 
         //*********************************************** From Local Laptop to Parag's Laptop ***********************************************
 
@@ -85,13 +103,13 @@ public class FileCopier {
 //        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\03DailyData";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\03DailyData";
+////        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\03DailyData";
 //        //String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments";
 //        //String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-//        //String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
-//        //String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
+//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
+//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
 //        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
 //        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";

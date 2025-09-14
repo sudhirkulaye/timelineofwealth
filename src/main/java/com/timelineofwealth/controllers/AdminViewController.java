@@ -8,12 +8,21 @@ import com.timelineofwealth.dto.Ticker;
 import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.*;
 import com.timelineofwealth.service.*;
-import org.apache.poi.ss.formula.eval.NotImplementedFunctionException;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +46,14 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +67,19 @@ public class AdminViewController {
     private java.sql.Date dateToday;
     public static final String AP_PROCESS_EOD = "ap_process_eod";
     public static final String AP_PROCESS_MOSL_TRANSACTIONS = "ap_process_mosl_transactions";
+
+    // ====== CONFIG: update base folders here if needed ======
+    private static final String BASE_DAILY = "C:/MyDocuments/03Business/03DailyData";
+    private static final Path NSE_DIR = Paths.get(BASE_DAILY, "NseData");
+    private static final Path BSE_DIR = Paths.get(BASE_DAILY, "BseData");
+    private static final Path MF_DIR = Paths.get(BASE_DAILY, "MutualFunds");
+    private static final Path SCREENER_DIR = Paths.get(BASE_DAILY, "ScreenerDaily");
+    private static final Path INDEX_DIR = Paths.get(BASE_DAILY, "IndexData");
+
+
+    private static final DateTimeFormatter INPUT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter YYYYMMDD = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter DDMMYYYY = DateTimeFormatter.ofPattern("ddMMyyyy");
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -478,7 +505,7 @@ public class AdminViewController {
         return "admin/uploadmfnavdata";
     }
 
-    @RequestMapping(value=("/admin/uploadmfnavdatastatus"),headers=("content-type=multipart/*"),method= RequestMethod.POST)
+    /*@RequestMapping(value=("/admin/uploadmfnavdatastatus"),headers=("content-type=multipart/*"),method= RequestMethod.POST)
     public String uploadMfNavDataStatus (Model model, @RequestParam("file") MultipartFile file){
         if (file.isEmpty()) {
             model.addAttribute("message", "Please select a file to upload");
@@ -584,7 +611,7 @@ public class AdminViewController {
                     }
                     mutualFundUniverse.setIsinDivPayoutIsinGrowth("XXX");
                     mutualFundUniverseRepository.save(mutualFundUniverse);
-                } /*else { //Run this code once in a quarter or month (offline) to update Mutual Fund
+                } *//*else { //Run this code once in a quarter or month (offline) to update Mutual Fund
                     MutualFundUniverse existingFund = mutualFundUniverseRepository.findBySchemeCode(new Long(code));
                     if(!existingFund.getSchemeNameFull().equals(schemeName)
                             || (existingFund.getIsinDivReinvestment() != null && !existingFund.getIsinDivReinvestment().equals(isinReinvestment))
@@ -596,7 +623,7 @@ public class AdminViewController {
                         logger.debug(String.format("Name changed for %d", code));
                         mutualFundUniverseRepository.save(existingFund);
                     }
-                }*/
+                }*//*
             }
             mutualFundNavHistories.sort(Comparator.comparing(l->l.getKey().getSchemeCode()));
             //mutualFundRepository.deleteAllInBatch();
@@ -611,6 +638,381 @@ public class AdminViewController {
             e.printStackTrace();
         }
         return "admin/uploadmfnavdata";
+    }*/
+
+    @RequestMapping(value=("/admin/uploadmfnavdatastatus"), headers=("content-type=multipart/*"), method= RequestMethod.POST)
+    public String uploadMfNavDataStatus(Model model, @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            model.addAttribute("message", "Please select a file to upload");
+            return "admin/uploadmfnavdata";
+        }
+
+        String originalName = file.getOriginalFilename();
+        String lower = (originalName == null) ? "" : originalName.toLowerCase();
+        if (!lower.endsWith(".xlsx")) {
+            model.addAttribute("message", "Only .xlsx files are supported for this upload");
+            return "admin/uploadmfnavdata";
+        }
+
+        File xlsxFile = null;
+        try {
+            // Create a temporary file with proper extension
+            xlsxFile = File.createTempFile("navdata", ".xlsx");
+            file.transferTo(xlsxFile);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            model.addAttribute("message", "Error saving uploaded file: " + ioe.getMessage());
+            return "admin/uploadmfnavdata";
+        }
+
+        // Header column positions
+        int colSD_Id = -1;     // Scheme Code
+        int colISIN_PO = -1;   // ISIN Div Payout / ISIN Growth
+        int colISIN_RI = -1;   // ISIN Div Reinvestment
+        int colNAV_Name = -1;  // Scheme Name
+        int colhNAV_Amt = -1;  // Net Asset Value
+        int colhNAV_Date = -1; // Date
+
+        List<MutualFundNavHistory> mutualFundNavHistories = new ArrayList<>();
+
+        FileInputStream fin = null;
+        Workbook wb = null;
+        try {
+            fin = new FileInputStream(xlsxFile);
+            wb = new XSSFWorkbook(fin);
+
+            Sheet sheet = wb.getSheetAt(0);
+            if (sheet == null) {
+                model.addAttribute("message", "Excel file has no sheets.");
+                return "admin/uploadmfnavdata";
+            }
+
+            FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
+
+            // Find header row (first row)
+            Row headerRow = sheet.getRow(0);
+            if (headerRow == null) {
+                model.addAttribute("message", "Could not locate header row in Excel.");
+                return "admin/uploadmfnavdata";
+            }
+
+            // Map headers
+            for (int i = 0; i < headerRow.getLastCellNum(); i++) {
+                Cell cell = headerRow.getCell(i);
+                if (cell == null) continue;
+
+                String headerName = getCellString(cell, evaluator);
+                if (headerName == null) headerName = "";
+                headerName = headerName.trim();
+
+                if (headerName.equalsIgnoreCase("SD_Id")) {
+                    colSD_Id = i;
+                } else if (headerName.equalsIgnoreCase("ISIN_PO")) {
+                    colISIN_PO = i;
+                } else if (headerName.equalsIgnoreCase("ISIN_RI")) {
+                    colISIN_RI = i;
+                } else if (headerName.equalsIgnoreCase("NAV_Name")) {
+                    colNAV_Name = i;
+                } else if (headerName.equalsIgnoreCase("hNAV_Amt")) {
+                    colhNAV_Amt = i;
+                } else if (headerName.equalsIgnoreCase("hNAV_Date")) {
+                    colhNAV_Date = i;
+                }
+            }
+
+            // Validate required columns
+            if (colSD_Id < 0 || colhNAV_Amt < 0 || colhNAV_Date < 0) {
+                model.addAttribute("message", "Required columns missing. Need SD_Id, hNAV_Amt, hNAV_Date.");
+                return "admin/uploadmfnavdata";
+            }
+
+            // Process data rows
+            for (int rn = 1; rn <= sheet.getLastRowNum(); rn++) {
+                Row row = sheet.getRow(rn);
+                if (row == null) continue;
+
+                // Scheme Code
+                String sdIdStr = getCellString(row.getCell(colSD_Id), evaluator);
+                if (sdIdStr == null || sdIdStr.trim().isEmpty()) continue;
+
+                Integer code;
+                try {
+                    // Handle potential decimal values in Excel
+                    double codeValue = Double.parseDouble(sdIdStr.trim());
+                    code = (int) codeValue;
+                } catch (NumberFormatException ex) {
+                    continue;
+                }
+
+                // Date
+                java.sql.Date date = null;
+                Cell dateCell = row.getCell(colhNAV_Date);
+                if (dateCell != null) {
+                    try {
+                        // First, try to get the raw string value regardless of cell type
+                        String dateStr = getCellString(dateCell, evaluator);
+
+                        // If we got a string value, try to parse it
+                        if (dateStr != null && !dateStr.trim().isEmpty() && !dateStr.equals("BLANK") && !dateStr.equals("ERROR")) {
+                            dateStr = dateStr.trim();
+
+                            // Try multiple date formats that might appear in Excel
+                            SimpleDateFormat[] formats = {
+                                    new SimpleDateFormat("yyyy-MM-dd"),
+                                    new SimpleDateFormat("dd-MMM-yyyy"),
+                                    new SimpleDateFormat("dd/MM/yyyy"),
+                                    new SimpleDateFormat("MM/dd/yyyy"),
+                                    new SimpleDateFormat("dd-MM-yyyy"),
+                                    new SimpleDateFormat("yyyyMMdd")
+                            };
+
+                            for (SimpleDateFormat format : formats) {
+                                try {
+                                    format.setLenient(false);
+                                    java.util.Date parsedDate = format.parse(dateStr);
+                                    date = new java.sql.Date(parsedDate.getTime());
+                                    break; // Success, break out of loop
+                                } catch (ParseException e) {
+                                    // Try next format
+                                    continue;
+                                }
+                            }
+                        }
+
+                        // If string parsing failed, try numeric approaches
+                        if (date == null) {
+                            try {
+                                // Try Excel's built-in date recognition
+                                if (DateUtil.isCellDateFormatted(dateCell)) {
+                                    java.util.Date utilDate = dateCell.getDateCellValue();
+                                    if (utilDate != null) {
+                                        date = new java.sql.Date(utilDate.getTime());
+                                    }
+                                }
+                            } catch (Exception e) {
+                                logger.debug("Excel date formatting failed for row " + rn + ": " + e.getMessage());
+                            }
+                        }
+
+                        // If still null, try direct numeric value (Excel serial date)
+                        if (date == null && dateCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                            try {
+                                double numericValue = dateCell.getNumericCellValue();
+                                // Check if it's a valid Excel date (dates are usually > 0)
+                                if (numericValue > 0) {
+                                    java.util.Date utilDate = DateUtil.getJavaDate(numericValue);
+                                    date = new java.sql.Date(utilDate.getTime());
+                                }
+                            } catch (Exception e) {
+                                logger.debug("Numeric date conversion failed for row " + rn);
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        logger.debug("Date processing error for row " + rn + ": " + e.getMessage());
+
+                        // Last resort: get the raw cell content for debugging
+                        try {
+                            if (dateCell.getCellType() == Cell.CELL_TYPE_STRING) {
+                                String rawValue = dateCell.getStringCellValue();
+                                logger.debug("Raw string value: '" + rawValue + "'");
+                            } else if (dateCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                                double rawValue = dateCell.getNumericCellValue();
+                                logger.debug("Raw numeric value: " + rawValue);
+                            }
+                        } catch (Exception ex) {
+                            logger.debug("Cannot get raw cell value: " + ex.getMessage());
+                        }
+                    }
+                }
+
+                // If date is still null, skip this row but log what we found
+                if (date == null) {
+                    String cellContent = "UNKNOWN";
+                    try {
+                        cellContent = getCellString(dateCell, evaluator);
+                    } catch (Exception e) {
+                        cellContent = "ERROR_GETTING_VALUE";
+                    }
+                    logger.debug("Skipping row " + rn + " - Cannot parse date from: '" + cellContent + "'");
+                    continue;
+                }
+
+                // NAV
+                BigDecimal nav = BigDecimal.ZERO;
+                Cell navCell = row.getCell(colhNAV_Amt);
+                if (navCell != null) {
+                    try {
+                        if (navCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                            nav = BigDecimal.valueOf(navCell.getNumericCellValue());
+                        } else {
+                            String navStr = getCellString(navCell, evaluator);
+                            if (navStr != null && !navStr.trim().isEmpty()) {
+                                nav = new BigDecimal(navStr.trim());
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        logger.debug(String.format("Error in NAV for MutualFund %d", code));
+                    }
+                }
+
+                // Optional fields
+                String schemeName = "";
+                if (colNAV_Name >= 0) {
+                    schemeName = getCellString(row.getCell(colNAV_Name), evaluator);
+                    if (schemeName != null) schemeName = schemeName.trim();
+                }
+
+                String isin = "";
+                if (colISIN_PO >= 0) {
+                    isin = getCellString(row.getCell(colISIN_PO), evaluator);
+                    if (isin != null) isin = isin.trim();
+                }
+
+                String isinReinvestment = "";
+                if (colISIN_RI >= 0) {
+                    isinReinvestment = getCellString(row.getCell(colISIN_RI), evaluator);
+                    if (isinReinvestment != null) isinReinvestment = isinReinvestment.trim();
+                }
+
+                // Create NAV history entry
+                MutualFundNavHistory mf = new MutualFundNavHistory();
+                mf.setKey(new MutualFundNavHistory.MutualFundNavHistoryKey(code, date));
+                mf.setNav(nav);
+                mutualFundNavHistories.add(mf);
+
+                // Check and create universe entry if needed
+                Long schemeCodeLong = Long.valueOf(code);
+                int countBySchemeCode = mutualFundUniverseRepository.countBySchemeCode(schemeCodeLong);
+
+                if (countBySchemeCode == 0 && date.after(CommonService.getSetupDates().getDateLastTradingDay())) {
+                    MutualFundUniverse mutualFundUniverse = new MutualFundUniverse();
+                    mutualFundUniverse.setSchemeCode(schemeCodeLong);
+                    mutualFundUniverse.setSchemeNameFull(schemeName);
+                    mutualFundUniverse.setIsinDivPayoutIsinGrowth(isin);
+                    mutualFundUniverse.setIsinDivReinvestment(isinReinvestment);
+                    mutualFundUniverse.setDateLatestNav(date);
+                    mutualFundUniverse.setFundHouse("XXX");
+                    mutualFundUniverse.setSchemeNamePart("XXX");
+                    mutualFundUniverse.setLatestNav(nav);
+
+                    String snl = schemeName.toLowerCase();
+                    if (snl.contains("direct")) {
+                        mutualFundUniverse.setDirectRegular("Direct");
+                    } else if (snl.contains("regular")) {
+                        mutualFundUniverse.setDirectRegular("Regular");
+                    }
+
+                    if (snl.contains("dividend") || snl.contains("idcw")) {
+                        mutualFundUniverse.setDividendGrowth("Dividend");
+                    } else if (snl.contains("growth")) {
+                        mutualFundUniverse.setDividendGrowth("Growth");
+                    }
+
+                    mutualFundUniverseRepository.save(mutualFundUniverse);
+                }
+            }
+
+            // Save all NAV histories
+            if (!mutualFundNavHistories.isEmpty()) {
+                mutualFundNavHistories.sort(Comparator.comparing(l -> l.getKey().getSchemeCode()));
+                mutualFundNavHistoryRepository.saveAll(mutualFundNavHistories);
+            }
+
+            model.addAttribute("message", "Successfully uploaded '" + originalName + "' with " + mutualFundNavHistories.size() + " records");
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            model.addAttribute("message", "Error reading Excel: " + ioe.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("message", "Unexpected error: " + e.getMessage());
+        } finally {
+            // Close resources
+            try {
+                if (wb != null) {
+                    wb.close();
+                }
+            } catch (Exception e) {
+                // ignore
+            }
+            try {
+                if (fin != null) {
+                    fin.close();
+                }
+            } catch (Exception e) {
+                // ignore
+            }
+            // Cleanup temp file
+            if (xlsxFile != null && xlsxFile.exists()) {
+                try {
+                    xlsxFile.delete();
+                } catch (Exception ignore) {}
+            }
+        }
+
+        return "admin/uploadmfnavdata";
+    }
+
+    private String getCellString(Cell cell, FormulaEvaluator evaluator) {
+        if (cell == null) {
+            return "";
+        }
+
+        try {
+            int cellType = cell.getCellType();
+
+            switch (cellType) {
+                case Cell.CELL_TYPE_STRING:
+                    return cell.getStringCellValue().trim();
+
+                case Cell.CELL_TYPE_NUMERIC:
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        java.util.Date date = cell.getDateCellValue();
+                        return new SimpleDateFormat("dd-MMM-yyyy").format(date);
+                    } else {
+                        double value = cell.getNumericCellValue();
+                        // Check if it's an integer value
+                        if (value == Math.floor(value)) {
+                            return String.valueOf((int) value);
+                        } else {
+                            return String.valueOf(value);
+                        }
+                    }
+
+                case Cell.CELL_TYPE_BOOLEAN:
+                    return String.valueOf(cell.getBooleanCellValue());
+
+                case Cell.CELL_TYPE_FORMULA:
+                    // For formula cells, we need to evaluate them
+                    CellValue cellValue = evaluator.evaluate(cell);
+                    if (cellValue != null) {
+                        switch (cellValue.getCellType()) {
+                            case Cell.CELL_TYPE_STRING:
+                                return cellValue.getStringValue().trim();
+                            case Cell.CELL_TYPE_NUMERIC:
+                                return String.valueOf(cellValue.getNumberValue());
+                            case Cell.CELL_TYPE_BOOLEAN:
+                                return String.valueOf(cellValue.getBooleanValue());
+                            default:
+                                return "";
+                        }
+                    }
+                    return "";
+
+                case Cell.CELL_TYPE_BLANK:
+                    return "";
+
+                case Cell.CELL_TYPE_ERROR:
+                    return "";
+
+                default:
+                    return "";
+            }
+        } catch (Exception e) {
+            logger.debug("Error reading cell value: " + e.getMessage());
+            return "";
+        }
     }
 
     @RequestMapping(value = "/admin/uploadindexdata")
@@ -1560,7 +1962,7 @@ public class AdminViewController {
         return "admin/oneclickupload";
     }
 
-    @RequestMapping(value=("/admin/oneclickuploadstatus"),method=RequestMethod.POST)
+    /*@RequestMapping(value=("/admin/oneclickuploadstatus"),method=RequestMethod.POST)
     public String oneClickUploadStatus(Model model, @RequestParam("confirmation") String confirmation){
         if (confirmation.equalsIgnoreCase("yes")) {
             DownloadEODFiles downloadEODFiles = new DownloadEODFiles();
@@ -1624,7 +2026,141 @@ public class AdminViewController {
             model.addAttribute("message", "Please confirm Yes/No to process Download, upload and running EOD");
             return "admin/oneclickupload";
         }
+    }*/
+
+    @RequestMapping(value=("/admin/oneclickuploadstatus"), method=RequestMethod.POST)
+    public String oneClickUploadStatus(@RequestParam("date") String dateStr, Model model) {
+        Map<String, String> status = new LinkedHashMap<String, String>();
+        try {
+            LocalDate date = LocalDate.parse(dateStr, INPUT);
+            String yyyymmdd = date.format(YYYYMMDD);
+            String ddmmyyyy = date.format(DDMMYYYY);
+
+            Path nseBhav     = NSE_DIR.resolve("BhavCopy_NSE_CM_0_0_0_" + yyyymmdd + "_F_0000.csv");
+            Path bseBhav     = BSE_DIR.resolve("BhavCopy_BSE_CM_0_0_0_" + yyyymmdd + "_F_0000.CSV");
+            Path mfNav       = MF_DIR.resolve(yyyymmdd + "MutualFund.xlsx");
+            Path screener    = SCREENER_DIR.resolve(yyyymmdd + "ScreenerDaily.csv");
+            Path bseMidCap   = INDEX_DIR.resolve(yyyymmdd + "_BSEMidCap.csv");
+            Path bseSmallCap = INDEX_DIR.resolve(yyyymmdd + "_BSESmallCap.csv");
+
+            List<Path> mustExist = Arrays.asList(nseBhav, bseBhav, mfNav, screener, bseMidCap, bseSmallCap);
+            List<Path> missing = new ArrayList<Path>();
+            for (Path p : mustExist) if (!Files.exists(p)) missing.add(p);
+
+            if (!missing.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Missing files for ").append(dateStr).append(". Please place them and retry.\\n");
+                for (Path p : missing) sb.append(" - ").append(p.toString()).append("\\n");
+                model.addAttribute("message", sb.toString());
+
+                status.put("uploadNseDailyPriceDataStatus", Files.exists(nseBhav) ? nseBhav.getFileName().toString() : "MISSING");
+                status.put("uploadBseDailyPriceDataStatus", Files.exists(bseBhav) ? bseBhav.getFileName().toString() : "MISSING");
+                status.put("uploadMfNavDataStatus", Files.exists(mfNav) ? mfNav.getFileName().toString() : "MISSING");
+                status.put("uploadDailyDataStatus", Files.exists(screener) ? screener.getFileName().toString() : "MISSING");
+                status.put("uploadBSEIndexDataStatus", (Files.exists(bseMidCap) && Files.exists(bseSmallCap))
+                        ? (bseMidCap.getFileName().toString() + ", " + bseSmallCap.getFileName().toString()) : "MISSING");
+                status.put("downloadAndSaveNSEIndexDataStatus", "Will download: ind_close_all_" + ddmmyyyy + ".csv");
+
+                model.addAttribute("statusMap", status);
+                return "admin/oneclickuploadstatus";
+            }
+
+            MultipartFile nseBhavPart     = asMultipartFile(nseBhav);
+            MultipartFile bseBhavPart     = asMultipartFile(bseBhav);
+            MultipartFile mfNavPart       = asMultipartFile(mfNav);
+            MultipartFile screenerPart    = asMultipartFile(screener);
+            MultipartFile bseMidCapPart   = asMultipartFile(bseMidCap);
+            MultipartFile bseSmallCapPart = asMultipartFile(bseSmallCap);
+
+            try {
+                status.put("uploadNseDailyPriceDataStatus", uploadNseDailyPriceDataStatus(model, nseBhavPart));
+                logger.debug(String.format("Uploaded NSE File %s", nseBhav));
+            }
+            catch (Exception ex) {
+                status.put("uploadNseDailyPriceDataStatus", "ERROR: " + safeMsg(ex));
+            }
+
+            try {
+                status.put("uploadBseDailyPriceDataStatus", uploadBseDailyPriceDataStatus(model, bseBhavPart));
+                logger.debug(String.format("Uploaded BSE File %s", bseBhav));
+            }
+            catch (Exception ex) {
+                status.put("uploadBseDailyPriceDataStatus", "ERROR: " + safeMsg(ex));
+            }
+
+            try {
+                status.put("uploadMfNavDataStatus", uploadMfNavDataStatus(model, mfNavPart));
+                logger.debug(String.format("Uploaded MF NAV File %s", mfNav));
+            }
+            catch (Exception ex) {
+                status.put("uploadMfNavDataStatus", "ERROR: " + safeMsg(ex));
+            }
+
+            try {
+                status.put("uploadDailyDataStatus", uploadDailyDataStatus(model, screenerPart));
+                logger.debug(String.format("Uploaded Screener File %s", screener));
+            }
+            catch (Exception ex) {
+                status.put("uploadDailyDataStatus", "ERROR: " + safeMsg(ex));
+            }
+
+            try {
+                status.put("downloadAndSaveNSEIndexDataStatus", downloadAndSaveNSEIndexDataStatus(model, dateStr));
+                logger.debug(String.format("Uploaded NSE Index data for date %s", dateStr));
+            }
+            catch (Exception ex) {
+                status.put("downloadAndSaveNSEIndexDataStatus", "ERROR: " + safeMsg(ex));
+            }
+
+            try {
+                status.put("uploadBSEIndexDataStatus", uploadBSEIndexDataStatus(model, dateStr));
+                logger.debug(String.format("Uploaded BSE Index data for date %s", dateStr));
+            }
+            catch (Exception ex) { status.put("uploadBSEIndexDataStatus", "ERROR: " + safeMsg(ex)); }
+
+            model.addAttribute("message", "Completed one-click uploads for " + dateStr);
+            model.addAttribute("statusMap", status);
+            return "admin/oneclickupload";
+        } catch (Exception e) {
+            model.addAttribute("message", "Failed: " + safeMsg(e));
+            return "admin/oneclickupload";
+        }
     }
+
+    private static String safeMsg(Exception ex) {
+        return (ex.getMessage() != null ? ex.getMessage() : ex.toString());
+    }
+
+    // ===== Utility: lightweight MultipartFile backed by bytes (no external deps) =====
+    private static MultipartFile asMultipartFile(Path path) throws IOException {
+        return new SimpleMultipartFile(path);
+    }
+
+    private static class SimpleMultipartFile implements MultipartFile {
+        private final String name;
+        private final String originalFilename;
+        private final String contentType;
+        private final byte[] content;
+
+
+        SimpleMultipartFile(Path path) throws IOException {
+            this.name = "file";
+            this.originalFilename = path.getFileName().toString();
+            String ct;
+            try { ct = Files.probeContentType(path); } catch (Throwable t) { ct = null; }
+            this.contentType = ct;
+            this.content = Files.readAllBytes(path);
+        }
+        public String getName() { return name; }
+        public String getOriginalFilename() { return originalFilename; }
+        public String getContentType() { return contentType; }
+        public boolean isEmpty() { return content.length == 0; }
+        public long getSize() { return content.length; }
+        public byte[] getBytes() { return content; }
+        public InputStream getInputStream() { return new ByteArrayInputStream(content); }
+        public void transferTo(File dest) throws IOException { try (FileOutputStream fos = new FileOutputStream(dest)) { fos.write(content); } }
+    }
+
 
     /**
      * Bloomberg JSON file upload login -- Now not in use since Bloomberg Data is not available

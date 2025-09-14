@@ -15,8 +15,6 @@ public class ConsolidatedResultTracker {
 
     static String QUARTER = "Q4"; // Update this for each new quarter
     static String YEAR = "25"; // Update this for each new year
-    static String TRACKER_FILE_PATH = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert\\ResultTracker.xlsx";
-    static String QUARTE_REXCEL_Folder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\20" + YEAR + QUARTER;
 
     static Boolean IS_OVERRIDE_PRICE_DATA = true;
     static Boolean IS_OVERRIDE_RECO_DATA = true;
@@ -201,7 +199,7 @@ public class ConsolidatedResultTracker {
                     String ticker = tickerCell.getStringCellValue();
                     try {
                         //opern ticker quarter result file
-                        String tickerFilePath = QUARTE_REXCEL_Folder + "\\" + ticker + "_FY" + YEAR + "Q" + QUARTER + ".xlsx";
+                        String tickerFilePath = QUARTER_EXCEL_FOLDER + "\\" + ticker + "_FY" + YEAR + "Q" + QUARTER + ".xlsx";
                         File tickerFile = null;
                         FileInputStream tickerFileInputStream = null;
                         Workbook tickerWorkbook = null;
