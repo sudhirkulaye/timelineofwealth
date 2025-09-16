@@ -707,15 +707,15 @@ public class AdminViewController {
 
                 if (headerName.equalsIgnoreCase("SD_Id")) {
                     colSD_Id = i;
-                } else if (headerName.equalsIgnoreCase("ISIN_PO")) {
+                } else if (headerName.equalsIgnoreCase("ISIN_Po")) {
                     colISIN_PO = i;
-                } else if (headerName.equalsIgnoreCase("ISIN_RI")) {
+                } else if (headerName.equalsIgnoreCase("ISIN_Ri")) {
                     colISIN_RI = i;
-                } else if (headerName.equalsIgnoreCase("NAV_Name")) {
+                } else if (headerName.equalsIgnoreCase("Nav_Name")) {
                     colNAV_Name = i;
-                } else if (headerName.equalsIgnoreCase("hNAV_Amt")) {
+                } else if (headerName.equalsIgnoreCase("NAV_Amt")) {
                     colhNAV_Amt = i;
-                } else if (headerName.equalsIgnoreCase("hNAV_Date")) {
+                } else if (headerName.equalsIgnoreCase("NAV_Date")) {
                     colhNAV_Date = i;
                 }
             }
