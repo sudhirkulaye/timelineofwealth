@@ -3,6 +3,9 @@ package com.timelineofwealth.service;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,31 +20,111 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+class ResultTrackerRunner {
+
+    public static void runValuationUpdate() {
+
+        ConfigurableApplicationContext ctx =
+                new SpringApplicationBuilder(com.timelineofwealth.wealthmanagement.WealthmanagementApplication.class)
+                        .run();
+
+        ResultTrackerService service = ctx.getBean(ResultTrackerService.class);
+
+        service.updateResultTracker();
+
+        ctx.close();
+    }
+}
+
 public class CreateFolderStructureForIndustry {
 
     public static void main(String[] argv) throws Exception {
-        //1. Create Folder Structure from source folder
-//        createFolderStructure(argv);
-        //2. List Duplicate excel files in Analysis Folder
-//        listDuplicateFiles(argv);
-        //3. List Files and their path in Analysis Folder
-//        listFilesAndFolderPath(argv);
-        //4. File Name and Corresponding Folder Name
-//        listFileNameAndSectorFolder();
-        //5. updateResultTrackerExcel in ResultTracker.xlsx
-        ConsolidatedResultTracker.updateResultTrackerExcel();
-        //6. CreateAutoSalesTable
-//        createAutoSalesTable();
-        //7. Update todays downloaded excels' MCap & Price Data (Note chang path for each new quarter)
-//        updateMCapAndPrice();
-        //8. Consolidated quarter data
-//        ConsolidateQuarterData.main(argv);
+
+        Scanner sc = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\nSelect an option to run:");
+            System.out.println(" 1. Create Folder Structure from source folder");
+            System.out.println(" 2. List Duplicate excel files in Analysis Folder");
+            System.out.println(" 3. List Files and their path in Analysis Folder");
+            System.out.println(" 4. File Name and Corresponding Folder Name");
+            System.out.println(" 5. Update ResultTracker.xlsx");
+            System.out.println(" 6. Create Auto Sales Table");
+            System.out.println(" 7. Update MCap and Price Data");
+            System.out.println(" 8. Consolidate Quarter Data");
+            System.out.println(" 9. Update Valuation Sheet of ResultTracker");
+            System.out.println("10. Exit");
+            System.out.print("Enter your choice: ");
+
+            String choice = sc.nextLine().trim();
+
+            switch (choice) {
+                case "1":
+                    createFolderStructure(argv);
+                    break;
+
+                case "2":
+                    listDuplicateFiles(argv);
+                    break;
+
+                case "3":
+                    listFilesAndFolderPath(argv);
+                    break;
+
+                case "4":
+                    listFileNameAndSectorFolder();
+                    break;
+
+                case "5":
+                    ConsolidatedResultTracker.updateResultTrackerExcel();
+                    break;
+
+                case "6":
+                    createAutoSalesTable();
+                    break;
+
+                case "7":
+                    updateMCapAndPrice(UpdateQuarterlyExcels.getLatestQuarterFolder());
+                    break;
+
+                case "8":
+                    ConsolidateQuarterData.main(argv);
+                    break;
+
+                case "9":
+                    ResultTrackerRunner.runValuationUpdate();
+                    break;
+
+                case "10":
+                    System.out.println("Exiting...");
+                    sc.close();
+                    return;
+
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        }
     }
 
+
     public static void createFolderStructure(String[] argv) throws IOException {
-//        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q1";
-        String sourcePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY25Q4";
-        String destinationPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY26Q1"; // "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
+        Scanner sc = new Scanner(System.in);
+
+        String basePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
+
+        System.out.println("Base folder: " + basePath);
+
+        System.out.print("Enter source quarter folder (e.g. FY26Q2): ");
+        String sourceQuarter = sc.nextLine().trim();
+
+        System.out.print("Enter destination quarter folder (e.g. FY26Q3): ");
+        String destinationQuarter = sc.nextLine().trim();
+
+        String sourcePath = basePath + "\\" + sourceQuarter;
+        String destinationPath = basePath + "\\" + destinationQuarter;
+
+        System.out.println("Source path: " + sourcePath);
+        System.out.println("Destination path: " + destinationPath);
 
         File sourceDirectory = new File(sourcePath);
 

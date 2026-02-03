@@ -21,6 +21,8 @@ public class ReportDataExtractConfig {
     private String REVENUE_ROW_NAME;
     private String EBITDA_ROW_NAME;
     private String DEPRECIATION_ROW_NAME;
+    private String PAT_ROW_NAME;
+    private String EPS_ROW_NAME;
 
     private String MARGIN_PAGE;
     private String MARGIN_HEADER_ROW_NAME;
@@ -37,6 +39,7 @@ public class ReportDataExtractConfig {
     private String Y0;
     private String Y1;
     private String Y2;
+    private String Y3;
 
     private String RESEARCHANALYST1;
     private String RESEARCHANALYST2;
@@ -175,6 +178,20 @@ public class ReportDataExtractConfig {
     }
     public void setDEPRECIATION_ROW_NAME(String DEPRECIATION_ROW_NAME) {
         this.DEPRECIATION_ROW_NAME = DEPRECIATION_ROW_NAME;
+    }
+
+    public String getPAT_ROW_NAME() {
+        return PAT_ROW_NAME;
+    }
+    public void setPAT_ROW_NAME(String PAT_ROW_NAME) {
+        this.PAT_ROW_NAME = PAT_ROW_NAME;
+    }
+
+    public String getEPS_ROW_NAME() {
+        return EPS_ROW_NAME;
+    }
+    public void setEPS_ROW_NAME(String EPS_ROW_NAME) {
+        this.EPS_ROW_NAME = EPS_ROW_NAME;
     }
 
     public String getMARGIN_PAGE() {
@@ -351,4 +368,12 @@ public class ReportDataExtractConfig {
     public void setNNPA_ROW_NAME(String NNPA_ROW_NAME) {
         this.NNPA_ROW_NAME = NNPA_ROW_NAME;
     }
+
+    public String getY3() {
+        return Y3;
+    }
+    public void setY3(String y3) {
+        Y3 = y3;
+    }
+
 }
