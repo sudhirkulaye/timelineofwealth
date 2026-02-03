@@ -133,6 +133,9 @@ public class AdminViewController {
     }
     @Autowired
     public AdminViewController(Environment environment){}
+    @Autowired
+    private ResultTrackerService resultTrackerService;
+
 
     @RequestMapping(value = "/admin/uploadnsedailypricedata")
     public String uploadNseDailyPriceData(Model model, @AuthenticationPrincipal UserDetails userDetails){
@@ -505,8 +508,26 @@ public class AdminViewController {
         return "admin/uploadmfnavdata";
     }
 
-    /*@RequestMapping(value=("/admin/uploadmfnavdatastatus"),headers=("content-type=multipart/*"),method= RequestMethod.POST)
-    public String uploadMfNavDataStatus (Model model, @RequestParam("file") MultipartFile file){
+    @RequestMapping(value=("/admin/uploadmfnavdatastatus"), headers=("content-type=multipart/*"), method= RequestMethod.POST)
+    public String uploadMfNavDataStatus(Model model, @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            model.addAttribute("message", "Please select a file to upload");
+            return "admin/uploadmfnavdata";
+        }
+
+        String originalName = file.getOriginalFilename();
+        String lower = (originalName == null) ? "" : originalName.toLowerCase();
+        if (lower.endsWith(".xlsx")) {
+            return uploadMfNavDataForExcel(model, file);
+        } else if (lower.endsWith(".txt")) {
+            return uploadMfNavDataTxt(model, file);
+        } else {
+            model.addAttribute("message", "Only .xlsx or .txt files are supported for this upload");
+            return "admin/uploadmfnavdata";
+        }
+    }
+
+    public String uploadMfNavDataTxt (Model model, @RequestParam("file") MultipartFile file){
         if (file.isEmpty()) {
             model.addAttribute("message", "Please select a file to upload");
             return "admin/uploadmfnavdata";
@@ -542,7 +563,7 @@ public class AdminViewController {
                         if (column.trim().equalsIgnoreCase("Scheme Name")){
                             schemeNamePostion = i;
                         }
-                        if (column.trim().equalsIgnoreCase("ISIN Div Payout/ISIN Growth")){
+                        if (column.trim().equalsIgnoreCase("ISIN Div Payout/ISIN Growth") || column.trim().equalsIgnoreCase("ISIN Div Payout/ ISIN Growth")){
                             isinPosition = i;
                         }
                         if (column.trim().equalsIgnoreCase("ISIN Div Reinvestment")){
@@ -611,7 +632,7 @@ public class AdminViewController {
                     }
                     mutualFundUniverse.setIsinDivPayoutIsinGrowth("XXX");
                     mutualFundUniverseRepository.save(mutualFundUniverse);
-                } *//*else { //Run this code once in a quarter or month (offline) to update Mutual Fund
+                } else { //Run this code once in a quarter or month (offline) to update Mutual Fund
                     MutualFundUniverse existingFund = mutualFundUniverseRepository.findBySchemeCode(new Long(code));
                     if(!existingFund.getSchemeNameFull().equals(schemeName)
                             || (existingFund.getIsinDivReinvestment() != null && !existingFund.getIsinDivReinvestment().equals(isinReinvestment))
@@ -623,7 +644,7 @@ public class AdminViewController {
                         logger.debug(String.format("Name changed for %d", code));
                         mutualFundUniverseRepository.save(existingFund);
                     }
-                }*//*
+                }
             }
             mutualFundNavHistories.sort(Comparator.comparing(l->l.getKey().getSchemeCode()));
             //mutualFundRepository.deleteAllInBatch();
@@ -638,10 +659,9 @@ public class AdminViewController {
             e.printStackTrace();
         }
         return "admin/uploadmfnavdata";
-    }*/
+    }
 
-    @RequestMapping(value=("/admin/uploadmfnavdatastatus"), headers=("content-type=multipart/*"), method= RequestMethod.POST)
-    public String uploadMfNavDataStatus(Model model, @RequestParam("file") MultipartFile file) {
+    public String uploadMfNavDataForExcel(Model model, @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             model.addAttribute("message", "Please select a file to upload");
             return "admin/uploadmfnavdata";
@@ -1427,7 +1447,6 @@ public class AdminViewController {
         return dataList;
     }
 
-
     public List<DailyDataS> readCsvFile(MultipartFile file, Date date) throws IOException {
         List<DailyDataS> dataList = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8));
@@ -2038,24 +2057,59 @@ public class AdminViewController {
 
             Path nseBhav     = NSE_DIR.resolve("BhavCopy_NSE_CM_0_0_0_" + yyyymmdd + "_F_0000.csv");
             Path bseBhav     = BSE_DIR.resolve("BhavCopy_BSE_CM_0_0_0_" + yyyymmdd + "_F_0000.CSV");
-            Path mfNav       = MF_DIR.resolve(yyyymmdd + "MutualFund.xlsx");
+
+            // Define both possible mutual fund files
+            Path mfNavExcel  = MF_DIR.resolve(yyyymmdd + "MutualFund.xlsx");
+            Path mfNavTxt    = MF_DIR.resolve(yyyymmdd + "MutualFund.txt");
+
+            // Determine which mutual fund file exists (prefer Excel if both exist)
+            Path mfNav = null;
+            if (Files.exists(mfNavExcel)) {
+                mfNav = mfNavExcel;
+            } else if (Files.exists(mfNavTxt)) {
+                mfNav = mfNavTxt;
+            }
+
             Path screener    = SCREENER_DIR.resolve(yyyymmdd + "ScreenerDaily.csv");
             Path bseMidCap   = INDEX_DIR.resolve(yyyymmdd + "_BSEMidCap.csv");
             Path bseSmallCap = INDEX_DIR.resolve(yyyymmdd + "_BSESmallCap.csv");
 
-            List<Path> mustExist = Arrays.asList(nseBhav, bseBhav, mfNav, screener, bseMidCap, bseSmallCap);
+            // Check required files (mutual fund is optional in this list since we handle it separately)
+            List<Path> mustExist = Arrays.asList(nseBhav, bseBhav, screener, bseMidCap, bseSmallCap);
             List<Path> missing = new ArrayList<Path>();
             for (Path p : mustExist) if (!Files.exists(p)) missing.add(p);
 
+            // Check mutual fund files separately
+            if (mfNav == null) {
+                missing.add(mfNavExcel); // Add one of them to missing list for reporting
+            }
+
             if (!missing.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
-                sb.append("Missing files for ").append(dateStr).append(". Please place them and retry.\\n");
-                for (Path p : missing) sb.append(" - ").append(p.toString()).append("\\n");
+                sb.append("Missing files for ").append(dateStr).append(". Please place them and retry.\n");
+                for (Path p : missing) {
+                    if (p.equals(mfNavExcel)) {
+                        sb.append(" - ").append(mfNavExcel.toString()).append(" OR ").append(mfNavTxt.toString()).append("\n");
+                    } else {
+                        sb.append(" - ").append(p.toString()).append("\n");
+                    }
+                }
                 model.addAttribute("message", sb.toString());
 
                 status.put("uploadNseDailyPriceDataStatus", Files.exists(nseBhav) ? nseBhav.getFileName().toString() : "MISSING");
                 status.put("uploadBseDailyPriceDataStatus", Files.exists(bseBhav) ? bseBhav.getFileName().toString() : "MISSING");
-                status.put("uploadMfNavDataStatus", Files.exists(mfNav) ? mfNav.getFileName().toString() : "MISSING");
+
+                // Enhanced mutual fund status
+                String mfStatus;
+                if (Files.exists(mfNavExcel)) {
+                    mfStatus = mfNavExcel.getFileName().toString() + " (Excel)";
+                } else if (Files.exists(mfNavTxt)) {
+                    mfStatus = mfNavTxt.getFileName().toString() + " (Text)";
+                } else {
+                    mfStatus = "MISSING (Expected: " + mfNavExcel.getFileName().toString() + " OR " + mfNavTxt.getFileName().toString() + ")";
+                }
+                status.put("uploadMfNavDataStatus", mfStatus);
+
                 status.put("uploadDailyDataStatus", Files.exists(screener) ? screener.getFileName().toString() : "MISSING");
                 status.put("uploadBSEIndexDataStatus", (Files.exists(bseMidCap) && Files.exists(bseSmallCap))
                         ? (bseMidCap.getFileName().toString() + ", " + bseSmallCap.getFileName().toString()) : "MISSING");
@@ -2589,7 +2643,12 @@ public class AdminViewController {
             } catch (Exception e) {
                 model.addAttribute("message", "Failed to compute index statistics.");
             }
-            model.addAttribute("message", "Index Statistics computed");
+            try {
+                resultTrackerService.updateResultTracker();
+            } catch (Exception e){
+                model.addAttribute("message", "Failed to Update ResultTracker.");
+            }
+            model.addAttribute("message", "Index Statistics computed & Result Tracker Updated");
             return "admin/computeindexstat";
         } else {
             model.addAttribute("message", "Please confirm Yes/No to process Download, upload and running EOD");
@@ -2773,7 +2832,46 @@ public class AdminViewController {
                         }
                     }*/
 
+                    // ============ ADD THESE LINES TO REFRESH FORMULAS ============
+                    // Force full workbook recalculation
+                    evaluator.clearAllCachedResultValues();
+
+                    // Evaluate ALL formulas in workbook before reading
+                    for (int sheetIndex = 0; sheetIndex < workbook.getNumberOfSheets(); sheetIndex++) {
+                        Sheet tempSheet = workbook.getSheetAt(sheetIndex);
+                        for (Row row : tempSheet) {
+                            for (Cell cell : row) {
+                                if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+                                    try {
+                                        // Force formula evaluation
+                                        evaluator.evaluateFormulaCell(cell);
+                                        // Also update cell with evaluated value
+                                        evaluator.evaluateInCell(cell);
+                                    } catch (Exception e) {
+                                        // Ignore errors, just continue
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Force one more pass specifically for DBInsert sheet
                     Sheet sheet = workbook.getSheet("DBInsert");
+                    if (sheet != null) {
+                        for (Row row : sheet) {
+                            for (Cell cell : row) {
+                                if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+                                    try {
+                                        evaluator.evaluateInCell(cell);
+                                    } catch (Exception e) {
+                                        // Ignore
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // ============ END OF ADDED CODE ============
+
                     for (int rowNumber = 72; rowNumber <= 488; rowNumber++) {
                         Row row = sheet.getRow(rowNumber);
                         if (row != null) {

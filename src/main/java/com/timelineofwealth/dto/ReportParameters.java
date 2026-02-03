@@ -18,32 +18,51 @@ public class ReportParameters implements Serializable {
     private BigDecimal y0Revenue;
     private BigDecimal y1Revenue;
     private BigDecimal y2Revenue;
+    private BigDecimal y3Revenue;
     private BigDecimal revenueChange;
     private String y0EBIT;
     private String y1EBIT;
     private String y2EBIT;
+    private String y3EBIT;
     private String ebitChange;
+    private BigDecimal y0PAT;
+    private BigDecimal y1PAT;
+    private BigDecimal y2PAT;
+    private BigDecimal y3PAT;
+    private BigDecimal patChange;
+    private BigDecimal y0EPS;
+    private BigDecimal y1EPS;
+    private BigDecimal y2EPS;
+    private BigDecimal y3EPS;
+    private BigDecimal epsChange;
     private BigDecimal y0OPM;
     private BigDecimal y1OPM;
     private BigDecimal y2OPM;
+    private BigDecimal y3OPM;
     private BigDecimal y0ROCE;
     private BigDecimal y1ROCE;
     private BigDecimal y2ROCE;
+    private BigDecimal y3ROCE;
     private BigDecimal y0EVBYEBIT;
     private BigDecimal y1EVBYEBIT;
     private BigDecimal y2EVBYEBIT;
+    private BigDecimal y3EVBYEBIT;
     private BigDecimal y0AUM;
     private BigDecimal y1AUM;
     private BigDecimal y2AUM;
+    private BigDecimal y3AUM;
     private BigDecimal y0CreditCost;
     private BigDecimal y1CreditCost;
     private BigDecimal y2CreditCost;
+    private BigDecimal y3CreditCost;
     private BigDecimal y0GNPA;
     private BigDecimal y1GNPA;
     private BigDecimal y2GNPA;
+    private BigDecimal y3GNPA;
     private BigDecimal y0NNPA;
     private BigDecimal y1NNPA;
     private BigDecimal y2NNPA;
+    private BigDecimal y3NNPA;
     private String analystsNames;
 
     public ReportParameters(){
@@ -59,20 +78,35 @@ public class ReportParameters implements Serializable {
         this.y0Revenue = new BigDecimal("0");
         this.y1Revenue = new BigDecimal("0");
         this.y2Revenue = new BigDecimal("0");
+        this.y3Revenue = new BigDecimal("0");
         this.revenueChange = new BigDecimal("0");
         this.y0EBIT = null;
         this.y1EBIT = null;
         this.y2EBIT = null;
+        this.y3EBIT = null;
         this.ebitChange = "";
+        this.y0PAT = new BigDecimal("0");
+        this.y1PAT = new BigDecimal("0");
+        this.y2PAT = new BigDecimal("0");
+        this.y3PAT = new BigDecimal("0");
+        this.patChange = new BigDecimal("0");
+        this.y0EPS = new BigDecimal("0");
+        this.y1EPS = new BigDecimal("0");
+        this.y2EPS = new BigDecimal("0");
+        this.y3EPS = new BigDecimal("0");
+        this.epsChange = new BigDecimal("0");
         this.y0OPM = new BigDecimal("0");
         this.y1OPM = new BigDecimal("0");
         this.y2OPM = new BigDecimal("0");
+        this.y3OPM = new BigDecimal("0");
         this.y0ROCE = new BigDecimal("0");
         this.y1ROCE = new BigDecimal("0");
         this.y2ROCE = new BigDecimal("0");
+        this.y3ROCE = new BigDecimal("0");
         this.y0EVBYEBIT = new BigDecimal("0");
         this.y1EVBYEBIT = new BigDecimal("0");
         this.y2EVBYEBIT = new BigDecimal("0");
+        this.y3EVBYEBIT = new BigDecimal("0");
         this.analystsNames = "";
 
     }
@@ -80,7 +114,6 @@ public class ReportParameters implements Serializable {
     public String getQuarter() {
         return quarter;
     }
-
     public void setQuarter(String quarter) {
         this.quarter = quarter;
     }
@@ -88,7 +121,6 @@ public class ReportParameters implements Serializable {
     public String getReportDate() {
         return reportDate;
     }
-
     public void setReportDate(String reportDate) {
         this.reportDate = reportDate;
     }
@@ -96,7 +128,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getMcap() {
         return mcap;
     }
-
     public void setMcap(BigDecimal mcap) {
         this.mcap = mcap;
     }
@@ -104,7 +135,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getPrice() {
         return price;
     }
-
     public void setPrice(BigDecimal price) {
         this.price = price;
     }
@@ -112,7 +142,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getPriceChange() {
         return priceChange;
     }
-
     public void setPriceChange(BigDecimal priceChange) {
         this.priceChange = priceChange;
     }
@@ -120,7 +149,6 @@ public class ReportParameters implements Serializable {
     public String getBroker() {
         return broker;
     }
-
     public void setBroker(String broker) {
         this.broker = broker;
     }
@@ -128,7 +156,6 @@ public class ReportParameters implements Serializable {
     public String getRating() {
         return rating;
     }
-
     public void setRating(String rating) {
         this.rating = rating;
     }
@@ -136,7 +163,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getTarget() {
         return target;
     }
-
     public void setTarget(BigDecimal target) {
         this.target = target;
     }
@@ -144,7 +170,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getTargetChange() {
         return targetChange;
     }
-
     public void setTargetChange(BigDecimal targetChange) {
         this.targetChange = targetChange;
     }
@@ -152,7 +177,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY0Revenue() {
         return y0Revenue;
     }
-
     public void setY0Revenue(BigDecimal y0Revenue) {
         this.y0Revenue = y0Revenue;
     }
@@ -160,7 +184,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY1Revenue() {
         return y1Revenue;
     }
-
     public void setY1Revenue(BigDecimal y1Revenue) {
         this.y1Revenue = y1Revenue;
     }
@@ -168,15 +191,20 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY2Revenue() {
         return y2Revenue;
     }
-
     public void setY2Revenue(BigDecimal y2Revenue) {
         this.y2Revenue = y2Revenue;
+    }
+
+    public BigDecimal getY3Revenue() {
+        return y3Revenue;
+    }
+    public void setY3Revenue(BigDecimal y3Revenue) {
+        this.y3Revenue = y3Revenue;
     }
 
     public BigDecimal getRevenueChange() {
         return revenueChange;
     }
-
     public void setRevenueChange(BigDecimal revenueChange) {
         this.revenueChange = revenueChange;
     }
@@ -184,7 +212,6 @@ public class ReportParameters implements Serializable {
     public String getY0EBIT() {
         return y0EBIT;
     }
-
     public void setY0EBIT(String y0EBIT) {
         this.y0EBIT = y0EBIT;
     }
@@ -192,7 +219,6 @@ public class ReportParameters implements Serializable {
     public String getY1EBIT() {
         return y1EBIT;
     }
-
     public void setY1EBIT(String y1EBIT) {
         this.y1EBIT = y1EBIT;
     }
@@ -200,23 +226,97 @@ public class ReportParameters implements Serializable {
     public String getY2EBIT() {
         return y2EBIT;
     }
-
     public void setY2EBIT(String y2EBIT) {
         this.y2EBIT = y2EBIT;
+    }
+
+    public String getY3EBIT() {
+        return y3EBIT;
+    }
+    public void setY3EBIT(String y3EBIT) {
+        this.y3EBIT = y3EBIT;
     }
 
     public String getEbitChange() {
         return ebitChange;
     }
-
     public void setEbitChange(String ebitChange) {
         this.ebitChange = ebitChange;
+    }
+
+    public BigDecimal getY0PAT() {
+        return y0PAT;
+    }
+    public void setY0PAT(BigDecimal y0PAT) {
+        this.y0PAT = y0PAT;
+    }
+
+    public BigDecimal getY1PAT() {
+        return y1PAT;
+    }
+    public void setY1PAT(BigDecimal y1PAT) {
+        this.y1PAT = y1PAT;
+    }
+
+    public BigDecimal getY2PAT() {
+        return y2PAT;
+    }
+    public void setY2PAT(BigDecimal y2PAT) {
+        this.y2PAT = y2PAT;
+    }
+
+    public BigDecimal getY3PAT() {
+        return y3PAT;
+    }
+    public void setY3PAT(BigDecimal y3PAT) {
+        this.y3PAT = y3PAT;
+    }
+
+    public BigDecimal getPatChange() {
+        return patChange;
+    }
+    public void setPatChange(BigDecimal patChange) {
+        this.patChange = patChange;
+    }
+
+    public BigDecimal getY0EPS() {
+        return y0EPS;
+    }
+    public void setY0EPS(BigDecimal y0EPS) {
+        this.y0EPS = y0EPS;
+    }
+
+    public BigDecimal getY1EPS() {
+        return y1EPS;
+    }
+    public void setY1EPS(BigDecimal y1EPS) {
+        this.y1EPS = y1EPS;
+    }
+
+    public BigDecimal getY2EPS() {
+        return y2EPS;
+    }
+    public void setY2EPS(BigDecimal y2EPS) {
+        this.y2EPS = y2EPS;
+    }
+
+    public BigDecimal getY3EPS() {
+        return y3EPS;
+    }
+    public void setY3EPS(BigDecimal y3EPS) {
+        this.y3EPS = y3EPS;
+    }
+
+    public BigDecimal getEpsChange() {
+        return epsChange;
+    }
+    public void setEpsChange(BigDecimal epsChange) {
+        this.epsChange = epsChange;
     }
 
     public BigDecimal getY0OPM() {
         return y0OPM;
     }
-
     public void setY0OPM(BigDecimal y0OPM) {
         this.y0OPM = y0OPM;
     }
@@ -224,7 +324,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY1OPM() {
         return y1OPM;
     }
-
     public void setY1OPM(BigDecimal y1OPM) {
         this.y1OPM = y1OPM;
     }
@@ -232,15 +331,20 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY2OPM() {
         return y2OPM;
     }
-
     public void setY2OPM(BigDecimal y2OPM) {
         this.y2OPM = y2OPM;
+    }
+
+    public BigDecimal getY3OPM() {
+        return y3OPM;
+    }
+    public void setY3OPM(BigDecimal y3OPM) {
+        this.y3OPM = y3OPM;
     }
 
     public BigDecimal getY0ROCE() {
         return y0ROCE;
     }
-
     public void setY0ROCE(BigDecimal y0ROCE) {
         this.y0ROCE = y0ROCE;
     }
@@ -248,7 +352,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY1ROCE() {
         return y1ROCE;
     }
-
     public void setY1ROCE(BigDecimal y1ROCE) {
         this.y1ROCE = y1ROCE;
     }
@@ -256,15 +359,20 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY2ROCE() {
         return y2ROCE;
     }
-
     public void setY2ROCE(BigDecimal y2ROCE) {
         this.y2ROCE = y2ROCE;
+    }
+
+    public BigDecimal getY3ROCE() {
+        return y3ROCE;
+    }
+    public void setY3ROCE(BigDecimal y3ROCE) {
+        this.y3ROCE = y3ROCE;
     }
 
     public BigDecimal getY0EVBYEBIT() {
         return y0EVBYEBIT;
     }
-
     public void setY0EVBYEBIT(BigDecimal y0EVBYEBIT) {
         this.y0EVBYEBIT = y0EVBYEBIT;
     }
@@ -272,7 +380,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY1EVBYEBIT() {
         return y1EVBYEBIT;
     }
-
     public void setY1EVBYEBIT(BigDecimal y1EVBYEBIT) {
         this.y1EVBYEBIT = y1EVBYEBIT;
     }
@@ -280,15 +387,20 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY2EVBYEBIT() {
         return y2EVBYEBIT;
     }
-
     public void setY2EVBYEBIT(BigDecimal y2EVBYEBIT) {
         this.y2EVBYEBIT = y2EVBYEBIT;
+    }
+
+    public BigDecimal getY3EVBYEBIT() {
+        return y3EVBYEBIT;
+    }
+    public void setY3EVBYEBIT(BigDecimal y3EVBYEBIT) {
+        this.y3EVBYEBIT = y3EVBYEBIT;
     }
 
     public String getAnalystsNames() {
         return analystsNames;
     }
-
     public void setAnalystsNames(String analystsNames) {
         this.analystsNames = analystsNames;
     }
@@ -296,7 +408,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY0AUM() {
         return y0AUM;
     }
-
     public void setY0AUM(BigDecimal y0AUM) {
         this.y0AUM = y0AUM;
     }
@@ -304,7 +415,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY1AUM() {
         return y1AUM;
     }
-
     public void setY1AUM(BigDecimal y1AUM) {
         this.y1AUM = y1AUM;
     }
@@ -312,15 +422,20 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY2AUM() {
         return y2AUM;
     }
-
     public void setY2AUM(BigDecimal y2AUM) {
         this.y2AUM = y2AUM;
+    }
+
+    public BigDecimal getY3AUM() {
+        return y3AUM;
+    }
+    public void setY3AUM(BigDecimal y3AUM) {
+        this.y3AUM = y3AUM;
     }
 
     public BigDecimal getY0CreditCost() {
         return y0CreditCost;
     }
-
     public void setY0CreditCost(BigDecimal y0CreditCost) {
         this.y0CreditCost = y0CreditCost;
     }
@@ -328,7 +443,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY1CreditCost() {
         return y1CreditCost;
     }
-
     public void setY1CreditCost(BigDecimal y1CreditCost) {
         this.y1CreditCost = y1CreditCost;
     }
@@ -336,15 +450,20 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY2CreditCost() {
         return y2CreditCost;
     }
-
     public void setY2CreditCost(BigDecimal y2CreditCost) {
         this.y2CreditCost = y2CreditCost;
+    }
+
+    public BigDecimal getY3CreditCost() {
+        return y3CreditCost;
+    }
+    public void setY3CreditCost(BigDecimal y3CreditCost) {
+        this.y3CreditCost = y3CreditCost;
     }
 
     public BigDecimal getY0GNPA() {
         return y0GNPA;
     }
-
     public void setY0GNPA(BigDecimal y0GNPA) {
         this.y0GNPA = y0GNPA;
     }
@@ -352,7 +471,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY1GNPA() {
         return y1GNPA;
     }
-
     public void setY1GNPA(BigDecimal y1GNPA) {
         this.y1GNPA = y1GNPA;
     }
@@ -360,15 +478,20 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY2GNPA() {
         return y2GNPA;
     }
-
     public void setY2GNPA(BigDecimal y2GNPA) {
         this.y2GNPA = y2GNPA;
+    }
+
+    public BigDecimal getY3GNPA() {
+        return y3GNPA;
+    }
+    public void setY3GNPA(BigDecimal y3GNPA) {
+        this.y3GNPA = y3GNPA;
     }
 
     public BigDecimal getY0NNPA() {
         return y0NNPA;
     }
-
     public void setY0NNPA(BigDecimal y0NNPA) {
         this.y0NNPA = y0NNPA;
     }
@@ -376,7 +499,6 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY1NNPA() {
         return y1NNPA;
     }
-
     public void setY1NNPA(BigDecimal y1NNPA) {
         this.y1NNPA = y1NNPA;
     }
@@ -384,8 +506,14 @@ public class ReportParameters implements Serializable {
     public BigDecimal getY2NNPA() {
         return y2NNPA;
     }
-
     public void setY2NNPA(BigDecimal y2NNPA) {
         this.y2NNPA = y2NNPA;
+    }
+
+    public BigDecimal getY3NNPA() {
+        return y3NNPA;
+    }
+    public void setY3NNPA(BigDecimal y3NNPA) {
+        this.y3NNPA = y3NNPA;
     }
 }

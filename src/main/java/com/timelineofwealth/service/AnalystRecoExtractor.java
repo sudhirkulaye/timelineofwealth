@@ -48,6 +48,8 @@ public class AnalystRecoExtractor {
     protected String REVENUE_ROW_NAME;
     protected String EBITDA_ROW_NAME;
     protected String DEPRECIATION_ROW_NAME;
+    protected String PAT_ROW_NAME;
+    protected String EPS_ROW_NAME;
 
     protected String MARGIN_PAGE;
     protected String MARGIN_HEADER_ROW_NAME;
@@ -64,6 +66,7 @@ public class AnalystRecoExtractor {
     protected String Y0;
     protected String Y1;
     protected String Y2;
+    protected String Y3;
 
     protected String RESEARCHANALYST1;
     protected String RESEARCHANALYST2;
@@ -144,11 +147,11 @@ public class AnalystRecoExtractor {
     protected Integer headerNPALineNumber = null;
     protected Integer revenueLineNumber = null;
     protected Integer ebitdaLineNumber = null;
-    protected Integer y0ColumnNumberOnIncStmt = null, y1ColumnNumberOnIncStmt = null, y2ColumnNumberOnIncStmt = null;
-    protected Integer y0ColumnNumberOnRatio = null, y1ColumnNumberOnRatio = null, y2ColumnNumberOnRatio = null;
+    protected Integer y0ColumnNumberOnIncStmt = null, y1ColumnNumberOnIncStmt = null, y2ColumnNumberOnIncStmt = null, y3ColumnNumberOnIncStmt = null;
+    protected Integer y0ColumnNumberOnRatio = null, y1ColumnNumberOnRatio = null, y2ColumnNumberOnRatio = null, y3ColumnNumberOnRatio = null;
 
-    protected BigDecimal y0EBITDANumber = null, y1EBITDANumber = null, y2EBITDANumber = null;
-    protected BigDecimal y0DepreciationNumber = null, y1DepreciationNumber = null, y2DepreciationNumber = null;
+    protected BigDecimal y0EBITDANumber = null, y1EBITDANumber = null, y2EBITDANumber = null, y3EBITDANumber = null;
+    protected BigDecimal y0DepreciationNumber = null, y1DepreciationNumber = null, y2DepreciationNumber = null, y3DepreciationNumber = null;
 
     protected ReportParameters reportParameters = new ReportParameters();
 
@@ -280,6 +283,8 @@ public class AnalystRecoExtractor {
                         reportExtractFile = basePath + "\\ReportExtract.txt";
                     }
 
+                    extractor.saveReportParametersNewFormat(tickerValue, reportParameters, Paths.get(excelFilePath).getParent().toString());
+
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(reportExtractFile, true))) {
                         writer.newLine(); // Start on a new line
                         writer.write(contentToAppend);
@@ -317,6 +322,8 @@ public class AnalystRecoExtractor {
         REVENUE_ROW_NAME = rdec.getREVENUE_ROW_NAME();
         EBITDA_ROW_NAME = rdec.getEBITDA_ROW_NAME();
         DEPRECIATION_ROW_NAME = rdec.getDEPRECIATION_ROW_NAME();
+        PAT_ROW_NAME = rdec.getPAT_ROW_NAME();
+        EPS_ROW_NAME = rdec.getEPS_ROW_NAME();
 
         MARGIN_PAGE = rdec.getMARGIN_PAGE();
         MARGIN_HEADER_ROW_NAME = rdec.getMARGIN_HEADER_ROW_NAME();
@@ -333,6 +340,7 @@ public class AnalystRecoExtractor {
         Y0 = rdec.getY0();
         Y1 = rdec.getY1();
         Y2 = rdec.getY2();
+        Y3 = rdec.getY3();
 
         RESEARCHANALYST1 = rdec.getRESEARCHANALYST1();
         RESEARCHANALYST2 = rdec.getRESEARCHANALYST2();
@@ -601,35 +609,6 @@ public class AnalystRecoExtractor {
         }
     }
 
-    /*private void loadReportDataExtractConfig(String reportDataExtractConfigFilePath, String forBroker, String forTicker){
-        try {
-            // Open the new workbook
-            FileInputStream file = new FileInputStream(new File(reportDataExtractConfigFilePath));
-            XSSFWorkbook wb = new XSSFWorkbook(file);
-
-            ReportDataExtractConfig reportDataExtractConfig = null;
-            XSSFSheet ws = wb.getSheet(forBroker);
-            XSSFRow headerRow = ws.getRow(0);
-
-            for(int i = 1; i <= ws.getLastRowNum(); i++) {
-                XSSFRow dataRow = ws.getRow(i);
-                if (dataRow != null && dataRow.getCell(0) != null && dataRow.getCell(1) != null) {
-                    String ticker = dataRow.getCell(0).getStringCellValue();
-                    String quarter = dataRow.getCell(1).getStringCellValue();
-                    if(ticker.equals(forTicker) || ticker.equals("DEFAULT")) {
-                        reportDataExtractConfig = loadReportDataExtractConfig(reportDataExtractConfigFilePath, quarter, ticker, forBroker);
-                        configMap.put(quarter + "_" + ticker + "_" + forBroker, reportDataExtractConfig);
-                    }
-                }
-            }
-            wb.close();
-            file.close();
-        } catch (Exception e) {
-            System.out.println("Exception in loadReportDataExtractConfig " + e.getMessage());
-            e.printStackTrace();
-        }
-    }*/
-
     private ReportDataExtractConfig loadReportDataExtractConfig(String reportDataExtractConfigFilePath, String quarter, String ticker, String brokerName) {
         ReportDataExtractConfig reportDataExtractConfig = null;
         try {
@@ -683,6 +662,8 @@ public class AnalystRecoExtractor {
             int REVENUE_ROW_NAMEColumnPosition = -1;
             int EBITDA_ROW_NAMEColumnPosition = -1;
             int DEPRECIATION_ROW_NAMEColumnPosition = -1;
+            int PAT_ROW_NAMEColumnPosition = -1;
+            int EPS_ROW_NAMEColumnPosition = -1;
 
             int MARGIN_PAGEColumnPosition = -1;
             int MARGIN_HEADER_ROW_NAMEColumnPosition = -1;
@@ -699,6 +680,7 @@ public class AnalystRecoExtractor {
             int Y0ColumnPosition = -1;
             int Y1ColumnPosition = -1;
             int Y2ColumnPosition = -1;
+            int Y3ColumnPosition = -1;
 
             int RESEARCHANALYST1ColumnPosition = -1;
             int RESEARCHANALYST2ColumnPosition = -1;
@@ -763,6 +745,12 @@ public class AnalystRecoExtractor {
                 if (headerCell.getStringCellValue().equals("DEPRECIATION_ROW_NAME")) {
                     DEPRECIATION_ROW_NAMEColumnPosition = i;
                 }
+                if (headerCell.getStringCellValue().equals("PROFIT_ROW_NAME")) {
+                    PAT_ROW_NAMEColumnPosition = i;
+                }
+                if (headerCell.getStringCellValue().equals("EPS_ROW_NAME")) {
+                    EPS_ROW_NAMEColumnPosition = i;
+                }
 
                 if (headerCell.getStringCellValue().equals("MARGIN_PAGE")) {
                     MARGIN_PAGEColumnPosition = i;
@@ -802,6 +790,9 @@ public class AnalystRecoExtractor {
                 }
                 if (headerCell.getStringCellValue().equals("Y2")) {
                     Y2ColumnPosition = i;
+                }
+                if (headerCell.getStringCellValue().equals("Y3")) {
+                    Y3ColumnPosition = i;
                 }
 
                 if (headerCell.getStringCellValue().equals("RESEARCHANALYST1")) {
@@ -923,6 +914,16 @@ public class AnalystRecoExtractor {
                     else
                         reportDataExtractConfig.setDEPRECIATION_ROW_NAME ("");
                 }
+                if (PAT_ROW_NAMEColumnPosition != -1 && dataRow.getCell(PAT_ROW_NAMEColumnPosition) != null) {
+                    reportDataExtractConfig.setPAT_ROW_NAME(dataRow.getCell(PAT_ROW_NAMEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setPAT_ROW_NAME("");
+                }
+                if (EPS_ROW_NAMEColumnPosition != -1 && dataRow.getCell(EPS_ROW_NAMEColumnPosition) != null) {
+                    reportDataExtractConfig.setEPS_ROW_NAME(dataRow.getCell(EPS_ROW_NAMEColumnPosition).getStringCellValue());
+                } else {
+                    reportDataExtractConfig.setEPS_ROW_NAME("");
+                }
 
                 if (MARGIN_PAGEColumnPosition != -1 && dataRow.getCell(MARGIN_PAGEColumnPosition) != null) {
                     reportDataExtractConfig.setMARGIN_PAGE(dataRow.getCell(MARGIN_PAGEColumnPosition).getStringCellValue());
@@ -986,6 +987,11 @@ public class AnalystRecoExtractor {
                     reportDataExtractConfig.setY2(dataRow.getCell(Y2ColumnPosition).getStringCellValue().replaceAll("\"", ""));
                 } else {
                     reportDataExtractConfig.setY2("");
+                }
+                if (Y3ColumnPosition != -1 && dataRow.getCell(Y3ColumnPosition) != null) {
+                    reportDataExtractConfig.setY3(dataRow.getCell(Y3ColumnPosition).getStringCellValue().replaceAll("\"", ""));
+                } else {
+                    reportDataExtractConfig.setY3("");
                 }
 
                 if (AUM_PAGEColumnPosition != -1) {
@@ -1523,6 +1529,140 @@ public class AnalystRecoExtractor {
             strOutput = "Not Rated";
 
         return strOutput;
+    }
+
+    protected void saveReportParametersNewFormat(String ticker, ReportParameters rp, String outputFolderPath) {
+
+        try {
+            String newFile = outputFolderPath + File.separator + "ReportextractNew.txt";
+            File file = new File(newFile);
+
+            boolean writeHeader = !file.exists();
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+
+                if (writeHeader) {
+                    writer.write("TICKER\tType\tQuarter\tDate\tMcap(Cr)\tPrice\tFirm\tReco\tTP\tFwd PE\tFIN Yr\tEPS\tRev.\tEBIT%\tProfit\tA1\tA2\tA3\tLead Analyst");
+                    writer.newLine();
+                }
+
+                // Lead analyst (first name)
+                String leadAnalyst = "";
+                if (rp.getAnalystsNames() != null && rp.getAnalystsNames().contains(";")) {
+                    leadAnalyst = rp.getAnalystsNames().split(";")[0].trim();
+                } else {
+                    leadAnalyst = rp.getAnalystsNames();
+                }
+
+                String type = "RE";
+                String firm = rp.getBroker();
+
+                // derive FY1, FY2, FY3
+                String[] fys = deriveFinancialYears(rp.getQuarter());
+                String fy1 = fys[0];
+                String fy2 = fys[1];
+                String fy3 = fys[2];
+
+                // three rows: FY1, FY2, FY3
+                String[][] rows = {
+                        { fy1, safe(rp.getY1EPS()), safe(rp.getY1Revenue()), safe(rp.getY1OPM()), safe(rp.getY1PAT()) },
+                        { fy2, safe(rp.getY2EPS()), safe(rp.getY2Revenue()), safe(rp.getY2OPM()), safe(rp.getY2PAT()) },
+                        { fy3, safe(rp.getY3EPS()), safe(rp.getY3Revenue()), safe(rp.getY3OPM()), safe(rp.getY3PAT()) }
+                };
+
+                for (String[] row : rows) {
+                    String fy = row[0];
+                    String eps = row[1];
+                    String rev = row[2];
+                    String ebitMargin = row[3];
+                    String profit = row[4];
+
+                    if (fy.isEmpty()) continue;
+
+                    /*boolean hasData = true;
+
+                    try {
+                        if (!rev.isEmpty() && Double.parseDouble(rev) > 0) hasData = true;
+                    } catch (Exception ignored) {}
+
+                    try {
+                        if (!eps.isEmpty() && Double.parseDouble(eps) > 0) hasData = true;
+                    } catch (Exception ignored) {}
+
+                    if (!hasData) continue;*/
+
+                    writer.write(
+                            ticker + "\t" +
+                                    type + "\t" +
+                                    rp.getQuarter() + "\t" +
+                                    rp.getReportDate() + "\t" +
+                                    safe(rp.getMcap()) + "\t" +
+                                    safe(rp.getPrice()) + "\t" +
+                                    firm + "\t" +
+                                    rp.getRating() + "\t" +
+                                    safe(rp.getTarget()) + "\t" +
+                                    "" + "\t" +      // Fwd PE
+                                    fy + "\t" +
+                                    eps + "\t" +
+                                    rev + "\t" +
+                                    ebitMargin + "\t" +
+                                    profit + "\t" +
+                                    "" + "\t" +      // A1
+                                    "" + "\t" +      // A2
+                                    "" + "\t" +      // A3
+                                    leadAnalyst
+                    );
+                    writer.newLine();
+                }
+            }
+
+            System.out.println("New formatted extract saved to: " + newFile);
+
+        } catch (Exception e) {
+            System.out.println("Exception in saveReportParametersNewFormat: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private String[] deriveFinancialYears(String quarter) {
+
+        if (quarter == null) return new String[] { "", "", "" };
+
+        try {
+            // Clean unexpected characters
+            quarter = quarter.trim().replaceAll("[^A-Za-z0-9]", "");
+
+            // Expect exactly FY26Q3
+            Pattern p = Pattern.compile("FY(\\d{2})Q(\\d)");
+            Matcher m = p.matcher(quarter);
+
+            if (!m.find()) {
+                System.out.println("Quarter parse failed for: [" + quarter + "]");
+                return new String[] { "", "", "" };
+            }
+
+            int fy = Integer.parseInt(m.group(1));  // 26
+            int q = Integer.parseInt(m.group(2));   // 3
+
+            int y1 = (q == 4) ? fy + 1 : fy;
+            int y2 = y1 + 1;
+            int y3 = y1 + 2;
+
+            return new String[] {
+                    "FY" + y1,
+                    "FY" + y2,
+                    "FY" + y3
+            };
+
+        } catch (Exception e) {
+            System.out.println("Error parsing quarter: [" + quarter + "]");
+            return new String[] { "", "", "" };
+        }
+    }
+
+    // Utility to avoid printing "null"
+    private String safe(Object obj) {
+        return (obj == null) ? "" : obj.toString();
     }
 
 }

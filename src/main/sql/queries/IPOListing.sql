@@ -2,6 +2,7 @@ SET SQL_SAFE_UPDATES = 0;
 Commit;
 
 -- Newly added IPOs
+select * from stock_universe a where ticker <> name order by a.listing_date desc;
 select * from stock_universe a where short_name like 'COFOR%' and is_bse500 = 1 and is_nse500 = 1;
 select * from stock_universe a where ticker in ('KPIT');
 select * from stock_universe a where a.listing_date > '2024-09-01' and ticker5 = '';
