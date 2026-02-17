@@ -19,9 +19,19 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "admin/api/")
 public class AdminRestApi {
-    private static final Logger logger = LoggerFactory.getLogger(AdminRestApi.class);
+    private final Logger logger = LoggerFactory.getLogger(AdminRestApi.class);
+    private final ServletContext context;
+    private final CommonService commonService;
+    private final AdminService adminService;
+
     @Autowired
-    private ServletContext context;
+    public AdminRestApi(ServletContext context,
+                        CommonService commonService,
+                        AdminService adminService){
+        this.context = context;
+        this.commonService = commonService;
+        this.adminService = adminService;
+    }
 
     @RequestMapping(value = "/getlatestresultexcels", method = RequestMethod.GET)
     public List<ResultExcelDTO> getLatestResultExcels() {
@@ -29,8 +39,8 @@ public class AdminRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return AdminService.getLatestResultExcels();
+        User user = commonService.getLoggedInUser(userDetails);
+        return adminService.getLatestResultExcels();
     }
 
 }

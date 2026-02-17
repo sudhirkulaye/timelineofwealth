@@ -6,6 +6,7 @@ import com.timelineofwealth.service.CommonService;
 import com.timelineofwealth.service.LiabilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +20,16 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "user/api/")
 public class LiabilityRestApi {
-    private static final Logger logger = LoggerFactory.getLogger(LiabilityRestApi.class);
+    private final Logger logger = LoggerFactory.getLogger(LiabilityRestApi.class);
+    private final CommonService commonService;
+    private final LiabilityService liabilityService;
+
+    @Autowired
+    public LiabilityRestApi(CommonService commonService,
+                            LiabilityService liabilityService){
+        this.commonService = commonService;
+        this.liabilityService = liabilityService;
+    }
 
     @RequestMapping(value = "/getliabilities", method = RequestMethod.GET)
     public List<Liability> getLiabilities() {
@@ -27,15 +37,15 @@ public class LiabilityRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return LiabilityService.getLiabilityRecords(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return liabilityService.getLiabilityRecords(user.getEmail());
     }
 
     @RequestMapping(value = "/updateliability", method = RequestMethod.PUT)
     public List<Liability> updateLiability(@RequestBody Liability editedRecord) {
         logger.debug("Call user/api/updateliability/ " + editedRecord.getKey().getMemberid());
         editedRecord.setPvOutstandingEmis(editedRecord.getPvOutstandingEmis().setScale(0, BigDecimal.ROUND_HALF_UP));
-        LiabilityService.updateLiabilityRecord(editedRecord);
+        liabilityService.updateLiabilityRecord(editedRecord);
         return getLiabilities();
     }
 
@@ -43,14 +53,14 @@ public class LiabilityRestApi {
     public List<Liability> addLiability(@RequestBody Liability newRecord) {
         logger.debug("Call user/api/addliability/ " + newRecord.getKey().getMemberid());
         newRecord.setPvOutstandingEmis(newRecord.getPvOutstandingEmis().setScale(0, BigDecimal.ROUND_HALF_UP));
-        LiabilityService.addLiabilityRecord(newRecord);
+        liabilityService.addLiabilityRecord(newRecord);
         return getLiabilities();
     }
 
     @RequestMapping(value = "/deleteliability", method = RequestMethod.POST)
     public List<Liability> deleteLiability(@RequestBody Liability deleteRecord) {
         logger.debug("Call user/api/deleteliability/ " + deleteRecord.getKey().getMemberid());
-        LiabilityService.deleteLiabilityRecord(deleteRecord);
+        liabilityService.deleteLiabilityRecord(deleteRecord);
         return getLiabilities();
     }
 }

@@ -6,56 +6,64 @@ import com.timelineofwealth.service.CommonService;
 import com.timelineofwealth.service.MemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "user/api/")
+@RequestMapping(value = "/user/api")  // ✅ Added leading slash
 public class MemberRestApi {
 
-    private static final Logger logger = LoggerFactory.getLogger(MemberRestApi.class);
+    private final Logger logger = LoggerFactory.getLogger(MemberRestApi.class);
+    private final MemberService memberService;
+    private final CommonService commonService;
 
-    @RequestMapping(value = "/getusermembers", method = RequestMethod.GET)
-    public List<Member> getUserMembers() {
-        logger.debug(String.format("Call user/api/getusermembers/"));
-
-        UserDetails userDetails =
-                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return MemberService.getUserMembers(user.getEmail());
+    // ✅ Constructor injection
+    @Autowired
+    public MemberRestApi(MemberService memberService,
+                         CommonService commonService) {
+        this.memberService = memberService;
+        this.commonService = commonService;
     }
 
-    @RequestMapping(value = "/updatemember", method = RequestMethod.PUT)
-    public List<Member> updateMember(@RequestBody Member editedMember) {
-        logger.debug("Call user/api/updatemember/ " + editedMember.getFirstName());
+    @GetMapping("/members")  // ✅ Modern annotation, better URL
+    public List<Member> getUserMembers() {
+        logger.debug("Call user/api/members");
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        if(MemberService.isAuthorised(user.getEmail(), editedMember.getMemberid())){
-            MemberService.updateMember(editedMember);
+        User user = commonService.getLoggedInUser(userDetails);
+        return memberService.getUserMembers(user.getEmail());
+    }
+
+    @PutMapping("/members")  // ✅ Modern annotation
+    public List<Member> updateMember(@RequestBody Member editedMember) {
+        logger.debug("Call user/api/members PUT: {}", editedMember.getFirstName());
+
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = commonService.getLoggedInUser(userDetails);
+
+        if(memberService.isAuthorised(user.getEmail(), editedMember.getMemberid())){
+            memberService.updateMember(editedMember);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }
-        return MemberService.getUserMembers(user.getEmail());
+        return memberService.getUserMembers(user.getEmail());
     }
 
-    @RequestMapping(value = "/addmember", method = RequestMethod.POST)
+    @PostMapping("/members")  // ✅ Modern annotation
     public List<Member> addMember(@RequestBody Member newMember) {
-        logger.debug("Call user/api/addmember/ " + newMember.getFirstName());
+        logger.debug("Call user/api/members POST: {}", newMember.getFirstName());
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        MemberService.addMember(user, newMember);
-        return MemberService.getUserMembers(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        memberService.addMember(user, newMember);
+        return memberService.getUserMembers(user.getEmail());
     }
-
 }

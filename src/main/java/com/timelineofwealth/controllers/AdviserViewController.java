@@ -45,73 +45,86 @@ import java.util.List;
 @Controller
 public class AdviserViewController {
 
+    private final Logger logger = LoggerFactory.getLogger(AdviserViewController.class);
 
-    private static final Logger logger = LoggerFactory.getLogger(AdviserViewController.class);
-    private java.sql.Date dateToday; // = new PublicApi().getSetupDates().getDateToday();
+    private java.sql.Date dateToday; // = publicApi.getSetupDates().getDateToday();
     @PersistenceContext
     private EntityManager entityManager;
+    private final ServletContext context;
+    private final CommonService commonService;
+    private final PublicApi publicApi;
+    private final AdviserService adviserService;
+    private final GeneratePDFReport generatePDFReport;
 
     @Autowired
-    private ServletContext context;
-
-    @Autowired
-    public AdviserViewController(Environment environment){}
+    public AdviserViewController(Environment environment,
+                                 ServletContext context,
+                                 CommonService commonService,
+                                 PublicApi publicApi,
+                                 AdviserService adviserService,
+                                 GeneratePDFReport generatePDFReport){
+        this.context = context;
+        this.commonService = commonService;
+        this.publicApi = publicApi;
+        this.adviserService = adviserService;
+        this.generatePDFReport = generatePDFReport;
+    }
 
     @RequestMapping(value = "/adviser/listofclients")
     public String listOfClients(Model model, @AuthenticationPrincipal UserDetails userDetails){
         Date dateToday = new Date();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        model.addAttribute("processingDate", dateToday.toString()/*commonService.getProcessingDate()*/);
         model.addAttribute("title", "TimelineOfWealth-Clients");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "adviser/listofclients";
     }
 
     @RequestMapping(value = "/adviser/consolidatedassets")
     public String consolidatedAssets(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        dateToday = publicApi.getSetupDates().getDateToday();
+        model.addAttribute("processingDate", dateToday.toString()/*commonService.getProcessingDate()*/);
         model.addAttribute("title", "Consolidated Assets");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "adviser/consolidatedassets";
     }
 
     @RequestMapping(value = "/adviser/generatepdfreport", method = RequestMethod.GET)
     public String generatePDFReport(Model model, @AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        dateToday = new PublicApi().getSetupDates().getDateToday();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        dateToday = publicApi.getSetupDates().getDateToday();
+        model.addAttribute("processingDate", dateToday.toString()/*commonService.getProcessingDate()*/);
         model.addAttribute("title", "Generate PDF Reports");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "adviser/generatepdfreport";
 
     }
 
     @RequestMapping(value = "/adviser/modelportfolios", method = RequestMethod.GET)
     public String getModelPortfolios(Model model, @AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        dateToday = new PublicApi().getSetupDates().getDateToday();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        dateToday = publicApi.getSetupDates().getDateToday();
+        model.addAttribute("processingDate", dateToday.toString()/*commonService.getProcessingDate()*/);
         model.addAttribute("title", "Composites/Model Portfolios");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "adviser/modelportfolios";
 
     }
 
     @RequestMapping(value = "/adviser/generateallpdfreports", method = RequestMethod.POST)
     public String generateAllPDFReports(Model model, @AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        dateToday = new PublicApi().getSetupDates().getDateToday();
-        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+        dateToday = publicApi.getSetupDates().getDateToday();
+        model.addAttribute("processingDate", dateToday.toString()/*commonService.getProcessingDate()*/);
         model.addAttribute("title", "Generate PDF Reports");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
 
         logger.debug(String.format("/adviser/generateallpdfreports"));
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
 
         String message = "";
 
-        List<ClientDTO> clients = AdviserService.getPMSClients(user.getEmail());
+        List<ClientDTO> clients = adviserService.getPMSClients(user.getEmail());
         for (ClientDTO client : clients){
             try {
                 logger.debug(String.format("Processing Client %s", client.getMemberName()));
-                boolean isSuccess = GeneratePDFReport.generatePMSPDFForMember(user, client.getMemberid(), context, request, response);
+                boolean isSuccess = generatePDFReport.generatePMSPDFForMember(user, client.getMemberid(), context, request, response);
                 if (isSuccess) {
                     String fullPath = request.getServletContext().getRealPath("/resources/reports/" + client.getMemberid() + ".pdf");
                     String fileName = "" + client.getMemberid() + ".pdf";
@@ -138,7 +151,7 @@ public class AdviserViewController {
             }
         }
         // finally generate Model Portfolio Report
-        boolean isSuccess = GeneratePDFReport.generatePMSPDFForMember(user, 1, context, request, response);
+        boolean isSuccess = generatePDFReport.generatePMSPDFForMember(user, 1, context, request, response);
         if (isSuccess) {
             String fullPath = request.getServletContext().getRealPath("/resources/reports/" + 1 + ".pdf");
             String fileName = "" + 1 + ".pdf";
@@ -194,16 +207,16 @@ public class AdviserViewController {
 
     @RequestMapping(value = "/adviser/generatepmspdf/{memberid}")
     public void generatePMSPDF(@PathVariable long memberid, Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        dateToday = new PublicApi().getSetupDates().getDateToday();
-//        model.addAttribute("processingDate", dateToday.toString()/*CommonService.getProcessingDate()*/);
+//        dateToday = publicApi.getSetupDates().getDateToday();
+//        model.addAttribute("processingDate", dateToday.toString()/*commonService.getProcessingDate()*/);
 //        model.addAttribute("title", "Generate PDF Reports");
-//        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+//        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         logger.debug(String.format("/adviser/generatepmspdf/ %d", memberid));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
 
-        boolean isSuccess = GeneratePDFReport.generatePMSPDFForMember(user, memberid, context, request, response);
+        boolean isSuccess = generatePDFReport.generatePMSPDFForMember(user, memberid, context, request, response);
         String fullPath = request.getServletContext().getRealPath("/resources/reports/"+memberid+".pdf");
         String fileName = ""+memberid+".pdf";
         if(isSuccess){

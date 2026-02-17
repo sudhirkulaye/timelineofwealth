@@ -13,8 +13,8 @@ import java.util.Arrays;
 
 public class ConsolidatedResultTracker {
 
-    static String QUARTER = "Q4"; // Update this for each new quarter
-    static String YEAR = "25"; // Update this for each new year
+    static String QUARTER = "Q3"; // Update this for each new quarter
+    static String YEAR = "26"; // Update this for each new year
 
     static Boolean IS_OVERRIDE_PRICE_DATA = true;
     static Boolean IS_OVERRIDE_RECO_DATA = true;
@@ -109,7 +109,7 @@ public class ConsolidatedResultTracker {
     static Integer AUM_GROWTH_ROW = 309;
 
 
-    public static void updateResultTrackerExcel() {
+    public void updateResultTrackerExcel() {
         String basePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
         File base = new File(basePath);
 
@@ -125,8 +125,7 @@ public class ConsolidatedResultTracker {
         updateResultTrackerExcel(latestFolder);
     }
 
-
-    public static void updateResultTrackerExcel(String latestFolder) {
+    public void updateResultTrackerExcel(String latestFolder) {
 
         String YEAR = latestFolder.substring(2, 4);
         String QUARTER = latestFolder.substring(5);
@@ -526,7 +525,7 @@ public class ConsolidatedResultTracker {
         }
     }
 
-    private static void saveWorkbook(Workbook workbook, String filePath) {
+    private void saveWorkbook(Workbook workbook, String filePath) {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
             workbook.write(fileOutputStream);
@@ -536,7 +535,7 @@ public class ConsolidatedResultTracker {
         }
     }
 
-    private static void setReco(String ticker, Workbook trackerWorkbook, Sheet analystRecoSheet, Cell trackerCell, int startPosition){
+    private void setReco(String ticker, Workbook trackerWorkbook, Sheet analystRecoSheet, Cell trackerCell, int startPosition){
 
         XSSFWorkbook workbook = (XSSFWorkbook) trackerWorkbook;
 
@@ -711,19 +710,19 @@ public class ConsolidatedResultTracker {
         }
     }
 
-    public static boolean isUpgrade(String lastReco, String currentReco) {
+    public boolean isUpgrade(String lastReco, String currentReco) {
         int lastRecoRank = getRecommendationRank(lastReco);
         int currentRecoRank = getRecommendationRank(currentReco);
         return currentRecoRank < lastRecoRank;
     }
 
-    public static boolean isDowngrade(String lastReco, String currentReco) {
+    public boolean isDowngrade(String lastReco, String currentReco) {
         int lastRecoRank = getRecommendationRank(lastReco);
         int currentRecoRank = getRecommendationRank(currentReco);
         return currentRecoRank > lastRecoRank;
     }
 
-    public static int getRecommendationRank(String reco) {
+    public int getRecommendationRank(String reco) {
         switch (reco.trim().toLowerCase()) {
             case "buy":
                 return 1;
@@ -746,7 +745,7 @@ public class ConsolidatedResultTracker {
         }
     }
 
-    public static void setTrend(Row trackerRow, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator,  int rownumber, int y0CellNo, int trackerCellNumber) {
+    public void setTrend(Row trackerRow, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator,  int rownumber, int y0CellNo, int trackerCellNumber) {
         setTrend(trackerRow, quarterPnLSheet, tickerFileEvaluator, rownumber, y0CellNo, trackerCellNumber, 1000, false);
         /*Row tickerRow = quarterPnLSheet.getRow(rownumber);//19 for Revenue
         String[] tickerRowValuesArray = new String[4];
@@ -779,7 +778,7 @@ public class ConsolidatedResultTracker {
         trackerRowTrendCell.setCellValue(trackerRowTrend);*/
     }
 
-    public static void setTrend(Row trackerRow, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator, int rownumber, int y0CellNo, int trackerCellNumber, int unit, boolean isPercent) {
+    public void setTrend(Row trackerRow, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator, int rownumber, int y0CellNo, int trackerCellNumber, int unit, boolean isPercent) {
 
         Row tickerRow = quarterPnLSheet.getRow(rownumber); // e.g., 19 for Revenue
         String[] tickerRowValuesArray = new String[5]; // Increased to 5 values
@@ -821,7 +820,7 @@ public class ConsolidatedResultTracker {
         trackerRowTrendCell.setCellValue(trackerRowTrend.toString());
     }
 
-    public static void setNumericValue(Row row, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator, int trackerCellLocation, int tickerRowNumber, int tickerCellNumber){
+    public void setNumericValue(Row row, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator, int trackerCellLocation, int tickerRowNumber, int tickerCellNumber){
         if (quarterPnLSheet.getRow(tickerRowNumber) != null) {
             if (row.getCell(trackerCellLocation) == null || row.getCell(trackerCellLocation).getCellType() == Cell.CELL_TYPE_BLANK || IS_OVERRIDE_OTHER_DATA) {
                 if (row.getCell(trackerCellLocation) == null)
@@ -831,7 +830,7 @@ public class ConsolidatedResultTracker {
         }
     }
 
-    private static double getNumberValueFromCell(Cell dataCell, FormulaEvaluator evaluator) {
+    private double getNumberValueFromCell(Cell dataCell, FormulaEvaluator evaluator) {
         double value = 0;
         if(dataCell == null) {
             return value;
@@ -849,7 +848,7 @@ public class ConsolidatedResultTracker {
         return value;
     }
 
-    private static void computeAndSetGrowth(Row row, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator,  int tickerRowNumber, int trackerFirstCellLocation){
+    private void computeAndSetGrowth(Row row, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator,  int tickerRowNumber, int trackerFirstCellLocation){
         if (quarterPnLSheet.getRow(tickerRowNumber) != null) {
             Cell currentProfitCell, lastYrProfitCell;
             for (int i = LATEST_QUARTER_COLUMN; i >= LATEST_QUARTER_COLUMN - 4; i--){

@@ -29,106 +29,76 @@ import java.util.stream.Collectors;
 @Service("GeneratePDFReport")
 public class GeneratePDFReport {
     private static final Logger logger = LoggerFactory.getLogger(GeneratePDFReport.class);
-    //private static Font topicFont = FontFactory.getFont("Cambria", 12, new BaseColor(21,37,57));
-    private static Font topicFont = FontFactory.getFont("Cambria", 12, BaseColor.BLUE);
-    private static Font paraTextFont = FontFactory.getFont("Calibri", 8, BaseColor.BLACK);
-    private static Font tableHeaderFont = FontFactory.getFont("Calibri", 10, BaseColor.WHITE);
-    private static Font tableBodyFont = FontFactory.getFont("Calibri", 8, BaseColor.BLACK);
-    private static Font benchmarkTableBodyFont = FontFactory.getFont("Calibri", 6, BaseColor.BLACK);
-    private static BaseColor tableHeaderBaseColor = new BaseColor(155, 187, 89);
-    private static BaseColor tableBodyBaseColor = new BaseColor(205, 221, 117);
-    private static BaseColor tableBodyBaseColorAlt = new BaseColor(230, 238, 213);
-    private static DecimalFormat dfForPercent = new DecimalFormat("##0.00");
-    private static DecimalFormat dfForAmt = new DecimalFormat("#,###");
 
-    @Autowired
-    private static UserMembersRepository userMembersRepository;
-    @Autowired
-    public void setUserMembersRepository(UserMembersRepository userMembersRepository){
-        GeneratePDFReport.userMembersRepository = userMembersRepository;
-    }
+    // ✅ These static fields are FINE - they're truly immutable constants
+    private static final Font topicFont = FontFactory.getFont("Cambria", 12, BaseColor.BLUE);
+    private static final Font paraTextFont = FontFactory.getFont("Calibri", 8, BaseColor.BLACK);
+    private static final Font tableHeaderFont = FontFactory.getFont("Calibri", 10, BaseColor.WHITE);
+    private static final Font tableBodyFont = FontFactory.getFont("Calibri", 8, BaseColor.BLACK);
+    private static final Font benchmarkTableBodyFont = FontFactory.getFont("Calibri", 6, BaseColor.BLACK);
+    private static final BaseColor tableHeaderBaseColor = new BaseColor(155, 187, 89);
+    private static final BaseColor tableBodyBaseColor = new BaseColor(205, 221, 117);
+    private static final BaseColor tableBodyBaseColorAlt = new BaseColor(230, 238, 213);
+    private static final DecimalFormat dfForPercent = new DecimalFormat("##0.00");
+    private static final DecimalFormat dfForAmt = new DecimalFormat("#,###");
 
-    @Autowired
-    private static MemberRepository memberRepository;
-    @Autowired
-    public void setMemberRepository(MemberRepository memberRepository){
-        GeneratePDFReport.memberRepository = memberRepository;
-    }
+    // ✅ CHANGED: Remove static, make instance fields with final
+    private final UserMembersRepository userMembersRepository;
+    private final MemberRepository memberRepository;
+    private final AdviserUserMappingRepository adviserUserMappingRepository;
+    private final PortfolioRepository portfolioRepository;
+    private final PortfolioHoldingsRepository portfolioHoldingsRepository;
+    private final PortfolioHistoricalHoldingsRepository portfolioHistoricalHoldingsRepository;
+    private final PortfolioCashflowRepository portfolioCashflowRepository;
+    private final PortfolioReturnsCalculationSupportRepository portfolioReturnsCalculationSupportRepository;
+    private final PortfolioTwrrMonthlyRepository portfolioTwrrMonthlyRepository;
+    private final PortfolioTwrrSummaryRepository portfolioTwrrSummaryRepository;
+    private final BenchmarkTwrrSummaryRepository benchmarkTwrrSummaryRepository;
+    private final BenchmarkTwrrMonthlyRepository benchmarkTwrrMonthlyRepository;
+    private final CompositeRepository compositeRepository;
+    private final CommonService commonService;
 
-    @Autowired
-    private static AdviserUserMappingRepository adviserUserMappingRepository;
-    @Autowired
-    public void setAdviserUserMappingRepository(AdviserUserMappingRepository adviserUserMappingRepository){
-        GeneratePDFReport.adviserUserMappingRepository = adviserUserMappingRepository;
-    }
+    // ✅ CHANGED: This should be instance field, not static
+    private final HeaderFooterPageEvent headerFooterPageEvent;
 
+    // ✅ Constructor injection - ONE constructor with ALL dependencies
     @Autowired
-    private static PortfolioRepository portfolioRepository;
-    @Autowired
-    public void setPortfolioRepository(PortfolioRepository portfolioRepository){
-        GeneratePDFReport.portfolioRepository = portfolioRepository;
-    }
-    @Autowired
-    private static PortfolioHoldingsRepository portfolioHoldingsRepository;
-    @Autowired
-    public void setPortfolioHoldingsRepository(PortfolioHoldingsRepository portfolioHoldingsRepository){
-        GeneratePDFReport.portfolioHoldingsRepository = portfolioHoldingsRepository;
-    }
-    @Autowired
-    private static PortfolioHistoricalHoldingsRepository portfolioHistoricalHoldingsRepository;
-    @Autowired
-    public void setPortfolioHistoricalHoldingsRepository(PortfolioHistoricalHoldingsRepository portfolioHistoricalHoldingsRepository){
-        GeneratePDFReport.portfolioHistoricalHoldingsRepository = portfolioHistoricalHoldingsRepository;
-    }
-    @Autowired
-    private static PortfolioCashflowRepository portfolioCashflowRepository;
-    @Autowired
-    public void setPortfolioCashflowRepository(PortfolioCashflowRepository portfolioCashflowRepository){
-        GeneratePDFReport.portfolioCashflowRepository = portfolioCashflowRepository;
-    }
-    @Autowired
-    private static PortfolioReturnsCalculationSupportRepository portfolioReturnsCalculationSupportRepository;
-    @Autowired
-    public void setPortfolioReturnsCalculationSupportRepository(PortfolioReturnsCalculationSupportRepository portfolioReturnsCalculationSupportRepository){
-        GeneratePDFReport.portfolioReturnsCalculationSupportRepository = portfolioReturnsCalculationSupportRepository;
-    }
-    @Autowired
-    private static PortfolioTwrrMonthlyRepository portfolioTwrrMonthlyRepository;
-    @Autowired
-    public void setPortfolioTwrrMonthlyRepository(PortfolioTwrrMonthlyRepository portfolioTwrrMonthlyRepository) {
-        GeneratePDFReport.portfolioTwrrMonthlyRepository = portfolioTwrrMonthlyRepository;
-    }
-    @Autowired
-    private static PortfolioTwrrSummaryRepository portfolioTwrrSummaryRepository;
-    @Autowired
-    public void setPortfolioTwrrSummaryRepository(PortfolioTwrrSummaryRepository portfolioTwrrSummaryRepository){
-        GeneratePDFReport.portfolioTwrrSummaryRepository = portfolioTwrrSummaryRepository;
-    }
-    @Autowired
-    private static BenchmarkTwrrSummaryRepository benchmarkTwrrSummaryRepository;
-    @Autowired
-    public void setBenchmarkTwrrSummaryRepository(BenchmarkTwrrSummaryRepository benchmarkTwrrSummaryRepository){
-        GeneratePDFReport.benchmarkTwrrSummaryRepository = benchmarkTwrrSummaryRepository;
-    }
-    @Autowired
-    private static BenchmarkTwrrMonthlyRepository benchmarkTwrrMonthlyRepository;
-    @Autowired
-    public void setBenchmarkTwrrMonthlyRepository(BenchmarkTwrrMonthlyRepository benchmarkTwrrMonthlyRepository){
-        GeneratePDFReport.benchmarkTwrrMonthlyRepository = benchmarkTwrrMonthlyRepository;
-    }
-    @Autowired
-    private static CompositeRepository compositeRepository;
-    @Autowired
-    public void setCompositeRepository(CompositeRepository compositeRepository){
-        GeneratePDFReport.compositeRepository = compositeRepository;
+    public GeneratePDFReport(
+            UserMembersRepository userMembersRepository,
+            MemberRepository memberRepository,
+            AdviserUserMappingRepository adviserUserMappingRepository,
+            PortfolioRepository portfolioRepository,
+            PortfolioHoldingsRepository portfolioHoldingsRepository,
+            PortfolioHistoricalHoldingsRepository portfolioHistoricalHoldingsRepository,
+            PortfolioCashflowRepository portfolioCashflowRepository,
+            PortfolioReturnsCalculationSupportRepository portfolioReturnsCalculationSupportRepository,
+            PortfolioTwrrMonthlyRepository portfolioTwrrMonthlyRepository,
+            PortfolioTwrrSummaryRepository portfolioTwrrSummaryRepository,
+            BenchmarkTwrrSummaryRepository benchmarkTwrrSummaryRepository,
+            BenchmarkTwrrMonthlyRepository benchmarkTwrrMonthlyRepository,
+            CompositeRepository compositeRepository,
+            CommonService commonService) {
+        this.userMembersRepository = userMembersRepository;
+        this.memberRepository = memberRepository;
+        this.adviserUserMappingRepository = adviserUserMappingRepository;
+        this.portfolioRepository = portfolioRepository;
+        this.portfolioHoldingsRepository = portfolioHoldingsRepository;
+        this.portfolioHistoricalHoldingsRepository = portfolioHistoricalHoldingsRepository;
+        this.portfolioCashflowRepository = portfolioCashflowRepository;
+        this.portfolioReturnsCalculationSupportRepository = portfolioReturnsCalculationSupportRepository;
+        this.portfolioTwrrMonthlyRepository = portfolioTwrrMonthlyRepository;
+        this.portfolioTwrrSummaryRepository = portfolioTwrrSummaryRepository;
+        this.benchmarkTwrrSummaryRepository = benchmarkTwrrSummaryRepository;
+        this.benchmarkTwrrMonthlyRepository = benchmarkTwrrMonthlyRepository;
+        this.compositeRepository = compositeRepository;
+        this.headerFooterPageEvent = new HeaderFooterPageEvent();
+        this.commonService = commonService; // ✅ Initialize here
     }
 
-    private static HeaderFooterPageEvent headerFooterPageEvent = new HeaderFooterPageEvent();
-
-    private static boolean isAuthenticatedRequest(User loggedInUser, long memberid){
-        logger.debug(String.format("In GeneratePDFReport.isAuthenticatedRequest "));
+    private boolean isAuthenticatedRequest(User loggedInUser, long memberid){
+        logger.debug(String.format("In this.isAuthenticatedRequest "));
         // Check for model portfolio
-        UserMembers memberUser = GeneratePDFReport.userMembersRepository.findByMemberid(memberid);
+        UserMembers memberUser = this.userMembersRepository.findByMemberid(memberid);
         //Login user wants to generate PDF
         if(loggedInUser.getEmail().equals(memberUser.getEmail())) {
             return true;
@@ -141,8 +111,8 @@ public class GeneratePDFReport {
         return false;
     }
 
-    private static boolean isModelPortfolio(User loggedInUser, long memberid){
-        logger.debug(String.format("In GeneratePDFReport.isAuthenticatedRequest "));
+    private boolean isModelPortfolio(User loggedInUser, long memberid){
+        logger.debug(String.format("In this.isAuthenticatedRequest "));
         // Check for model portfolio
         int count = compositeRepository.countByFundManagerEmailAndAdviserMemberid(loggedInUser.getEmail(), memberid);
         if (count > 0){
@@ -151,7 +121,7 @@ public class GeneratePDFReport {
         return false;
     }
 
-    private static void addFirstPage(Document document, String reportHeader, long memberid, boolean isModelPortfolio) throws Exception{
+    private void addFirstPage(Document document, String reportHeader, long memberid, boolean isModelPortfolio) throws Exception{
 
         Paragraph paragraph;
         paragraph = new Paragraph("", topicFont);
@@ -186,7 +156,7 @@ public class GeneratePDFReport {
         Member member = memberRepository.findByMemberid(memberid);
 
         PdfPCell leftCell = new PdfPCell(new Phrase("Statement Date: ",paraTextFont));
-        PdfPCell rightCell = new PdfPCell(new Phrase(""+CommonService.getSetupDates().getDateToday().toString(),paraTextFont));
+        PdfPCell rightCell = new PdfPCell(new Phrase("" + commonService.getSetupDates().getDateToday().toString(),paraTextFont));
 
         leftCell.setBorder(Rectangle.NO_BORDER);
         leftCell.setBackgroundColor(BaseColor.WHITE);
@@ -258,7 +228,7 @@ public class GeneratePDFReport {
         document.add(paragraph);
     }
 
-    private static void addListOfPMS(Document document, List<Portfolio> portfolios) throws DocumentException{
+    private void addListOfPMS(Document document, List<Portfolio> portfolios) throws DocumentException{
 
         document.newPage();
         document.add( Chunk.NEWLINE );
@@ -446,7 +416,7 @@ public class GeneratePDFReport {
         document.add(table);
     }
 
-    private static void addPortfolioHoldings(Document document, List<Portfolio> portfolios, List<ConsolidatedPortfolioHoldings> consolidatedPortfolioHoldings) throws DocumentException{
+    private void addPortfolioHoldings(Document document, List<Portfolio> portfolios, List<ConsolidatedPortfolioHoldings> consolidatedPortfolioHoldings) throws DocumentException{
 
         document.newPage();
         document.add( Chunk.NEWLINE );
@@ -663,7 +633,7 @@ public class GeneratePDFReport {
         }
     }
 
-    private static void addPortfolioCashflows(Document document, List<Portfolio> portfolios, List<PortfolioReturnsCalculationSupport> cashflows) throws DocumentException{
+    private void addPortfolioCashflows(Document document, List<Portfolio> portfolios, List<PortfolioReturnsCalculationSupport> cashflows) throws DocumentException{
 
         document.newPage();
         document.add( Chunk.NEWLINE );
@@ -814,7 +784,7 @@ public class GeneratePDFReport {
         }
     }
 
-    private static void addPortfolioReturns(Document document, List<Portfolio> portfolios, List<PortfolioTwrrSummary> portfolioTwrrSummaries, List<PortfolioTwrrMonthly> portfolioTwrrMonthlyList) throws DocumentException{
+    private void addPortfolioReturns(Document document, List<Portfolio> portfolios, List<PortfolioTwrrSummary> portfolioTwrrSummaries, List<PortfolioTwrrMonthly> portfolioTwrrMonthlyList) throws DocumentException{
 
         document.newPage();
         document.add( Chunk.NEWLINE );
@@ -1536,7 +1506,7 @@ public class GeneratePDFReport {
         }
     }
 
-    private static void addBenchmarkReturns(Document document, List<Portfolio> portfolios, List<BenchmarkTwrrSummaryDTO> benchmarkTwrrSummaries, List<BenchmarkTwrrMonthlyDTO> benchmarkTwrrMonthlyList) throws DocumentException{
+    private void addBenchmarkReturns(Document document, List<Portfolio> portfolios, List<BenchmarkTwrrSummaryDTO> benchmarkTwrrSummaries, List<BenchmarkTwrrMonthlyDTO> benchmarkTwrrMonthlyList) throws DocumentException{
 
         document.newPage();
         document.add( Chunk.NEWLINE );
@@ -1598,7 +1568,7 @@ public class GeneratePDFReport {
 
     }
 
-    private static void addBenchmarkReturnsForTypes(Document document, List<BenchmarkTwrrSummaryDTO> benchmarkTwrrSummaries) throws DocumentException{
+    private void addBenchmarkReturnsForTypes(Document document, List<BenchmarkTwrrSummaryDTO> benchmarkTwrrSummaries) throws DocumentException{
         PdfPTable table = new PdfPTable(10);
         table.setWidthPercentage(100);
         table.setSpacingBefore(10f);
@@ -1773,8 +1743,8 @@ public class GeneratePDFReport {
         document.add(table);
     }
 
-    public static boolean generatePMSPDFForMember(User user, long memberid, ServletContext context, HttpServletRequest request, HttpServletResponse response){
-        logger.debug(String.format("In GeneratePDFReport.generatePMSPDFForMember "));
+    public boolean generatePMSPDFForMember(User user, long memberid, ServletContext context, HttpServletRequest request, HttpServletResponse response){
+        logger.debug(String.format("In this.generatePMSPDFForMember "));
         //Authentication for user PDF Generation
         boolean isModelPortfolio = isModelPortfolio(user, memberid);
 
@@ -1962,7 +1932,7 @@ public class GeneratePDFReport {
             }
 
             PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(file + "/" +memberid+".pdf"));
-            writer.setPageEvent(GeneratePDFReport.headerFooterPageEvent);
+            writer.setPageEvent(this.headerFooterPageEvent);
             document.open();
 
             addFirstPage(document,"PMS Performance", memberid, isModelPortfolio);

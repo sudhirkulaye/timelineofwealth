@@ -17,63 +17,55 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service("AdviserService")
+@Service
 public class AdviserService {
-    private static final Logger logger = LoggerFactory.getLogger(AdviserService.class);
+    private final Logger logger = LoggerFactory.getLogger(AdviserService.class);
 
+    // ✅ All dependencies as instance fields (final for immutability)
+    private final MemberService memberService;
+    private final AdviserUserMappingRepository adviserUserMappingRepository;
+    private final WealthDetailsRepository wealthDetailsRepository;
+    private final PortfolioRepository portfolioRepository;
+    private final CompositeRepository compositeRepository;
+    private final CompositeConstituentsRepository compositeConstituentsRepository;
+    private final MoslcodeMemberidRepository moslcodeMemberidRepository;
+    private final WealthDetailsService wealthDetailsService;  // ✅ Inject instead of static call
+    private final CommonService commonService;  // ✅ Inject instead of static call
+
+    // ✅ Constructor injection for ALL dependencies
     @Autowired
-    private static AdviserUserMappingRepository adviserUserMappingRepository;
-    @Autowired
-    public void setAdviserUserMappingRepository(AdviserUserMappingRepository adviserUserMappingRepository){
-        AdviserService.adviserUserMappingRepository = adviserUserMappingRepository;
+    public AdviserService(
+            MemberService memberService,
+            AdviserUserMappingRepository adviserUserMappingRepository,
+            WealthDetailsRepository wealthDetailsRepository,
+            PortfolioRepository portfolioRepository,
+            CompositeRepository compositeRepository,
+            CompositeConstituentsRepository compositeConstituentsRepository,
+            MoslcodeMemberidRepository moslcodeMemberidRepository,
+            WealthDetailsService wealthDetailsService,
+            CommonService commonService) {
+        this.memberService = memberService;
+        this.adviserUserMappingRepository = adviserUserMappingRepository;
+        this.wealthDetailsRepository = wealthDetailsRepository;
+        this.portfolioRepository = portfolioRepository;
+        this.compositeRepository = compositeRepository;
+        this.compositeConstituentsRepository = compositeConstituentsRepository;
+        this.moslcodeMemberidRepository = moslcodeMemberidRepository;
+        this.wealthDetailsService = wealthDetailsService;
+        this.commonService = commonService;
     }
 
-    @Autowired
-    private static WealthDetailsRepository wealthDetailsRepository;
-    @Autowired
-    public void setWealthDetailsRepository(WealthDetailsRepository wealthDetailsRepository){
-        AdviserService.wealthDetailsRepository = wealthDetailsRepository;
-    }
-
-    @Autowired
-    private static PortfolioRepository portfolioRepository;
-    @Autowired
-    public void setPortfolioRepository(PortfolioRepository portfolioRepository){
-        AdviserService.portfolioRepository = portfolioRepository;
-    }
-
-    @Autowired
-    private static CompositeRepository compositeRepository;
-    @Autowired
-    public void setCompositeRepository(CompositeRepository compositeRepository){
-        AdviserService.compositeRepository = compositeRepository;
-    }
-
-    @Autowired
-    private static CompositeConstituentsRepository compositeConstituentsRepository;
-    @Autowired
-    public void setCompositeConstituentsRepository(CompositeConstituentsRepository compositeConstituentsRepository){
-        AdviserService.compositeConstituentsRepository = compositeConstituentsRepository;
-    }
-
-    @Autowired
-    private static MoslcodeMemberidRepository moslcodeMemberidRepository;
-    @Autowired
-    public void setMoslcodeMemberidRepository(MoslcodeMemberidRepository moslcodeMemberidRepository){
-        AdviserService.moslcodeMemberidRepository = moslcodeMemberidRepository;
-    }
-
-
-    public static List<ClientDTO> getClients(String email){
-        logger.debug(String.format("In AdviserService.getClients: Email %s", email));
+    // ✅ Changed from static to instance method
+    public List<ClientDTO> getClients(String email) {
+        logger.debug("In AdviserService.getClients: Email {}", email);
 
         List<ClientDTO> clientDTOS = new ArrayList<>();
         List<AdviserUserMapping> clients = adviserUserMappingRepository.findByKeyAdviseridOrderByKeyUseridAsc(email);
-        for (AdviserUserMapping client : clients ){
-            //members.add(memberRepository.findByMemberid(userMember.getMemberid()));
-            List<Member> members = MemberService.getUserMembers(client.getKey().getUserid());
 
-            for (Member member : members){
+        for (AdviserUserMapping client : clients) {
+            List<Member> members = memberService.getUserMembers(client.getKey().getUserid());
+
+            for (Member member : members) {
                 ClientDTO clientDTO = new ClientDTO();
                 clientDTO.setMemberid(member.getMemberid());
                 clientDTO.setRelationship(member.getRelationship());
@@ -87,57 +79,72 @@ public class AdviserService {
         return clientDTOS;
     }
 
-    public static List<ClientDTO> getPMSClients(String email) {
-        logger.debug(String.format("In AdviserService.getPMSClients: Email %s", email));
+    // ✅ Changed from static to instance method
+    public List<ClientDTO> getPMSClients(String email) {
+        logger.debug("In AdviserService.getPMSClients: Email {}", email);
 
         List<ClientDTO> clientDTOS = new ArrayList<>();
         List<AdviserUserMapping> clients = adviserUserMappingRepository.findByKeyAdviseridOrderByKeyUseridAsc(email);
 
-        for (AdviserUserMapping client : clients ){
-            //members.add(memberRepository.findByMemberid(userMember.getMemberid()));
-            List<Member> members = MemberService.getUserMembers(client.getKey().getUserid());
-            List<Long> membersIds = new ArrayList<>();
-            for (Member member : members ){
-                membersIds.add(new Long(member.getMemberid()));
-            }
+        for (AdviserUserMapping client : clients) {
+            List<Member> members = memberService.getUserMembers(client.getKey().getUserid());
+
+            // ✅ Better way to collect member IDs using streams
+            List<Long> membersIds = members.stream()
+                    .map(Member::getMemberid)
+                    .collect(Collectors.toList());
+
             List<Portfolio> portfolios = portfolioRepository.findAllByKeyMemberidInAndStatusOrderByKeyPortfolioid(membersIds, "ACTIVE");
-            for (Portfolio portfolio : portfolios){
-                Member member = members.stream().filter(m -> m.getMemberid()==portfolio.getKey().getMemberid()).collect(Collectors.toList()).get(0);
-                if(clientDTOS.stream().filter(d->d.getMemberid()==portfolio.getKey().getMemberid()).collect(Collectors.toList()).size() == 0){
+
+            for (Portfolio portfolio : portfolios) {
+                // ✅ Use findFirst() instead of get(0) to avoid IndexOutOfBoundsException
+                Member member = members.stream()
+                        .filter(m -> m.getMemberid() == portfolio.getKey().getMemberid())
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalStateException("Member not found for portfolio"));
+
+                // ✅ Check if member already exists in DTO list
+                boolean memberExists = clientDTOS.stream()
+                        .anyMatch(d -> d.getMemberid() == portfolio.getKey().getMemberid());
+
+                if (!memberExists) {
                     ClientDTO clientDTO = new ClientDTO();
                     clientDTO.setMemberid(portfolio.getKey().getMemberid());
                     clientDTO.setRelationship(member.getRelationship());
                     clientDTO.setUserid(member.getEmail());
-                    clientDTO.setMemberName(member.getFirstName()+"_"+member.getLastName());
+                    clientDTO.setMemberName(member.getFirstName() + "_" + member.getLastName());
                     clientDTO.setFirstName(member.getFirstName());
                     clientDTO.setLastName(member.getLastName());
+
                     try {
                         MoslcodeMemberid moslcodeMemberid = moslcodeMemberidRepository.findByMemberid(member.getMemberid());
                         clientDTO.setMoslCode(moslcodeMemberid.getMoslcode());
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         clientDTO.setMoslCode("HXXX");
                     }
                     clientDTOS.add(clientDTO);
                 }
             }
         }
-        clientDTOS.sort(Comparator.comparing(d->d.getMemberid()));
+        clientDTOS.sort(Comparator.comparing(ClientDTO::getMemberid));
         return clientDTOS;
     }
 
-    public static List<ConsolidatedAssetsDTO> getConsolidatedAssets(String adviserEmail, String clientEmail){
-        logger.debug(String.format("In AdviserService.getConsolidatedAssets: Adviser Email %s AND Client Email %s", adviserEmail, clientEmail));
+    // ✅ Changed from static to instance method
+    public List<ConsolidatedAssetsDTO> getConsolidatedAssets(String adviserEmail, String clientEmail) {
+        logger.debug("In AdviserService.getConsolidatedAssets: Adviser Email {} AND Client Email {}", adviserEmail, clientEmail);
 
         List<ConsolidatedAssetsDTO> assets = new ArrayList<>();
         List<AdviserUserMapping> clients = new ArrayList<>();
-        if(clientEmail != null){
-            clientEmail = clientEmail.replace("\"", ""); //removing end quotes
-            clientEmail = clientEmail.trim();
+
+        if (clientEmail != null) {
+            clientEmail = clientEmail.replace("\"", "").trim();
         }
-        if (!clientEmail.equals("")){
+
+        if (!clientEmail.equals("")) {
             int count = adviserUserMappingRepository.countByKeyAdviseridAndKeyUserid(adviserEmail, clientEmail);
-            if (count == 0 ){
-                throw new InsufficientAuthenticationException("Adviser is not authorized or client doesn't exists");
+            if (count == 0) {
+                throw new InsufficientAuthenticationException("Adviser is not authorized or client doesn't exist");
             } else {
                 clients.add(adviserUserMappingRepository.findOneByKeyAdviseridAndKeyUserid(adviserEmail, clientEmail));
             }
@@ -145,67 +152,82 @@ public class AdviserService {
             clients = adviserUserMappingRepository.findByKeyAdviseridOrderByKeyUseridAsc(adviserEmail);
         }
 
-        for (AdviserUserMapping client : clients ){
-            assets.addAll(WealthDetailsService.getConsolidatedWealthDetailsRecords(client.getKey().getUserid()));
+        for (AdviserUserMapping client : clients) {
+            // ✅ Call instance method instead of static
+            assets.addAll(wealthDetailsService.getConsolidatedWealthDetailsRecords(client.getKey().getUserid()));
         }
         return assets;
     }
 
-
-    public static List<Composite> getComposites(){
+    // ✅ Changed from static to instance method
+    public List<Composite> getComposites() {
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        // ✅ Call instance method instead of static
+        User user = commonService.getLoggedInUser(userDetails);
 
-        logger.debug(String.format("In AdviserService.getComposites: Adviser Email %s ", user.getEmail()));
+        logger.debug("In AdviserService.getComposites: Adviser Email {}", user.getEmail());
 
-        return AdviserService.compositeRepository.findByFundManagerEmail(user.getEmail());
-
+        return compositeRepository.findByFundManagerEmail(user.getEmail());
     }
 
-    public static List<CompositeConstituents> getCompositeDetails(){
+    // ✅ Changed from static to instance method
+    public List<CompositeConstituents> getCompositeDetails() {
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        // ✅ Call instance method instead of static
+        User user = commonService.getLoggedInUser(userDetails);
 
-        logger.debug(String.format("In AdviserService.getCompositeDetails: Adviser Email %s", user.getEmail()));
+        logger.debug("In AdviserService.getCompositeDetails: Adviser Email {}", user.getEmail());
 
-        List<CompositeConstituents> compositeConstituents = new ArrayList<>();
-        List<Composite> composites = new ArrayList<>();
-        composites = AdviserService.compositeRepository.findByFundManagerEmail(user.getEmail());
-        List<Long> compositeids = new ArrayList<>();
-        for (Composite composite : composites ){
-            compositeids.add(new Long(composite.getCompositeid()));
-        }
-        return AdviserService.compositeConstituentsRepository.findAllByKeyCompositeidInOrderByTargetWeightDesc(compositeids);
+        List<Composite> composites = compositeRepository.findByFundManagerEmail(user.getEmail());
+
+        // ✅ Use streams to collect composite IDs
+        List<Long> compositeids = composites.stream()
+                .map(Composite::getCompositeid)
+                .collect(Collectors.toList());
+
+        return compositeConstituentsRepository.findAllByKeyCompositeidInOrderByTargetWeightDesc(compositeids);
     }
 
-    public static void updateCompositeDetails(CompositeConstituents editedRecord) {
-        logger.debug(String.format("In AdviserService.updateCompositeDetails: editedRecord.key.compositeid %d - %s", editedRecord.getKey().getCompositeid(), editedRecord.getKey().getTicker()));
+    // ✅ Changed from static to instance method
+    public void updateCompositeDetails(CompositeConstituents editedRecord) {
+        logger.debug("In AdviserService.updateCompositeDetails: editedRecord.key.compositeid {} - {}",
+                editedRecord.getKey().getCompositeid(), editedRecord.getKey().getTicker());
+
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        logger.debug(String.format("In AdviserService.updateCompositeDetails: Email %s", user.getEmail()));
-        int count = AdviserService.compositeRepository.countByFundManagerEmailAndCompositeid(user.getEmail(), editedRecord.getKey().getCompositeid());
-        if(count == 1){
-            AdviserService.compositeConstituentsRepository.save(editedRecord);
+        User user = commonService.getLoggedInUser(userDetails);
+
+        logger.debug("In AdviserService.updateCompositeDetails: Email {}", user.getEmail());
+
+        int count = compositeRepository.countByFundManagerEmailAndCompositeid(user.getEmail(), editedRecord.getKey().getCompositeid());
+        if (count == 1) {
+            compositeConstituentsRepository.save(editedRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }
     }
 
-    public static void addCompositeDetails(CompositeConstituents newRecord) {
-        logger.debug(String.format("In AdviserService.addCompositeDetails: newRecord.key.memberid %d - %s", newRecord.getKey().getCompositeid(), newRecord.getKey().getTicker()));
+    // ✅ Changed from static to instance method
+    public void addCompositeDetails(CompositeConstituents newRecord) {
+        logger.debug("In AdviserService.addCompositeDetails: newRecord.key.memberid {} - {}",
+                newRecord.getKey().getCompositeid(), newRecord.getKey().getTicker());
+
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        logger.debug(String.format("In AdviserService.addCompositeDetails: Email %s", user.getEmail()));
-        int count = AdviserService.compositeRepository.countByFundManagerEmailAndCompositeid(user.getEmail(), newRecord.getKey().getCompositeid());
-        if(count == 1){
-            count = AdviserService.compositeConstituentsRepository.countByKeyCompositeidAndKeyTicker(newRecord.getKey().getCompositeid(), newRecord.getKey().getTicker());
-            logger.debug(String.format("In AdviserService.addCompositeDetails: record count is %d", count));
+        User user = commonService.getLoggedInUser(userDetails);
+
+        logger.debug("In AdviserService.addCompositeDetails: Email {}", user.getEmail());
+
+        int count = compositeRepository.countByFundManagerEmailAndCompositeid(user.getEmail(), newRecord.getKey().getCompositeid());
+        if (count == 1) {
+            count = compositeConstituentsRepository.countByKeyCompositeidAndKeyTicker(
+                    newRecord.getKey().getCompositeid(), newRecord.getKey().getTicker());
+            logger.debug("In AdviserService.addCompositeDetails: record count is {}", count);
+
             if (count == 0) {
-                AdviserService.compositeConstituentsRepository.save(newRecord);
+                compositeConstituentsRepository.save(newRecord);
             } else {
                 throw new IllegalArgumentException("Record already exists.");
             }
@@ -213,15 +235,21 @@ public class AdviserService {
             throw new InsufficientAuthenticationException("User is not authorized");
         }
     }
-    public static void deleteCompositeDetails(CompositeConstituents deletedRecord){
-        logger.debug(String.format("In AdviserService.deleteCompositeDetails: deletedRecord.shortName %d - %s", deletedRecord.getKey().getCompositeid(), deletedRecord.getKey().getTicker()));
+
+    // ✅ Changed from static to instance method
+    public void deleteCompositeDetails(CompositeConstituents deletedRecord) {
+        logger.debug("In AdviserService.deleteCompositeDetails: deletedRecord.shortName {} - {}",
+                deletedRecord.getKey().getCompositeid(), deletedRecord.getKey().getTicker());
+
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        logger.debug(String.format("In AdviserService.deleteWealthDetailsRecord: Email %s", user.getEmail()));
-        int count = AdviserService.compositeRepository.countByFundManagerEmailAndCompositeid(user.getEmail(), deletedRecord.getKey().getCompositeid());
-        if(count == 1){
-            AdviserService.compositeConstituentsRepository.delete(deletedRecord);
+        User user = commonService.getLoggedInUser(userDetails);
+
+        logger.debug("In AdviserService.deleteWealthDetailsRecord: Email {}", user.getEmail());
+
+        int count = compositeRepository.countByFundManagerEmailAndCompositeid(user.getEmail(), deletedRecord.getKey().getCompositeid());
+        if (count == 1) {
+            compositeConstituentsRepository.delete(deletedRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }

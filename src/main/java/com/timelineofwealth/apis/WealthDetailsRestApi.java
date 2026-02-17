@@ -9,6 +9,7 @@ import com.timelineofwealth.service.CommonService;
 import com.timelineofwealth.service.WealthDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +26,16 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "user/api/")
 public class WealthDetailsRestApi {
-    private static final Logger logger = LoggerFactory.getLogger(WealthDetailsRestApi.class);
+    private final Logger logger = LoggerFactory.getLogger(WealthDetailsRestApi.class);
+    private final CommonService commonService;
+    private final WealthDetailsService wealthDetailsService;
+
+    @Autowired
+    public WealthDetailsRestApi(CommonService commonService,
+                                WealthDetailsService wealthDetailsService){
+        this.commonService = commonService;
+        this.wealthDetailsService = wealthDetailsService;
+    }
 
     @RequestMapping(value = "/getwealthdetailsrecords", method = RequestMethod.GET)
     public List<WealthDetails> getWealthDetailsRecords() {
@@ -33,8 +43,8 @@ public class WealthDetailsRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return WealthDetailsService.getWealthDetailsRecords(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return wealthDetailsService.getWealthDetailsRecords(user.getEmail());
     }
 
     @RequestMapping(value = "/getconsolidatedwealthdetailsrecords", method = RequestMethod.GET)
@@ -43,28 +53,28 @@ public class WealthDetailsRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return WealthDetailsService.getConsolidatedWealthDetailsRecords(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return wealthDetailsService.getConsolidatedWealthDetailsRecords(user.getEmail());
     }
 
     @RequestMapping(value = "/updatewealthdetailsrecord", method = RequestMethod.PUT)
     public List<WealthDetails> updateWealthDetailsRecord(@RequestBody WealthDetails editedRecord) {
         logger.debug("Call user/api/updatewealthdetailsrecord/ " + editedRecord.getKey().getMemberid());
-        WealthDetailsService.updateWealthDetailsRecord(editedRecord);
+        wealthDetailsService.updateWealthDetailsRecord(editedRecord);
         return getWealthDetailsRecords();
     }
 
     @RequestMapping(value = "/addwealthdetailsrecord", method = RequestMethod.POST)
     public List<WealthDetails> addWealthDetailsRecord(@RequestBody WealthDetails newRecord) {
         logger.debug("Call user/api/addwealthdetailsrecord/ " + newRecord.getKey().getMemberid());
-        WealthDetailsService.addWealthDetailsRecord(newRecord);
+        wealthDetailsService.addWealthDetailsRecord(newRecord);
         return getWealthDetailsRecords();
     }
 
     @RequestMapping(value = "/deletewealthdetailsrecord", method = RequestMethod.POST)
     public List<WealthDetails> deleteWealthDetailsRecord(@RequestBody WealthDetails deleteRecord) {
         logger.debug("Call user/api/deletewealthdetailsrecord/ " + deleteRecord.getKey().getMemberid());
-        WealthDetailsService.deleteWealthDetailsRecord(deleteRecord);
+        wealthDetailsService.deleteWealthDetailsRecord(deleteRecord);
         return getWealthDetailsRecords();
     }
 
@@ -74,8 +84,8 @@ public class WealthDetailsRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return WealthDetailsService.getWealthHistoryRecords(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return wealthDetailsService.getWealthHistoryRecords(user.getEmail());
     }
 
     @RequestMapping(value = "/getcurretassetallocation", method = RequestMethod.GET)
@@ -84,8 +94,8 @@ public class WealthDetailsRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return WealthDetailsService.getCurrentAssetAllocation(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return wealthDetailsService.getCurrentAssetAllocation(user.getEmail());
     }
 
 

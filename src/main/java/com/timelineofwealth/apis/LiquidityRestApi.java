@@ -19,7 +19,15 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "user/api/")
 public class LiquidityRestApi {
-    private static final Logger logger = LoggerFactory.getLogger(LiquidityRestApi.class);
+    private final Logger logger = LoggerFactory.getLogger(LiquidityRestApi.class);
+    private final CommonService commonService;
+    private final LiquidityService liquidityService;
+
+    public LiquidityRestApi(CommonService commonService,
+                            LiquidityService liquidityService){
+        this.commonService = commonService;
+        this.liquidityService = liquidityService;
+    }
 
     @RequestMapping(value = "/getliquidities", method = RequestMethod.GET)
     public List<Liquidity> getLiquidities() {
@@ -27,28 +35,28 @@ public class LiquidityRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return LiquidityService.getLiquidityRecords(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return liquidityService.getLiquidityRecords(user.getEmail());
     }
 
     @RequestMapping(value = "/updateliquidity", method = RequestMethod.PUT)
     public List<Liquidity> updateLiquidity(@RequestBody Liquidity editedRecord) {
         logger.debug("Call user/api/updateliquidity/ " + editedRecord.getKey().getMemberid());
-        LiquidityService.updateLiquidityRecord(editedRecord);
+        liquidityService.updateLiquidityRecord(editedRecord);
         return getLiquidities();
     }
 
     @RequestMapping(value = "/addliquidity", method = RequestMethod.POST)
     public List<Liquidity> addLiquidity(@RequestBody Liquidity newRecord) {
         logger.debug("Call user/api/addliquidity/ " + newRecord.getKey().getMemberid());
-        LiquidityService.addLiquidityRecord(newRecord);
+        liquidityService.addLiquidityRecord(newRecord);
         return getLiquidities();
     }
 
     @RequestMapping(value = "/deleteliquidity", method = RequestMethod.POST)
     public List<Liquidity> deleteLiquidity(@RequestBody Liquidity deleteRecord) {
         logger.debug("Call user/api/deleteliquidity/ " + deleteRecord.getKey().getMemberid());
-        LiquidityService.deleteLiquidityRecord(deleteRecord);
+        liquidityService.deleteLiquidityRecord(deleteRecord);
         return getLiquidities();
     }
     

@@ -12,14 +12,16 @@ import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class UpdateQuarterlyExcels {
 
-    private static final String BASE_PATH = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
+    private final String BASE_PATH = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
 
     public static void main(String[] args) throws IOException, EncryptedDocumentException {
+        UpdateQuarterlyExcels updateQuarterlyExcels = new UpdateQuarterlyExcels();
         Properties prop = new Properties();
-        FileInputStream input = new FileInputStream(BASE_PATH + "\\Analysis\\config.properties");
+        FileInputStream input = new FileInputStream(updateQuarterlyExcels.BASE_PATH + "\\Analysis\\config.properties");
         prop.load(input);
         input.close();
 
@@ -27,11 +29,11 @@ public class UpdateQuarterlyExcels {
         int days = extractDurationInDays(filesToBeUpdated);
         int minutes = extractDurationInMinutes(filesToBeUpdated);
 
-        String latestFolder = getLatestQuarterFolder();
+        String latestFolder = updateQuarterlyExcels.getLatestQuarterFolder();
         String previousFolder = getPreviousQuarter(latestFolder);
 
-        File latestDir = new File(BASE_PATH + File.separator + latestFolder);
-        File previousDir = new File(BASE_PATH + File.separator + previousFolder);
+        File latestDir = new File(updateQuarterlyExcels.BASE_PATH + File.separator + latestFolder);
+        File previousDir = new File(updateQuarterlyExcels.BASE_PATH + File.separator + previousFolder);
 
         if (!latestDir.exists() || !previousDir.exists()) {
             System.out.println("Required folders not found.");
@@ -65,7 +67,7 @@ public class UpdateQuarterlyExcels {
         }
 
         CreateFolderStructureForIndustry.updateMCapAndPrice(latestFolder);
-        ConsolidatedResultTracker.updateResultTrackerExcel(latestFolder);
+        new ConsolidatedResultTracker().updateResultTrackerExcel(latestFolder);
     }
 
     private static int extractDurationInDays(String str) {
@@ -111,8 +113,8 @@ public class UpdateQuarterlyExcels {
                 .collect(Collectors.toList());
     }
 
-    public static String getLatestQuarterFolder() {
-        File base = new File(BASE_PATH);
+    public String getLatestQuarterFolder() {
+        File base = new File(this.BASE_PATH);
         String[] folders = base.list((dir, name) -> name.matches("\\d{4}Q[1-4]"));
         if (folders == null || folders.length < 2)
             throw new IllegalStateException("Not enough quarter folders");

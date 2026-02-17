@@ -63,20 +63,18 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 @Controller
 public class AdminViewController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AdminViewController.class);
+    private final Logger logger = LoggerFactory.getLogger(AdminViewController.class);
     private java.sql.Date dateToday;
+
+    // ✅ These static constants are FINE - they're truly constants
     public static final String AP_PROCESS_EOD = "ap_process_eod";
     public static final String AP_PROCESS_MOSL_TRANSACTIONS = "ap_process_mosl_transactions";
-
-    // ====== CONFIG: update base folders here if needed ======
-    private static final String BASE_DAILY = "C:/MyDocuments/03Business/03DailyData";
-    private static final Path NSE_DIR = Paths.get(BASE_DAILY, "NseData");
-    private static final Path BSE_DIR = Paths.get(BASE_DAILY, "BseData");
-    private static final Path MF_DIR = Paths.get(BASE_DAILY, "MutualFunds");
-    private static final Path SCREENER_DIR = Paths.get(BASE_DAILY, "ScreenerDaily");
-    private static final Path INDEX_DIR = Paths.get(BASE_DAILY, "IndexData");
-
-
+    private final String BASE_DAILY = "C:/MyDocuments/03Business/03DailyData";
+    private final Path NSE_DIR = Paths.get(BASE_DAILY, "NseData");
+    private final Path BSE_DIR = Paths.get(BASE_DAILY, "BseData");
+    private final Path MF_DIR = Paths.get(BASE_DAILY, "MutualFunds");
+    private final Path SCREENER_DIR = Paths.get(BASE_DAILY, "ScreenerDaily");
+    private final Path INDEX_DIR = Paths.get(BASE_DAILY, "IndexData");
     private static final DateTimeFormatter INPUT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter YYYYMMDD = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter DDMMYYYY = DateTimeFormatter.ofPattern("ddMMyyyy");
@@ -84,65 +82,62 @@ public class AdminViewController {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
-    NsePriceHistoryRepository nsePriceHistoryRepository;
-    @Autowired
-    public void setNsePriceHistoryRepository(NsePriceHistoryRepository nsePriceHistoryRepository){
-        this.nsePriceHistoryRepository = nsePriceHistoryRepository;
-    }
-    @Autowired
-    BsePriceHistoryRepository bsePriceHistoryRepository;
-    @Autowired
-    public void setBsePriceHistoryRepository(BsePriceHistoryRepository bsePriceHistoryRepository){
-        this.bsePriceHistoryRepository = bsePriceHistoryRepository;
-    }
-    @Autowired
-    MutualFundNavHistoryRepository mutualFundNavHistoryRepository;
-    @Autowired
-    public void setMutualFundNavHistoryRepository(MutualFundNavHistoryRepository mutualFundNavHistoryRepository){
-        this.mutualFundNavHistoryRepository = mutualFundNavHistoryRepository;
-    }
-    @Autowired
-    MutualFundUniverseRepository mutualFundUniverseRepository;
-    @Autowired
-    public void setMutualFundUniverseRepository(MutualFundUniverseRepository mutualFundUniverseRepository){
-        this.mutualFundNavHistoryRepository = mutualFundNavHistoryRepository;
-    }
-    @Autowired
-    DailyDataBRepository dailyDataBRepository;
-    @Autowired
-    public void setDailyDataBRepository(DailyDataBRepository dailyDataBRepository){
-        this.dailyDataBRepository = dailyDataBRepository;
-    }
-    @Autowired
-    DailyDataSRepository dailyDataSRepository;
-    @Autowired
-    public void setDailyDataSRepository(DailyDataSRepository dailyDataSRepository){
-        this.dailyDataSRepository = dailyDataSRepository;
-    }
-    @Autowired
-    MOSLTransactionRepository moslTransactionRepository;
-    @Autowired
-    public void setMoslTransactionRepository(MOSLTransactionRepository moslTransactionRepository){
-        this.moslTransactionRepository = moslTransactionRepository;
-    }
-    @Autowired
-    IndexValuationRepository indexValuationRepository;
-    public void setIndexValuationRepository(IndexValuationRepository indexValuationRepository){
-        this.indexValuationRepository = indexValuationRepository;
-    }
-    @Autowired
-    public AdminViewController(Environment environment){}
-    @Autowired
-    private ResultTrackerService resultTrackerService;
+    // ✅ CHANGED: Remove setter injection, use constructor injection
+    private final NsePriceHistoryRepository nsePriceHistoryRepository;
+    private final BsePriceHistoryRepository bsePriceHistoryRepository;
+    private final MutualFundNavHistoryRepository mutualFundNavHistoryRepository;
+    private final MutualFundUniverseRepository mutualFundUniverseRepository;
+    private final DailyDataBRepository dailyDataBRepository;
+    private final DailyDataSRepository dailyDataSRepository;
+    private final MOSLTransactionRepository moslTransactionRepository;
+    private final IndexValuationRepository indexValuationRepository;
+    private final ResultTrackerService resultTrackerService;
+    private final CommonService commonService;
+    private final PublicApi publicApi;
+    private final DownloadEODFiles downloadEODFiles;
+    private final IndexService indexService;
+    private final AdminService adminService;
 
+    // ✅ ONE constructor with ALL dependencies
+    @Autowired
+    public AdminViewController(
+            NsePriceHistoryRepository nsePriceHistoryRepository,
+            BsePriceHistoryRepository bsePriceHistoryRepository,
+            MutualFundNavHistoryRepository mutualFundNavHistoryRepository,
+            MutualFundUniverseRepository mutualFundUniverseRepository,
+            DailyDataBRepository dailyDataBRepository,
+            DailyDataSRepository dailyDataSRepository,
+            MOSLTransactionRepository moslTransactionRepository,
+            IndexValuationRepository indexValuationRepository,
+            ResultTrackerService resultTrackerService,
+            CommonService commonService,
+            PublicApi publicApi,
+            DownloadEODFiles downloadEODFiles,
+            IndexService indexService,
+            AdminService adminService,
+            Environment environment) {
+        this.nsePriceHistoryRepository = nsePriceHistoryRepository;
+        this.bsePriceHistoryRepository = bsePriceHistoryRepository;
+        this.mutualFundNavHistoryRepository = mutualFundNavHistoryRepository;
+        this.mutualFundUniverseRepository = mutualFundUniverseRepository;
+        this.dailyDataBRepository = dailyDataBRepository;
+        this.dailyDataSRepository = dailyDataSRepository;
+        this.moslTransactionRepository = moslTransactionRepository;
+        this.indexValuationRepository = indexValuationRepository;
+        this.resultTrackerService = resultTrackerService;
+        this.commonService = commonService;
+        this.publicApi = publicApi;
+        this.downloadEODFiles = downloadEODFiles;
+        this.indexService = indexService;
+        this.adminService = adminService;
+    }
 
     @RequestMapping(value = "/admin/uploadnsedailypricedata")
     public String uploadNseDailyPriceData(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/uploadnsedailypricedata";
     }
 
@@ -317,10 +312,10 @@ public class AdminViewController {
 
     @RequestMapping(value = "/admin/uploadbsedailypricedata")
     public String uploadBseDailyPriceData(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/uploadbsedailypricedata";
     }
 
@@ -501,10 +496,10 @@ public class AdminViewController {
 
     @RequestMapping(value = "/admin/uploadmfnavdata")
     public String uploadMfNavData(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/uploadmfnavdata";
     }
 
@@ -608,7 +603,7 @@ public class AdminViewController {
                 mutualFundNavHistories.add(mutualFundNavHistory);
                 int countBySchemeCode = mutualFundUniverseRepository.countBySchemeCode(new Long(code));
 
-                if (countBySchemeCode == 0 && date.after(CommonService.getSetupDates().getDateLastTradingDay())){
+                if (countBySchemeCode == 0 && date.after(commonService.getSetupDates().getDateLastTradingDay())){
                     MutualFundUniverse mutualFundUniverse = new MutualFundUniverse();
                     mutualFundUniverse.setSchemeCode(new Long(code));
                     mutualFundUniverse.setSchemeNameFull(schemeName);
@@ -905,7 +900,7 @@ public class AdminViewController {
                 Long schemeCodeLong = Long.valueOf(code);
                 int countBySchemeCode = mutualFundUniverseRepository.countBySchemeCode(schemeCodeLong);
 
-                if (countBySchemeCode == 0 && date.after(CommonService.getSetupDates().getDateLastTradingDay())) {
+                if (countBySchemeCode == 0 && date.after(commonService.getSetupDates().getDateLastTradingDay())) {
                     MutualFundUniverse mutualFundUniverse = new MutualFundUniverse();
                     mutualFundUniverse.setSchemeCode(schemeCodeLong);
                     mutualFundUniverse.setSchemeNameFull(schemeName);
@@ -1037,259 +1032,21 @@ public class AdminViewController {
 
     @RequestMapping(value = "/admin/uploadindexdata")
     public String uploadIndexData(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/uploadindexdata";
     }
 
     @RequestMapping(value = "/admin/uploaddailydatas")
     public String uploadDailyDataB(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/uploaddailydatas";
     }
-
-    /*@RequestMapping(value=("/admin/uploaddailydatasstatus"),headers=("content-type=multipart/*"),method= RequestMethod.POST)
-    public String uploadDailyDataSStatus (Model model, @RequestParam("file") MultipartFile file){
-        if (file.isEmpty()) {
-            model.addAttribute("message", "Please select a file to upload");
-            return "admin/uploaddailydatas";
-        }
-        try {
-            List<DailyDataS> dailyDataSList = new ArrayList<>();
-            XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
-            XSSFSheet worksheet = workbook.getSheetAt(0);
-            String filename = file.getOriginalFilename();
-            String dateString = filename.substring(0, 8);
-            java.sql.Date date =  java.sql.Date.valueOf(dateString.substring(0, 4) + "-" + dateString.substring(4, 6) + "-" + dateString.substring(6));
-
-            for(int i=1;i<worksheet.getPhysicalNumberOfRows() ;i++) {
-                DailyDataS dailyDataS = new DailyDataS();
-
-                XSSFRow row = worksheet.getRow(i);
-                dailyDataS.setKey(new DailyDataS.DailyDataSKey());
-                dailyDataS.getKey().setDate(date); // set as date
-                dailyDataS.setRank(i);
-
-                if(row.getCell(2)!= null && row.getCell(2).getCellType() != Cell.CELL_TYPE_BLANK && !row.getCell(2).getStringCellValue().trim().isEmpty())
-                    if (row.getCell(2).getCellType() == Cell.CELL_TYPE_STRING )
-                        dailyDataS.getKey().setName((String) row.getCell(2).getStringCellValue());
-                    else {
-                        int bse_ticker = (int) row.getCell(2).getNumericCellValue();
-                        dailyDataS.getKey().setName("" + bse_ticker);
-                    }
-                else if (row.getCell(1)!= null && row.getCell(1).getCellType() != Cell.CELL_TYPE_BLANK)
-                    if (row.getCell(1).getCellType() == Cell.CELL_TYPE_STRING)
-                        dailyDataS.getKey().setName((String) row.getCell(1).getStringCellValue());
-                    else {
-                        int bse_ticker = (int)row.getCell(1).getNumericCellValue();
-                        dailyDataS.getKey().setName("" + bse_ticker);
-                    }
-                else
-                    continue;
-
-                if(row.getCell(4) != null && row.getCell(4).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(4).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setCmp(new BigDecimal(row.getCell(4).getNumericCellValue()));
-                else
-                    dailyDataS.setCmp(new BigDecimal(0));
-
-                if(row.getCell(5) != null && row.getCell(5).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(5).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setMarketCap(new BigDecimal(row.getCell(5).getNumericCellValue()));
-                else
-                    dailyDataS.setMarketCap(new BigDecimal(0));
-
-                if(row.getCell(6) != null && row.getCell(6).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(6).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setLastResultDate((int) row.getCell(6).getNumericCellValue());
-                else
-                    dailyDataS.setLastResultDate(0);
-
-                if(row.getCell(7) != null && row.getCell(7).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(7).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setNetProfit(new BigDecimal(row.getCell(7).getNumericCellValue()));
-                else
-                    dailyDataS.setNetProfit(new BigDecimal(0));
-
-                if(row.getCell(8) != null && row.getCell(8).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(8).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setSales(new BigDecimal(row.getCell(8).getNumericCellValue()));
-                else
-                    dailyDataS.setSales(new BigDecimal(0));
-
-                if(row.getCell(9) != null && row.getCell(9).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(9).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setYoyQuarterlySalesGrowth(new BigDecimal(row.getCell(9).getNumericCellValue()));
-                else
-                    dailyDataS.setYoyQuarterlySalesGrowth(new BigDecimal(0));
-
-                if(row.getCell(10) != null && row.getCell(10).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(10).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setYoyQuarterlyProfitGrowth(new BigDecimal(row.getCell(10).getNumericCellValue()));
-                else
-                    dailyDataS.setYoyQuarterlyProfitGrowth(new BigDecimal(0));
-
-                if(row.getCell(11) != null && row.getCell(11).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(11).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setQoqSalesGrowth(new BigDecimal(row.getCell(11).getNumericCellValue()));
-                else
-                    dailyDataS.setQoqSalesGrowth(new BigDecimal(0));
-
-                if(row.getCell(12) != null && row.getCell(12).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(12).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setQoqProfitGrowth(new BigDecimal(row.getCell(12).getNumericCellValue()));
-                else
-                    dailyDataS.setQoqProfitGrowth(new BigDecimal(0));
-
-                if(row.getCell(13) != null && row.getCell(13).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(13).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setOpmLatestQuarter(new BigDecimal(row.getCell(13).getNumericCellValue()));
-                else
-                    dailyDataS.setOpmLatestQuarter(new BigDecimal(0));
-
-                if(row.getCell(14) != null && row.getCell(14).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(14).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setOpmLastYear(new BigDecimal(row.getCell(14).getNumericCellValue()));
-                else
-                    dailyDataS.setOpmLastYear(new BigDecimal(0));
-
-                if(row.getCell(15) != null && row.getCell(15).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(15).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setNpmLatestQuarter(new BigDecimal(row.getCell(15).getNumericCellValue()));
-                else
-                    dailyDataS.setNpmLatestQuarter(new BigDecimal(0));
-
-                if(row.getCell(16) != null && row.getCell(16).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(16).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setNpmLastYear(new BigDecimal(row.getCell(16).getNumericCellValue()));
-                else
-                    dailyDataS.setNpmLastYear(new BigDecimal(0));
-
-                if(row.getCell(17) != null && row.getCell(17).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(17).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setProfitGrowth3years(new BigDecimal(row.getCell(17).getNumericCellValue()));
-                else
-                    dailyDataS.setProfitGrowth3years(new BigDecimal(0));
-
-                if(row.getCell(18) != null && row.getCell(18).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(18).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setSalesGrowth3years(new BigDecimal(row.getCell(18).getNumericCellValue()));
-                else
-                    dailyDataS.setSalesGrowth3years(new BigDecimal(0));
-
-                if(row.getCell(19) != null && row.getCell(19).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(19).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setPeTtm(new BigDecimal(row.getCell(19).getNumericCellValue()));
-                else
-                    dailyDataS.setPeTtm(new BigDecimal(0));
-
-                if(row.getCell(20) != null && row.getCell(20).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(20).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setHistoricalPe3years(new BigDecimal(row.getCell(20).getNumericCellValue()));
-                else
-                    dailyDataS.setHistoricalPe3years(new BigDecimal(0));
-
-                if(row.getCell(21) != null && row.getCell(21).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(21).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setPegRatio(new BigDecimal(row.getCell(21).getNumericCellValue()));
-                else
-                    dailyDataS.setPegRatio(new BigDecimal(0));
-
-                if(row.getCell(22) != null && row.getCell(22).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(22).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setPbTtm(new BigDecimal(row.getCell(22).getNumericCellValue()));
-                else
-                    dailyDataS.setPbTtm(new BigDecimal(0));
-
-                if(row.getCell(23) != null && row.getCell(23).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(23).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setEvToEbit(new BigDecimal(row.getCell(23).getNumericCellValue()));
-                else
-                    dailyDataS.setEvToEbit(new BigDecimal(0));
-
-                if(row.getCell(24) != null && row.getCell(24).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(24).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setDividendPayout(new BigDecimal(row.getCell(24).getNumericCellValue()));
-                else
-                    dailyDataS.setDividendPayout(new BigDecimal(0));
-
-                if(row.getCell(25) != null && row.getCell(25).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(25).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setRoe(new BigDecimal(row.getCell(25).getNumericCellValue()));
-                else
-                    dailyDataS.setRoe(new BigDecimal(0));
-
-                if(row.getCell(26) != null && row.getCell(26).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(26).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setAvgRoe3years(new BigDecimal(row.getCell(26).getNumericCellValue()));
-                else
-                    dailyDataS.setAvgRoe3years(new BigDecimal(0));
-
-                if(row.getCell(27) != null && row.getCell(27).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(27).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setDebt(new BigDecimal(row.getCell(27).getNumericCellValue()));
-                else
-                    dailyDataS.setDebt(new BigDecimal(0));
-
-                if(row.getCell(28) != null && row.getCell(28).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(28).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setDebtToEquity(new BigDecimal(row.getCell(28).getNumericCellValue()));
-                else
-                    dailyDataS.setDebtToEquity(new BigDecimal(0));
-
-                if(row.getCell(29) != null && row.getCell(29).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(29).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setDebt3yearsback(new BigDecimal(row.getCell(29).getNumericCellValue()));
-                else
-                    dailyDataS.setDebt3yearsback(new BigDecimal(0));
-
-                if(row.getCell(30) != null && row.getCell(30).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(30).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setRoce(new BigDecimal(row.getCell(30).getNumericCellValue()));
-                else
-                    dailyDataS.setRoce(new BigDecimal(0));
-
-                if(row.getCell(31) != null && row.getCell(31).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(31).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setAvgRoce3years(new BigDecimal(row.getCell(31).getNumericCellValue()));
-                else
-                    dailyDataS.setAvgRoce3years(new BigDecimal(0));
-
-                if(row.getCell(32) != null && row.getCell(32).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(32).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setFcfS(new BigDecimal(row.getCell(32).getNumericCellValue()));
-                else
-                    dailyDataS.setFcfS(new BigDecimal(0));
-
-                if(row.getCell(33) != null && row.getCell(33).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(33).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setSalesGrowth5years(new BigDecimal(row.getCell(33).getNumericCellValue()));
-                else
-                    dailyDataS.setSalesGrowth5years(new BigDecimal(0));
-
-                if(row.getCell(34) != null && row.getCell(34).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(34).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setSalesGrowth10years(new BigDecimal(row.getCell(34).getNumericCellValue()));
-                else
-                    dailyDataS.setSalesGrowth10years(new BigDecimal(0));
-
-                if(row.getCell(35) != null && row.getCell(35).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(35).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setNoplat(new BigDecimal(row.getCell(35).getNumericCellValue()));
-                else
-                    dailyDataS.setNoplat(new BigDecimal(0));
-
-                if(row.getCell(36) != null && row.getCell(36).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(36).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setCapex(new BigDecimal(row.getCell(36).getNumericCellValue()));
-                else
-                    dailyDataS.setCapex(new BigDecimal(0));
-
-                if(row.getCell(37) != null && row.getCell(37).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(37).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setFcff(new BigDecimal(row.getCell(37).getNumericCellValue()));
-                else
-                    dailyDataS.setFcff(new BigDecimal(0));
-
-                if(row.getCell(38) != null && row.getCell(38).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(38).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setInvestedCapital(new BigDecimal(row.getCell(38).getNumericCellValue()));
-                else
-                    dailyDataS.setInvestedCapital(new BigDecimal(0));
-
-                if(row.getCell(39) != null && row.getCell(39).getCellType() != Cell.CELL_TYPE_BLANK && row.getCell(39).getCellType() == Cell.CELL_TYPE_NUMERIC)
-                    dailyDataS.setRoic(new BigDecimal(row.getCell(39).getNumericCellValue()));
-                else
-                    dailyDataS.setRoic(new BigDecimal(0));
-
-                dailyDataS.setMcapToNetprofit(new BigDecimal(0));
-                dailyDataS.setMcapToSales(new BigDecimal(0));
-                dailyDataS.setSector("");
-                dailyDataS.setIndustry("");
-                dailyDataS.setSubIndustry("");
-
-                dailyDataSList.add(dailyDataS);
-            }
-            dailyDataSList.sort(Comparator.comparing(DailyDataS::getMarketCap).reversed());
-            dailyDataSRepository.saveAll(dailyDataSList);
-
-            model.addAttribute("message",
-                    "You successfully uploaded '" + file.getOriginalFilename() + "'");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "admin/uploaddailydatas";
-    }*/
 
     @RequestMapping(value = "/admin/uploaddailydatasstatus", headers = "content-type=multipart/*", method = RequestMethod.POST)
     public String uploadDailyDataStatus(Model model, @RequestParam("file") MultipartFile file) {
@@ -1613,10 +1370,10 @@ public class AdminViewController {
 
     @RequestMapping(value = "/admin/uploadmosltxn")
     public String uploadMOSLTxn(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/uploadmosltxn";
     }
 
@@ -1764,148 +1521,10 @@ public class AdminViewController {
         return null;
     }
 
-    /*public String uploadMOSLTxnStatus (Model model, @RequestParam("file") MultipartFile file){
-        if (file.isEmpty()) {
-            model.addAttribute("message", "Please select a file to upload");
-            return "admin/uploadmosltxn";
-        }
-        try {
-
-            List<MOSLTransaction> moslTransactions = new ArrayList<>();
-            XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
-            XSSFSheet worksheet = workbook.getSheetAt(0);
-
-            for(int i=1;i<worksheet.getPhysicalNumberOfRows() ;i++) {
-                MOSLTransaction moslTransaction = new MOSLTransaction();
-
-                XSSFRow row = worksheet.getRow(i);
-                moslTransaction.setKey(new MOSLTransaction.MOSLTransactionKey());
-                String moslCode = (String) row.getCell(0).getStringCellValue();
-                if (moslCode.equalsIgnoreCase("H20488")){ // hardcoded for time being account that I am not handling
-                    continue;
-                }
-                if(moslCode.equalsIgnoreCase("Total")){
-                    break;
-                }
-                moslTransaction.getKey().setMoslCode(moslCode);
-                moslTransaction.setExchange((String) row.getCell(1).getStringCellValue());
-                String dateString = (String)row.getCell(2).getStringCellValue();
-                SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy");
-                java.sql.Date date = null;
-                try {
-                    date = new java.sql.Date(format.parse(dateString).getTime());
-                    if (date == null && dateString != null){
-                        format = new SimpleDateFormat("yyyy-mm-dd");
-                        date = new java.sql.Date(format.parse(dateString).getTime());
-                    }
-                } catch (ParseException e) {
-                    try{
-                        if (date == null && dateString != null){
-                            format = new SimpleDateFormat("yyyy-mm-dd");
-                            date = new java.sql.Date(format.parse(dateString).getTime());
-                        }
-                    } catch (ParseException e1) {
-                        if (date == null)
-                            continue;
-                    }
-                }
-
-                moslTransaction.getKey().setDate(date);
-                String scriptName = (String) row.getCell(3).getStringCellValue();
-                moslTransaction.getKey().setScriptName(scriptName);
-                String sellBuy = (String) row.getCell(4).getStringCellValue().trim();
-                moslTransaction.getKey().setSellBuy(sellBuy);
-                try{
-                    moslTransaction.setQuantity(new BigDecimal(row.getCell(5).getStringCellValue()));
-                } catch (Exception e) {
-                    moslTransaction.setQuantity(new BigDecimal(row.getCell(5).getNumericCellValue()));
-                }
-                try{
-                    moslTransaction.setRate(new BigDecimal(row.getCell(6).getStringCellValue()));
-                } catch (Exception e) {
-                    moslTransaction.setRate(new BigDecimal(row.getCell(6).getNumericCellValue()));
-                }
-                try{
-                    moslTransaction.setAmount(new BigDecimal(row.getCell(7).getStringCellValue()));
-                } catch (Exception e) {
-                    moslTransaction.setAmount(new BigDecimal(row.getCell(7).getNumericCellValue()));
-                }
-                try{
-                    moslTransaction.setBrokerage(new BigDecimal(row.getCell(8).getStringCellValue()));
-                } catch (Exception e) {
-                    moslTransaction.setBrokerage(new BigDecimal(row.getCell(8).getNumericCellValue()));
-                }
-                try{
-                    moslTransaction.setTxnCharges(new BigDecimal(row.getCell(9).getStringCellValue()));
-                } catch (Exception e) {
-                    moslTransaction.setTxnCharges(new BigDecimal(row.getCell(9).getNumericCellValue()));
-                }
-                try{
-                    moslTransaction.setServiceTax(new BigDecimal(row.getCell(10).getStringCellValue()));
-                } catch (Exception e) {
-                    moslTransaction.setServiceTax(new BigDecimal(row.getCell(10).getNumericCellValue()));
-                }
-                try{
-                    moslTransaction.setStampDuty(new BigDecimal(row.getCell(11).getStringCellValue()));
-                } catch (Exception e) {
-                    moslTransaction.setStampDuty(new BigDecimal(row.getCell(11).getNumericCellValue()));
-                }
-                try{
-                    moslTransaction.setSttCtt(new BigDecimal(row.getCell(12).getStringCellValue()));
-                } catch (Exception e) {
-                    moslTransaction.setSttCtt(new BigDecimal(row.getCell(12).getNumericCellValue()));
-                }
-                try{
-                    moslTransaction.setNetRate(new BigDecimal(row.getCell(13).getStringCellValue()));
-                } catch (Exception e) {
-                    moslTransaction.setNetRate(new BigDecimal(row.getCell(13).getNumericCellValue()));
-                }
-                try{
-                    moslTransaction.setNetAmount(new BigDecimal(row.getCell(14).getStringCellValue()));
-                } catch (Exception e) {
-                    moslTransaction.setNetAmount(new BigDecimal(row.getCell(14).getNumericCellValue()));
-                }
-                String orderNo = (String) row.getCell(15).getStringCellValue();
-                moslTransaction.getKey().setOrderNo(orderNo);
-                String tradeNO = (String) row.getCell(16).getStringCellValue();
-                moslTransaction.getKey().setTradeNo(tradeNO);
-                moslTransaction.setIsProcessed("N");
-                int portfolioid = 1;
-                try {
-                    portfolioid = Double.valueOf(row.getCell(17).getNumericCellValue()).intValue();
-                } catch (Exception e){
-                    portfolioid = 1;
-                }
-                moslTransaction.getKey().setPortfolioid(portfolioid);
-
-                int count = moslTransactionRepository.countByKeyMoslCodeAndKeyDateAndKeyScriptNameAndKeySellBuyAndKeyOrderNoAndKeyTradeNoAndKeyPortfolioid(moslCode, date, scriptName, sellBuy, orderNo, tradeNO, portfolioid);
-                if (count == 0) {
-                    moslTransactions.add(moslTransaction);
-                }
-            }
-            //moslTransactions.sort(Comparator.comparing(MOSLTransaction::getMarketCap).reversed());
-            moslTransactionRepository.saveAll(moslTransactions);
-
-            StoredProcedureQuery storedProcedure = entityManager.createStoredProcedureQuery(AP_PROCESS_MOSL_TRANSACTIONS);
-            boolean result = storedProcedure.execute();
-            if (!result) {
-                model.addAttribute("message", "Successfully uploaded transactions in the file "+ file.getOriginalFilename());
-            } else {
-                model.addAttribute("message", "Failed to upload transactions successfully. Check log_table.");
-            }
-
-        } catch (IOException e) {
-            model.addAttribute("error", "Exception in Processing the file.");
-            e.printStackTrace();
-        }
-        return "admin/uploadmosltxn";
-    }*/
-
-
 
     @RequestMapping(value = "/admin/eodprocs")
     public String eodProcs(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         List<Object[]> objects = nsePriceHistoryRepository.findMaxDateAndCount();
         for (Object[] object : objects) {
             model.addAttribute("nsecount", object[0]);
@@ -1929,7 +1548,7 @@ public class AdminViewController {
 
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/eodprocs";
     }
 
@@ -1953,7 +1572,7 @@ public class AdminViewController {
 
     @RequestMapping(value = "/admin/oneclickupload")
     public String oneClickUpload(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         List<Object[]> objects = nsePriceHistoryRepository.findMaxDateAndCount();
         for (Object[] object : objects) {
             model.addAttribute("nsecount", object[0]);
@@ -1977,75 +1596,9 @@ public class AdminViewController {
 
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/oneclickupload";
     }
-
-    /*@RequestMapping(value=("/admin/oneclickuploadstatus"),method=RequestMethod.POST)
-    public String oneClickUploadStatus(Model model, @RequestParam("confirmation") String confirmation){
-        if (confirmation.equalsIgnoreCase("yes")) {
-            DownloadEODFiles downloadEODFiles = new DownloadEODFiles();
-            int returnvalue = 0;
-            try {
-                returnvalue = downloadEODFiles.oneClickUpload(nsePriceHistoryRepository, bsePriceHistoryRepository, mutualFundNavHistoryRepository, dailyDataSRepository, mutualFundUniverseRepository);
-                if (returnvalue < 0) {
-                    model.addAttribute("error", "Failed to Download and Upload Data files successfully. Check log files.");
-                } else {
-                    model.addAttribute("message", "Successfully Downloaded and uploaded Data files");
-                }
-            } catch (Exception e) {
-                model.addAttribute("error", "Failed to Upload Data files successfully. Check log files.");
-            }
-            try {
-                List<Object[]> objects = nsePriceHistoryRepository.findMaxDateAndCount();
-                java.sql.Date sqlDate = null;
-                for (Object[] object : objects) {
-                    sqlDate = (java.sql.Date) object[1];
-                }
-                if (sqlDate != null) {
-                    downloadEODFiles.setIndexValuationRepository(indexValuationRepository);
-                    returnvalue = downloadEODFiles.downloadAndSaveNSEIndexData(sqlDate);
-                    if (returnvalue < 0) {
-                        System.out.println("Failed to upload NSE Index Data successfully.");
-                        model.addAttribute("error", "Failed to upload NSE Index Data successfully. Check log files.");
-                    } else {
-                        System.out.println("Uploaded NSE Index Data successfully.");
-                        try {
-                            downloadEODFiles = new DownloadEODFiles();
-                            downloadEODFiles.setIndexValuationRepository(indexValuationRepository);
-                            int returnValue = 0;
-                            returnValue = downloadEODFiles.uploadBSEIndexData(sqlDate, "BSEMidCap");
-                            if (returnValue < 0) {
-                                System.out.println("Failed to upload BSEMidCap Index Data.");
-                                model.addAttribute("error", "Failed to upload BSEMidCap Index Data. Please check log files.");
-                            } else {
-                                System.out.println("Uploaded BSEMidCap Index Data successfully.");
-                                downloadEODFiles.uploadBSEIndexData(sqlDate, "BSESmallCap");
-                                if (returnValue < 0) {
-                                    System.out.println("Failed to upload BSESmallCap Index Data.");
-                                    model.addAttribute("error", "Failed to upload BSESmallCap Index Data. Please check log files.");
-                                }
-                                else {
-                                    System.out.println("Uploaded BSESmallCap Index Data successfully.");
-                                    model.addAttribute("message", "Successfully uploaded both BSE Mid and Small Cap Index Data");
-                                }
-                            }
-                        } catch (Exception e) {
-                            model.addAttribute("error", "Failed to download and save BSE Index Data. Please check log files.");
-                        }
-                    }
-                } else {
-                    model.addAttribute("error", "Failed to upload NSE Index Data successfully. Check log files.");
-                }
-            } catch (Exception e) {
-                model.addAttribute("error", "Failed to upload NSE Index Data successfully. Check log files.");
-            }
-            return "admin/oneclickupload";
-        } else {
-            model.addAttribute("message", "Please confirm Yes/No to process Download, upload and running EOD");
-            return "admin/oneclickupload";
-        }
-    }*/
 
     @RequestMapping(value=("/admin/oneclickuploadstatus"), method=RequestMethod.POST)
     public String oneClickUploadStatus(@RequestParam("date") String dateStr, Model model) {
@@ -2257,10 +1810,10 @@ public class AdminViewController {
 
     @RequestMapping(value = "/admin/uploadresultexcel")
     public String uploadResultExcel(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/uploadresultexcel";
     }
 
@@ -2426,10 +1979,10 @@ public class AdminViewController {
 
     @RequestMapping(value = "/admin/downloadresultexcel")
     public String downloadResultExcel(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/downloadresultexcel";
     }
 
@@ -2491,10 +2044,10 @@ public class AdminViewController {
 
     @RequestMapping(value = "/admin/updateanalystreco")
     public String updateAnalystReco(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/updateanalystreco";
     }
 
@@ -2545,52 +2098,52 @@ public class AdminViewController {
 
     @RequestMapping(value = "/admin/uploadscreenerdata")
     public String uploadScreenerData(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/uploadscreenerdata";
     }
 
     @RequestMapping(value = "/admin/stockuniverse")
     public String stockUniverse(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/stockuniverse";
     }
 
     @RequestMapping(value = "/admin/stocksplit")
     public String stockSplit(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/stocksplit";
     }
 
     @RequestMapping(value = "/admin/stockdividend")
     public String stockDividend(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/stockdividend";
     }
 
     @RequestMapping(value = "/admin/mfuniverse")
     public String mfUniverse(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/mfuniverse";
     }
 
     @RequestMapping(value = "/admin/computeindexstat")
     public String computeIndexStat(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
 
         Date maxNiftyDate, maxBSEMidCapDate, maxBSESmallCapDate;
         maxNiftyDate = indexValuationRepository.findMaxKeyDateForKeyTicker("NIFTY");
@@ -2603,7 +2156,7 @@ public class AdminViewController {
         model.addAttribute("maxBSESmallCapDate", maxBSESmallCapDate);
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/computeindexstat";
     }
 
@@ -2611,33 +2164,33 @@ public class AdminViewController {
     public String computeIndexStatStatus(Model model, @RequestParam("confirmation") String confirmation){
         if (confirmation.equalsIgnoreCase("yes")) {
             try {
-                IndexService.computeAndSaveIndexMonthlyReturns("NIFTY", true);
-                IndexService.computeAndSaveIndexMonthlyReturns("BSEMidCap", true);
-                IndexService.computeAndSaveIndexMonthlyReturns("BSESmallCap", true);
+                indexService.computeAndSaveIndexMonthlyReturns("NIFTY", true);
+                indexService.computeAndSaveIndexMonthlyReturns("BSEMidCap", true);
+                indexService.computeAndSaveIndexMonthlyReturns("BSESmallCap", true);
 
-                IndexService.computeAndSavePeriodReturnStatistics("NIFTY", 1);
-                IndexService.computeAndSavePeriodReturnStatistics("NIFTY", 3);
-                IndexService.computeAndSavePeriodReturnStatistics("NIFTY", 5);
-                IndexService.computeAndSavePeriodReturnStatistics("NIFTY", 10);
+                indexService.computeAndSavePeriodReturnStatistics("NIFTY", 1);
+                indexService.computeAndSavePeriodReturnStatistics("NIFTY", 3);
+                indexService.computeAndSavePeriodReturnStatistics("NIFTY", 5);
+                indexService.computeAndSavePeriodReturnStatistics("NIFTY", 10);
 
-                IndexService.computeAndSavePeriodReturnStatistics("BSEMidCap", 1);
-                IndexService.computeAndSavePeriodReturnStatistics("BSEMidCap", 3);
-                IndexService.computeAndSavePeriodReturnStatistics("BSEMidCap", 5);
-                IndexService.computeAndSavePeriodReturnStatistics("BSEMidCap", 10);
+                indexService.computeAndSavePeriodReturnStatistics("BSEMidCap", 1);
+                indexService.computeAndSavePeriodReturnStatistics("BSEMidCap", 3);
+                indexService.computeAndSavePeriodReturnStatistics("BSEMidCap", 5);
+                indexService.computeAndSavePeriodReturnStatistics("BSEMidCap", 10);
 
-                IndexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 1);
-                IndexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 3);
-                IndexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 5);
-                IndexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 10);
+                indexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 1);
+                indexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 3);
+                indexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 5);
+                indexService.computeAndSavePeriodReturnStatistics("BSESmallCap", 10);
 
                 Date maxNiftyDate, maxBSEMidCapDate, maxBSESmallCapDate;
                 maxNiftyDate = indexValuationRepository.findMaxKeyDateForKeyTicker("NIFTY");
                 maxBSEMidCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("BSEMidCap");
                 maxBSESmallCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("BSESmallCap");
 
-                IndexService.setDateLastUpdatedForIndexStats("NIFTY", maxNiftyDate);
-                IndexService.setDateLastUpdatedForIndexStats("BSEMidCap", maxBSEMidCapDate);
-                IndexService.setDateLastUpdatedForIndexStats("BSESmallCap", maxBSESmallCapDate);
+                indexService.setDateLastUpdatedForIndexStats("NIFTY", maxNiftyDate);
+                indexService.setDateLastUpdatedForIndexStats("BSEMidCap", maxBSEMidCapDate);
+                indexService.setDateLastUpdatedForIndexStats("BSESmallCap", maxBSESmallCapDate);
 
 
             } catch (Exception e) {
@@ -2658,10 +2211,10 @@ public class AdminViewController {
 
     @RequestMapping(value = "/admin/uploadbseindexdata")
     public String uploadBSEIndexData(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         Date maxBSEMidCapDate, maxBSESmallCapDate;
         maxBSEMidCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("BSEMidCap");
         maxBSESmallCapDate = indexValuationRepository.findMaxKeyDateForKeyTicker("BSESmallCap");
@@ -2673,10 +2226,10 @@ public class AdminViewController {
 
     @RequestMapping(value = "/admin/downloadandsavenseindexdata")
     public String downloadAndSaveNSEIndexData(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         Date maxNiftyDate, maxBSEMidCapDate, maxBSESmallCapDate;
         maxNiftyDate = indexValuationRepository.findMaxKeyDateForKeyTicker("NIFTY");
         model.addAttribute("maxNiftyDate", maxNiftyDate);
@@ -2698,9 +2251,6 @@ public class AdminViewController {
 
         if (sqlDate != null) {
             try {
-                DownloadEODFiles downloadEODFiles = new DownloadEODFiles();
-                downloadEODFiles = new DownloadEODFiles();
-                downloadEODFiles.setIndexValuationRepository(indexValuationRepository);
                 int returnValue = downloadEODFiles.downloadAndSaveNSEIndexData(sqlDate);
                 if (returnValue < 0)
                     model.addAttribute("error", "Failed to download and save NSE Index Data. Please check log files.");
@@ -2731,9 +2281,6 @@ public class AdminViewController {
 
         if (sqlDate != null) {
             try {
-                DownloadEODFiles downloadEODFiles = new DownloadEODFiles();
-                downloadEODFiles = new DownloadEODFiles();
-                downloadEODFiles.setIndexValuationRepository(indexValuationRepository);
                 int returnValue = 0;
                 returnValue = downloadEODFiles.uploadBSEIndexData(sqlDate, "BSEMidCap");
                 if (returnValue < 0) {
@@ -2757,17 +2304,17 @@ public class AdminViewController {
 
     @RequestMapping(value = "/admin/generatedbinsertscript")
     public String createDBInsertScript(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "TimelineOfWealth");
-        model.addAttribute("welcomeMessage", CommonService.getWelcomeMessage(CommonService.getLoggedInUser(userDetails)));
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
         return "admin/generatedbinsertscript";
     }
 
     @RequestMapping(value=("/admin/generatedbinsertscriptstatus"),method=RequestMethod.POST)
-    public static String generateDBInsertScriptStatus(Model model, @RequestParam("dateRange") String dateRange ) {
+    public String generateDBInsertScriptStatus(Model model, @RequestParam("dateRange") String dateRange ) {
 
-        File inputFolderPath = AdminService.getLatestQuarterFolder();
+        File inputFolderPath = adminService.getLatestQuarterFolder();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
         Date now = new Date(System.currentTimeMillis());

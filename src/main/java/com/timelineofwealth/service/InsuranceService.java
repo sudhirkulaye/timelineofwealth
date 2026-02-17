@@ -18,21 +18,25 @@ import java.util.List;
 
 @Service("InsuranceService")
 public class InsuranceService {
-    private static final Logger logger = LoggerFactory.getLogger(InsuranceService.class);
-
+    private final Logger logger = LoggerFactory.getLogger(InsuranceService.class);
+    private final InsuranceRepository insuranceRepository;
+    private final MemberService memberService;
+    private final CommonService commonService;
 
     @Autowired
-    private static InsuranceRepository insuranceRepository;
-    @Autowired
-    public void setInsuranceRepository(InsuranceRepository insuranceRepository){
-        InsuranceService.insuranceRepository = insuranceRepository;
+    public InsuranceService(InsuranceRepository insuranceRepository,
+                            MemberService memberService,
+                            CommonService commonService){
+        this.insuranceRepository = insuranceRepository;
+        this.memberService = memberService;
+        this.commonService = commonService;
     }
 
-    public static List<Insurance> getInsuranceRecords(String email){
+    public List<Insurance> getInsuranceRecords(String email){
         logger.debug(String.format("In InsuranceService.getInsuranceRecords: Email %s", email));
 
         List<Insurance> insuranceRecords;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -42,47 +46,47 @@ public class InsuranceService {
         return insuranceRecords;
     }
 
-    public static void updateInsuranceRecord(Insurance editedRecord) {
+    public void updateInsuranceRecord(Insurance editedRecord) {
         logger.debug(String.format("In InsuranceService.updateInsuranceRecord: editedRecord.key.memberid %d", editedRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In InsuranceService.updateInsuranceRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), editedRecord.getKey().getMemberid())){
-            InsuranceService.insuranceRepository.save(editedRecord);
+        if(memberService.isAuthorised(user.getEmail(), editedRecord.getKey().getMemberid())){
+            this.insuranceRepository.save(editedRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }
     }
 
-    public static void addInsuranceRecord(Insurance newRecord) {
+    public void addInsuranceRecord(Insurance newRecord) {
         logger.debug(String.format("In InsuranceService.addInsuranceRecord: newRecord.key.memberid %d", newRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In InsuranceService.addInsuranceRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
+        if(memberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
             int newInsuranceid = 0;
-            int count = InsuranceService.insuranceRepository.countByKeyMemberid(newRecord.getKey().getMemberid());
+            int count = this.insuranceRepository.countByKeyMemberid(newRecord.getKey().getMemberid());
             if (count == 0) { newInsuranceid = 1; } else {
-                newInsuranceid = InsuranceService.insuranceRepository.findTopByKeyMemberidOrderByKeyInsuranceidDesc(newRecord.getKey().getMemberid()).getKey().getInsuranceid() + 1;
+                newInsuranceid = this.insuranceRepository.findTopByKeyMemberidOrderByKeyInsuranceidDesc(newRecord.getKey().getMemberid()).getKey().getInsuranceid() + 1;
             }
             logger.debug(String.format("In InsuranceService.addInsuranceRecord: new insuranceid %d", newInsuranceid));
             newRecord.getKey().setInsuranceid(newInsuranceid);
-            InsuranceService.insuranceRepository.save(newRecord);
+            this.insuranceRepository.save(newRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }
     }
 
-    public static void deleteInsuranceRecord(Insurance deletedRecord){
+    public void deleteInsuranceRecord(Insurance deletedRecord){
         logger.debug(String.format("In InsuranceService.deleteInsuranceRecord: deletedRecord.key.memberid %d", deletedRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In InsuranceService.deleteInsuranceRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), deletedRecord.getKey().getMemberid())){
-            InsuranceService.insuranceRepository.delete(deletedRecord);
+        if(memberService.isAuthorised(user.getEmail(), deletedRecord.getKey().getMemberid())){
+            this.insuranceRepository.delete(deletedRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }

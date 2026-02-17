@@ -24,17 +24,17 @@ import java.util.stream.Collectors;
 
 @Service("AdminService")
 public class AdminService {
-    private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
-    private static String basePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
+    private final Logger logger = LoggerFactory.getLogger(AdminService.class);
+    private String basePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
+
+    private final AdviserUserMappingRepository adviserUserMappingRepository;
 
     @Autowired
-    private static AdviserUserMappingRepository adviserUserMappingRepository;
-    @Autowired
-    public void setAdviserUserMappingRepository(AdviserUserMappingRepository adviserUserMappingRepository){
-        AdminService.adviserUserMappingRepository = adviserUserMappingRepository;
+    public AdminService(AdviserUserMappingRepository adviserUserMappingRepository){
+        this.adviserUserMappingRepository = adviserUserMappingRepository;
     }
 
-    public static List<ResultExcelDTO> getLatestResultExcels() {
+    public List<ResultExcelDTO> getLatestResultExcels() {
         logger.debug(String.format("In AdminService.getLatestResultExcels"));
 
         // Find the latest quarter result folder by comparing folder names
@@ -76,12 +76,12 @@ public class AdminService {
     }
 
     // Helper method to check if a folder name is in the format YYYYQn
-    private static boolean isQuarterFolder(File folder) {
+    private boolean isQuarterFolder(File folder) {
         String folderName = folder.getName();
         return folderName.matches("\\d{4}Q[1-4]");
     }
 
-    public static File getLatestQuarterFolder(){
+    public File getLatestQuarterFolder(){
         File latestQuarterFolder = null;
 
         File baseFolder = new File(basePath);

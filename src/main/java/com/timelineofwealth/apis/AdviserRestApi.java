@@ -29,8 +29,22 @@ import java.util.List;
 @RequestMapping(value = "adviser/api/")
 public class AdviserRestApi {
     private static final Logger logger = LoggerFactory.getLogger(AdviserRestApi.class);
+
+    // ✅ Inject all needed services
+    private final AdviserService adviserService;
+    private final CommonService commonService;
+    private final ServletContext context;
+
+    // ✅ Constructor injection
     @Autowired
-    private ServletContext context;
+    public AdviserRestApi(AdviserService adviserService,
+                          CommonService commonService,
+                          ServletContext context) {
+        this.adviserService = adviserService;
+        this.commonService = commonService;
+        this.context = context;
+    }
+
 
     @RequestMapping(value = "/getclients", method = RequestMethod.GET)
     public List<ClientDTO> getClients() {
@@ -38,8 +52,8 @@ public class AdviserRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return AdviserService.getClients(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return adviserService.getClients(user.getEmail());
     }
 
     @RequestMapping(value = "/getpmsclients", method = RequestMethod.GET)
@@ -48,8 +62,8 @@ public class AdviserRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return AdviserService.getPMSClients(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return adviserService.getPMSClients(user.getEmail());
     }
 
     @RequestMapping(value = "/getconsolidatedassetsofclient", method = RequestMethod.POST)
@@ -58,42 +72,42 @@ public class AdviserRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return AdviserService.getConsolidatedAssets(user.getEmail(),clientemail);
+        User user = commonService.getLoggedInUser(userDetails);
+        return adviserService.getConsolidatedAssets(user.getEmail(),clientemail);
     }
 
     @RequestMapping(value = "/getcomposites", method = RequestMethod.GET)
     public List<Composite> getComposites() {
         logger.debug(String.format("Call adviser/api/getcomposites "));
 
-        return AdviserService.getComposites();
+        return adviserService.getComposites();
     }
 
     @RequestMapping(value = "/getcompositedetails", method = RequestMethod.GET)
     public List<CompositeConstituents> getCompositeDetails() {
         logger.debug(String.format("Call adviser/api/getcompositedetails "));
 
-        return AdviserService.getCompositeDetails();
+        return adviserService.getCompositeDetails();
     }
 
     @RequestMapping(value = "/deletecompositedetail", method = RequestMethod.POST)
     public List<CompositeConstituents> deleteCompositeDetails(@RequestBody CompositeConstituents deleteRecord) {
         logger.debug(String.format("Call adviser/api/deletecompositedetails " + deleteRecord.getShortName()));
-        AdviserService.deleteCompositeDetails(deleteRecord);
+        adviserService.deleteCompositeDetails(deleteRecord);
         return getCompositeDetails();
     }
 
     @RequestMapping(value = "/updatewcompositedetail", method = RequestMethod.PUT)
     public List<CompositeConstituents> updateWealthDetailsRecord(@RequestBody CompositeConstituents editedRecord) {
         logger.debug("Call user/api/updatecompositedetails/ " + editedRecord.getShortName());
-        AdviserService.updateCompositeDetails(editedRecord);
+        adviserService.updateCompositeDetails(editedRecord);
         return getCompositeDetails();
     }
 
     @RequestMapping(value = "/addcompositedetail", method = RequestMethod.POST)
     public List<CompositeConstituents> addWealthDetailsRecord(@RequestBody CompositeConstituents newRecord) {
         logger.debug("Call user/api/addcompositedetail/ " + newRecord.getShortName());
-        AdviserService.addCompositeDetails(newRecord);
+        adviserService.addCompositeDetails(newRecord);
         return getCompositeDetails();
     }
 

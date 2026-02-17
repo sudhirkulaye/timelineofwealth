@@ -21,32 +21,31 @@ import java.util.*;
 @Service("WealthDetailsService")
 public class WealthDetailsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(WealthDetailsService.class);
+    private final Logger logger = LoggerFactory.getLogger(WealthDetailsService.class);
+    private final WealthDetailsRepository wealthDetailsRepository;
+    private final WealthHistoryRepository wealthHistoryRepository;
+    private final WealthAssetAllocationHistoryRepository wealthAssetAllocationHistoryRepository;
+    private final MemberService memberService;
+    private final CommonService commonService;
 
     @Autowired
-    private static WealthDetailsRepository wealthDetailsRepository;
-    @Autowired
-    public void setWealthDetailsRepository(WealthDetailsRepository wealthDetailsRepository){
-        WealthDetailsService.wealthDetailsRepository = wealthDetailsRepository;
-    }
-    @Autowired
-    private static WealthHistoryRepository wealthHistoryRepository;
-    @Autowired
-    public void setWealthHistoryRepository(WealthHistoryRepository wealthHistoryRepository) {
-        WealthDetailsService.wealthHistoryRepository = wealthHistoryRepository;
-    }
-    @Autowired
-    private static WealthAssetAllocationHistoryRepository wealthAssetAllocationHistoryRepository;
-    @Autowired
-    public void setWealthAssetAllocationHistoryRepository(WealthAssetAllocationHistoryRepository wealthAssetAllocationHistoryRepository){
-        WealthDetailsService.wealthAssetAllocationHistoryRepository = wealthAssetAllocationHistoryRepository;
+    public WealthDetailsService(WealthDetailsRepository wealthDetailsRepository,
+                                WealthHistoryRepository wealthHistoryRepository,
+                                WealthAssetAllocationHistoryRepository wealthAssetAllocationHistoryRepository,
+                                MemberService memberService,
+                                CommonService commonService){
+        this.wealthDetailsRepository = wealthDetailsRepository;
+        this.wealthHistoryRepository = wealthHistoryRepository;
+        this.wealthAssetAllocationHistoryRepository = wealthAssetAllocationHistoryRepository;
+        this.memberService = memberService;
+        this.commonService = commonService;
     }
 
-    public static List<WealthDetails> getWealthDetailsRecords(String email){
-        logger.debug(String.format("In WealthDetailsService.getWealthDetailsRecords: Email %s", email));
+    public List<WealthDetails> getWealthDetailsRecords(String email){
+        logger.debug(String.format("In this.getWealthDetailsRecords: Email %s", email));
 
         List<WealthDetails> wealthDetailsRecords;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -56,12 +55,12 @@ public class WealthDetailsService {
         return wealthDetailsRecords;
     }
 
-    public static List<ConsolidatedAssetsDTO> getConsolidatedWealthDetailsRecords(String email){
-        logger.debug(String.format("In WealthDetailsService.getConsolidatedWealthDetailsRecords: Email %s", email));
+    public List<ConsolidatedAssetsDTO> getConsolidatedWealthDetailsRecords(String email){
+        logger.debug(String.format("In this.getConsolidatedWealthDetailsRecords: Email %s", email));
 
         List<Object[]> objects;
         List<ConsolidatedAssetsDTO> dtos = new ArrayList<>();
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -92,30 +91,30 @@ public class WealthDetailsService {
         return dtos;
     }
 
-    public static void updateWealthDetailsRecord(WealthDetails editedRecord) {
-        logger.debug(String.format("In WealthDetailsService.updateWealthDetailsRecord: editedRecord.key.memberid %d", editedRecord.getKey().getMemberid()));
+    public void updateWealthDetailsRecord(WealthDetails editedRecord) {
+        logger.debug(String.format("In this.updateWealthDetailsRecord: editedRecord.key.memberid %d", editedRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        logger.debug(String.format("In WealthDetailsService.updateWealthDetailsRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), editedRecord.getKey().getMemberid())){
-            WealthDetailsService.wealthDetailsRepository.save(editedRecord);
+        User user = commonService.getLoggedInUser(userDetails);
+        logger.debug(String.format("In this.updateWealthDetailsRecord: Email %s", user.getEmail()));
+        if(memberService.isAuthorised(user.getEmail(), editedRecord.getKey().getMemberid())){
+            this.wealthDetailsRepository.save(editedRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }
     }
 
-    public static void addWealthDetailsRecord(WealthDetails newRecord) {
-        logger.debug(String.format("In WealthDetailsService.addWealthDetailsRecord: newRecord.key.memberid %d", newRecord.getKey().getMemberid()));
+    public void addWealthDetailsRecord(WealthDetails newRecord) {
+        logger.debug(String.format("In this.addWealthDetailsRecord: newRecord.key.memberid %d", newRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        logger.debug(String.format("In WealthDetailsService.addWealthDetailsRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
-            int count = WealthDetailsService.wealthDetailsRepository.countByKeyMemberidAndKeyBuyDateAndKeyTicker(newRecord.getKey().getMemberid(), newRecord.getKey().getBuyDate(), newRecord.getKey().getTicker());
-            logger.debug(String.format("In WealthDetailsService.addWealthDetailsRecord: record count is %d", count));
+        User user = commonService.getLoggedInUser(userDetails);
+        logger.debug(String.format("In this.addWealthDetailsRecord: Email %s", user.getEmail()));
+        if(memberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
+            int count = this.wealthDetailsRepository.countByKeyMemberidAndKeyBuyDateAndKeyTicker(newRecord.getKey().getMemberid(), newRecord.getKey().getBuyDate(), newRecord.getKey().getTicker());
+            logger.debug(String.format("In this.addWealthDetailsRecord: record count is %d", count));
             if (count == 0) {
-                WealthDetailsService.wealthDetailsRepository.save(newRecord);
+                this.wealthDetailsRepository.save(newRecord);
             } else {
                 throw new IllegalArgumentException("Record already exists.");
             }
@@ -124,40 +123,40 @@ public class WealthDetailsService {
         }
     }
 
-    public static void deleteWealthDetailsRecord(WealthDetails deletedRecord){
-        logger.debug(String.format("In WealthDetailsService.deleteWealthDetailsRecord: deletedRecord.key.memberid %d", deletedRecord.getKey().getMemberid()));
+    public void deleteWealthDetailsRecord(WealthDetails deletedRecord){
+        logger.debug(String.format("In this.deleteWealthDetailsRecord: deletedRecord.key.memberid %d", deletedRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        logger.debug(String.format("In WealthDetailsService.deleteWealthDetailsRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), deletedRecord.getKey().getMemberid())){
-            WealthDetailsService.wealthDetailsRepository.delete(deletedRecord);
+        User user = commonService.getLoggedInUser(userDetails);
+        logger.debug(String.format("In this.deleteWealthDetailsRecord: Email %s", user.getEmail()));
+        if(memberService.isAuthorised(user.getEmail(), deletedRecord.getKey().getMemberid())){
+            this.wealthDetailsRepository.delete(deletedRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }
     }
 
-    public static List<WealthAssetAllocationHistory> getCurrentAssetAllocation(String email){
-        logger.debug(String.format("In WealthDetailsService.getCurrentAssetAllocation: Email %s", email));
+    public List<WealthAssetAllocationHistory> getCurrentAssetAllocation(String email){
+        logger.debug(String.format("In this.getCurrentAssetAllocation: Email %s", email));
 
         List<WealthAssetAllocationHistory> wealthAssetAllocationHistoryRecords;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
         }
 
-        Date dateToday = CommonService.getSetupDates().getDateToday();
+        Date dateToday = commonService.getSetupDates().getDateToday();
         wealthAssetAllocationHistoryRecords = wealthAssetAllocationHistoryRepository.findAllByKeyMemberidInAndKeyDateOrderByKeyMemberidAscKeyAssetClassGroupAsc(membersIds,dateToday);
 
         return wealthAssetAllocationHistoryRecords;
     }
 
-    public static Map<Date, Map<Long, BigDecimal>> getWealthHistoryRecords(String email){
-        logger.debug(String.format("In WealthDetailsService.getWealthHistoryRecords: Email %s", email));
+    public Map<Date, Map<Long, BigDecimal>> getWealthHistoryRecords(String email){
+        logger.debug(String.format("In this.getWealthHistoryRecords: Email %s", email));
 
         List<WealthHistory> wealthHistoryRecords;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
