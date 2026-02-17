@@ -23,7 +23,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -39,160 +38,85 @@ import java.util.Properties;
 @EnableCaching
 public class CommonService {
 
-    public static final String ADMIN_ROLE = "ROLE_ADMIN";
-    public static final String ADVISER_ROLE = "ROLE_ADVISER";
-    private static final Logger logger = LoggerFactory.getLogger(CommonService.class);
-    private static final String BASE_EXCEL_PATH = "C:/MyDocuments/03Business/05ResearchAndAnalysis/StockInvestments/QuarterResultsScreenerExcels/";
+    public final String ADMIN_ROLE = "ROLE_ADMIN";
+    public final String ADVISER_ROLE = "ROLE_ADVISER";
+    private final Logger logger = LoggerFactory.getLogger(CommonService.class);
+    private final String BASE_EXCEL_PATH = "C:/MyDocuments/03Business/05ResearchAndAnalysis/StockInvestments/QuarterResultsScreenerExcels/";
+    private final UserRepository userRepository;
+    private final AssetClassificationRepository assetClassificationRepository;
+    private final SubindustryRepository subindustryRepository;
+    private final MutualFundUniverseRepository mutualFundUniverseRepository;
+    private final MutualFundStatsRepository mutualFundStatsRepository;
+    private final StockUniverseRepository stockUniverseRepository;
+    private final StockAnalystRecoRepository stockAnalystRecoRepository;
+    private final StockValuationRepository stockValuationRepository;
+    private final StockPnlRepository stockPnlRepository;
+    private final StockQuarterRepository stockQuarterRepository;
+    private final DailyDataSRepository dailyDataSRepository;
+    private final DailyDataBRepository dailyDataBRepository;
+    private final StockPriceMovementRepository stockPriceMovementRepository;
+    private final SetupDatesRepository setupDatesRepository;
+    private final IndexValuationRepository indexValuationRepository;
+    private final IndexStatisticsRepository indexStatisticsRepository;
+    private final StockPriceMovementHistoryRepository stockPriceMovementHistoryRepository;
+    private final BenchmarkTwrrMonthlyRepository benchmarkTwrrMonthlyRepository;
+    private final BenchmarkTwrrSummaryRepository benchmarkTwrrSummaryRepository;
+    private final IndexService indexService;
+    public final JdbcTemplate jdbcTemplate;
+    private List<StockUniverse> nseBse500BasicList;
+    private List<NseBse500> nseBse500List;
 
     @Autowired
-    private static UserRepository userRepository;
-    @Autowired
-    public  void setUserRepository(UserRepository userRepository){
-        CommonService.userRepository = userRepository;
+    public CommonService(UserRepository userRepository,
+                         AssetClassificationRepository assetClassificationRepository,
+                         SubindustryRepository subindustryRepository,
+                         MutualFundUniverseRepository mutualFundUniverseRepository,
+                         MutualFundStatsRepository mutualFundStatsRepository,
+                         StockUniverseRepository stockUniverseRepository,
+                         StockAnalystRecoRepository stockAnalystRecoRepository,
+                         StockValuationRepository stockValuationRepository,
+                         StockPnlRepository stockPnlRepository,
+                         StockQuarterRepository stockQuarterRepository,
+                         DailyDataSRepository dailyDataSRepository,
+                         DailyDataBRepository dailyDataBRepository,
+                         StockPriceMovementRepository stockPriceMovementRepository,
+                         SetupDatesRepository setupDatesRepository,
+                         IndexValuationRepository indexValuationRepository,
+                         IndexStatisticsRepository indexStatisticsRepository,
+                         StockPriceMovementHistoryRepository stockPriceMovementHistoryRepository,
+                         BenchmarkTwrrMonthlyRepository benchmarkTwrrMonthlyRepository,
+                         BenchmarkTwrrSummaryRepository benchmarkTwrrSummaryRepository,
+                         IndexService indexService,
+                         JdbcTemplate jdbcTemplate){
+        this.userRepository = userRepository;
+        this.assetClassificationRepository = assetClassificationRepository;
+        this.subindustryRepository = subindustryRepository;
+        this.mutualFundUniverseRepository = mutualFundUniverseRepository;
+        this.mutualFundStatsRepository = mutualFundStatsRepository;
+        this.stockUniverseRepository = stockUniverseRepository;
+        this.stockAnalystRecoRepository = stockAnalystRecoRepository;
+        this.stockValuationRepository = stockValuationRepository;
+        this.stockPnlRepository = stockPnlRepository;
+        this.stockQuarterRepository = stockQuarterRepository;
+        this.dailyDataSRepository = dailyDataSRepository;
+        this.dailyDataBRepository = dailyDataBRepository;
+        this.stockPriceMovementRepository = stockPriceMovementRepository;
+        this.setupDatesRepository = setupDatesRepository;
+        this.indexValuationRepository = indexValuationRepository;
+        this.indexStatisticsRepository = indexStatisticsRepository;
+        this.stockPriceMovementHistoryRepository = stockPriceMovementHistoryRepository;
+        this.benchmarkTwrrMonthlyRepository = benchmarkTwrrMonthlyRepository;
+        this.benchmarkTwrrSummaryRepository = benchmarkTwrrSummaryRepository;
+        this.indexService = indexService;
+        this.jdbcTemplate = jdbcTemplate;
     }
-
-    @Autowired
-    private static AssetClassificationRepository assetClassificationRepository;
-    @Autowired
-    public void setAssetClassificationRepository(AssetClassificationRepository assetClassificationRepository){
-        CommonService.assetClassificationRepository = assetClassificationRepository;
-    }
-
-    @Autowired
-    private static SubindustryRepository subindustryRepository;
-    @Autowired
-    public void setSubindustryRepository(SubindustryRepository subindustryRepository){
-        CommonService.subindustryRepository = subindustryRepository;
-    }
-
-    @Autowired
-    private static MutualFundUniverseRepository mutualFundUniverseRepository;
-    @Autowired
-    public void setMutualFundUniverseRepository(MutualFundUniverseRepository mutualFundUniverseRepository){
-        CommonService.mutualFundUniverseRepository = mutualFundUniverseRepository;
-    }
-
-    @Autowired
-    private static MutualFundStatsRepository mutualFundStatsRepository;
-    @Autowired
-    public void setMutualFundStatsRepository(MutualFundStatsRepository mutualFundStatsRepository){
-        CommonService.mutualFundStatsRepository = mutualFundStatsRepository;
-    }
-
-    @Autowired
-    private static StockUniverseRepository stockUniverseRepository;
-    @Autowired
-    public void setStockUniverseRepository(StockUniverseRepository stockUniverseRepository){
-        CommonService.stockUniverseRepository = stockUniverseRepository;
-    }
-
-    @Autowired
-    private static StockAnalystRecoRepository stockAnalystRecoRepository;
-    @Autowired
-    public void setStockAnalystRecoRepository(StockAnalystRecoRepository stockAnalystRecoRepository){
-        CommonService.stockAnalystRecoRepository = stockAnalystRecoRepository;
-    }
-
-    @Autowired
-    private static StockValuationRepository stockValuationRepository;
-    @Autowired
-    public void setStockAnalystRecoRepository(StockValuationRepository stockValuationRepository){
-        CommonService.stockValuationRepository = stockValuationRepository;
-    }
-
-    @Autowired
-    private static StockPnlRepository stockPnlRepository;
-    @Autowired
-    public void setStockPnlRepository(StockPnlRepository stockPnlRepository){
-        CommonService.stockPnlRepository = stockPnlRepository;
-    }
-
-    @Autowired
-    private static StockQuarterRepository stockQuarterRepository;
-    @Autowired
-    public void setStockQuarterRepository(StockQuarterRepository stockQuarterRepository){
-        CommonService.stockQuarterRepository = stockQuarterRepository;
-    }
-
-    @Autowired
-    private static DailyDataSRepository dailyDataSRepository;
-    @Autowired
-    public void setDailyDataSRepository(DailyDataSRepository dailyDataSRepository) {
-        CommonService.dailyDataSRepository = dailyDataSRepository;
-    }
-
-    @Autowired
-    private static DailyDataBRepository dailyDataBRepository;
-    @Autowired
-    public void setDailyDataBRepository(DailyDataBRepository dailyDataBRepository) {
-        CommonService.dailyDataBRepository = dailyDataBRepository;
-    }
-
-    @Autowired
-    private static StockPriceMovementRepository stockPriceMovementRepository;
-    @Autowired
-    public void setStockPriceMovementRepository(StockPriceMovementRepository stockPriceMovementRepository) {
-        CommonService.stockPriceMovementRepository = stockPriceMovementRepository;
-    }
-
-    @Autowired
-    private static SetupDatesRepository setupDatesRepository;
-    @Autowired
-    public void setSetupDatesRepository(SetupDatesRepository setupDatesRepository){
-        CommonService.setupDatesRepository = setupDatesRepository;
-    }
-
-    @Autowired
-    private static IndexValuationRepository indexValuationRepository;
-    @Autowired
-    public void setIndexValuationRepository(IndexValuationRepository indexValuationRepository){
-        CommonService.indexValuationRepository = indexValuationRepository;
-    }
-
-    @Autowired
-    private static IndexStatisticsRepository indexStatisticsRepository;
-    @Autowired
-    public void setIndexStatisticsRepository(IndexStatisticsRepository indexStatisticsRepository){
-        CommonService.indexStatisticsRepository = indexStatisticsRepository;
-    }
-
-    @Autowired
-    private static StockPriceMovementHistoryRepository stockPriceMovementHistoryRepository;
-    @Autowired
-    public void setStockPriceMovementHistoryRepository(StockPriceMovementHistoryRepository stockPriceMovementHistoryRepository){
-        CommonService.stockPriceMovementHistoryRepository = stockPriceMovementHistoryRepository;
-    }
-
-    @Autowired
-    private static BenchmarkTwrrMonthlyRepository benchmarkTwrrMonthlyRepository;
-    @Autowired
-    public void setBenchmarkTwrrMonthlyRepository(BenchmarkTwrrMonthlyRepository benchmarkTwrrMonthlyRepository){
-        CommonService.benchmarkTwrrMonthlyRepository = benchmarkTwrrMonthlyRepository;
-    }
-
-    @Autowired
-    private static BenchmarkTwrrSummaryRepository benchmarkTwrrSummaryRepository;
-    @Autowired
-    public void setBenchmarkTwrrSummaryRepository(BenchmarkTwrrSummaryRepository benchmarkTwrrSummaryRepository){
-        CommonService.benchmarkTwrrSummaryRepository = benchmarkTwrrSummaryRepository;
-    }
-
-    @Autowired
-    public static JdbcTemplate jdbcTemplate;
-    @Autowired
-    public void setJdbcTemplate(JdbcTemplate template) {
-        CommonService.jdbcTemplate = template;
-    }
-
-    private static List<StockUniverse> nseBse500BasicList;
-    private static List<NseBse500> nseBse500List;
 
     /**
      * Returns true if SignIn User is Admin
      * @param userDetails
      * @return
      */
-    public static boolean isAdmin(@AuthenticationPrincipal UserDetails userDetails){
+    public boolean isAdmin(@AuthenticationPrincipal UserDetails userDetails){
         boolean isAdmin = false;
         String roleName = getLoggedInUser(userDetails).getRoleName();
         if (roleName.equals(ADMIN_ROLE)) {
@@ -206,7 +130,7 @@ public class CommonService {
      * @param userDetails
      * @return
      */
-    public static boolean isAdviser(@AuthenticationPrincipal UserDetails userDetails){
+    public boolean isAdviser(@AuthenticationPrincipal UserDetails userDetails){
         boolean isAdviser = false;
         String roleName = getLoggedInUser(userDetails).getRoleName();
         if (roleName.equals(ADVISER_ROLE)) {
@@ -215,7 +139,7 @@ public class CommonService {
         return isAdviser;
     }
 
-    public static void updateLastLoginStatus(@AuthenticationPrincipal UserDetails userDetails){
+    public void updateLastLoginStatus(@AuthenticationPrincipal UserDetails userDetails){
         User loggedInUser = getLoggedInUser(userDetails);
         loggedInUser.setLastLoginTime(new java.sql.Timestamp(new java.util.Date().getTime()));
         userRepository.save(loggedInUser);
@@ -227,7 +151,7 @@ public class CommonService {
      * @return
      * @throws UsernameNotFoundException
      */
-    public static User getLoggedInUser(UserDetails userDetails) throws  UsernameNotFoundException {
+    public User getLoggedInUser(UserDetails userDetails) throws  UsernameNotFoundException {
         Optional<User> optionalUser = userRepository.findByEmail(userDetails.getUsername());
 
         optionalUser
@@ -242,7 +166,7 @@ public class CommonService {
      * @param signInUser
      * @return
      */
-    public static String getWelcomeMessage(User signInUser){
+    public String getWelcomeMessage(User signInUser){
         String welcomeMessage = "";
         if (signInUser != null) {
             welcomeMessage = signInUser.getPrefix()+ " "+ signInUser.getLastName();
@@ -255,11 +179,11 @@ public class CommonService {
      * @return
      */
     //@Cacheable("SetupDates")
-    public static SetupDates getSetupDates() {
+    public SetupDates getSetupDates() {
         List<SetupDates> setupDatesList;
         SetupDates setupDates = new SetupDates();
-        if (CommonService.setupDatesRepository != null) {
-            setupDatesList = CommonService.setupDatesRepository.findAll();
+        if (this.setupDatesRepository != null) {
+            setupDatesList = this.setupDatesRepository.findAll();
             setupDates = setupDatesList.get(0);
         }
 
@@ -271,13 +195,13 @@ public class CommonService {
      * @return
      */
     @Cacheable("AssetClassfication")
-    public static List<AssetClassification> getAssetClassfication() {
-//        if (CommonService.assetClassificationRepository != null) {
-//            return  CommonService.assetClassificationRepository.findAll();
+    public List<AssetClassification> getAssetClassfication() {
+//        if (this.assetClassificationRepository != null) {
+//            return  this.assetClassificationRepository.findAll();
 //        } else {
 //            return new ArrayList<>();
 //        }
-        return  CommonService.assetClassificationRepository.findAll();
+        return  this.assetClassificationRepository.findAll();
     }
 
     /**
@@ -285,8 +209,8 @@ public class CommonService {
      * @return
      */
     @Cacheable("Subindustries")
-    public static List<Subindustry> getSubindustries() {
-        return CommonService.subindustryRepository.findAll();
+    public List<Subindustry> getSubindustries() {
+        return this.subindustryRepository.findAll();
     }
 
     /**
@@ -294,8 +218,8 @@ public class CommonService {
      * @return
      */
     @Cacheable("FundHouses")
-    public static List<String> getDistinctFundHouse() {
-        return CommonService.mutualFundUniverseRepository.findDistinctFundHouse();
+    public List<String> getDistinctFundHouse() {
+        return this.mutualFundUniverseRepository.findDistinctFundHouse();
     }
 
     /**
@@ -304,14 +228,14 @@ public class CommonService {
      * @return
      */
     @Cacheable(value = "SchemeNamesByFundHouse")
-    public static List<MutualFundDTO> getSchemeNames(String fundHouse){
-        List<MutualFundUniverse> funds = CommonService.mutualFundUniverseRepository.findSchemeNamesByFundHouse(fundHouse,new Sort("schemeNamePart"));
+    public List<MutualFundDTO> getSchemeNames(String fundHouse){
+        List<MutualFundUniverse> funds = this.mutualFundUniverseRepository.findSchemeNamesByFundHouse(fundHouse,new Sort("schemeNamePart"));
         List<MutualFundDTO> fundsDTO = new ArrayList<>();
         setFundsDTO(funds, fundsDTO);
         return  fundsDTO;
     }
 
-    private static void setFundsDTO(List<MutualFundUniverse> funds, List<MutualFundDTO> fundsDTO) {
+    private final void setFundsDTO(List<MutualFundUniverse> funds, List<MutualFundDTO> fundsDTO) {
         for (MutualFundUniverse fund: funds) {
             MutualFundDTO fundDTO = new MutualFundDTO();
             fundDTO.setSchemeCode(fund.getSchemeCode());
@@ -343,8 +267,8 @@ public class CommonService {
      * @return
      */
     @Cacheable(value = "SchemeNamesByFundHouseAndPlan")
-    public static List<MutualFundDTO> getSchemeNames(String fundHouse,String directRegular){
-        List<MutualFundUniverse> funds = CommonService.mutualFundUniverseRepository.findSchemeNamesByFundHouse(fundHouse,directRegular, new Sort("schemeNamePart"));
+    public List<MutualFundDTO> getSchemeNames(String fundHouse,String directRegular){
+        List<MutualFundUniverse> funds = this.mutualFundUniverseRepository.findSchemeNamesByFundHouse(fundHouse,directRegular, new Sort("schemeNamePart"));
         List<MutualFundDTO> fundsDTO = new ArrayList<>();
         setFundsDTO(funds, fundsDTO);
         return  fundsDTO;
@@ -358,27 +282,27 @@ public class CommonService {
      * @return
      */
     @Cacheable(value = "SchemeNamesByFundHouseAndPlanAndOption")
-    public static List<MutualFundDTO> getSchemeNames(String fundHouse,String directRegular,String dividendGrowth){
-        List<MutualFundUniverse> funds = CommonService.mutualFundUniverseRepository.findSchemeNamesByFundHouse(fundHouse,directRegular, dividendGrowth, new Sort("schemeNamePart"));
+    public List<MutualFundDTO> getSchemeNames(String fundHouse,String directRegular,String dividendGrowth){
+        List<MutualFundUniverse> funds = this.mutualFundUniverseRepository.findSchemeNamesByFundHouse(fundHouse,directRegular, dividendGrowth, new Sort("schemeNamePart"));
         List<MutualFundDTO> fundsDTO = new ArrayList<>();
         setFundsDTO(funds, fundsDTO);
         return  fundsDTO;
     }
 
     @Cacheable(value = "GetSchemeDetails")
-    public  static  List<MutualFundDTO> getSchemeDetails(String fundHouse, String category) {
+    public List<MutualFundDTO> getSchemeDetails(String fundHouse, String category) {
 
-        List<MutualFundUniverse> funds = CommonService.mutualFundUniverseRepository.findSchemeNamesByFundHouseAndCategory(fundHouse, category, new Sort("schemeNamePart"));
-        //List<MutualFundUniverse> funds = CommonService.mutualFundUniverseRepository.findAllByFundHouseAndCategory(fundHouse, category);
+        List<MutualFundUniverse> funds = this.mutualFundUniverseRepository.findSchemeNamesByFundHouseAndCategory(fundHouse, category, new Sort("schemeNamePart"));
+        //List<MutualFundUniverse> funds = this.mutualFundUniverseRepository.findAllByFundHouseAndCategory(fundHouse, category);
         List<MutualFundDTO> fundsDTO = new ArrayList<>();
         setFundsDTO(funds, fundsDTO);
         return fundsDTO;
     }
 
     @Cacheable(value = "SelectedMFStats")
-    public static List<MutualFundStats> getSelectedMF() {
+    public List<MutualFundStats> getSelectedMF() {
         //return null;
-        List<MutualFundStats> mfStats =  CommonService.mutualFundStatsRepository.findAll();
+        List<MutualFundStats> mfStats =  this.mutualFundStatsRepository.findAll();
         mfStats.sort(Comparator.comparing(l->l.getSchemeNamePart()));
         mfStats.sort(Comparator.comparing(l->l.getSchemeType()));
         return mfStats;
@@ -389,8 +313,8 @@ public class CommonService {
      * @return
      */
     @Cacheable(value = "StockUniverse")
-    public static List<StockUniverse> getAllStocks(){
-        return CommonService.stockUniverseRepository.findAll();
+    public List<StockUniverse> getAllStocks(){
+        return this.stockUniverseRepository.findAll();
     }
 
 
@@ -399,12 +323,12 @@ public class CommonService {
      * @return
      */
     @Cacheable(value = "NseBse500Basic")
-    public static List<NseBse500> getNseBse500() {
-        nseBse500BasicList = CommonService.stockUniverseRepository.findAllByIsNse500OrIsBse500OrderByMarketcapDesc(1,1);
-        List<DailyDataS> dailyDataSList = CommonService.dailyDataSRepository.findAllByKeyDate(getSetupDates().getDateToday());
-        List<StockPriceMovement> stockPriceMovementList = CommonService.stockPriceMovementRepository.findAll();
+    public List<NseBse500> getNseBse500() {
+        nseBse500BasicList = this.stockUniverseRepository.findAllByIsNse500OrIsBse500OrderByMarketcapDesc(1,1);
+        List<DailyDataS> dailyDataSList = this.dailyDataSRepository.findAllByKeyDate(getSetupDates().getDateToday());
+        List<StockPriceMovement> stockPriceMovementList = this.stockPriceMovementRepository.findAll();
         nseBse500List = new ArrayList<>();
-        List<Subindustry> subindustries = CommonService.getSubindustries();
+        List<Subindustry> subindustries = this.getSubindustries();
         for(StockUniverse stockUniverse : nseBse500BasicList){
             NseBse500 nseBse500 = new NseBse500(stockUniverse);
             List<Subindustry> subindustries1 = subindustries.stream()
@@ -431,7 +355,7 @@ public class CommonService {
         return nseBse500List;
     }
 
-    private static String getLatestFourRecommendations(String ticker, String broker, double cmp) {
+    private final String getLatestFourRecommendations(String ticker, String broker, double cmp) {
         // Get the latest quarter across all records
         String latestQuarter = stockAnalystRecoRepository.findMaxKeyQuarter();
 
@@ -488,7 +412,7 @@ public class CommonService {
         return result;
     }
 
-    private static void getLatestFourValuation(String ticker, double cmp, NseBse500 nseBse500) {
+    private final void getLatestFourValuation(String ticker, double cmp, NseBse500 nseBse500) {
         // Get the latest quarter across all records
         String latestQuarter = stockValuationRepository.findMaxKeyQuarter();
 
@@ -666,7 +590,7 @@ public class CommonService {
      * @param ticker
      * @return
      */
-    public static NseBse500 getStockDetails(String ticker) {
+    public NseBse500 getStockDetails(String ticker) {
         if (nseBse500List == null) {
             nseBse500List = getNseBse500();
         }
@@ -678,7 +602,7 @@ public class CommonService {
                     .get(0);
         } catch (Exception e) {
             System.out.println("Stock " + ticker + " Not in a NSE500 or BSE500 ");
-            StockUniverse stock = CommonService.stockUniverseRepository.findByTicker(ticker);
+            StockUniverse stock = this.stockUniverseRepository.findByTicker(ticker);
             dto = new NseBse500(stock);
         }
 
@@ -693,15 +617,15 @@ public class CommonService {
      * @param ticker
      * @return
      */
-    public static List<StockQuarter> getStockQuarter(String ticker){
-        List<java.sql.Date> dates = CommonService.stockQuarterRepository.findDistinctDatesForTicker(ticker);
+    public List<StockQuarter> getStockQuarter(String ticker){
+        List<java.sql.Date> dates = this.stockQuarterRepository.findDistinctDatesForTicker(ticker);
         List<StockQuarter> stockQuarterList = new ArrayList<>();
         for(java.sql.Date date: dates){
-            StockQuarter stockQuarter = CommonService.stockQuarterRepository.findAllByKeyTickerAndKeyConsStandaloneAndKeyDate(ticker,"C", date);
+            StockQuarter stockQuarter = this.stockQuarterRepository.findAllByKeyTickerAndKeyConsStandaloneAndKeyDate(ticker,"C", date);
             if (stockQuarter != null) {
                 stockQuarterList.add(stockQuarter);
             } else {
-                stockQuarter = CommonService.stockQuarterRepository.findAllByKeyTickerAndKeyConsStandaloneAndKeyDate(ticker,"S", date);
+                stockQuarter = this.stockQuarterRepository.findAllByKeyTickerAndKeyConsStandaloneAndKeyDate(ticker,"S", date);
                 if (stockQuarter != null){
                     stockQuarterList.add(stockQuarter);
                 }
@@ -715,15 +639,15 @@ public class CommonService {
      * @param ticker
      * @return
      */
-    public static List<StockPnl> getStockPnl(String ticker){
-        List<java.sql.Date> dates = CommonService.stockPnlRepository.findDistinctDatesForTicker(ticker);
+    public List<StockPnl> getStockPnl(String ticker){
+        List<java.sql.Date> dates = this.stockPnlRepository.findDistinctDatesForTicker(ticker);
         List<StockPnl> stockPnlList = new ArrayList<>();
         for(java.sql.Date date: dates){
-            StockPnl stockPnl = CommonService.stockPnlRepository.findAllByKeyTickerAndKeyConsStandaloneAndKeyDate(ticker,"C", date);
+            StockPnl stockPnl = this.stockPnlRepository.findAllByKeyTickerAndKeyConsStandaloneAndKeyDate(ticker,"C", date);
             if (stockPnl != null) {
                 stockPnlList.add(stockPnl);
             } else {
-                stockPnl = CommonService.stockPnlRepository.findAllByKeyTickerAndKeyConsStandaloneAndKeyDate(ticker,"S", date);
+                stockPnl = this.stockPnlRepository.findAllByKeyTickerAndKeyConsStandaloneAndKeyDate(ticker,"S", date);
                 if (stockPnl != null){
                     stockPnlList.add(stockPnl);
                 }
@@ -737,7 +661,7 @@ public class CommonService {
      * @param ticker
      * @return
      */
-    public static List<StockValuationHistory> getStockValuationHistory(String ticker){
+    public List<StockValuationHistory> getStockValuationHistory(String ticker){
         List<StockValuationHistory> valuationHistories = new ArrayList<>();
         List<StockPnl> stockPnlList = getStockPnl(ticker);
         stockPnlList.sort(Comparator.comparing(l->l.getKey().getDate()));
@@ -757,12 +681,12 @@ public class CommonService {
      * @param ticker
      * @return
      */
-    public static List<StockPriceMovementHistory> getPriceMovements(String ticker) {
+    public List<StockPriceMovementHistory> getPriceMovements(String ticker) {
         List<StockPriceMovementHistory> stockPriceMovementHistoryList = new ArrayList<>();
         LocalDate now = LocalDate.now();
         LocalDate oneYearOld = now.minusDays(365);
 
-        stockPriceMovementHistoryList = CommonService.stockPriceMovementHistoryRepository.findAllByKeyTickerAndKeyDateGreaterThanOrderByKeyDateAsc(ticker,java.sql.Date.valueOf(oneYearOld));
+        stockPriceMovementHistoryList = this.stockPriceMovementHistoryRepository.findAllByKeyTickerAndKeyDateGreaterThanOrderByKeyDateAsc(ticker,java.sql.Date.valueOf(oneYearOld));
 
         return stockPriceMovementHistoryList;
     }
@@ -772,16 +696,16 @@ public class CommonService {
      * @param ticker
      * @return
      */
-    public static List<RecentValuations> getRecentValuations(String ticker) {
+    public List<RecentValuations> getRecentValuations(String ticker) {
         List<RecentValuations> recentPES = new ArrayList<>();
         LocalDate now = LocalDate.now();
         LocalDate tenQuarterBefore = now.minusMonths(30);
         NseBse500 stockDetails = getStockDetails(ticker);
 
-        List<java.sql.Date> resultDates = CommonService.stockQuarterRepository.findDistinctResultDateForTicker(ticker, java.sql.Date.valueOf(tenQuarterBefore));
+        List<java.sql.Date> resultDates = this.stockQuarterRepository.findDistinctResultDateForTicker(ticker, java.sql.Date.valueOf(tenQuarterBefore));
 
-        List<DailyDataS> dailyDataSList = CommonService.dailyDataSRepository.findAllByKeyNameAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker(),java.sql.Date.valueOf(tenQuarterBefore));
-        //List<DailyDataB> dailyDataBList = CommonService.dailyDataBRepository.findAllByKeyTickerBAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker2(),java.sql.Date.valueOf(oneYearOld));
+        List<DailyDataS> dailyDataSList = this.dailyDataSRepository.findAllByKeyNameAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker(),java.sql.Date.valueOf(tenQuarterBefore));
+        //List<DailyDataB> dailyDataBList = this.dailyDataBRepository.findAllByKeyTickerBAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker2(),java.sql.Date.valueOf(oneYearOld));
         for(DailyDataS dailyDataS: dailyDataSList){
             RecentValuations recentPE = new RecentValuations();
             recentPE.setTicker(ticker);
@@ -823,9 +747,9 @@ public class CommonService {
      * @return
      */
     //@Cacheable(value = "IndexValuation")
-    public static List<IndexValuation> getIndexValuation(){
-        return CommonService.indexValuationRepository.findAllByKeyTickerOrderByKeyDate("NIFTY");
-        //List<IndexValuation> list = CommonService.indexValuationRepository.findAllByKeyTickerAndKeyDateBetweenOrderByKeyDate("NIFTY", getSetupDates().getDateStart4Quarter() , getSetupDates().getDateToday());
+    public List<IndexValuation> getIndexValuation(){
+        return this.indexValuationRepository.findAllByKeyTickerOrderByKeyDate("NIFTY");
+        //List<IndexValuation> list = this.indexValuationRepository.findAllByKeyTickerAndKeyDateBetweenOrderByKeyDate("NIFTY", getSetupDates().getDateStart4Quarter() , getSetupDates().getDateToday());
         //System.out.println("list.size()::"+ list.size());
         //return list;
 
@@ -837,21 +761,21 @@ public class CommonService {
      * @return
      */
     @Cacheable(value = "IndexMonthlyReturnsDTO")
-    public static List<IndexMonthlyReturnsDTO> getIndexMonthlyReturns(String ticker){
-        return IndexService.getMonthlyReturns(ticker);
+    public List<IndexMonthlyReturnsDTO> getIndexMonthlyReturns(String ticker){
+        return indexService.getMonthlyReturns(ticker);
     }
 
     /**
      * Get Index Statistics
      * @return
      */
-    public static List<IndexStatistics> getIndexReturnStatistics(String index){
+    public List<IndexStatistics> getIndexReturnStatistics(String index){
         if (index.equalsIgnoreCase("NIFTY")) {
-            return CommonService.indexStatisticsRepository.findOneByTicker("NIFTY");
+            return this.indexStatisticsRepository.findOneByTicker("NIFTY");
         } else {
-            List<IndexStatistics> indexStatistics = CommonService.indexStatisticsRepository.findOneByTicker("NIFTY");
-            indexStatistics.addAll(CommonService.indexStatisticsRepository.findOneByTicker("BSEMidCap"));
-            indexStatistics.addAll(CommonService.indexStatisticsRepository.findOneByTicker("BSESmallCap"));
+            List<IndexStatistics> indexStatistics = this.indexStatisticsRepository.findOneByTicker("NIFTY");
+            indexStatistics.addAll(this.indexStatisticsRepository.findOneByTicker("BSEMidCap"));
+            indexStatistics.addAll(this.indexStatisticsRepository.findOneByTicker("BSESmallCap"));
             return indexStatistics;
         }
     }
@@ -859,10 +783,10 @@ public class CommonService {
     /**
      * Get Benchmark Returns
      */
-    public static List<BenchmarkTwrrMonthlyDTO> getBenchmarkTwrrMonthly() {
+    public List<BenchmarkTwrrMonthlyDTO> getBenchmarkTwrrMonthly() {
         List<Object[]> objects;
         List<BenchmarkTwrrMonthlyDTO> dtos = new ArrayList<>();
-        objects = CommonService.benchmarkTwrrMonthlyRepository.findAllBenchmarks();
+        objects = this.benchmarkTwrrMonthlyRepository.findAllBenchmarks();
         for (Object[] object : objects) {
             BenchmarkTwrrMonthlyDTO dto = new BenchmarkTwrrMonthlyDTO();
             dto.setBenchmarkType(""+object[0]);
@@ -964,10 +888,10 @@ public class CommonService {
         return dtos;
 
     }
-    public static List<BenchmarkTwrrSummaryDTO> getBenchmarkTwrrSummary() {
+    public List<BenchmarkTwrrSummaryDTO> getBenchmarkTwrrSummary() {
         List<Object[]> objects;
         List<BenchmarkTwrrSummaryDTO> dtos = new ArrayList<>();
-        objects = CommonService.benchmarkTwrrSummaryRepository.findAllBenchmarks();
+        objects = this.benchmarkTwrrSummaryRepository.findAllBenchmarks();
         for (Object[] object : objects) {
             BenchmarkTwrrSummaryDTO dto = new BenchmarkTwrrSummaryDTO();
             dto.setBenchmarkType(""+object[0]);
@@ -1005,7 +929,7 @@ public class CommonService {
         return dtos;
     }
 
-    private static List<CustomChartData> loadExcelChartsForTicker(String ticker) {
+    private final List<CustomChartData> loadExcelChartsForTicker(String ticker) {
         List<CustomChartData> chartDataList = new ArrayList<>();
         try {
             Map<String, Map<String, String>> chartProperty = loadSectionedProperties(BASE_EXCEL_PATH + "ChartForSheet&Row.property");
@@ -1123,7 +1047,7 @@ public class CommonService {
         return chartDataList;
     }
 
-    private static File getLatestExcelFileForTicker(String ticker) {
+    private final File getLatestExcelFileForTicker(String ticker) {
         List<String> quarters = getAvailableQuarters(BASE_EXCEL_PATH);
         for (String quarter : quarters) {
             String filePath = BASE_EXCEL_PATH + quarter + "/" + ticker + "_FY" + quarter.substring(2) + ".xlsx";
@@ -1135,7 +1059,7 @@ public class CommonService {
         return null;
     }
 
-    private static List<String> getAvailableQuarters(String basePath) {
+    private final List<String> getAvailableQuarters(String basePath) {
         File baseDir = new File(basePath);
         if (!baseDir.exists() || !baseDir.isDirectory()) {
             return Collections.emptyList();
@@ -1156,7 +1080,7 @@ public class CommonService {
         return quarters;
     }
 
-    private static Map<String, Map<String, String>> loadSectionedProperties(String filePath) {
+    private final Map<String, Map<String, String>> loadSectionedProperties(String filePath) {
         Map<String, Map<String, String>> sectionedProps = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -1181,7 +1105,7 @@ public class CommonService {
         return sectionedProps;
     }
 
-    public static List<ReportNotes> loadReportNotesForTicker(String ticker) {
+    public List<ReportNotes> loadReportNotesForTicker(String ticker) {
         List<ReportNotes> notesList = new ArrayList<>();
         try {
             File excelFile = getLatestExcelFileForTicker(ticker);
@@ -1214,7 +1138,7 @@ public class CommonService {
         return notesList;
     }
 
-    private static String getCellString(Cell cell) {
+    private final String getCellString(Cell cell) {
         if (cell == null) return "";
         if (cell.getCellType() == Cell.CELL_TYPE_STRING) return cell.getStringCellValue().trim();
         if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
@@ -1238,7 +1162,7 @@ public class CommonService {
         return "";
     }
 
-    public static List<Map<String, Object>> getPriceSeries(String ticker, String rangeOrDate) {
+    public List<Map<String, Object>> getPriceSeries(String ticker, String rangeOrDate) {
         List<Object> params = new ArrayList<>();
         String sql;
 
@@ -1286,7 +1210,7 @@ public class CommonService {
         });
     }
 
-    public static List<Map<String, Object>> getPriceSeries(String ticker, String from, String to) {
+    public List<Map<String, Object>> getPriceSeries(String ticker, String from, String to) {
         List<Object> params = new ArrayList<>();
         String sql;
 
@@ -1325,7 +1249,7 @@ public class CommonService {
         });
     }
 
-    public static List<Map<String, Object>> getMarketCapSeries(String ticker, String rangeOrDate, String from, String to) {
+    public List<Map<String, Object>> getMarketCapSeries(String ticker, String rangeOrDate, String from, String to) {
         String sql = "SELECT date, market_cap as marketcap, pb_ttm, ev_to_ebit FROM daily_data_s WHERE name = ?";
         List<Object> params = new ArrayList<>();
         params.add(ticker);
@@ -1373,15 +1297,15 @@ public class CommonService {
         });
     }
 
-    public static List<Map<String, Object>> computeIndexTtmPeSeries(String indexTicker, String from, String to) {
+    public List<Map<String, Object>> computeIndexTtmPeSeries(String indexTicker, String from, String to) {
         return computeIndexTtmPeSeriesInternal(indexTicker, "custom", from, to);
     }
 
-    public static List<Map<String, Object>> computeIndexTtmPeSeries(String indexTicker, String range) {
+    public List<Map<String, Object>> computeIndexTtmPeSeries(String indexTicker, String range) {
         return computeIndexTtmPeSeriesInternal(indexTicker, range, null, null);
     }
 
-    public static List<Map<String, Object>> computeIndexTtmPeSeriesInternal(String ticker, String rangeOrDate, String from, String to) {
+    public List<Map<String, Object>> computeIndexTtmPeSeriesInternal(String ticker, String rangeOrDate, String from, String to) {
         List<Map<String, Object>> result = new ArrayList<>();
 
         String sql = "SELECT date, value, pe, implied_earnings FROM index_valuation WHERE ticker = ? ";
@@ -1461,15 +1385,15 @@ public class CommonService {
         return result;
     }
 
-    public static List<Map<String, Object>> computeStockTtmPeSeries(String ticker, String from, String to) {
+    public List<Map<String, Object>> computeStockTtmPeSeries(String ticker, String from, String to) {
         return computeStockTtmPeSeriesInternal(ticker, "custom", from, to);
     }
 
-    public static List<Map<String, Object>> computeStockTtmPeSeries(String ticker, String range) {
+    public List<Map<String, Object>> computeStockTtmPeSeries(String ticker, String range) {
         return computeStockTtmPeSeriesInternal(ticker, range, null, null);
     }
 
-    private static List<Map<String, Object>> computeStockTtmPeSeriesInternal(String ticker, String rangeOrDate, String from, String to) {
+    private final List<Map<String, Object>> computeStockTtmPeSeriesInternal(String ticker, String rangeOrDate, String from, String to) {
         List<Map<String, Object>> output = new ArrayList<>();
 
         try {
@@ -1573,7 +1497,7 @@ public class CommonService {
         return output;
     }
 
-    private static Map<java.sql.Date, Double> extractSharesFromAnnualSheet(Workbook workbook) {
+    private final Map<java.sql.Date, Double> extractSharesFromAnnualSheet(Workbook workbook) {
         Map<java.sql.Date, Double> sharesByDate = new TreeMap<>();
         Sheet sheet = workbook.getSheet("AnnualResults");
 
@@ -1602,7 +1526,7 @@ public class CommonService {
         return sharesByDate;
     }
 
-    private static java.sql.Date getSqlDateFromCell(Cell cell) {
+    private final java.sql.Date getSqlDateFromCell(Cell cell) {
         if (cell == null) return null;
         try {
             int type = (cell.getCellType() == Cell.CELL_TYPE_FORMULA)
@@ -1620,7 +1544,7 @@ public class CommonService {
         return null;
     }
 
-    private static Double getNumericFromCell(Cell cell) {
+    private final Double getNumericFromCell(Cell cell) {
         if (cell == null) return null;
         try {
             int type = (cell.getCellType() == Cell.CELL_TYPE_FORMULA)
@@ -1641,7 +1565,7 @@ public class CommonService {
         }
     }
 
-    private static List<ResultRow> extractQuarterlyResults(Workbook workbook) {
+    private final List<ResultRow> extractQuarterlyResults(Workbook workbook) {
         List<ResultRow> results = new ArrayList<>();
         Sheet sheet = workbook.getSheet("QuarterP&L");
 
@@ -1678,11 +1602,11 @@ public class CommonService {
         return results;
     }
 
-    public static List<PricePoint> getPriceSeriesFromDB(String ticker, String rangeOrDate) {
+    public List<PricePoint> getPriceSeriesFromDB(String ticker, String rangeOrDate) {
         return getPriceSeriesFromDB(ticker, rangeOrDate, null, null);
     }
 
-    public static List<PricePoint> getPriceSeriesFromDB(String ticker, String rangeOrDate, String from, String to) {
+    public List<PricePoint> getPriceSeriesFromDB(String ticker, String rangeOrDate, String from, String to) {
         List<PricePoint> result = new ArrayList<>();
 
         String sql = "SELECT date, close_price FROM nse_price_history WHERE nse_ticker = ?";

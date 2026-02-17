@@ -19,7 +19,15 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "user/api/")
 public class PortfolioRestApi {
-    private static final Logger logger = LoggerFactory.getLogger(PortfolioRestApi.class);
+    private final Logger logger = LoggerFactory.getLogger(PortfolioRestApi.class);
+    private final CommonService commonService;
+    private final PortfolioService portfolioService;
+
+    public PortfolioRestApi(CommonService commonService,
+                            PortfolioService portfolioService){
+        this.commonService = commonService;
+        this.portfolioService = portfolioService;
+    }
 
     @RequestMapping(value = "/getportfolios", method = RequestMethod.GET)
     public List<Portfolio> getPortfolios() {
@@ -27,8 +35,8 @@ public class PortfolioRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return PortfolioService.getPortfolios(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return portfolioService.getPortfolios(user.getEmail());
     }
 
     @RequestMapping(value = "/getindividualholdings", method = RequestMethod.GET)
@@ -37,8 +45,8 @@ public class PortfolioRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return PortfolioService.getPortfolioHoldings(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return portfolioService.getPortfolioHoldings(user.getEmail());
     }
 
     //getConsolidatedPortfolioHoldings
@@ -48,8 +56,8 @@ public class PortfolioRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return PortfolioService.getConsolidatedPortfolioHoldings(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return portfolioService.getConsolidatedPortfolioHoldings(user.getEmail());
     }
 
     @RequestMapping(value = "/getportfoliohistoricalholdings", method = RequestMethod.GET)
@@ -58,8 +66,8 @@ public class PortfolioRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return PortfolioService.getPortfolioHistoricalHoldings(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return portfolioService.getPortfolioHistoricalHoldings(user.getEmail());
     }
 
     @RequestMapping(value = "/getfinyearprofit", method = RequestMethod.GET)
@@ -68,8 +76,8 @@ public class PortfolioRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return PortfolioService.getFinYearProfit(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return portfolioService.getFinYearProfit(user.getEmail());
     }
 
     @RequestMapping(value = "/getportfoliocashflows", method = RequestMethod.GET)
@@ -78,8 +86,8 @@ public class PortfolioRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return PortfolioService.getPortfolioCashflows(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return portfolioService.getPortfolioCashflows(user.getEmail());
     }
 
     @RequestMapping(value = "/getportfoliotwrrsummary", method = RequestMethod.GET)
@@ -88,8 +96,8 @@ public class PortfolioRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return PortfolioService.getPortfolioTwrrSummary(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return portfolioService.getPortfolioTwrrSummary(user.getEmail());
     }
 
     @RequestMapping(value = "/getportfoliotwrrmonthly", method = RequestMethod.GET)
@@ -98,7 +106,7 @@ public class PortfolioRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return PortfolioService.getPortfolioTwrrMonthly(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return portfolioService.getPortfolioTwrrMonthly(user.getEmail());
     }
 }

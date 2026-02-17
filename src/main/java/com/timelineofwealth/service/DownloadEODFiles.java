@@ -48,58 +48,39 @@ import java.util.zip.ZipInputStream;
 
 @Service
 public class DownloadEODFiles {
-    @Autowired
-    NsePriceHistoryRepository nsePriceHistoryRepository;
-    @Autowired
-    public void setNsePriceHistoryRepository(NsePriceHistoryRepository nsePriceHistoryRepository){
-        this.nsePriceHistoryRepository = nsePriceHistoryRepository;
-    }
-    @Autowired
-    BsePriceHistoryRepository bsePriceHistoryRepository;
-    @Autowired
-    public void setBsePriceHistoryRepository(BsePriceHistoryRepository bsePriceHistoryRepository){
-        this.bsePriceHistoryRepository = bsePriceHistoryRepository;
-    }
-    @Autowired
-    MutualFundNavHistoryRepository mutualFundNavHistoryRepository;
-    @Autowired
-    public void setMutualFundNavHistoryRepository(MutualFundNavHistoryRepository mutualFundNavHistoryRepository){
-        this.mutualFundNavHistoryRepository = mutualFundNavHistoryRepository;
-    }
-    @Autowired
-    MutualFundUniverseRepository mutualFundUniverseRepository;
-    @Autowired
-    public void setMutualFundUniverseRepository(MutualFundUniverseRepository mutualFundUniverseRepository){
-        this.mutualFundNavHistoryRepository = mutualFundNavHistoryRepository;
-    }
-    @Autowired
-    DailyDataSRepository dailyDataSRepository;
-    @Autowired
-    public void setDailyDataSRepository(DailyDataSRepository dailyDataSRepository){
-        this.dailyDataSRepository = dailyDataSRepository;
-    }
-    @Autowired
-    IndexValuationRepository indexValuationRepository;
-    @Autowired
-    public void setIndexValuationRepository(IndexValuationRepository indexValuationRepository){
-        this.indexValuationRepository = indexValuationRepository;
-    }
+    // ✅ Make all repositories final instance fields
+    private final NsePriceHistoryRepository nsePriceHistoryRepository;
+    private final BsePriceHistoryRepository bsePriceHistoryRepository;
+    private final MutualFundNavHistoryRepository mutualFundNavHistoryRepository;
+    private final MutualFundUniverseRepository mutualFundUniverseRepository;
+    private final DailyDataSRepository dailyDataSRepository;
+    private final IndexValuationRepository indexValuationRepository;
+    private final CommonService commonService;
 
-    public static void main(String[] args) throws IOException {
-        DownloadEODFiles downloadEODFiles = new DownloadEODFiles();
-        downloadEODFiles.oneClickUpload(downloadEODFiles.nsePriceHistoryRepository, downloadEODFiles.bsePriceHistoryRepository, downloadEODFiles.mutualFundNavHistoryRepository, downloadEODFiles.dailyDataSRepository, downloadEODFiles.mutualFundUniverseRepository);
+    // ✅ ONE constructor with ALL dependencies
+    @Autowired
+    public DownloadEODFiles(
+            NsePriceHistoryRepository nsePriceHistoryRepository,
+            BsePriceHistoryRepository bsePriceHistoryRepository,
+            MutualFundNavHistoryRepository mutualFundNavHistoryRepository,
+            MutualFundUniverseRepository mutualFundUniverseRepository,
+            DailyDataSRepository dailyDataSRepository,
+            IndexValuationRepository indexValuationRepository,
+            CommonService commonService) {
+        this.nsePriceHistoryRepository = nsePriceHistoryRepository;
+        this.bsePriceHistoryRepository = bsePriceHistoryRepository;
+        this.mutualFundNavHistoryRepository = mutualFundNavHistoryRepository;
+        this.mutualFundUniverseRepository = mutualFundUniverseRepository;
+        this.dailyDataSRepository = dailyDataSRepository;
+        this.indexValuationRepository = indexValuationRepository;
+        this.commonService = commonService;
     }
 
     String downloadConfigFilePath = "C:\\MyDocuments\\03Business\\03DailyData\\downloadconfig.property";
 
-    public int oneClickUpload(NsePriceHistoryRepository nsePriceHistoryRepository, BsePriceHistoryRepository bsePriceHistoryRepository, MutualFundNavHistoryRepository mutualFundNavHistoryRepository, DailyDataSRepository dailyDataSRepository, MutualFundUniverseRepository mutualFundUniverseRepository) throws IOException {
+    public int oneClickUpload() throws IOException {
         int returnValue = 0;
         try {
-            this.nsePriceHistoryRepository = nsePriceHistoryRepository;
-            this.bsePriceHistoryRepository = bsePriceHistoryRepository;
-            this.mutualFundNavHistoryRepository = mutualFundNavHistoryRepository;
-            this.dailyDataSRepository = dailyDataSRepository;
-            this.mutualFundUniverseRepository = mutualFundUniverseRepository;
             Properties properties = new Properties();
             properties.load(new FileInputStream(downloadConfigFilePath));
             returnValue = downloadAndUploadBSEBhavCopy(properties);
@@ -761,7 +742,7 @@ public class DownloadEODFiles {
                 mutualFundNavHistories.add(mutualFundNavHistory);
                 int countBySchemeCode = mutualFundUniverseRepository.countBySchemeCode(new Long(code));
 
-                if (countBySchemeCode == 0 && date.after(CommonService.getSetupDates().getDateLastTradingDay())){
+                if (countBySchemeCode == 0 && date.after(commonService.getSetupDates().getDateLastTradingDay())){
                     MutualFundUniverse mutualFundUniverse = new MutualFundUniverse();
                     mutualFundUniverse.setSchemeCode(new Long(code));
                     mutualFundUniverse.setSchemeNameFull(schemeName);

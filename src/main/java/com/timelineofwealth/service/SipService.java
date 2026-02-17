@@ -22,27 +22,28 @@ import java.util.List;
 
 @Service("SipService")
 public class SipService {
-    private static final Logger logger = LoggerFactory.getLogger(SipService.class);
+    private final Logger logger = LoggerFactory.getLogger(SipService.class);
+    private final SipRepository sipRepository;
+    private final MutualFundUniverseRepository mutualFundUniverseRepository;
+    private final MemberService memberService;
+    private final CommonService commonService;
 
     @Autowired
-    private static SipRepository sipRepository;
-    @Autowired
-    public void setSipRepository(SipRepository sipRepository){
-        SipService.sipRepository = sipRepository;
+    public  SipService(SipRepository sipRepository,
+                       MutualFundUniverseRepository mutualFundUniverseRepository,
+                       MemberService memberService,
+                       CommonService commonService){
+        this.sipRepository = sipRepository;
+        this.mutualFundUniverseRepository = mutualFundUniverseRepository;
+        this.memberService = memberService;
+        this.commonService = commonService;
     }
 
-    @Autowired
-    private static MutualFundUniverseRepository mutualFundUniverseRepository;
-    @Autowired
-    public void setMutualFundUniverseRepository(MutualFundUniverseRepository mutualFundUniverseRepository){
-        SipService.mutualFundUniverseRepository = mutualFundUniverseRepository;
-    }
-
-    public static List<SipForm> getSipRecords(String email){
+    public List<SipForm> getSipRecords(String email){
         logger.debug(String.format("In SipService.getSipRecords: Email %s", email));
 
         List<Sip> sipRecords;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -52,7 +53,7 @@ public class SipService {
         MutualFundUniverse scheme;
         for (Sip sipRecord : sipRecords) {
             if (sipRecord.getInstrumentType().equals("Mutual Fund")) {
-                scheme = SipService.mutualFundUniverseRepository.findBySchemeCode(sipRecord.getSchemeCode());
+                scheme = this.mutualFundUniverseRepository.findBySchemeCode(sipRecord.getSchemeCode());
             } else {
                 scheme = null;
             }
@@ -62,10 +63,10 @@ public class SipService {
         return sipFormRecords;
     }
 
-    public static List<Sip> getSipRecordsBySchemeCode(String email, long memberid, long schemeCode) {
+    public List<Sip> getSipRecordsBySchemeCode(String email, long memberid, long schemeCode) {
         logger.debug(String.format("In SipService.getSipRecordsBySchemeCode: Email: %s, Member id: %d, Scheme Code: %d", email,memberid,schemeCode));
         List<Sip> sipRecords;
-        if(MemberService.isAuthorised(email, memberid)){
+        if(memberService.isAuthorised(email, memberid)){
             sipRecords = sipRepository.findByKeyMemberidAndSchemeCodeOrderByKeySipid(memberid,schemeCode);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
@@ -73,35 +74,35 @@ public class SipService {
         return sipRecords;
     }
 
-    public static void updateSipRecord(Sip editedRecord) {
+    public void updateSipRecord(Sip editedRecord) {
         logger.debug(String.format("In SipService.updateSipRecord: editedRecord.key.memberid %d", editedRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In SipService.updateSipRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), editedRecord.getKey().getMemberid())){
-            SipService.sipRepository.save(editedRecord);
+        if(memberService.isAuthorised(user.getEmail(), editedRecord.getKey().getMemberid())){
+            this.sipRepository.save(editedRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }
     }
 
     @Transactional
-    public static void addSipRecord(Model model, Sip newRecord, EntityManager entityManager) {
+    public void addSipRecord(Model model, Sip newRecord, EntityManager entityManager) {
         logger.debug(String.format("In SipService.addSipRecord: newRecord.key.memberid %d", newRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In SipService.addSipRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
+        if(memberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
             int newSipid = 0;
-            int count = SipService.sipRepository.countByKeyMemberid(newRecord.getKey().getMemberid());
+            int count = this.sipRepository.countByKeyMemberid(newRecord.getKey().getMemberid());
             if (count == 0) { newSipid = 1;} else {
-                newSipid = SipService.sipRepository.findTopByKeyMemberidOrderByKeySipidDesc(newRecord.getKey().getMemberid()).getKey().getSipid() + 1;
+                newSipid = this.sipRepository.findTopByKeyMemberidOrderByKeySipidDesc(newRecord.getKey().getMemberid()).getKey().getSipid() + 1;
             }
             logger.debug(String.format("In SipService.addSipRecord: new sipid %d", newSipid));
             newRecord.getKey().setSipid(newSipid);
-            SipService.sipRepository.save(newRecord);
+            this.sipRepository.save(newRecord);
             if(newRecord.getInstrumentType().equals("Mutual Fund")) {
                 if (entityManager != null) {
                     StoredProcedureQuery storedProcedure = entityManager.createStoredProcedureQuery("ap_process_sip_history");
@@ -125,14 +126,14 @@ public class SipService {
         }
     }
 
-    public static void deleteSipRecord(Sip deletedRecord){
+    public void deleteSipRecord(Sip deletedRecord){
         logger.debug(String.format("In SipService.deleteSipRecord: deletedRecord.key.memberid %d", deletedRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In SipService.deleteSipRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), deletedRecord.getKey().getMemberid())){
-            SipService.sipRepository.delete(deletedRecord);
+        if(memberService.isAuthorised(user.getEmail(), deletedRecord.getKey().getMemberid())){
+            this.sipRepository.delete(deletedRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }

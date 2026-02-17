@@ -17,21 +17,25 @@ import java.util.List;
 
 @Service("LiquidityService")
 public class LiquidityService {
-    private static final Logger logger = LoggerFactory.getLogger(LiquidityService.class);
-
+    private final Logger logger = LoggerFactory.getLogger(LiquidityService.class);
+    private final MemberService memberService;
+    private final LiquidityRepository liquidityRepository;
+    private final CommonService commonService;
 
     @Autowired
-    private static LiquidityRepository liquidityRepository;
-    @Autowired
-    public void setLiquidityRepository(LiquidityRepository liquidityRepository){
-        LiquidityService.liquidityRepository = liquidityRepository;
+    public LiquidityService(LiquidityRepository liquidityRepository,
+                            MemberService memberService,
+                            CommonService commonService){
+        this.liquidityRepository = liquidityRepository;
+        this.memberService = memberService;
+        this.commonService = commonService;
     }
 
-    public static List<Liquidity> getLiquidityRecords(String email){
+    public List<Liquidity> getLiquidityRecords(String email){
         logger.debug(String.format("In LiquidityService.getLiquidityRecords: Email %s", email));
 
         List<Liquidity> liquidityRecords;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -41,47 +45,47 @@ public class LiquidityService {
         return liquidityRecords;
     }
 
-    public static void updateLiquidityRecord(Liquidity editedRecord) {
+    public void updateLiquidityRecord(Liquidity editedRecord) {
         logger.debug(String.format("In LiquidityService.updateLiquidityRecord: editedRecord.key.memberid %d", editedRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In LiquidityService.updateLiquidityRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), editedRecord.getKey().getMemberid())){
-            LiquidityService.liquidityRepository.save(editedRecord);
+        if(memberService.isAuthorised(user.getEmail(), editedRecord.getKey().getMemberid())){
+            this.liquidityRepository.save(editedRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }
     }
 
-    public static void addLiquidityRecord(Liquidity newRecord) {
+    public void addLiquidityRecord(Liquidity newRecord) {
         logger.debug(String.format("In LiquidityService.addLiquidityRecord: newRecord.key.memberid %d", newRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In LiquidityService.addLiquidityRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
+        if(memberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
             int newLiquidityid = 0;
-            int count = LiquidityService.liquidityRepository.countByKeyMemberid(newRecord.getKey().getMemberid());
+            int count = this.liquidityRepository.countByKeyMemberid(newRecord.getKey().getMemberid());
             if (count == 0) { newLiquidityid = 1; } else {
-                newLiquidityid = LiquidityService.liquidityRepository.findTopByKeyMemberidOrderByKeyLiquidityidDesc(newRecord.getKey().getMemberid()).getKey().getLiquidityid() + 1;
+                newLiquidityid = this.liquidityRepository.findTopByKeyMemberidOrderByKeyLiquidityidDesc(newRecord.getKey().getMemberid()).getKey().getLiquidityid() + 1;
             }
             logger.debug(String.format("In LiquidityService.addLiquidityRecord: new liquidityid %d", newLiquidityid));
             newRecord.getKey().setLiquidityid(newLiquidityid);
-            LiquidityService.liquidityRepository.save(newRecord);
+            this.liquidityRepository.save(newRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }
     }
 
-    public static void deleteLiquidityRecord(Liquidity deletedRecord){
+    public void deleteLiquidityRecord(Liquidity deletedRecord){
         logger.debug(String.format("In LiquidityService.deleteLiquidityRecord: deletedRecord.key.memberid %d", deletedRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In LiquidityService.deleteLiquidityRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), deletedRecord.getKey().getMemberid())){
-            LiquidityService.liquidityRepository.delete(deletedRecord);
+        if(memberService.isAuthorised(user.getEmail(), deletedRecord.getKey().getMemberid())){
+            this.liquidityRepository.delete(deletedRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }

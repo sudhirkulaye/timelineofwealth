@@ -76,7 +76,7 @@ public class CreateFolderStructureForIndustry {
                     break;
 
                 case "5":
-                    ConsolidatedResultTracker.updateResultTrackerExcel();
+                    new ConsolidatedResultTracker().updateResultTrackerExcel();
                     break;
 
                 case "6":
@@ -84,7 +84,7 @@ public class CreateFolderStructureForIndustry {
                     break;
 
                 case "7":
-                    updateMCapAndPrice(UpdateQuarterlyExcels.getLatestQuarterFolder());
+                    updateMCapAndPrice(new UpdateQuarterlyExcels().getLatestQuarterFolder());
                     break;
 
                 case "8":

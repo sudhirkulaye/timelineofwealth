@@ -20,20 +20,26 @@ import java.util.List;
 @Service("incomeExpenseSavingsService")
 public class IncomeExpenseSavingsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(IncomeExpenseSavingsService.class);
+    private final Logger logger = LoggerFactory.getLogger(IncomeExpenseSavingsService.class);
+
+    private final IncomeExpenseSavingsRepository incomeExpenseSavingsRepository;
+    private final MemberService memberService;
+    private final CommonService commonService;
 
     @Autowired
-    private static IncomeExpenseSavingsRepository incomeExpenseSavingsRepository;
-    @Autowired
-    public void setIncomeExpenseSavingsRepository(IncomeExpenseSavingsRepository incomeExpenseSavingsRepository){
-        IncomeExpenseSavingsService.incomeExpenseSavingsRepository = incomeExpenseSavingsRepository;
+    public IncomeExpenseSavingsService(IncomeExpenseSavingsRepository incomeExpenseSavingsRepository,
+                                       MemberService memberService,
+                                       CommonService commonService){
+        this.incomeExpenseSavingsRepository = incomeExpenseSavingsRepository;
+        this.memberService = memberService;
+        this.commonService = commonService;
     }
 
-    public static List<IncomeExpenseSavings> getIncomeExpenseSavingsRecords(String email){
+    public List<IncomeExpenseSavings> getIncomeExpenseSavingsRecords(String email){
         logger.debug(String.format("In IncomeExpenseSavingsService.getIncomeExpenseSavingsRecords: Email %s", email));
 
         List<IncomeExpenseSavings> incomeExpenseSavingsRecords;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -43,27 +49,27 @@ public class IncomeExpenseSavingsService {
         return incomeExpenseSavingsRecords;
     }
 
-    public static void updateIncomeExpenseSavingsRecord(IncomeExpenseSavings editedRecord) {
+    public void updateIncomeExpenseSavingsRecord(IncomeExpenseSavings editedRecord) {
         logger.debug(String.format("In IncomeExpenseSavingsService.updateIncomeExpenseSavingsRecord: editedRecord.key.memberid %d", editedRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In IncomeExpenseSavingsService.updateIncomeExpenseSavingsRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), editedRecord.getKey().getMemberid())){
-            IncomeExpenseSavingsService.incomeExpenseSavingsRepository.save(editedRecord);
+        if(memberService.isAuthorised(user.getEmail(), editedRecord.getKey().getMemberid())){
+            this.incomeExpenseSavingsRepository.save(editedRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }
     }
 
-    public static void addIncomeExpenseSavingsRecord(IncomeExpenseSavings newRecord) {
+    public void addIncomeExpenseSavingsRecord(IncomeExpenseSavings newRecord) {
         logger.debug(String.format("In IncomeExpenseSavingsService.addIncomeExpenseSavingsRecord: newRecord.key.memberid %d", newRecord.getKey().getMemberid()));
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
+        User user = commonService.getLoggedInUser(userDetails);
         logger.debug(String.format("In IncomeExpenseSavingsService.addIncomeExpenseSavingsRecord: Email %s", user.getEmail()));
-        if(MemberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
-            IncomeExpenseSavingsService.incomeExpenseSavingsRepository.save(newRecord);
+        if(memberService.isAuthorised(user.getEmail(), newRecord.getKey().getMemberid())){
+            this.incomeExpenseSavingsRepository.save(newRecord);
         } else {
             throw new InsufficientAuthenticationException("User is not authorized");
         }

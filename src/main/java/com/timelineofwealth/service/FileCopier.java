@@ -35,12 +35,12 @@ public class FileCopier {
 //        String srcFolder = "C:\\Users\\Sudhir Kulaye\\JupyterProjects";
 //        String dstFolder = "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
 
-        String srcFolder = "\\\\HPSpectre\\MyDocuments\\";
-        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\";
+//        String srcFolder = "\\\\HPSpectre\\MyDocuments\\";
+//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\";
 
         //Move Daily Data from HP to Redmii
-//        String srcFolder = "\\\\HPSpectre\\MyDocuments\\03Business\\03DailyData";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\03DailyData";
+        String srcFolder = "\\\\HPSpectre\\MyDocuments\\03Business\\03DailyData";
+        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\03DailyData";
 
         //Move Daily Data from HP to Redmii
 //        String srcFolder = "\\\\HPSpectre\\CFA2025";

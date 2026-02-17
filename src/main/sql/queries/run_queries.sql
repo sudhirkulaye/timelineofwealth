@@ -189,7 +189,7 @@ ORDER BY sector_name_display , industry_name_display , sub_industry_name_display
 select ticker, latest_price from stock_universe a where (a.is_nse500 = 1 or a.is_bse500 = 1) order by marketcap desc;
 
 select if(is_sensex = 1, 'SENSEX', if(is_nifty50 = 1, 'NIFTY', if(is_nse100 = 1 or is_bse100 = 1, 'NSE-BSE100', if(is_nse200 = 1 or is_bse200 = 1, 'NSE-BSE200', if(is_nse500 = 1 or is_bse500 = 1, 'NSE-BSE500', 'Other')))) ) index1, 
-b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, a.cmp, a.market_cap, rank, 
+b.ticker, b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, a.cmp, a.market_cap, rank, 
 last_result_date, sales, net_profit, (opm_latest_quarter/100), (npm_latest_quarter/100), (opm_last_year/100), (npm_last_year/100),
 debt, debt_3years_back, debt_to_equity, (roce/100), (avg_roce_3years/100), (roe/100), (avg_roe_3years/100), 
 (yoy_quarterly_sales_growth/100), (yoy_quarterly_profit_growth/100), (sales_growth_3years/100), (profit_growth_3years/100), 
@@ -205,7 +205,7 @@ b.subindustryid = c.subindustryid and
 -- (b.is_bse500 = 1 or b.is_nse500 = 1) and
 b.ticker = d.ticker
 UNION
-select 'INDEX', b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, b.latest_price, 0, 0, 
+select 'INDEX', b.ticker, b.short_name, c.sector_name_display, c.industry_name_display, c.sub_industry_name_display, b.latest_price, 0, 0, 
 '200009', 0, 0, 0, 0, 0 market_cap, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 (return_1D/100), (return_1W/100), (return_2W/100), (return_1M/100), (return_2M/100), (return_3M/100), (return_6M/100), (return_9M/100), 
 (return_YTD/100), (return_1Y/100), (up_52w_min/100), (down_52w_max/100), (return_2Y/100), (return_3Y/100), 

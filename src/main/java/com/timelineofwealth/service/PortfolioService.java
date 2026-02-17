@@ -16,56 +16,40 @@ import java.util.List;
 
 @Service("PortfolioService")
 public class PortfolioService {
-    private static final Logger logger = LoggerFactory.getLogger(PortfolioService.class);
+    private final Logger logger = LoggerFactory.getLogger(PortfolioService.class);
+    private final PortfolioRepository portfolioRepository;
+    private final PortfolioHoldingsRepository portfolioHoldingsRepository;
+    private final PortfolioHistoricalHoldingsRepository portfolioHistoricalHoldingsRepository;
+    private final PortfolioCashflowRepository portfolioCashflowRepository;
+    private final PortfolioReturnsCalculationSupportRepository portfolioReturnsCalculationSupportRepository;
+    private final PortfolioTwrrMonthlyRepository portfolioTwrrMonthlyRepository;
+    private final PortfolioTwrrSummaryRepository portfolioTwrrSummaryRepository;
+    private final MemberService memberService;
 
     @Autowired
-    private static PortfolioRepository portfolioRepository;
-    @Autowired
-    public void setPortfolioRepository(PortfolioRepository portfolioRepository){
-        PortfolioService.portfolioRepository = portfolioRepository;
-    }
-    @Autowired
-    private static PortfolioHoldingsRepository portfolioHoldingsRepository;
-    @Autowired
-    public void setPortfolioHoldingsRepository(PortfolioHoldingsRepository portfolioHoldingsRepository){
-        PortfolioService.portfolioHoldingsRepository = portfolioHoldingsRepository;
-    }
-    @Autowired
-    private static PortfolioHistoricalHoldingsRepository portfolioHistoricalHoldingsRepository;
-    @Autowired
-    public void setPortfolioHistoricalHoldingsRepository(PortfolioHistoricalHoldingsRepository portfolioHistoricalHoldingsRepository){
-        PortfolioService.portfolioHistoricalHoldingsRepository = portfolioHistoricalHoldingsRepository;
-    }
-    @Autowired
-    private static PortfolioCashflowRepository portfolioCashflowRepository;
-    @Autowired
-    public void setPortfolioCashflowRepository(PortfolioCashflowRepository portfolioCashflowRepository){
-        PortfolioService.portfolioCashflowRepository = portfolioCashflowRepository;
-    }
-    @Autowired
-    private static PortfolioReturnsCalculationSupportRepository portfolioReturnsCalculationSupportRepository;
-    @Autowired
-    public void setPortfolioReturnsCalculationSupportRepository(PortfolioReturnsCalculationSupportRepository portfolioReturnsCalculationSupportRepository){
-        PortfolioService.portfolioReturnsCalculationSupportRepository = portfolioReturnsCalculationSupportRepository;
-    }
-    @Autowired
-    private static PortfolioTwrrMonthlyRepository portfolioTwrrMonthlyRepository;
-    @Autowired
-    public void setPortfolioTwrrMonthlyRepository(PortfolioTwrrMonthlyRepository portfolioTwrrMonthlyRepository) {
-        PortfolioService.portfolioTwrrMonthlyRepository = portfolioTwrrMonthlyRepository;
-    }
-    @Autowired
-    private static PortfolioTwrrSummaryRepository portfolioTwrrSummaryRepository;
-    @Autowired
-    public void setPortfolioTwrrSummaryRepository(PortfolioTwrrSummaryRepository portfolioTwrrSummaryRepository){
-        PortfolioService.portfolioTwrrSummaryRepository = portfolioTwrrSummaryRepository;
+    public PortfolioService(PortfolioRepository portfolioRepository,
+                            PortfolioHoldingsRepository portfolioHoldingsRepository,
+                            PortfolioHistoricalHoldingsRepository portfolioHistoricalHoldingsRepository,
+                            PortfolioCashflowRepository portfolioCashflowRepository,
+                            PortfolioReturnsCalculationSupportRepository portfolioReturnsCalculationSupportRepository,
+                            PortfolioTwrrMonthlyRepository portfolioTwrrMonthlyRepository,
+                            PortfolioTwrrSummaryRepository portfolioTwrrSummaryRepository,
+                            MemberService memberService){
+        this.portfolioRepository = portfolioRepository;
+        this.portfolioHoldingsRepository = portfolioHoldingsRepository;
+        this.portfolioHistoricalHoldingsRepository = portfolioHistoricalHoldingsRepository;
+        this.portfolioCashflowRepository = portfolioCashflowRepository;
+        this.portfolioReturnsCalculationSupportRepository = portfolioReturnsCalculationSupportRepository;
+        this.portfolioTwrrMonthlyRepository = portfolioTwrrMonthlyRepository;
+        this.portfolioTwrrSummaryRepository = portfolioTwrrSummaryRepository;
+        this.memberService = memberService;
     }
 
-    public static List<Portfolio> getPortfolios(String email){
+    public List<Portfolio> getPortfolios(String email){
         logger.debug(String.format("In PortfolioService.getPortfolios: Email %s", email));
 
         List<Portfolio> portfolios;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -75,11 +59,11 @@ public class PortfolioService {
         return portfolios;
     }
 
-    public static List<PortfolioHoldings> getPortfolioHoldings(String email){
+    public List<PortfolioHoldings> getPortfolioHoldings(String email){
         logger.debug(String.format("In PortfolioService.getPortfolioHoldings: Email %s", email));
 
         List<PortfolioHoldings> portfolioHoldings;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -89,11 +73,11 @@ public class PortfolioService {
         return portfolioHoldings;
     }
 
-    public static List<ConsolidatedPortfolioHoldings> getConsolidatedPortfolioHoldings(String email){
+    public List<ConsolidatedPortfolioHoldings> getConsolidatedPortfolioHoldings(String email){
         logger.debug(String.format("In PortfolioService.getConsolidatedPortfolioHoldings: Email %s", email));
 
         List<ConsolidatedPortfolioHoldings> consolidatedPortfolioHoldings = new ArrayList<>();
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -116,11 +100,11 @@ public class PortfolioService {
         return consolidatedPortfolioHoldings;
     }
 
-    public static List<PortfolioHistoricalHoldings> getPortfolioHistoricalHoldings(String email){
+    public List<PortfolioHistoricalHoldings> getPortfolioHistoricalHoldings(String email){
         logger.debug(String.format("In PortfolioService.getPortfolioHistoricalHoldings: Email %s", email));
 
         List<PortfolioHistoricalHoldings> portfolioHistoricalHoldings;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -130,11 +114,11 @@ public class PortfolioService {
         return portfolioHistoricalHoldings;
     }
 
-    public static List<FinYearProfit> getFinYearProfit(String email){
+    public List<FinYearProfit> getFinYearProfit(String email){
         logger.debug(String.format("In PortfolioService.getFinYearProfit: Email %s", email));
 
         List<FinYearProfit> finYearProfits = new ArrayList<>();
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -164,11 +148,11 @@ public class PortfolioService {
     }
 
     //
-    public static List<PortfolioReturnsCalculationSupport> getPortfolioCashflows(String email){
+    public List<PortfolioReturnsCalculationSupport> getPortfolioCashflows(String email){
         logger.debug(String.format("In PortfolioService.getPortfolioCashflows: Email %s", email));
 
         List<PortfolioReturnsCalculationSupport> portfolioCashflows;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -178,11 +162,11 @@ public class PortfolioService {
         return portfolioCashflows;
     }
 
-    public static List<PortfolioTwrrSummary> getPortfolioTwrrSummary(String email) {
+    public List<PortfolioTwrrSummary> getPortfolioTwrrSummary(String email) {
         logger.debug(String.format("In PortfolioService.getPortfolioTwrrSummary: Email %s", email));
 
         List<PortfolioTwrrSummary> portfolioTwrrSummaries;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));
@@ -192,11 +176,11 @@ public class PortfolioService {
         return portfolioTwrrSummaries;
     }
 
-    public static List<PortfolioTwrrMonthly> getPortfolioTwrrMonthly(String email) {
+    public List<PortfolioTwrrMonthly> getPortfolioTwrrMonthly(String email) {
         logger.debug(String.format("In PortfolioService.getPortfolioTwrrMonthly: Email %s", email));
 
         List<PortfolioTwrrMonthly> portfolioTwrrMonthlies;
-        List<Member> members = MemberService.getUserMembers(email);
+        List<Member> members = memberService.getUserMembers(email);
         List<Long> membersIds = new ArrayList<>();
         for (Member member : members ){
             membersIds.add(new Long(member.getMemberid()));

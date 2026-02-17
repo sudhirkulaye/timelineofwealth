@@ -27,34 +27,25 @@ import java.util.stream.Collectors;
 @EnableCaching
 public class IndexService {
 
-    private static final Logger logger = LoggerFactory.getLogger(IndexService.class);
+    private final Logger logger = LoggerFactory.getLogger(IndexService.class);
+    private final IndexValuationRepository indexValuationRepository;
+    private final IndexMonthlyReturnsRepository indexMonthlyReturnsRepository;
+    private final IndexStatisticsRepository indexStatisticsRepository;
 
     @Autowired
-    private static IndexValuationRepository indexValuationRepository;
-    @Autowired
-    public void setIndexValuationRepository(IndexValuationRepository indexValuationRepository){
-        IndexService.indexValuationRepository = indexValuationRepository;
+    public IndexService(IndexValuationRepository indexValuationRepository,
+                        IndexMonthlyReturnsRepository indexMonthlyReturnsRepository,
+                        IndexStatisticsRepository indexStatisticsRepository){
+        this.indexValuationRepository = indexValuationRepository;
+        this.indexMonthlyReturnsRepository = indexMonthlyReturnsRepository;
+        this.indexStatisticsRepository = indexStatisticsRepository;
     }
 
-    @Autowired
-    private static IndexMonthlyReturnsRepository indexMonthlyReturnsRepository;
-    @Autowired
-    public void setIndexMonthlyReturnsRepository(IndexMonthlyReturnsRepository indexMonthlyReturnsRepository){
-        IndexService.indexMonthlyReturnsRepository = indexMonthlyReturnsRepository;
-    }
-
-    @Autowired
-    private static IndexStatisticsRepository indexStatisticsRepository;
-    @Autowired
-    public void setIndexStatisticsRepository(IndexStatisticsRepository indexStatisticsRepository){
-        IndexService.indexStatisticsRepository = indexStatisticsRepository;
-    }
-
-    public static void saveMonthlyReturns(IndexMonthlyReturns indexMonthlyReturns) {
+    public void saveMonthlyReturns(IndexMonthlyReturns indexMonthlyReturns) {
         indexMonthlyReturnsRepository.save(indexMonthlyReturns);
     }
 
-    public static List<IndexMonthlyReturnsDTO> getMonthlyReturns(String ticker) {
+    public List<IndexMonthlyReturnsDTO> getMonthlyReturns(String ticker) {
         List<IndexMonthlyReturns> indexMonthlyReturnsList = indexMonthlyReturnsRepository.findAllByKeyTickerOrderByKeyYearDesc(ticker);
         List<IndexMonthlyReturnsDTO> monthlyReturnsDTOList = new ArrayList<>();
 
@@ -91,7 +82,7 @@ public class IndexService {
         return monthlyReturnsDTOList;
     }
 
-    public static void computeAndSaveIndexMonthlyReturns(String ticker, boolean... isCurrentYear) {
+    public void computeAndSaveIndexMonthlyReturns(String ticker, boolean... isCurrentYear) {
         List<IndexMonthlyReturnsDTO> monthlyReturnsList = new ArrayList<>();
 
         // Find the maximum available date for the ticker
@@ -190,7 +181,7 @@ public class IndexService {
         }
     }
 
-    private static void setMonthReturn(IndexMonthlyReturnsDTO monthlyReturns, int month, BigDecimal returnVal) {
+    private void setMonthReturn(IndexMonthlyReturnsDTO monthlyReturns, int month, BigDecimal returnVal) {
         switch (month) {
             case 1:
                 monthlyReturns.setJanReturn(returnVal);
@@ -234,11 +225,11 @@ public class IndexService {
         }
     }
 
-    private static void setMonthReturnToZero(IndexMonthlyReturnsDTO monthlyReturns, int month) {
+    private void setMonthReturnToZero(IndexMonthlyReturnsDTO monthlyReturns, int month) {
         setMonthReturn(monthlyReturns, month, BigDecimal.ZERO);
     }
 
-    private static BigDecimal findLastValueOfMonth(String ticker, int year, int month) {
+    private BigDecimal findLastValueOfMonth(String ticker, int year, int month) {
         Date maxDate = indexValuationRepository.findMaxDateForMonth(ticker, year, month);
 
         if (maxDate != null) {
@@ -252,12 +243,12 @@ public class IndexService {
         return null; // No data for this month
     }
 
-    private static int findMinYear(String ticker) {
+    private int findMinYear(String ticker) {
         Integer minYear = indexValuationRepository.findMinYearForTicker(ticker);
         return minYear != null ? minYear : Calendar.getInstance().get(Calendar.YEAR);
     }
 
-    private static BigDecimal calculateAnnualReturn(String ticker, int year) {
+    private BigDecimal calculateAnnualReturn(String ticker, int year) {
         int previousYear = year - 1;
 
         BigDecimal initialValue = findLastValueOfMonth(ticker, previousYear, 12);
@@ -270,7 +261,7 @@ public class IndexService {
         return BigDecimal.ZERO;
     }
 
-    public static void computeAndSavePeriodReturnStatistics(String ticker, int period) {
+    public void computeAndSavePeriodReturnStatistics(String ticker, int period) {
         List<IndexReturnsDTO> periodReturnsList = getPeriodReturns(ticker, period);
 
         if (periodReturnsList.isEmpty()) {
@@ -338,7 +329,7 @@ public class IndexService {
         saveIndexStatisticsForPeriod(ticker, statistics,period);
     }
 
-    private static List<IndexReturnsDTO> getPeriodReturns(String ticker, int period) {
+    private List<IndexReturnsDTO> getPeriodReturns(String ticker, int period) {
         List<IndexReturnsDTO> oneYearReturnsList = new ArrayList<>();
 
         // Get all data for the given ticker ordered by date in descending order
@@ -375,7 +366,7 @@ public class IndexService {
         return oneYearReturnsList;
     }
 
-    public static BigDecimal calculateAnnualizedReturn(BigDecimal beginningValue, BigDecimal endValue, int n) {
+    public BigDecimal calculateAnnualizedReturn(BigDecimal beginningValue, BigDecimal endValue, int n) {
         BigDecimal returnRatio = endValue.divide(beginningValue, MathContext.DECIMAL128);
         double exponent = 1.0 / n;
         BigDecimal annualizedReturn = new BigDecimal(Math.pow(returnRatio.doubleValue(), exponent), MathContext.DECIMAL128)
@@ -384,7 +375,7 @@ public class IndexService {
         return annualizedReturn;
     }
 
-    private static String findDateRangeForReturns(List<IndexReturnsDTO> returnsList, double returns, boolean isMinimumFlag) {
+    private String findDateRangeForReturns(List<IndexReturnsDTO> returnsList, double returns, boolean isMinimumFlag) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String fromDateStr = null;
         String toDateStr = null;
@@ -426,7 +417,7 @@ public class IndexService {
         }
     }
 
-    public static void setDateLastUpdatedForIndexStats(String ticker, Date date){
+    public void setDateLastUpdatedForIndexStats(String ticker, Date date){
         List<IndexStatistics> existingRecords = indexStatisticsRepository.findOneByTicker(ticker);
         if (existingRecords != null && !existingRecords.isEmpty()) {
             existingRecords.get(0).setLastUpdated(date);
@@ -434,7 +425,7 @@ public class IndexService {
         }
     }
 
-    private static void saveIndexStatisticsForPeriod(String ticker, IndexStatistics statistics, int period) {
+    private void saveIndexStatisticsForPeriod(String ticker, IndexStatistics statistics, int period) {
         // Save the statistics entity to the index_statistics table
         // You can implement this method based on your data access logic.
         List<IndexStatistics> existingRecords = indexStatisticsRepository.findOneByTicker(ticker);
@@ -496,7 +487,7 @@ public class IndexService {
         }
     }
 
-    private static Date calculatePeriodBeforeDate(String ticker, Date currentDate, int period) {
+    private Date calculatePeriodBeforeDate(String ticker, Date currentDate, int period) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(currentDate);
         calendar.add(Calendar.YEAR, -period);
@@ -509,7 +500,7 @@ public class IndexService {
         }
     }
 
-    private static BigDecimal findValueForDate(String ticker, Date date) {
+    private BigDecimal findValueForDate(String ticker, Date date) {
         IndexValuation indexData = indexValuationRepository.findByKeyTickerAndKeyDate(ticker, date);
         if(indexData!=null)
             return indexData.getValue();

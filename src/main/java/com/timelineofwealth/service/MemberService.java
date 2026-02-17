@@ -14,27 +14,24 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service("memberService")
+@Service
 @Transactional
 public class MemberService {
-    private static final Logger logger = LoggerFactory.getLogger(MemberService.class);
+    private final Logger logger = LoggerFactory.getLogger(MemberService.class);
 
+    private final MemberRepository memberRepository;  // ✅ Remove setter injection
+    private final UserMembersRepository userMembersRepository;  // ✅ Use final
+
+    // ✅ Constructor injection (best practice)
     @Autowired
-    private static MemberRepository memberRepository;
-    @Autowired
-    public void setMemberRepository(MemberRepository memberRepository){
-        MemberService.memberRepository = memberRepository;
+    public MemberService(MemberRepository memberRepository,
+                         UserMembersRepository userMembersRepository) {
+        this.memberRepository = memberRepository;
+        this.userMembersRepository = userMembersRepository;
     }
 
-    @Autowired
-    private static UserMembersRepository userMembersRepository;
-    @Autowired
-    public  void setUserMembersRepository(UserMembersRepository userMembersRepository){
-        MemberService.userMembersRepository = userMembersRepository;
-    }
-
-    public static List<Member> getUserMembers(String email){
-        logger.debug(String.format("In MemberService.getUserMembers: Email %s", email));
+    public List<Member> getUserMembers(String email){
+        logger.debug("In MemberService.getUserMembers: Email {}", email);  // ✅ Modern logging
 
         List<Member> members = new ArrayList<>();
         List<UserMembers> userMembers = userMembersRepository.findAllByEmail(email);
@@ -44,33 +41,29 @@ public class MemberService {
         return members;
     }
 
-    @Transactional
-    public static void addMember(User user, Member newMember){
-        logger.debug(String.format("In MemberService.addMember: Before Add %d", newMember.getMemberid()));
-        MemberService.memberRepository.save(newMember);
-        logger.debug(String.format("In MemberService.addMember: After Add %d", newMember.getMemberid()));
+    public void addMember(User user, Member newMember){
+        logger.debug("In MemberService.addMember: Before Add {}", newMember.getMemberid());
+
+        Member savedMember = memberRepository.save(newMember);  // ✅ Capture result!
+        logger.debug("In MemberService.addMember: After Add {}", savedMember.getMemberid());
+
         UserMembers userMembers = new UserMembers();
         userMembers.setEmail(user.getEmail());
-        Member newMemberWithmemberid = MemberService.memberRepository.findTopByFirstNameAndLastNameOrderByMemberidDesc(newMember.getFirstName(),newMember.getLastName());
-        logger.debug(String.format("In MemberService.addMember: New Member id  %d", newMemberWithmemberid.getMemberid()));
-        userMembers.setMemberid(newMemberWithmemberid.getMemberid());
+        userMembers.setMemberid(savedMember.getMemberid());  // ✅ Use saved member's ID
         userMembers.setRelationship(newMember.getRelationship());
-        MemberService.userMembersRepository.save(userMembers);
+        userMembersRepository.save(userMembers);
     }
 
-    public static void updateMember(Member editedMember){
-        logger.debug(String.format("In MemberService.updateMember: EditedMember %d", editedMember.getMemberid()));
-        MemberService.memberRepository.save(editedMember);
+    public void updateMember(Member editedMember){
+        logger.debug("In MemberService.updateMember: EditedMember {}", editedMember.getMemberid());
+        memberRepository.save(editedMember);
     }
 
-    public static boolean isAuthorised(String signInUserEmail, Long memeberId){
-        UserMembers userMembers = MemberService.userMembersRepository.findByMemberid(memeberId);
-        logger.debug(String.format("In MemberService.isAuthorised: userMembers.getEmail() %s", userMembers.getEmail()));
-        logger.debug(String.format("In MemberService.isAuthorised: signInUserEmail %s", signInUserEmail));
-        if (userMembers.getEmail().equals(signInUserEmail)){
-            return  true;
-        } else  {
-            return  false;
-        }
+    public boolean isAuthorised(String signInUserEmail, Long memberId){  // ✅ Fixed typo
+        UserMembers userMembers = userMembersRepository.findByMemberid(memberId);
+        logger.debug("In MemberService.isAuthorised: userMembers.getEmail() {}", userMembers.getEmail());
+        logger.debug("In MemberService.isAuthorised: signInUserEmail {}", signInUserEmail);
+
+        return userMembers.getEmail().equals(signInUserEmail);  // ✅ Simplified
     }
 }

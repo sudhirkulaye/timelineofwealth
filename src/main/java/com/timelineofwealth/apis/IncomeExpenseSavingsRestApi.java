@@ -6,6 +6,7 @@ import com.timelineofwealth.service.IncomeExpenseSavingsService;
 import com.timelineofwealth.service.MemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +20,16 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "user/api/")
 public class IncomeExpenseSavingsRestApi {
-    private static final Logger logger = LoggerFactory.getLogger(IncomeExpenseSavingsRestApi.class);
+    private final Logger logger = LoggerFactory.getLogger(IncomeExpenseSavingsRestApi.class);
+    private final CommonService commonService;
+    private final IncomeExpenseSavingsService incomeExpenseSavingsService;
+
+    @Autowired
+    public IncomeExpenseSavingsRestApi(CommonService commonService,
+                                       IncomeExpenseSavingsService incomeExpenseSavingsService){
+        this.commonService = commonService;
+        this.incomeExpenseSavingsService = incomeExpenseSavingsService;
+    }
 
     @RequestMapping(value = "/getincexpsavingsrecords", method = RequestMethod.GET)
     public List<IncomeExpenseSavings> getIncExpSavingsRecords() {
@@ -27,21 +37,21 @@ public class IncomeExpenseSavingsRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return IncomeExpenseSavingsService.getIncomeExpenseSavingsRecords(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return incomeExpenseSavingsService.getIncomeExpenseSavingsRecords(user.getEmail());
     }
 
     @RequestMapping(value = "/updateincexpsavingsrecords", method = RequestMethod.PUT)
     public List<IncomeExpenseSavings> updateMember(@RequestBody IncomeExpenseSavings editedRecord) {
         logger.debug("Call user/api/updateincexpsavingsrecords/ " + editedRecord.getKey().getMemberid());
-        IncomeExpenseSavingsService.updateIncomeExpenseSavingsRecord(editedRecord);
+        incomeExpenseSavingsService.updateIncomeExpenseSavingsRecord(editedRecord);
         return getIncExpSavingsRecords();
     }
 
     @RequestMapping(value = "/addincexpsavingsrecords", method = RequestMethod.POST)
     public List<IncomeExpenseSavings> addMember(@RequestBody IncomeExpenseSavings newRecord) {
         logger.debug("Call user/api/addincexpsavingsrecords/ " + newRecord.getKey().getMemberid());
-        IncomeExpenseSavingsService.addIncomeExpenseSavingsRecord(newRecord);
+        incomeExpenseSavingsService.addIncomeExpenseSavingsRecord(newRecord);
         return getIncExpSavingsRecords();
     }
 }

@@ -21,13 +21,20 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "user/api/")
 public class SipRestApi {
-    private static final Logger logger = LoggerFactory.getLogger(SipRestApi.class);
+    private final Logger logger = LoggerFactory.getLogger(SipRestApi.class);
+    private final CommonService commonService;
+    private final SipService sipService;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    public SipRestApi(Environment environment){}
+    public SipRestApi(Environment environment,
+                      CommonService commonService,
+                      SipService sipService){
+        this.commonService = commonService;
+        this.sipService = sipService;
+    }
 
     @RequestMapping(value = "/getsips", method = RequestMethod.GET)
     public List<SipForm> getSips() {
@@ -35,8 +42,8 @@ public class SipRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return SipService.getSipRecords(user.getEmail());
+        User user = commonService.getLoggedInUser(userDetails);
+        return sipService.getSipRecords(user.getEmail());
     }
 
     @RequestMapping(value = "/getsipbyschemecode/{memberid}/{schemecode}", method = RequestMethod.GET)
@@ -45,8 +52,8 @@ public class SipRestApi {
 
         UserDetails userDetails =
                 (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = CommonService.getLoggedInUser(userDetails);
-        return SipService.getSipRecordsBySchemeCode(user.getEmail(), memberid, schemecode);
+        User user = commonService.getLoggedInUser(userDetails);
+        return sipService.getSipRecordsBySchemeCode(user.getEmail(), memberid, schemecode);
     }
 
     @RequestMapping(value = "/updatesip", method = RequestMethod.PUT)
@@ -54,7 +61,7 @@ public class SipRestApi {
         logger.debug("Call user/api/updatesip/ " + editedRecord.getKey().getMemberid());
         Sip editedSipRecord = new Sip();
         setSipFromSipForm(editedSipRecord,editedRecord);
-        SipService.updateSipRecord(editedSipRecord);
+        sipService.updateSipRecord(editedSipRecord);
         return getSips();
     }
 
@@ -63,7 +70,7 @@ public class SipRestApi {
         logger.debug("Call user/api/addsip/ " + newRecord.getKey().getMemberid());
         Sip editedSipRecord = new Sip();
         setSipFromSipForm(editedSipRecord,newRecord);
-        SipService.addSipRecord(model, editedSipRecord, entityManager);
+        sipService.addSipRecord(model, editedSipRecord, entityManager);
         return getSips();
     }
 
@@ -72,7 +79,7 @@ public class SipRestApi {
         logger.debug("Call user/api/deletesip/ " + deleteRecord.getKey().getMemberid());
         Sip editedSipRecord = new Sip();
         setSipFromSipForm(editedSipRecord,deleteRecord);
-        SipService.deleteSipRecord(editedSipRecord);
+        sipService.deleteSipRecord(editedSipRecord);
         return getSips();
     }
 

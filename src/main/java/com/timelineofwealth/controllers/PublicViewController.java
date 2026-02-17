@@ -22,9 +22,17 @@ import java.sql.Date;
 @Controller
 public class PublicViewController {
 
-    private static final Logger logger = LoggerFactory.getLogger(PublicViewController.class);
+    private final Logger logger = LoggerFactory.getLogger(PublicViewController.class);
+    private final CommonService commonService;
+    private final PublicApi publicApi;
 
     private Date dateToday;
+
+    public PublicViewController(CommonService commonService,
+                                PublicApi publicApi){
+        this.commonService = commonService;
+        this.publicApi = publicApi;
+    }
 
     @RequestMapping(value = "/access-denied")
     public String accessDenied(Model model){
@@ -37,7 +45,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited Homepage: IP -  - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
         return "public/indexreturnstats";
@@ -49,7 +57,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited Login: IP -  - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Login");
         if (error != null)
@@ -66,11 +74,11 @@ public class PublicViewController {
 
         logger.debug(String.format("New Login As: /%s", userDetails.getUsername()));
         // set user to save last login time
-        CommonService.updateLastLoginStatus(userDetails);
-        if (CommonService.isAdmin(userDetails)){
+        commonService.updateLastLoginStatus(userDetails);
+        if (commonService.isAdmin(userDetails)){
             return "redirect:admin/uploadnsedailypricedata";
         }
-        if (CommonService.isAdviser(userDetails)){
+        if (commonService.isAdviser(userDetails)){
             return "redirect:adviser/listofclients";
         }
         return "redirect:user/members";
@@ -82,7 +90,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/services - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Services");
         return "public/services";
@@ -94,7 +102,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/contactus - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Contact Us");
         return "public/contactus";
@@ -106,7 +114,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/blog0001 - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Notes on Financial Shenanigans");
         return "public/blog0001";
@@ -118,7 +126,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/wealthmanagementapp - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
         return "public/wealthmanagementapp";
@@ -131,7 +139,7 @@ public class PublicViewController {
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/pmsapp - " + ipAddress + ", browser - " + browser + ", OS - " + os));
 
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
         return "public/pmsapp";
@@ -143,7 +151,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/ethicalstandards - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Ethical Standards");
         return "public/ethicalstandards";
@@ -155,7 +163,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/whyindependentadvice - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
         return "public/whyindependentadvice";
@@ -167,7 +175,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/privacy - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
         return "public/privacy";
@@ -180,7 +188,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/saa - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Sudhir Kulaye");
         return "public/saa";
@@ -192,7 +200,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/mftypes - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Types of Mutual Funds");
         return "public/mftypes";
@@ -204,7 +212,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/mflist - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Funds' Performance");
         return "public/mflist";
@@ -216,7 +224,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/nifty50stats - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "NIFTY-50");
         return "public/nifty50stats";
@@ -228,7 +236,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/stocklist - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Stocks Fundamentals");
         return "public/stocklist";
@@ -240,7 +248,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/research - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Research");
         return "public/research";
@@ -252,9 +260,9 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/stockanalysis/" + ticker + " - IP Add:  - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Fundamentals of "+ CommonService.getStockDetails(ticker).getName());
+        model.addAttribute("title", "Fundamentals of "+ commonService.getStockDetails(ticker).getName());
         model.addAttribute("ticker", ticker);
         return "public/stockanalysis";
     }
@@ -265,7 +273,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/stockcompare/" + " - IP Add:  - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Stock Comparison ");
         return "public/stockcompare"; 
@@ -277,7 +285,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/stockcompareplus/" + " - IP Add:  - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Stock Comparison ");
         return "public/stockcompareplus";
@@ -289,7 +297,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/indianeconomy - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Indian Economic Indicators");
         return "public/indianeconomy";
@@ -301,7 +309,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/retirementfundcalculation - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Retirement Fund Calculation");
         return "public/retirementfundcalculation";
@@ -313,7 +321,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/indexreturnstats - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Index Statistics");
         return "public/indexreturnstats";
@@ -325,7 +333,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/benchmarkreturns - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Benchmarks Returns");
         return "public/benchmarkreturns";
@@ -337,7 +345,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/bankanalysis1 - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Banking Stocks Analysis - Large Cap");
         return "public/bankanalysis1";
@@ -349,7 +357,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/bankanalysis2 - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Banking Stocks Analysis - Mid Cap");
         return "public/bankanalysis2";
@@ -361,7 +369,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/bankanalysis3 - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Banking Stocks Analysis - Small Cap");
         return "public/bankanalysis3";
@@ -373,7 +381,7 @@ public class PublicViewController {
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");
         logger.debug(String.format("Visited /public/stockbubblechart - " + ipAddress + ", browser - " + browser + ", OS - " + os));
-        dateToday = new PublicApi().getSetupDates().getDateToday();
+        dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
         model.addAttribute("title", "Stock Bubble Chart");
         return "/public/stockbubblechart";
