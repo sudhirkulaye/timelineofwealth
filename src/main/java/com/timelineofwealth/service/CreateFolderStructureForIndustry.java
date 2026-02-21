@@ -1,19 +1,22 @@
 package com.timelineofwealth.service;
 
+import com.timelineofwealth.entities.DailyDataS;
+import com.timelineofwealth.repositories.DailyDataSRepository;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -36,6 +39,185 @@ class ResultTrackerRunner {
     }
 }
 
+class DailyDataSRepairRunner {
+    public static void reuploadAffectedDates(String screenerDailyPath) {
+        ConfigurableApplicationContext ctx =
+                new SpringApplicationBuilder(com.timelineofwealth.wealthmanagement.WealthmanagementApplication.class)
+                        .run();
+
+        try {
+            DailyDataSRepository repository = ctx.getBean(DailyDataSRepository.class);
+            List<Date> affectedDates = repository.findDistinctDatesWithCmpZero();
+
+            if (affectedDates == null || affectedDates.isEmpty()) {
+                System.out.println("No affected dates found (cmp = 0).");
+                return;
+            }
+
+            System.out.println("Affected dates found: " + affectedDates.size());
+            for (Date affectedDate : affectedDates) {
+                String yyyymmdd = affectedDate.toString().replace("-", "");
+                File sourceFile = findDateCsvFile(screenerDailyPath, yyyymmdd);
+
+                if (sourceFile == null) {
+                    System.out.println("[SKIP] File not found for date " + yyyymmdd + " in " + screenerDailyPath);
+                    continue;
+                }
+
+                List<DailyDataS> dailyDataSList = readCsvFile(sourceFile, affectedDate);
+
+                if (dailyDataSList.isEmpty()) {
+                    System.out.println("[SKIP] Empty parsed data for " + sourceFile.getName());
+                    continue;
+                }
+
+                dailyDataSList.sort(Comparator.comparing(DailyDataS::getMarketCap).reversed());
+                repository.saveAll(dailyDataSList);
+                System.out.println("[DONE] Upserted " + dailyDataSList.size() + " rows for date " + yyyymmdd + " from " + sourceFile.getName());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            ctx.close();
+        }
+    }
+
+    private static File findDateCsvFile(String basePath, String yyyymmdd) {
+        File csvFile = new File(basePath, yyyymmdd + "ScreenerDaily.csv");
+        return csvFile.exists() && csvFile.isFile() ? csvFile : null;
+    }
+
+    private static List<DailyDataS> readCsvFile(File file, Date date) throws IOException {
+        List<DailyDataS> dataList = new ArrayList<>();
+        int rank = 1;
+        try (Reader reader = new BufferedReader(new FileReader(file));
+             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+            for (CSVRecord record : csvParser) {
+                DailyDataS daily = buildDailyDataS(rank++, date,
+                        getCsvValue(record, "NSE Code"),
+                        getCsvValue(record, "BSE Code"));
+                if (daily == null) continue;
+
+                populateDailyDataFromRecord(daily, record);
+                dataList.add(daily);
+            }
+        }
+        return dataList;
+    }
+
+    private static DailyDataS buildDailyDataS(int rank, Date date, String nseCode, String bseCode) {
+        String name = nseCode == null || nseCode.trim().isEmpty() ? bseCode : nseCode;
+        if (name == null || name.trim().isEmpty()) return null;
+
+        DailyDataS daily = new DailyDataS();
+        daily.setKey(new DailyDataS.DailyDataSKey());
+        daily.getKey().setDate(date);
+        daily.getKey().setName(name.trim());
+        daily.setRank(rank);
+        return daily;
+    }
+
+    private static void populateDailyDataFromRecord(DailyDataS daily, CSVRecord record) {
+        daily.setCmp(getCsvBigDecimal(record, "Current Price"));
+        daily.setMarketCap(getCsvBigDecimal(record, "Market Capitalization"));
+        daily.setLastResultDate(getInt(getCsvValue(record, "Last result date")));
+        daily.setNetProfit(getCsvBigDecimal(record, "Net profit"));
+        daily.setSales(getCsvBigDecimal(record, "Sales"));
+        daily.setYoyQuarterlySalesGrowth(getCsvBigDecimal(record, "YOY Quarterly sales growth"));
+        daily.setYoyQuarterlyProfitGrowth(getCsvBigDecimal(record, "YOY Quarterly profit growth"));
+        daily.setQoqSalesGrowth(getCsvBigDecimal(record, "QoQ sales growth"));
+        daily.setQoqProfitGrowth(getCsvBigDecimal(record, "QoQ profit growth"));
+        daily.setOpmLatestQuarter(getCsvBigDecimal(record, "OPM latest quarter"));
+        daily.setOpmLastYear(getCsvBigDecimal(record, "OPM last year"));
+        daily.setNpmLatestQuarter(getCsvBigDecimal(record, "NPM latest quarter"));
+        daily.setNpmLastYear(getCsvBigDecimal(record, "NPM last year"));
+        daily.setProfitGrowth3years(getCsvBigDecimal(record, "Profit growth 3Years"));
+        daily.setSalesGrowth3years(getCsvBigDecimal(record, "Sales growth 3Years"));
+        daily.setPeTtm(getCsvBigDecimal(record, "Price to Earning"));
+        daily.setHistoricalPe3years(getCsvBigDecimal(record, "Historical PE 3Years"));
+        daily.setPegRatio(getCsvBigDecimal(record, "PEG Ratio"));
+        daily.setPbTtm(getCsvBigDecimal(record, "Price to book value"));
+        daily.setEvToEbit(getCsvBigDecimal(record, "Enterprise Value to EBIT"));
+        daily.setDividendPayout(getCsvBigDecimal(record, "Dividend Payout Ratio"));
+        daily.setRoe(getCsvBigDecimal(record, "Return on equity"));
+        daily.setAvgRoe3years(getCsvBigDecimal(record, "Average return on equity 3Years"));
+        daily.setDebt(getCsvBigDecimal(record, "Debt"));
+        daily.setDebtToEquity(getCsvBigDecimal(record, "Debt to equity"));
+        daily.setDebt3yearsback(getCsvBigDecimal(record, "Debt 3Years back"));
+        daily.setRoce(getCsvBigDecimal(record, "Return on capital employed"));
+        daily.setAvgRoce3years(getCsvBigDecimal(record, "Average return on capital employed 3Years"));
+        daily.setFcfS(getCsvBigDecimal(record, "Free cash flow last year"));
+        daily.setSalesGrowth5years(getCsvBigDecimal(record, "Sales growth 5Years"));
+        daily.setSalesGrowth10years(getCsvBigDecimal(record, "Sales growth 10Years"));
+        daily.setNoplat(getCsvBigDecimal(record, "NOPLAT"));
+        daily.setCapex(getCsvBigDecimal(record, "Capex"));
+        daily.setFcff(getCsvBigDecimal(record, "FCFF"));
+        daily.setInvestedCapital(getCsvBigDecimal(record, "Invested Capital"));
+        daily.setRoic(getCsvBigDecimal(record, "RoIC"));
+        daily.setReturn1D(getCsvBigDecimal(record, "Return over 1day"));
+        daily.setReturn1W(getCsvBigDecimal(record, "Return over 1week"));
+        daily.setReturn1M(getCsvBigDecimal(record, "Return over 1month"));
+        daily.setReturn3M(getCsvBigDecimal(record, "Return over 3months"));
+        daily.setReturn6M(getCsvBigDecimal(record, "Return over 6months"));
+        daily.setReturn1Y(getCsvBigDecimal(record, "Return over 1year"));
+        daily.setUp52wMin(getCsvBigDecimal(record, "Up from 52w low"));
+        daily.setDown52wMax(getCsvBigDecimal(record, "Down from 52w high"));
+        daily.setVolume1D(getCsvBigDecimal(record, "Volume"));
+        daily.setVolume1W(getCsvBigDecimal(record, "Volume 1week average"));
+        daily.setDma50(getCsvBigDecimal(record, "DMA 50"));
+        daily.setDma200(getCsvBigDecimal(record, "DMA 200"));
+        daily.setRsi(getCsvBigDecimal(record, "RSI"));
+        daily.setTotalAssets(getCsvBigDecimal(record, "Total Assets"));
+        daily.setNetBlock(getCsvBigDecimal(record, "Net block"));
+        daily.setWorkingCapital(getCsvBigDecimal(record, "Working capital"));
+        daily.setInventory(getCsvBigDecimal(record, "Inventory"));
+        daily.setTradeReceivables(getCsvBigDecimal(record, "Trade receivables"));
+        daily.setTradePayables(getCsvBigDecimal(record, "Trade Payables"));
+        daily.setSharesOutstandingCr(getCsvBigDecimal(record, "Number of equity shares"));
+        daily.setIndustry(getCsvValue(record, "Industry"));
+        daily.setSector("");
+        daily.setSubIndustry("");
+        computeRatios(daily);
+    }
+
+    private static void computeRatios(DailyDataS daily) {
+        if (daily.getNetProfit() != null && daily.getNetProfit().compareTo(BigDecimal.ZERO) != 0) {
+            daily.setMcapToNetprofit(daily.getMarketCap().divide(daily.getNetProfit(), 2, RoundingMode.HALF_UP));
+        } else {
+            daily.setMcapToNetprofit(BigDecimal.ZERO);
+        }
+
+        if (daily.getSales() != null && daily.getSales().compareTo(BigDecimal.ZERO) != 0) {
+            daily.setMcapToSales(daily.getMarketCap().divide(daily.getSales(), 2, RoundingMode.HALF_UP));
+        } else {
+            daily.setMcapToSales(BigDecimal.ZERO);
+        }
+    }
+
+    private static String getCsvValue(CSVRecord record, String columnName) {
+        if (!record.isMapped(columnName)) return "";
+        String value = record.get(columnName);
+        return value == null ? "" : value.trim();
+    }
+
+    private static BigDecimal getCsvBigDecimal(CSVRecord record, String columnName) {
+        try {
+            String value = getCsvValue(record, columnName);
+            return value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value);
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
+    }
+
+    private static int getInt(String value) {
+        try {
+            return new BigDecimal(value).intValue();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+}
+
 public class CreateFolderStructureForIndustry {
 
     public static void main(String[] argv) throws Exception {
@@ -53,7 +235,8 @@ public class CreateFolderStructureForIndustry {
             System.out.println(" 7. Update MCap and Price Data");
             System.out.println(" 8. Consolidate Quarter Data");
             System.out.println(" 9. Update Valuation Sheet of ResultTracker");
-            System.out.println("10. Exit");
+            System.out.println("10. Upsert affected daily_data_s dates (cmp=0) from ScreenerDaily CSV");
+            System.out.println("11. Exit");
             System.out.print("Enter your choice: ");
 
             String choice = sc.nextLine().trim();
@@ -96,6 +279,10 @@ public class CreateFolderStructureForIndustry {
                     break;
 
                 case "10":
+                    DailyDataSRepairRunner.reuploadAffectedDates("C:\\MyDocuments\\03Business\\03DailyData\\ScreenerDaily");
+                    break;
+
+                case "11":
                     System.out.println("Exiting...");
                     sc.close();
                     return;
@@ -281,7 +468,7 @@ public class CreateFolderStructureForIndustry {
                 Cell headerCell = headerRow.getCell(i);
 
                 if (DateUtil.isCellDateFormatted(headerCell)) {
-                    Date date = headerCell.getDateCellValue();
+                    java.util.Date date = headerCell.getDateCellValue();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     headers.add(dateFormat.format(date));
                 } else {
@@ -333,7 +520,7 @@ public class CreateFolderStructureForIndustry {
 
                     for (int i = 2; i < dataRow.getLastCellNum(); i++) {
                         Cell dateCell = headerRow.getCell(i);
-                        Date date = dateCell.getDateCellValue();
+                        java.util.Date date = dateCell.getDateCellValue();
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
                         Row newRow = newSheet.createRow(rowIndex++);
@@ -505,7 +692,7 @@ public class CreateFolderStructureForIndustry {
     private static String getYesterdayDate() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
-        Date yesterday = cal.getTime();
+        java.util.Date yesterday = cal.getTime();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(yesterday);
     }

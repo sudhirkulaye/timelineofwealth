@@ -42,6 +42,7 @@ public class CommonService {
     public final String ADVISER_ROLE = "ROLE_ADVISER";
     private final Logger logger = LoggerFactory.getLogger(CommonService.class);
     private final String BASE_EXCEL_PATH = "C:/MyDocuments/03Business/05ResearchAndAnalysis/StockInvestments/QuarterResultsScreenerExcels/";
+    private final String WATCHLIST_PROPERTIES_FILE = BASE_EXCEL_PATH + "watchlists.properties";
     private final UserRepository userRepository;
     private final AssetClassificationRepository assetClassificationRepository;
     private final SubindustryRepository subindustryRepository;
@@ -329,6 +330,7 @@ public class CommonService {
         List<StockPriceMovement> stockPriceMovementList = this.stockPriceMovementRepository.findAll();
         nseBse500List = new ArrayList<>();
         List<Subindustry> subindustries = this.getSubindustries();
+        Map<String, List<String>> watchlistsByTicker = loadWatchlistsByTicker();
         for(StockUniverse stockUniverse : nseBse500BasicList){
             NseBse500 nseBse500 = new NseBse500(stockUniverse);
             List<Subindustry> subindustries1 = subindustries.stream()
@@ -349,6 +351,10 @@ public class CommonService {
             nseBse500.setLatestKOTAKReco(getLatestFourRecommendations(stockUniverse.getTicker(), "KOTAK", stockUniverse.getLatestPrice().doubleValue()));
 
             getLatestFourValuation(stockUniverse.getTicker(),stockUniverse.getLatestPrice().doubleValue(), nseBse500);
+
+            List<String> watchlistNames = watchlistsByTicker.getOrDefault(normalizeTicker(stockUniverse.getTicker()), new ArrayList<>());
+            nseBse500.setWatchlistNames(watchlistNames);
+            nseBse500.setWatchlistsDisplay(String.join(", ", watchlistNames));
 
             nseBse500List.add(nseBse500);
         }
@@ -927,6 +933,43 @@ public class CommonService {
             dtos.add(dto);
         }
         return dtos;
+    }
+
+    private Map<String, List<String>> loadWatchlistsByTicker() {
+        Map<String, List<String>> watchlistsByTicker = new HashMap<>();
+        try {
+            Map<String, Map<String, String>> watchlistSections = loadSectionedProperties(WATCHLIST_PROPERTIES_FILE);
+
+            for (Map.Entry<String, Map<String, String>> sectionEntry : watchlistSections.entrySet()) {
+                String watchlistName = sectionEntry.getKey();
+                String tickersCsv = sectionEntry.getValue().get("tickers");
+
+                if (tickersCsv == null || tickersCsv.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] tickers = tickersCsv.split(",");
+                for (String ticker : tickers) {
+                    String normalizedTicker = normalizeTicker(ticker);
+                    if (normalizedTicker.isEmpty()) {
+                        continue;
+                    }
+                    watchlistsByTicker
+                            .computeIfAbsent(normalizedTicker, key -> new ArrayList<>())
+                            .add(watchlistName);
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("Unable to load watchlists from {}", WATCHLIST_PROPERTIES_FILE, ex);
+        }
+        return watchlistsByTicker;
+    }
+
+    private String normalizeTicker(String ticker) {
+        if (ticker == null) {
+            return "";
+        }
+        return ticker.trim().toUpperCase(Locale.ROOT);
     }
 
     private final List<CustomChartData> loadExcelChartsForTicker(String ticker) {

@@ -5,6 +5,8 @@ module.controller('StockListController', function($scope, $http, $filter) {
     $scope.industries = [];
     $scope.stocks = [];
     $scope.indexFilter = "SENSEX";
+    $scope.watchlistFilter = "";
+    $scope.watchlistNames = [];
     $scope.flagBasicInfo = false;
     $scope.flagFundamentalInfo = true;
     $scope.flagCapitalStructureInfo = true;
@@ -44,8 +46,20 @@ module.controller('StockListController', function($scope, $http, $filter) {
             then(function (response) {
                 if (response != undefined) {
                     $scope.stocks = response.data;
+                    $scope.watchlistNames = [];
+                    angular.forEach($scope.stocks, function(stock) {
+                        if (stock.watchlistNames != undefined) {
+                            angular.forEach(stock.watchlistNames, function(watchlistName) {
+                                if ($scope.watchlistNames.indexOf(watchlistName) === -1) {
+                                    $scope.watchlistNames.push(watchlistName);
+                                }
+                            });
+                        }
+                    });
+                    $scope.watchlistNames.sort();
                 } else {
                     $scope.stocks = [];
+                    $scope.watchlistNames = [];
                 }
             });
 
@@ -124,6 +138,19 @@ module.controller('StockListController', function($scope, $http, $filter) {
             }
         }
         return false;
+    }
+
+
+    $scope.filterByWatchlist = function (stock) {
+        if ($scope.watchlistFilter == undefined || $scope.watchlistFilter == "") {
+            return true;
+        }
+
+        if (stock.watchlistNames == undefined) {
+            return false;
+        }
+
+        return stock.watchlistNames.indexOf($scope.watchlistFilter) !== -1;
     }
 
     $scope.filterByIndustry = function (stock) {

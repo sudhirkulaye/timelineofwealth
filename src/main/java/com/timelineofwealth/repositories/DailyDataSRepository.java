@@ -12,6 +12,8 @@ public interface DailyDataSRepository extends JpaRepository<DailyDataS, DailyDat
     public DailyDataS findByKeyNameAndKeyDate(String name, Date date);
     public List<DailyDataS> findAllByKeyDate(Date date);
     public List<DailyDataS> findAllByKeyNameAndKeyDateGreaterThanOrderByKeyDateAsc(String name, Date date);
+    @Query(value = "select distinct date from daily_data_s where cmp = 0 order by date", nativeQuery = true)
+    public List<Date> findDistinctDatesWithCmpZero();
     @Query(value="select count(1), date from daily_data_s " +
             "where date = (select max(date) from daily_data_s) " +
             "group by date order by date desc; ", nativeQuery = true)
