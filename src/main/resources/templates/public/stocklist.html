@@ -84,6 +84,12 @@
                                 <option value=""></option>
                                 <option ng-repeat="stock in stocks | unique:'industryNameDisplay' | orderBy:['sectorNameDisplay','industryNameDisplay']">{{stock.sectorNameDisplay}}-{{stock.industryNameDisplay}}</option>
                             </select>
+                            <label class="pull-left" >&nbsp;&nbsp;&nbsp;</label>
+                            <label class="pull-left" >Watchlist : &nbsp;&nbsp;&nbsp;</label>
+                            <select class="pull-left" ng-model="watchlistFilter" >
+                                <option value=""></option>
+                                <option ng-repeat="watchlistName in watchlistNames | orderBy">{{watchlistName}}</option>
+                            </select>
                             <lebel class="pull-left" >&nbsp;&nbsp;&nbsp;</lebel>
                             <input class="pull-left" type="text" placeholder="Search by Short Name" ng-model="searchTextFilter" />
                         </div>
@@ -191,7 +197,7 @@
 
                                 </tr>
                                 <tbody>
-                                <tr ng-repeat="stock in stocks  | filter:filterByIndex | filter:filterByFno | filter:filterBySector | filter:filterByIndustry | filter:searchStock | orderBy:sortColumn:reverseSort">
+                            <tr ng-repeat="stock in stocks  | filter:filterByIndex | filter:filterByFno | filter:filterBySector | filter:filterByIndustry | filter:filterByWatchlist | filter:searchStock | orderBy:sortColumn:reverseSort">
                                     <!--<td>{{ (assetClasses | filter : { 'classid' : stock.assetClassid})[0].subclassName }}</td>-->
                                     <!--<td>{{stock.ticker}}</td>-->
                                     <td ng-hide="flagBasicInfo">{{stock.includedIndexName}}</td>

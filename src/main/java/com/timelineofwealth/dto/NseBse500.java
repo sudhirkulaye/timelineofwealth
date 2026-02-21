@@ -8,6 +8,7 @@ import com.timelineofwealth.entities.StockUniverse;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 public class NseBse500 implements Serializable {
@@ -68,6 +69,8 @@ public class NseBse500 implements Serializable {
     private String historicalRoic;
     private String secondAndTerminalStageAssumptions;
     private String otherIncGrowthAssumptions;
+    private List<String> watchlistNames = new ArrayList<>();
+    private String watchlistsDisplay;
     private List<CustomChartData> excelCharts;
     private List<ReportNotes> reportNotes;
 
@@ -508,6 +511,20 @@ public class NseBse500 implements Serializable {
     }
     public void setOtherIncGrowthAssumptions(String otherIncGrowthAssumptions) {
         this.otherIncGrowthAssumptions = otherIncGrowthAssumptions;
+    }
+
+    public List<String> getWatchlistNames() {
+        return watchlistNames;
+    }
+    public void setWatchlistNames(List<String> watchlistNames) {
+        this.watchlistNames = watchlistNames;
+    }
+
+    public String getWatchlistsDisplay() {
+        return watchlistsDisplay;
+    }
+    public void setWatchlistsDisplay(String watchlistsDisplay) {
+        this.watchlistsDisplay = watchlistsDisplay;
     }
 
     public List<CustomChartData> getExcelCharts() {

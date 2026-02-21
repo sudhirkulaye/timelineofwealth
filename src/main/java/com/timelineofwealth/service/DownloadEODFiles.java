@@ -267,25 +267,47 @@ public class DownloadEODFiles {
         String csvFilePath = properties.getProperty("csvfilepath");
         String dateString = getDateFromNseBhavCopy(properties);
         String xlsxFilePath = properties.getProperty("xlsxfilepath") + dateString + "ScreenerDaily.xlsx";
+        List<String> normalizedHeaderOrder = Arrays.asList(
+                "Name", "BSE Code", "NSE Code", "ISIN Code", "Current Price", "Market Capitalization",
+                "Last result date", "Net profit", "Sales", "YOY Quarterly sales growth",
+                "YOY Quarterly profit growth", "QoQ sales growth", "QoQ profit growth", "OPM latest quarter",
+                "OPM last year", "NPM latest quarter", "NPM last year", "Profit growth 3Years",
+                "Sales growth 3Years", "Price to Earning", "Historical PE 3Years", "PEG Ratio",
+                "Price to book value", "Enterprise Value to EBIT", "Dividend Payout Ratio", "Return on equity",
+                "Average return on equity 3Years", "Debt", "Debt to equity", "Debt 3Years back",
+                "Return on capital employed", "Average return on capital employed 3Years", "Free cash flow last year",
+                "Sales growth 5Years", "Sales growth 10Years", "NOPLAT", "Capex", "FCFF", "Invested Capital",
+                "RoIC", "Return over 1day", "Return over 1week", "Return over 1month", "Return over 3months",
+                "Return over 6months", "Return over 1year", "Up from 52w low", "Down from 52w high", "Volume",
+                "Volume 1week average", "DMA 50", "DMA 200", "RSI", "Total Assets", "Net block",
+                "Working capital", "Inventory", "Trade receivables", "Trade Payables", "Number of equity shares"
+        );
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("core-watchlist");
-        String currentLine;
+
         int rowNum = 0;
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
-            while ((currentLine = br.readLine()) != null) {
-                String[] data = currentLine.split(",");
+        try (Reader reader = new FileReader(csvFilePath);
+             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+            Row headerRow = sheet.createRow(rowNum++);
+            for (int i = 0; i < normalizedHeaderOrder.size(); i++) {
+                headerRow.createCell(i).setCellValue(normalizedHeaderOrder.get(i));
+            }
+
+            for (CSVRecord csvRecord : csvParser) {
                 Row row = sheet.createRow(rowNum++);
-                for (int i = 0; i < data.length; i++) {
+                for (int i = 0; i < normalizedHeaderOrder.size(); i++) {
+                    String columnName = normalizedHeaderOrder.get(i);
+                    String value = csvRecord.isMapped(columnName) ? csvRecord.get(columnName).trim() : "";
                     Cell cell = row.createCell(i);
                     if (rowNum > 1 && i > 3) {
-                        if (data[i] == null || data[i].isEmpty()) {
+                        if (value.isEmpty()) {
                             cell.setCellValue(0);
                         } else {
-                            cell.setCellValue(Double.parseDouble(data[i]));
+                            cell.setCellValue(Double.parseDouble(value));
                         }
                     } else {
-                        cell.setCellValue(data[i]);
+                        cell.setCellValue(value);
                     }
                 }
             }

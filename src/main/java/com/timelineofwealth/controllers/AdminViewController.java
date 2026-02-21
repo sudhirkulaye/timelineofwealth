@@ -9,6 +9,9 @@ import com.timelineofwealth.entities.*;
 import com.timelineofwealth.repositories.*;
 import com.timelineofwealth.service.*;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -1206,115 +1209,106 @@ public class AdminViewController {
 
     public List<DailyDataS> readCsvFile(MultipartFile file, Date date) throws IOException {
         List<DailyDataS> dataList = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8));
-
-        String headerLine = reader.readLine();
-        if (headerLine == null) return dataList;
-
-        String[] headers = headerLine.split(",", -1);
-        Map<String, Integer> headerMap = new HashMap<>();
-        for (int i = 0; i < headers.length; i++) {
-            headerMap.put(headers[i].trim().toLowerCase(), i);
-        }
-
-        String line;
+        Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8));
         int rank = 1;
-        while ((line = reader.readLine()) != null) {
-            String[] values = line.split(",", -1);
-            DailyDataS daily = new DailyDataS();
-            daily.setKey(new DailyDataS.DailyDataSKey());
-            daily.getKey().setDate(date);
-            daily.setRank(rank++);
 
-            String name = getCsvValue(values, headerMap, "NSE Code");
-            if (name.isEmpty()) name = getCsvValue(values, headerMap, "BSE Code");
-            if (name.isEmpty()) continue;
-            daily.getKey().setName(name);
+        try (CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+            for (CSVRecord record : csvParser) {
+                DailyDataS daily = new DailyDataS();
+                daily.setKey(new DailyDataS.DailyDataSKey());
+                daily.getKey().setDate(date);
+                daily.setRank(rank++);
 
-            daily.setCmp(getCsvBigDecimal(values, headerMap, "Current Price"));
-            daily.setMarketCap(getCsvBigDecimal(values, headerMap, "Market Capitalization"));
-            String resultDateStr = getCsvValue(values, headerMap, "Last result date");
-            int resultDate = 0;
-            try {
-                resultDate = new BigDecimal(resultDateStr).intValue(); // handle both int and float values
-            } catch (Exception e) {
-                resultDate = 0;
+                String name = getCsvValue(record, "NSE Code");
+                if (name.isEmpty()) name = getCsvValue(record, "BSE Code");
+                if (name.isEmpty()) continue;
+                daily.getKey().setName(name);
+
+                daily.setCmp(getCsvBigDecimal(record, "Current Price"));
+                daily.setMarketCap(getCsvBigDecimal(record, "Market Capitalization"));
+                String resultDateStr = getCsvValue(record, "Last result date");
+                int resultDate = 0;
+                try {
+                    resultDate = new BigDecimal(resultDateStr).intValue(); // handle both int and float values
+                } catch (Exception e) {
+                    resultDate = 0;
+                }
+                daily.setLastResultDate(resultDate);
+                daily.setNetProfit(getCsvBigDecimal(record, "Net profit"));
+                daily.setSales(getCsvBigDecimal(record, "Sales"));
+                daily.setYoyQuarterlySalesGrowth(getCsvBigDecimal(record, "YOY Quarterly sales growth"));
+                daily.setYoyQuarterlyProfitGrowth(getCsvBigDecimal(record, "YOY Quarterly profit growth"));
+                daily.setQoqSalesGrowth(getCsvBigDecimal(record, "QoQ sales growth"));
+                daily.setQoqProfitGrowth(getCsvBigDecimal(record, "QoQ profit growth"));
+                daily.setOpmLatestQuarter(getCsvBigDecimal(record, "OPM latest quarter"));
+                daily.setOpmLastYear(getCsvBigDecimal(record, "OPM last year"));
+                daily.setNpmLatestQuarter(getCsvBigDecimal(record, "NPM latest quarter"));
+                daily.setNpmLastYear(getCsvBigDecimal(record, "NPM last year"));
+                daily.setProfitGrowth3years(getCsvBigDecimal(record, "Profit growth 3Years"));
+                daily.setSalesGrowth3years(getCsvBigDecimal(record, "Sales growth 3Years"));
+                daily.setPeTtm(getCsvBigDecimal(record, "Price to Earning"));
+                daily.setHistoricalPe3years(getCsvBigDecimal(record, "Historical PE 3Years"));
+                daily.setPegRatio(getCsvBigDecimal(record, "PEG Ratio"));
+                daily.setPbTtm(getCsvBigDecimal(record, "Price to book value"));
+                daily.setEvToEbit(getCsvBigDecimal(record, "Enterprise Value to EBIT"));
+                daily.setDividendPayout(getCsvBigDecimal(record, "Dividend Payout Ratio"));
+                daily.setRoe(getCsvBigDecimal(record, "Return on equity"));
+                daily.setAvgRoe3years(getCsvBigDecimal(record, "Average return on equity 3Years"));
+                daily.setDebt(getCsvBigDecimal(record, "Debt"));
+                daily.setDebtToEquity(getCsvBigDecimal(record, "Debt to equity"));
+                daily.setDebt3yearsback(getCsvBigDecimal(record, "Debt 3Years back"));
+                daily.setRoce(getCsvBigDecimal(record, "Return on capital employed"));
+                daily.setAvgRoce3years(getCsvBigDecimal(record, "Average return on capital employed 3Years"));
+                daily.setFcfS(getCsvBigDecimal(record, "Free cash flow last year"));
+                daily.setSalesGrowth5years(getCsvBigDecimal(record, "Sales growth 5Years"));
+                daily.setSalesGrowth10years(getCsvBigDecimal(record, "Sales growth 10Years"));
+                daily.setNoplat(getCsvBigDecimal(record, "NOPLAT"));
+                daily.setCapex(getCsvBigDecimal(record, "Capex"));
+                daily.setFcff(getCsvBigDecimal(record, "FCFF"));
+                daily.setInvestedCapital(getCsvBigDecimal(record, "Invested Capital"));
+                daily.setRoic(getCsvBigDecimal(record, "RoIC"));
+
+                // New additional fields
+                daily.setReturn1D(getCsvBigDecimal(record, "Return over 1day"));
+                daily.setReturn1W(getCsvBigDecimal(record, "Return over 1week"));
+                daily.setReturn1M(getCsvBigDecimal(record, "Return over 1month"));
+                daily.setReturn3M(getCsvBigDecimal(record, "Return over 3months"));
+                daily.setReturn6M(getCsvBigDecimal(record, "Return over 6months"));
+                daily.setReturn1Y(getCsvBigDecimal(record, "Return over 1year"));
+                daily.setUp52wMin(getCsvBigDecimal(record, "Up from 52w low"));
+                daily.setDown52wMax(getCsvBigDecimal(record, "Down from 52w high"));
+                daily.setVolume1D(getCsvBigDecimal(record, "Volume"));
+                daily.setVolume1W(getCsvBigDecimal(record, "Volume 1week average"));
+                daily.setDma50(getCsvBigDecimal(record, "DMA 50"));
+                daily.setDma200(getCsvBigDecimal(record, "DMA 200"));
+                daily.setRsi(getCsvBigDecimal(record, "RSI"));
+                daily.setTotalAssets(getCsvBigDecimal(record, "Total Assets"));
+                daily.setNetBlock(getCsvBigDecimal(record, "Net Block"));
+                daily.setWorkingCapital(getCsvBigDecimal(record, "Working Capital"));
+                daily.setInventory(getCsvBigDecimal(record, "Inventory"));
+                daily.setTradeReceivables(getCsvBigDecimal(record, "Trade Receivables"));
+                daily.setTradePayables(getCsvBigDecimal(record, "Trade Payables"));
+                daily.setSharesOutstandingCr(getCsvBigDecimal(record, "Number of equity shares"));
+
+                daily.setIndustry(getCsvValue(record, "Industry"));
+                daily.setSubIndustry("");
+                daily.setSector("");
+
+                // Computed ratios
+                if (daily.getNetProfit() != null && daily.getNetProfit().compareTo(BigDecimal.ZERO) != 0) {
+                    daily.setMcapToNetprofit(daily.getMarketCap().divide(daily.getNetProfit(), 2, RoundingMode.HALF_UP));
+                } else {
+                    daily.setMcapToNetprofit(BigDecimal.ZERO);
+                }
+
+                if (daily.getSales() != null && daily.getSales().compareTo(BigDecimal.ZERO) != 0) {
+                    daily.setMcapToSales(daily.getMarketCap().divide(daily.getSales(), 2, RoundingMode.HALF_UP));
+                } else {
+                    daily.setMcapToSales(BigDecimal.ZERO);
+                }
+
+                dataList.add(daily);
             }
-            daily.setLastResultDate(resultDate);
-            daily.setNetProfit(getCsvBigDecimal(values, headerMap, "Net profit"));
-            daily.setSales(getCsvBigDecimal(values, headerMap, "Sales"));
-            daily.setYoyQuarterlySalesGrowth(getCsvBigDecimal(values, headerMap, "YOY Quarterly sales growth"));
-            daily.setYoyQuarterlyProfitGrowth(getCsvBigDecimal(values, headerMap, "YOY Quarterly profit growth"));
-            daily.setQoqSalesGrowth(getCsvBigDecimal(values, headerMap, "QoQ sales growth"));
-            daily.setQoqProfitGrowth(getCsvBigDecimal(values, headerMap, "QoQ profit growth"));
-            daily.setOpmLatestQuarter(getCsvBigDecimal(values, headerMap, "OPM latest quarter"));
-            daily.setOpmLastYear(getCsvBigDecimal(values, headerMap, "OPM last year"));
-            daily.setNpmLatestQuarter(getCsvBigDecimal(values, headerMap, "NPM latest quarter"));
-            daily.setNpmLastYear(getCsvBigDecimal(values, headerMap, "NPM last year"));
-            daily.setProfitGrowth3years(getCsvBigDecimal(values, headerMap, "Profit growth 3Years"));
-            daily.setSalesGrowth3years(getCsvBigDecimal(values, headerMap, "Sales growth 3Years"));
-            daily.setPeTtm(getCsvBigDecimal(values, headerMap, "Price to Earning"));
-            daily.setHistoricalPe3years(getCsvBigDecimal(values, headerMap, "Historical PE 3Years"));
-            daily.setPegRatio(getCsvBigDecimal(values, headerMap, "PEG Ratio"));
-            daily.setPbTtm(getCsvBigDecimal(values, headerMap, "Price to book value"));
-            daily.setEvToEbit(getCsvBigDecimal(values, headerMap, "Enterprise Value to EBIT"));
-            daily.setDividendPayout(getCsvBigDecimal(values, headerMap, "Dividend Payout Ratio"));
-            daily.setRoe(getCsvBigDecimal(values, headerMap, "Return on equity"));
-            daily.setAvgRoe3years(getCsvBigDecimal(values, headerMap, "Average return on equity 3Years"));
-            daily.setDebt(getCsvBigDecimal(values, headerMap, "Debt"));
-            daily.setDebtToEquity(getCsvBigDecimal(values, headerMap, "Debt to equity"));
-            daily.setDebt3yearsback(getCsvBigDecimal(values, headerMap, "Debt 3Years back"));
-            daily.setRoce(getCsvBigDecimal(values, headerMap, "Return on capital employed"));
-            daily.setAvgRoce3years(getCsvBigDecimal(values, headerMap, "Average return on capital employed 3Years"));
-            daily.setFcfS(getCsvBigDecimal(values, headerMap, "Free cash flow last year"));
-            daily.setSalesGrowth5years(getCsvBigDecimal(values, headerMap, "Sales growth 5Years"));
-            daily.setSalesGrowth10years(getCsvBigDecimal(values, headerMap, "Sales growth 10Years"));
-            daily.setNoplat(getCsvBigDecimal(values, headerMap, "NOPLAT"));
-            daily.setCapex(getCsvBigDecimal(values, headerMap, "Capex"));
-            daily.setFcff(getCsvBigDecimal(values, headerMap, "FCFF"));
-            daily.setInvestedCapital(getCsvBigDecimal(values, headerMap, "Invested Capital"));
-            daily.setRoic(getCsvBigDecimal(values, headerMap, "RoIC"));
-
-            // New additional fields
-            daily.setReturn1D(getCsvBigDecimal(values, headerMap, "Return over 1day"));
-            daily.setReturn1W(getCsvBigDecimal(values, headerMap, "Return over 1week"));
-            daily.setReturn1M(getCsvBigDecimal(values, headerMap, "Return over 1month"));
-            daily.setReturn3M(getCsvBigDecimal(values, headerMap, "Return over 3months"));
-            daily.setReturn6M(getCsvBigDecimal(values, headerMap, "Return over 6months"));
-            daily.setReturn1Y(getCsvBigDecimal(values, headerMap, "Return over 1year"));
-            daily.setUp52wMin(getCsvBigDecimal(values, headerMap, "Up from 52w low"));
-            daily.setDown52wMax(getCsvBigDecimal(values, headerMap, "Down from 52w high"));
-            daily.setVolume1D(getCsvBigDecimal(values, headerMap, "Volume"));
-            daily.setVolume1W(getCsvBigDecimal(values, headerMap, "Volume 1week average"));
-            daily.setDma50(getCsvBigDecimal(values, headerMap, "DMA 50"));
-            daily.setDma200(getCsvBigDecimal(values, headerMap, "DMA 200"));
-            daily.setRsi(getCsvBigDecimal(values, headerMap, "RSI"));
-            daily.setTotalAssets(getCsvBigDecimal(values, headerMap, "Total Assets"));
-            daily.setNetBlock(getCsvBigDecimal(values, headerMap, "Net Block"));
-            daily.setWorkingCapital(getCsvBigDecimal(values, headerMap, "Working Capital"));
-            daily.setInventory(getCsvBigDecimal(values, headerMap, "Inventory"));
-            daily.setTradeReceivables(getCsvBigDecimal(values, headerMap, "Trade Receivables"));
-            daily.setTradePayables(getCsvBigDecimal(values, headerMap, "Trade Payables"));
-            daily.setSharesOutstandingCr(getCsvBigDecimal(values, headerMap, "Number of equity shares"));
-
-            daily.setIndustry(getCsvValue(values, headerMap, "Industry"));
-            daily.setSubIndustry("");
-            daily.setSector("");
-
-            // Computed ratios
-            if (daily.getNetProfit() != null && daily.getNetProfit().compareTo(BigDecimal.ZERO) != 0) {
-                daily.setMcapToNetprofit(daily.getMarketCap().divide(daily.getNetProfit(), 2, RoundingMode.HALF_UP));
-            } else {
-                daily.setMcapToNetprofit(BigDecimal.ZERO);
-            }
-
-            if (daily.getSales() != null && daily.getSales().compareTo(BigDecimal.ZERO) != 0) {
-                daily.setMcapToSales(daily.getMarketCap().divide(daily.getSales(), 2, RoundingMode.HALF_UP));
-            } else {
-                daily.setMcapToSales(BigDecimal.ZERO);
-            }
-
-            dataList.add(daily);
         }
 
         return dataList;
@@ -1354,16 +1348,20 @@ public class AdminViewController {
         }
     }
 
-    private String getCsvValue(String[] row, Map<String, Integer> map, String key) {
-        Integer index = map.get(key.toLowerCase());
-        return (index != null && index < row.length) ? row[index].trim() : "";
+    private String getCsvValue(CSVRecord record, String columnName) {
+        if (!record.isMapped(columnName)) {
+            return "";
+        }
+        String value = record.get(columnName);
+        return value == null ? "" : value.trim();
     }
 
-    private BigDecimal getCsvBigDecimal(String[] row, Map<String, Integer> map, String key) {
+    private BigDecimal getCsvBigDecimal(CSVRecord record, String columnName) {
         try {
-            String val = getCsvValue(row, map, key);
+            String val = getCsvValue(record, columnName);
             return val.isEmpty() ? BigDecimal.ZERO : new BigDecimal(val);
         } catch (Exception e) {
+            logger.debug("Error parsing CSV decimal for column {}", columnName);
             return BigDecimal.ZERO;
         }
     }
