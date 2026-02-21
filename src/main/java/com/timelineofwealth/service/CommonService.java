@@ -331,6 +331,31 @@ public class CommonService {
         nseBse500List = new ArrayList<>();
         List<Subindustry> subindustries = this.getSubindustries();
         Map<String, List<String>> watchlistsByTicker = loadWatchlistsByTicker();
+        Set<String> existingTickers = nseBse500BasicList.stream()
+                .map(StockUniverse::getTicker)
+                .filter(Objects::nonNull)
+                .map(this::normalizeTicker)
+                .collect(Collectors.toSet());
+
+        for (String watchlistTicker : watchlistsByTicker.keySet()) {
+            if (!existingTickers.contains(watchlistTicker)) {
+                StockUniverse stock = this.stockUniverseRepository.findByTicker(watchlistTicker);
+                if (stock != null) {
+                    nseBse500BasicList.add(stock);
+                    existingTickers.add(watchlistTicker);
+                } else {
+                    logger.warn("Watchlist ticker not found in stock_universe: {}", watchlistTicker);
+                }
+            }
+        }
+
+        nseBse500BasicList.sort((a, b) -> {
+            if (a.getMarketcap() == null && b.getMarketcap() == null) return 0;
+            if (a.getMarketcap() == null) return 1;
+            if (b.getMarketcap() == null) return -1;
+            return b.getMarketcap().compareTo(a.getMarketcap());
+        });
+
         for(StockUniverse stockUniverse : nseBse500BasicList){
             NseBse500 nseBse500 = new NseBse500(stockUniverse);
             List<Subindustry> subindustries1 = subindustries.stream()
@@ -1696,5 +1721,8 @@ public class CommonService {
 
     }
 
+    private Set<String> getWatchlistTickers(Map<String, List<String>> watchlistsByTicker) {
+        return new HashSet<>(watchlistsByTicker.keySet());
+    }
 
 }
