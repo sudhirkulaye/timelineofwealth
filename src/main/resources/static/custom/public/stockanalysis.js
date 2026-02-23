@@ -767,7 +767,7 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 let latestSummary = '';
                 if (latestBySeries.length > 0) {
                     latestSummary = latestBySeries
-                        .slice(0, 4)
+                        .slice(0, 10)
                         .map(function(item) {
                             let val = item.value;
                             let fmt = '';
@@ -784,7 +784,17 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 }
 
                 // Title text with subtitle
-                titleH2.innerHTML = `${chartInfo.title} <small>(${latestSummary || (latestSeriesName ? `Series: ${latestSeriesName}` : `Field: ${chartInfo.fieldName}`)}${(!latestSummary && formattedLatest) ? `, Latest: ${formattedLatest}` : ''})</small>`;
+                titleH2.innerHTML = `${chartInfo.title} <small style="
+                    display: block;
+                    font-size: 13px;
+                    font-weight: normal;
+                    color: #555;
+                    margin-top: 6px;
+                    line-height: 1.6;
+                    white-space: normal;
+                    word-break: break-word;
+                    overflow-wrap: break-word;
+                ">(${latestSummary || (latestSeriesName ? `Series: ${latestSeriesName}` : `Field: ${chartInfo.fieldName}`)}${(!latestSummary && formattedLatest) ? `, Latest: ${formattedLatest}` : ''})</small>`;
 
                 titleDiv.appendChild(titleH2);
 
