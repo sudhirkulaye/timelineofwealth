@@ -514,8 +514,8 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 yAxisID: 'y-axis-1',
                 type: 'line',
                 showLine: false,
-                pointRadius: 4,
-                pointHoverRadius: 6,
+                pointRadius: 8,
+                pointHoverRadius: 10,
                 pointStyle: 'triangle',
                 borderWidth: 0,
                 backgroundColor: '#d9534f',
@@ -812,6 +812,18 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 panel.appendChild(titleDiv);
 
                 // === x_content ===
+                let contentDiv = document.createElement('div');
+                contentDiv.className = 'x_content';
+
+                let canvas = document.createElement('canvas');
+                canvas.style.width = '100%';
+                canvas.style.height = '320px';
+                contentDiv.appendChild(canvas);
+
+                panel.appendChild(contentDiv);
+                wrapperColDiv.appendChild(panel);
+                rowDiv.appendChild(wrapperColDiv);
+
                 const palette = ['#26B99A', '#3498DB', '#9B59B6', '#F39C12', '#E74C3C', '#1ABC9C', '#2ECC71', '#34495E'];
                 let datasets = [];
 
@@ -829,6 +841,11 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                     });
 
                     const color = palette[idx % palette.length];
+                    let datasetType = series.chartType || chartInfo.chartType || 'line';
+                    let validPointCount = formattedValues.filter(function(v) {
+                        return v !== null && v !== undefined && !isNaN(v);
+                    }).length;
+
                     datasets.push({
                         label: series.label || ('Series ' + (idx + 1)),
                         data: formattedValues,
@@ -836,9 +853,11 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                         borderColor: color,
                         backgroundColor: color,
                         fill: false,
-                        type: series.chartType || chartInfo.chartType || 'line',
-                        pointRadius: (series.chartType === 'bar') ? 0 : 2,
-                        lineTension: 0.3
+                        type: datasetType,
+                        pointRadius: (datasetType === 'bar') ? 0 : 2,
+                        tension: 0,
+                        showLine: (datasetType === 'line') ? (validPointCount > 1) : true,
+                        spanGaps: true
                     });
                 });
 
@@ -857,6 +876,29 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                     return lbl;
                 });
 
+                let maxDataPoints = datasets.reduce(function(maxLen, ds) {
+                    return Math.max(maxLen, (ds.data && ds.data.length) ? ds.data.length : 0);
+                }, 0);
+
+                if (normalizedLabels.length === 0 && maxDataPoints > 0) {
+                    normalizedLabels = Array.from({ length: maxDataPoints }, function(_, idx) {
+                        return 'P' + (idx + 1);
+                    });
+                } else if (normalizedLabels.length < maxDataPoints) {
+                    for (let i = normalizedLabels.length; i < maxDataPoints; i++) {
+                        normalizedLabels.push('P' + (i + 1));
+                    }
+                }
+
+                datasets = datasets.map(function(ds) {
+                    let nextData = (ds.data || []).slice(0, normalizedLabels.length);
+                    while (nextData.length < normalizedLabels.length) {
+                        nextData.push(null);
+                    }
+                    ds.data = nextData;
+                    return ds;
+                });
+
                 // === Create Chart ===
                 try {
                     new Chart(canvas.getContext('2d'), {
@@ -867,29 +909,34 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                     },
                     options: {
                         responsive: true,
-                        legend: {
-                            display: showLegend
-                        },
-                        tooltips: {
-                            callbacks: {
-                                label: function(tooltipItem, data) {
-                                    let val = tooltipItem.yLabel;
-                                    if (val == null) return '';
-                                    if (Math.abs(val) >= 1000) {
-                                        return Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
-                                    } else if (Math.abs(val) <= 100) {
-                                        return Number(val).toLocaleString('en-IN', { maximumFractionDigits: 1 });
-                                    } else {
-                                        return Number(val).toFixed(1);
+                        plugins: {
+                            title: {
+                                display: false
+                            },
+                            legend: {
+                                display: showLegend
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let val = context.raw;
+                                        if (val == null) return '';
+                                        if (Math.abs(val) >= 1000) {
+                                            return Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+                                        } else if (Math.abs(val) <= 100) {
+                                            return Number(val).toLocaleString('en-IN', { maximumFractionDigits: 1 });
+                                        } else {
+                                            return Number(val).toFixed(1);
+                                        }
                                     }
                                 }
                             }
                         },
                         scales: {
-                            yAxes: [{
+                            y: {
                                 stacked: isStacked,
+                                beginAtZero: true,
                                 ticks: {
-                                    stacked: isStacked,
                                     callback: function(value) {
                                         if (Math.abs(value) >= 1000) {
                                             return Number(value).toLocaleString('en-IN', { maximumFractionDigits: 0 });
@@ -900,14 +947,14 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                                         }
                                     }
                                 }
-                            }],
-                            xAxes: [{
+                            },
+                            x: {
                                 stacked: isStacked,
                                 ticks: {
                                     autoSkip: true,
                                     maxTicksLimit: 10
                                 }
-                            }]
+                            }
                         }
                     }
                 });
@@ -921,6 +968,9 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
     // === Extended: Display Notes Section for Each Ticker ===
     function renderReportNotes() {
         let container = document.getElementById("reportNotesContainer");
+        if (!container) {
+            return;
+        }
         container.innerHTML = "";
 
         let notes = $scope.stockDetails.reportNotes;
