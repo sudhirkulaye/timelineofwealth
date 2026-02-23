@@ -498,7 +498,7 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 borderDash: [],
                 borderWidth: 2,
                 pointRadius: 0,
-                tension: 0.4
+                lineTension: 0.4
             },
             {
                 label: "Price",
@@ -507,7 +507,7 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 borderDash: [],
                 borderWidth: 2,
                 pointRadius: 0,
-                tension: 0.4
+                lineTension: 0.4
             },
             {
                 label: "Result MCap",
@@ -812,20 +812,6 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 panel.appendChild(titleDiv);
 
                 // === x_content ===
-                let contentDiv = document.createElement('div');
-                contentDiv.className = 'x_content';
-
-                let canvas = document.createElement('canvas');
-                canvas.id = 'custom_chart_' + index;
-                canvas.style.height = "300px";
-                canvas.style.maxHeight = "300px";
-                contentDiv.appendChild(canvas);
-
-                panel.appendChild(contentDiv);
-                wrapperColDiv.appendChild(panel);
-                rowDiv.appendChild(wrapperColDiv);
-
-                // === Format Data ===
                 const palette = ['#26B99A', '#3498DB', '#9B59B6', '#F39C12', '#E74C3C', '#1ABC9C', '#2ECC71', '#34495E'];
                 let datasets = [];
 
@@ -852,15 +838,31 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                         fill: false,
                         type: series.chartType || chartInfo.chartType || 'line',
                         pointRadius: (series.chartType === 'bar') ? 0 : 2,
-                        tension: 0.3
+                        lineTension: 0.3
                     });
                 });
 
+                datasets = datasets.filter(function(ds) {
+                    return ds.data && ds.data.some(function(v) { return v !== null && v !== undefined && !isNaN(v); });
+                });
+                if (datasets.length === 0) {
+                    return;
+                }
+
+                let primaryType = datasets[0].type || 'line';
+                let normalizedLabels = (chartInfo.labels || []).map(function(lbl, idx) {
+                    if (lbl === null || lbl === undefined || lbl === '') {
+                        return 'P' + (idx + 1);
+                    }
+                    return lbl;
+                });
+
                 // === Create Chart ===
-                new Chart(canvas.getContext('2d'), {
-                    type: 'line',
+                try {
+                    new Chart(canvas.getContext('2d'), {
+                    type: primaryType,
                     data: {
-                        labels: chartInfo.labels,
+                        labels: normalizedLabels,
                         datasets: datasets
                     },
                     options: {
@@ -909,6 +911,9 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                         }
                     }
                 });
+                } catch (e) {
+                    console.error('Failed rendering custom excel chart', chartInfo, e);
+                }
             });
         }
     }
