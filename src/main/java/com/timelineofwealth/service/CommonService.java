@@ -734,9 +734,11 @@ public class CommonService {
         NseBse500 stockDetails = getStockDetails(ticker);
 
         List<java.sql.Date> resultDates = this.stockQuarterRepository.findDistinctResultDateForTicker(ticker, java.sql.Date.valueOf(tenQuarterBefore));
+        Set<java.sql.Date> resultDateSet = new HashSet<>(resultDates);
+        resultDateSet.addAll(getResultDatesFromExcel(ticker));
 
         List<DailyDataS> dailyDataSList = this.dailyDataSRepository.findAllByKeyNameAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker(),java.sql.Date.valueOf(tenQuarterBefore));
-        //List<DailyDataB> dailyDataBList = this.dailyDataBRepository.findAllByKeyTickerBAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker2(),java.sql.Date.valueOf(oneYearOld));
+        Set<java.sql.Date> markerDates = buildNearestMarketDatesForResults(resultDateSet, dailyDataSList);
         for(DailyDataS dailyDataS: dailyDataSList){
             RecentValuations recentPE = new RecentValuations();
             recentPE.setTicker(ticker);
@@ -746,32 +748,78 @@ public class CommonService {
             recentPE.setEvToEbita(dailyDataS.getEvToEbit().setScale(2, RoundingMode.HALF_UP));
             recentPE.setMarketCap(dailyDataS.getMarketCap().setScale(0, RoundingMode.HALF_UP));
             recentPE.setMarketPrice(dailyDataS.getCmp().setScale(0, RoundingMode.HALF_UP));
-            int index = Collections.binarySearch(resultDates, dailyDataS.getKey().getDate());
-            if (index >= 0) {
+            if (markerDates.contains(dailyDataS.getKey().getDate())) {
                 recentPE.setResultDateMCap(dailyDataS.getMarketCap().setScale(0, RoundingMode.HALF_UP));
             } else {
                 recentPE.setResultDateMCap(new BigDecimal(0));
             }
             recentPES.add(recentPE);
         }
-        // set PB from bloomberg data
-        // commenting following code since bloomberg data is now not available
-        /*for(DailyDataB dailyDataB: dailyDataBList){
-            List<RecentValuations> recentPES1 = recentPES.stream()
-                    .filter( recentPE -> recentPE.getDate().equals(dailyDataB.getKey().getDate()) )
-                    .collect(Collectors.toList());
-            if (recentPES1.size() > 0) {
-                RecentValuations recentPE = recentPES1.get(0);
-                if (dailyDataB.getPriceBook().floatValue() > 0) {
-                    recentPE.setPb(dailyDataB.getPriceBook());
-                }
-                if (dailyDataB.getCurrentPe().floatValue() > 0) {
-                    recentPE.setPe(dailyDataB.getCurrentPe());
-                }
-            }
-        }*/
         return recentPES;
     }
+
+    private Set<java.sql.Date> buildNearestMarketDatesForResults(Set<java.sql.Date> resultDates, List<DailyDataS> dailyDataSList) {
+        Set<java.sql.Date> mappedDates = new HashSet<>();
+        if (resultDates == null || resultDates.isEmpty() || dailyDataSList == null || dailyDataSList.isEmpty()) {
+            return mappedDates;
+        }
+
+        List<java.sql.Date> tradingDates = dailyDataSList.stream()
+                .map(d -> d.getKey().getDate())
+                .sorted()
+                .collect(Collectors.toList());
+
+        for (java.sql.Date resultDate : resultDates) {
+            if (resultDate == null) {
+                continue;
+            }
+            java.sql.Date mapped = null;
+            for (java.sql.Date tradingDate : tradingDates) {
+                if (!tradingDate.before(resultDate)) {
+                    mapped = tradingDate;
+                    break;
+                }
+            }
+            if (mapped == null) {
+                mapped = tradingDates.get(tradingDates.size() - 1);
+            }
+            mappedDates.add(mapped);
+        }
+        return mappedDates;
+    }
+
+    private Set<java.sql.Date> getResultDatesFromExcel(String ticker) {
+        Set<java.sql.Date> excelResultDates = new HashSet<>();
+        File excelFile = getLatestExcelFileForTicker(ticker);
+        if (excelFile == null) {
+            return excelResultDates;
+        }
+
+        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(excelFile))) {
+            Sheet sheet = workbook.getSheet("QuarterP&L");
+            if (sheet == null) {
+                return excelResultDates;
+            }
+
+            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+            Row quarterDateRow = sheet.getRow(14); // Excel row 15
+            if (quarterDateRow == null) {
+                return excelResultDates;
+            }
+
+            for (int col = CellReference.convertColStringToIndex("B"); col <= CellReference.convertColStringToIndex("R"); col++) {
+                Cell cell = quarterDateRow.getCell(col);
+                java.sql.Date parsedDate = extractSqlDate(cell, evaluator);
+                if (parsedDate != null) {
+                    excelResultDates.add(parsedDate);
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("Unable to read result dates from excel for ticker {}", ticker, ex);
+        }
+        return excelResultDates;
+    }
+
 
     /**
      * Get Index Valuation
@@ -1009,6 +1057,7 @@ public class CommonService {
             if (excelFile == null) return chartDataList;
 
             Workbook workbook = new XSSFWorkbook(new FileInputStream(excelFile));
+            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
 
             // Read active combinations for this ticker
             String combos = tickerCombination.getProperty(ticker);
@@ -1046,22 +1095,19 @@ public class CommonService {
                 String startCol = sectionProps.get("date_column_start");
                 String endCol = sectionProps.get("date_column_end");
                 String title = sectionProps.get("name");
+                String chartType = sectionProps.getOrDefault("chart_type", "line");
+                String fieldNameColumn = sectionProps.getOrDefault("name_column", "A");
+                boolean stacked = Boolean.parseBoolean(sectionProps.getOrDefault("stacked", "false"));
+                boolean showLegend = Boolean.parseBoolean(sectionProps.getOrDefault("show_legend", "false"));
 
                 Sheet sheet = workbook.getSheet(sheetName);
                 if (sheet == null) continue;
 
                 Row dateRowObj = sheet.getRow(dateRow - 1);
                 Row paramRowObj = sheet.getRow(paramRow - 1);
+                if (dateRowObj == null || paramRowObj == null) continue;
 
-                String fieldName = "";
-                Cell fieldCell = paramRowObj.getCell(0); // Column A is index 0
-                if (fieldCell != null) {
-                    if (fieldCell.getCellType() == Cell.CELL_TYPE_STRING) {
-                        fieldName = fieldCell.getStringCellValue();
-                    } else if (fieldCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-                        fieldName = String.valueOf(fieldCell.getNumericCellValue());
-                    }
-                }
+                String fieldName = getCellAsString(paramRowObj.getCell(CellReference.convertColStringToIndex(fieldNameColumn)), evaluator);
 
                 int startIdx = CellReference.convertColStringToIndex(startCol);
                 int endIdx = CellReference.convertColStringToIndex(endCol);
@@ -1069,36 +1115,48 @@ public class CommonService {
                 List<String> dates = new ArrayList<>();
                 List<Double> values = new ArrayList<>();
 
-                FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-
                 for (int col = startIdx; col <= endIdx; col++) {
-                    Cell dateCell = dateRowObj.getCell(col);
-                    Cell valueCell = paramRowObj.getCell(col);
-                    if (dateCell == null || valueCell == null) continue;
-
-                    // === Evaluate Date Cell ===
-                    CellValue evaluatedDate = evaluator.evaluate(dateCell);
-                    if (evaluatedDate != null) {
-                        if (evaluatedDate.getCellType() == Cell.CELL_TYPE_NUMERIC && DateUtil.isValidExcelDate(evaluatedDate.getNumberValue())) {
-                            dates.add(new DataFormatter().formatRawCellContents(
-                                    evaluatedDate.getNumberValue(),
-                                    -1,
-                                    DateFormatConverter.convert(Locale.ENGLISH, "yyyy-MM-dd")
-                            ));
-                        } else if (evaluatedDate.getCellType() == Cell.CELL_TYPE_STRING) {
-                            dates.add(evaluatedDate.getStringValue());
-                        } else {
-                            continue;
-                        }
-                    }
-
-                    // === Evaluate Value Cell ===
-                    CellValue evaluatedValue = evaluator.evaluate(valueCell);
-                    if (evaluatedValue != null && evaluatedValue.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-                        values.add(evaluatedValue.getNumberValue());
+                    java.sql.Date parsedDate = extractSqlDate(dateRowObj.getCell(col), evaluator);
+                    if (parsedDate != null) {
+                        dates.add(parsedDate.toString());
                     } else {
-                        values.add(null);
+                        String textDate = getCellAsString(dateRowObj.getCell(col), evaluator);
+                        dates.add(textDate.isEmpty() ? null : textDate);
                     }
+                }
+                String seriesStart = sectionProps.get("series_row_start");
+                String seriesEnd = sectionProps.get("series_row_end");
+                List<ChartSeriesData> series = new ArrayList<>();
+
+                if (seriesStart != null && seriesEnd != null) {
+                    int sRow = Integer.parseInt(seriesStart);
+                    int eRow = Integer.parseInt(seriesEnd);
+                    for (int rowNo = sRow; rowNo <= eRow; rowNo++) {
+                        Row seriesRow = sheet.getRow(rowNo - 1);
+                        if (seriesRow == null) continue;
+
+                        String label = getCellAsString(seriesRow.getCell(CellReference.convertColStringToIndex(fieldNameColumn)), evaluator);
+                        if (label == null || label.trim().isEmpty()) continue;
+
+                        List<Double> seriesValues = extractValues(seriesRow, startIdx, endIdx, evaluator);
+                        boolean hasData = seriesValues.stream().anyMatch(Objects::nonNull);
+                        if (!hasData) continue;
+
+                        ChartSeriesData chartSeriesData = new ChartSeriesData();
+                        chartSeriesData.setLabel(label.trim());
+                        chartSeriesData.setValues(seriesValues);
+                        chartSeriesData.setChartType(sectionProps.getOrDefault("series_chart_type", chartType));
+                        series.add(chartSeriesData);
+                    }
+                }
+
+                if (series.isEmpty()) {
+                    values = extractValues(paramRowObj, startIdx, endIdx, evaluator);
+                    ChartSeriesData defaultSeries = new ChartSeriesData();
+                    defaultSeries.setLabel((fieldName == null || fieldName.trim().isEmpty()) ? title : fieldName.trim());
+                    defaultSeries.setValues(values);
+                    defaultSeries.setChartType(chartType);
+                    series.add(defaultSeries);
                 }
 
                 CustomChartData chartData = new CustomChartData();
@@ -1107,12 +1165,92 @@ public class CommonService {
                 chartData.setLabels(dates);
                 chartData.setValues(values);
                 chartData.setFieldName(fieldName);
+                chartData.setSeries(series);
+                chartData.setChartType(chartType);
+                chartData.setStacked(stacked);
+                chartData.setShowLegend(showLegend);
                 chartDataList.add(chartData);
             }
+            workbook.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         return chartDataList;
+    }
+
+    private List<Double> extractValues(Row valueRow, int startIdx, int endIdx, FormulaEvaluator evaluator) {
+        List<Double> values = new ArrayList<>();
+        for (int col = startIdx; col <= endIdx; col++) {
+            Cell valueCell = valueRow.getCell(col);
+            if (valueCell == null) {
+                values.add(null);
+                continue;
+            }
+            CellValue evaluatedValue = evaluator.evaluate(valueCell);
+            if (evaluatedValue != null && evaluatedValue.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                values.add(evaluatedValue.getNumberValue());
+            } else {
+                values.add(null);
+            }
+        }
+        return values;
+    }
+
+    private String getCellAsString(Cell cell, FormulaEvaluator evaluator) {
+        if (cell == null) {
+            return "";
+        }
+
+        CellValue evaluated = evaluator.evaluate(cell);
+        if (evaluated == null) {
+            return "";
+        }
+
+        if (evaluated.getCellType() == Cell.CELL_TYPE_STRING) {
+            return evaluated.getStringValue();
+        }
+        if (evaluated.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+            if (DateUtil.isValidExcelDate(evaluated.getNumberValue())) {
+                return new DataFormatter().formatRawCellContents(
+                        evaluated.getNumberValue(),
+                        -1,
+                        DateFormatConverter.convert(Locale.ENGLISH, "yyyy-MM-dd")
+                );
+            }
+            return String.valueOf(evaluated.getNumberValue());
+        }
+        if (evaluated.getCellType() == Cell.CELL_TYPE_BOOLEAN) {
+            return String.valueOf(evaluated.getBooleanValue());
+        }
+
+        return "";
+    }
+
+    private java.sql.Date extractSqlDate(Cell cell, FormulaEvaluator evaluator) {
+        if (cell == null) {
+            return null;
+        }
+
+        CellValue evaluated = evaluator.evaluate(cell);
+        if (evaluated == null) {
+            return null;
+        }
+
+        try {
+            if (evaluated.getCellType() == Cell.CELL_TYPE_NUMERIC && DateUtil.isValidExcelDate(evaluated.getNumberValue())) {
+                return new java.sql.Date(DateUtil.getJavaDate(evaluated.getNumberValue()).getTime());
+            }
+            if (evaluated.getCellType() == Cell.CELL_TYPE_STRING) {
+                String value = evaluated.getStringValue();
+                if (value != null && !value.trim().isEmpty()) {
+                    return java.sql.Date.valueOf(value.trim());
+                }
+            }
+        } catch (Exception ignored) {
+            return null;
+        }
+
+        return null;
     }
 
     private final File getLatestExcelFileForTicker(String ticker) {

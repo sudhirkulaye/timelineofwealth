@@ -458,10 +458,8 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
             recentpb.push($scope.recentValuations[i].pb);
             recentevtoebita.push($scope.recentValuations[i].evToEbita);
             recentpedate.push($scope.recentValuations[i].date);
-            resultDateMCap.push($scope.recentValuations[i].resultDateMCap);
-//            if ($scope.recentValuations[i].resultDateMCap > 0) {
-//                console.log("i = " + i + " MCap = " + $scope.recentValuations[i].resultDateMCap);
-//            }
+            var resultMCap = $scope.recentValuations[i].resultDateMCap;
+            resultDateMCap.push((resultMCap && resultMCap > 0) ? resultMCap : null);
         }
         $scope.dataRecentPE.push(recentpe);
         $scope.dataRecentMCap.push(recentmcap);
@@ -514,7 +512,16 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
             {
                 label: "Result MCap",
                 yAxisID: 'y-axis-1',
-                type: 'line'
+                type: 'line',
+                showLine: false,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointStyle: 'triangle',
+                borderWidth: 0,
+                backgroundColor: '#d9534f',
+                borderColor: '#d9534f',
+                pointBackgroundColor: '#d9534f',
+                pointBorderColor: '#d9534f'
             }
         ];
         $scope.chartMCapAndPriceSeries = ['Market Cap', 'Price', 'Result MCap'];
@@ -625,19 +632,12 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
            salesGrowth.push(Number(Math.round(map[yr][0].salesG*100 * 100)/100 || 1));
            operatingProfitGrowth.push(Number(Math.round(map[yr][0].ebitdaG*100 * 100)/100 || 1));
            opm.push(Number(Math.round(map[yr][0].opm*100 * 100)/100 || 1));
-//           console.log(map[yr][0].opm);
-//           computedNpm = (map[yr][0].netProfit/map[yr][0].sales);
-//           computedNpm = Math.round(computedNpm * 100)/100;
-//           npm.push(computedNpm);
         }
 
         $scope.labelsYearsStockQuarter = years;
         $scope.stockQuarter = [];
-        //$scope.stockQuarter.push(sales);
         $scope.stockQuarter.push(noplat);
         $scope.stockQuarter.push(opm);
-        //$scope.stockQuarter.push(salesGrowth);
-        //$scope.stockQuarter.push(operatingProfitGrowth);
 
         $scope.chartOptionsStockQuarter = { scales: {
                                             yAxes: [
@@ -659,11 +659,6 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                                        } };
 
         $scope.stockQuarterDataOverride = [
-//              {
-//                label: "Sales",
-//                yAxisID: 'y-axis-1',
-//                type: 'bar'
-//              },
               {
                 label: "NOPLAT",
                 yAxisID: 'y-axis-1',
@@ -674,11 +669,6 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 yAxisID: 'y-axis-2',
                 type: 'line', borderDash: [], borderWidth: 2, pointRadius: 0, tension: 0.4
               },
-//              {
-//                label: "Op. Profit g%",
-//                yAxisID: 'y-axis-2',
-//                type: 'line'
-//              },
         ];
 
         $scope.stockQuarterSales = [sales];
@@ -736,13 +726,31 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
 
                 let titleH2 = document.createElement('h2');
 
+                let chartSeries = (chartInfo.series && chartInfo.series.length > 0)
+                    ? chartInfo.series
+                    : [{ label: chartInfo.fieldName || chartInfo.title, values: chartInfo.values, chartType: chartInfo.chartType || 'line' }];
+                let isStacked = chartInfo.stacked === true;
+                let showLegend = (chartInfo.showLegend === true) || chartSeries.length > 1;
+
                 let latestVal = null;
-                for (let i = chartInfo.values.length - 1; i >= 0; i--) {
-                    if (chartInfo.values[i] != null && isFinite(chartInfo.values[i])) {
-                        latestVal = chartInfo.values[i];
-                        break;
+                let latestSeriesName = '';
+                let latestBySeries = [];
+                chartSeries.forEach(function (series) {
+                    if (!series || !series.values) return;
+                    for (let i = series.values.length - 1; i >= 0; i--) {
+                        if (series.values[i] != null && isFinite(series.values[i])) {
+                            latestBySeries.push({
+                                name: series.label || '',
+                                value: series.values[i]
+                            });
+                            if (latestVal == null) {
+                                latestVal = series.values[i];
+                                latestSeriesName = series.label || '';
+                            }
+                            break;
+                        }
                     }
-                }
+                });
 
                 // Format value
                 let formattedLatest = "";
@@ -756,8 +764,27 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                     }
                 }
 
+                let latestSummary = '';
+                if (latestBySeries.length > 0) {
+                    latestSummary = latestBySeries
+                        .slice(0, 4)
+                        .map(function(item) {
+                            let val = item.value;
+                            let fmt = '';
+                            if (Math.abs(val) <= 1) {
+                                fmt = (val * 100).toFixed(1) + '%';
+                            } else if (Math.abs(val) > 1000) {
+                                fmt = Math.round(val).toLocaleString('en-IN');
+                            } else {
+                                fmt = val.toFixed(1);
+                            }
+                            return `${item.name}: ${fmt}`;
+                        })
+                        .join(' | ');
+                }
+
                 // Title text with subtitle
-                titleH2.innerHTML = `${chartInfo.title} <small>(Field: ${chartInfo.fieldName}${formattedLatest ? `, Latest: ${formattedLatest}` : ''})</small>`;
+                titleH2.innerHTML = `${chartInfo.title} <small>(${latestSummary || (latestSeriesName ? `Series: ${latestSeriesName}` : `Field: ${chartInfo.fieldName}`)}${(!latestSummary && formattedLatest) ? `, Latest: ${formattedLatest}` : ''})</small>`;
 
                 titleDiv.appendChild(titleH2);
 
@@ -799,15 +826,34 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                 rowDiv.appendChild(wrapperColDiv);
 
                 // === Format Data ===
-                let formattedValues = chartInfo.values.map(function(val) {
-                    if (val == null) return null;
-                    if (Math.abs(val) <= 1) {
-                        return +(val * 100).toFixed(1); // percentage
-                    } else if (Math.abs(val) > 1000) {
-                        return Math.round(val); // big number
-                    } else {
-                        return +val.toFixed(1); // normal
-                    }
+                const palette = ['#26B99A', '#3498DB', '#9B59B6', '#F39C12', '#E74C3C', '#1ABC9C', '#2ECC71', '#34495E'];
+                let datasets = [];
+
+                chartSeries.forEach(function(series, idx) {
+                    if (!series || !series.values) return;
+                    let formattedValues = series.values.map(function(val) {
+                        if (val == null) return null;
+                        if (Math.abs(val) <= 1) {
+                            return +(val * 100).toFixed(1);
+                        } else if (Math.abs(val) > 1000) {
+                            return Math.round(val);
+                        } else {
+                            return +val.toFixed(1);
+                        }
+                    });
+
+                    const color = palette[idx % palette.length];
+                    datasets.push({
+                        label: series.label || ('Series ' + (idx + 1)),
+                        data: formattedValues,
+                        borderWidth: 2,
+                        borderColor: color,
+                        backgroundColor: color,
+                        fill: false,
+                        type: series.chartType || chartInfo.chartType || 'line',
+                        pointRadius: (series.chartType === 'bar') ? 0 : 2,
+                        tension: 0.3
+                    });
                 });
 
                 // === Create Chart ===
@@ -815,43 +861,33 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                     type: 'line',
                     data: {
                         labels: chartInfo.labels,
-                        datasets: [{
-                            label: '',
-                            data: formattedValues,
-                            borderWidth: 2,
-                            borderColor: '#26B99A',
-                            backgroundColor: '#26B99A',
-                            fill: false
-                        }]
+                        datasets: datasets
                     },
                     options: {
                         responsive: true,
-                        plugins: {
-                            title: {
-                                display: false
-                            },
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let val = context.raw;
-                                        if (val == null) return '';
-                                        if (Math.abs(val) >= 1000) {
-                                            return Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
-                                        } else if (Math.abs(val) <= 100) {
-                                            return Number(val).toLocaleString('en-IN', { maximumFractionDigits: 1 });
-                                        } else {
-                                            return Number(val).toFixed(1);
-                                        }
+                        legend: {
+                            display: showLegend
+                        },
+                        tooltips: {
+                            callbacks: {
+                                label: function(tooltipItem, data) {
+                                    let val = tooltipItem.yLabel;
+                                    if (val == null) return '';
+                                    if (Math.abs(val) >= 1000) {
+                                        return Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+                                    } else if (Math.abs(val) <= 100) {
+                                        return Number(val).toLocaleString('en-IN', { maximumFractionDigits: 1 });
+                                    } else {
+                                        return Number(val).toFixed(1);
                                     }
                                 }
                             }
                         },
                         scales: {
-                            y: {
+                            yAxes: [{
+                                stacked: isStacked,
                                 ticks: {
+                                    stacked: isStacked,
                                     callback: function(value) {
                                         if (Math.abs(value) >= 1000) {
                                             return Number(value).toLocaleString('en-IN', { maximumFractionDigits: 0 });
@@ -862,13 +898,14 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                                         }
                                     }
                                 }
-                            },
-                            x: {
+                            }],
+                            xAxes: [{
+                                stacked: isStacked,
                                 ticks: {
                                     autoSkip: true,
                                     maxTicksLimit: 10
                                 }
-                            }
+                            }]
                         }
                     }
                 });
@@ -932,5 +969,4 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
             });
         });
     }
-
 });
