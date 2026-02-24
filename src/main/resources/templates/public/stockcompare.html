@@ -24,10 +24,14 @@
 <script src="../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
 <!-- ui-bootstrap-tpls.js -->
 <script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
-<!-- Chart.js -->
+<!-- Chart.js v2 - used by angular-chart directives -->
 <script src="../../static/vendors/Chart.js/dist/Chart.min.js" th:src="@{/vendors/Chart.js/dist/Chart.min.js}"></script>
-<!-- angular.chartjs -->
+<!-- Save v2 reference before v4 overwrites it -->
+<script>window.ChartV2 = window.Chart;</script>
+<!-- angular.chartjs - must load after ChartV2 is saved -->
 <script src="../../static/vendors/angular.chartjs/angular-chart.min.js" th:src="@{/vendors/angular.chartjs/angular-chart.min.js}"></script>
+<!-- Chart.js v4 - for renderComparisonCharts() direct new Chart() calls -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>-->
 <!-- custom angular script -->
 <script type="text/javascript" src="../../static/custom/public/stockcompare.js" th:src="@{/custom/public/stockcompare.js}"></script>
@@ -85,11 +89,11 @@
                                 <!-- Compare Button -->
                                 <button class="btn btn-success" ng-click="compareStocks()">Compare</button>
                                 <div id="compareChartsContainer" style="margin-top: 30px;"></div>
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <div id="reportNotesContainer" style="margin-top: 40px;"></div>
-                                    </div>
-                                </div>
+                                <!--<div class="row">-->
+                                    <!--<div class="col-md-12 col-sm-12 col-xs-12">-->
+                                        <!--<div id="reportNotesContainer" style="margin-top: 40px;"></div>-->
+                                    <!--</div>-->
+                                <!--</div>-->
                             </div>
                             <br />
                             <strong>Note: </strong> Values are in Cr. INR. First preference is given to consolidated data and ratios. Data Sources: Publicly available information on NSE India, BSE India, MorningStar.in, Screener.in, ValueResearchOnline.com, MoneyControl.com, Motilal Oswal, Prabhudas Lilladher, Edelweiss, HDFC Securities, ICICI Direct, Kotak Securities, tradingeconomics.com and Internal Data Processing

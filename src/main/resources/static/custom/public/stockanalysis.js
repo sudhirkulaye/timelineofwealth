@@ -867,7 +867,8 @@ module.controller('StockAnalysisController', function($scope, $http, $filter, $w
                         pointRadius: (datasetType === 'bar') ? 0 : 2,
                         tension: 0,
                         showLine: (datasetType === 'line') ? (validPointCount > 1) : true,
-                        spanGaps: true
+                        spanGaps: true,
+                        stack: isStacked ? 'stack-group-1' : undefined   // ADD THIS LINE
                     });
                 });
 

@@ -22,10 +22,14 @@
 <script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
 <!--Angular custom filter (for group by) JS-->
 <script src="../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
-<!-- Chart.js -->
+<!-- Chart.js v2 - used by angular-chart directives (PE, PB, MCap charts) -->
 <script src="../../static/vendors/Chart.js/dist/Chart.min.js" th:src="@{/vendors/Chart.js/dist/Chart.min.js}"></script>
-<!-- angular.chartjs -->
+<!-- Save v2 reference before v4 overwrites the global -->
+<script>window.ChartV2 = window.Chart;</script>
+<!-- angular.chartjs - must load after ChartV2 is saved -->
 <script src="../../static/vendors/angular.chartjs/angular-chart.min.js" th:src="@{/vendors/angular.chartjs/angular-chart.min.js}"></script>
+<!-- Chart.js v4 - only for dynamic excel charts in renderExcelCharts() -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>-->
 <!-- custom angular script -->
 <script type="text/javascript" src="../../static/custom/public/stockanalysis.js" th:src="@{/custom/public/stockanalysis.js}"></script>
