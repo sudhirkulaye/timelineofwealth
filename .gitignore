@@ -23,3 +23,7 @@
 /dist/
 /nbdist/
 /.nb-gradle/
+
+### Logs and archives ###
+*.log
+*.gz
