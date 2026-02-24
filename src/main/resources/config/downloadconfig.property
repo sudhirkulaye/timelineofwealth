@@ -1,0 +1,34 @@
+#NSE Bhavcopy properites
+nseDomain=https://www.nseindia.com/all-reports
+#nseDomain=https://archives.nseindia.com/content/historical/EQUITIES
+#nseDomain=https://www1.nseindia.com
+#nsebhavcopyurl=https://www1.nseindia.com/products/dynaContent/equities/equities/htms/CM_homepage_1.htm
+#nsebhavcopylinksearch=Bhavcopy file (csv)
+#nseDomain=https://www.nseindia.com/api/reports?archives=%5B%7B%22name%22%3A%22CM%20-%20Bhavcopy(csv)%22%2C%22type%22%3A%22archives%22%2C%22category%22%3A%22capital-market%22%2C%22section%22%3A%22equities%22%7D%5D
+nsebhavcopycookie=__Secure-3PAPISID=J8HUBqcEtuGuKN9W/A5o0TRDKvIl1ZGFfL; __Secure-3PSID=g.a000lggprcgd6HgngVmQhEuJvlpLYtNvCdoXv1sleWpGo2ohbq8IG_a3ugGb07jYS5ub_sWyIgACgYKAZYSARASFQHGX2MiaJm_Oi57-I4Y-MnzHjfPgRoVAUF8yKpxL4ijPiRELOrbKDkTM8650076; NID=515=wLh7LPJqcwMur2Su5nlDVNUjS35Hr11Wt2ZSffreAidwv1O3j7d12HvCqvVDSJv1bUD0x2ZtHuI0gjjJknv3o21txNiJ8G-BMZG1OjlZR35DgtT7KijK4LQhxzUhZYgY3CqVmv2gyFgJvt7a38IYCofZR7cnkrhnAec6Rdg7cdg3FJiWIsg6xO6q-Gyw37Vv80RJffeK_YO6yFju03IUPVqgjerjdZHDla02XEyrcewMDVv94RVnpgXj2_VU7aA8qhUeuZDaeq2blR4vq_hWFDBEi8JWUfhAvPTCZPSHt8rFBj28-yKER9reNhQ5jhb1SP_d0QGWpsDRnrG8K_l3-AB7n92-plHh3vr1ptD1Y4p5NEVItnu3QcoThDhjSH84UrUajTz5lcZ6Mxq2_87lnsl1PjeTFIm5Jof6s9ognxiE-ACH88HXSw3S2VHzINbwwGTH-wJuO_XpF_NNUiC06K8TOj8s8Yx25u-MS5K35r9kdhQOitwJHuwjD84YWE6JmAE; __Secure-3PSIDTS=sidts-CjEB4E2dkTNK_480jjpB0n2EOK6l5Pa5Rr76H44SrQaKOBhxH6seOefUj39fpYCo0g1eEAA; __Secure-3PSIDCC=AKEyXzX57dqVHmLHzj8S9O5i76dLK9-LxycRBguPfz3oV8BcjnuCUqs2xNGZL3vE0jNTJYe8ZNuc
+nsebhavcopyzipfilename=C:/MyDocuments/03Business/03DailyData/nse_bhavcopy.zip
+nsebhavcopyzipfileextractpath=C:/MyDocuments/03Business/03DailyData/NseData/
+
+#BSE Bhavcopy properites
+bsebhavcopyurl=https://www.bseindia.com/markets/MarketInfo/BhavCopy.aspx
+bsebhavcopylinksearch=Equity (UDiFF)
+bsebhavcopyrefer=https://www.bseindia.com/markets/equity/EQReports/Equitydebcopy.aspx
+bsebhavcopycookie=BSEindia=ASP.NET_SessionId=5wm5p5f5uz5efj55c4wwrs55; bse+utmcampaign=direct; bse+utmmedium=direct; bse+utmsource=direct; bse+utmcontent=direct; __utmc=202936964; __utmz=202936964.1648111371.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); _ga=GA1.2.2076863416.1648111371; _gid=GA1.2.575918930.1648111371; bse+GA1.2.2076863416.1648111371=Direct; __utma=202936964.2076863416.1648111371.1648111371.1648111371.1; __utmt=1; bse+utmcs=windows-1252; bse+timezone=Asia%2FCalcutta; __utmb=202936964.2.10.1648111371; _gat=1
+bsebhavcopyzipfilename=C:/MyDocuments/03Business/03DailyData/
+bsebhavcopyzipfileextractpath=C:/MyDocuments/03Business/03DailyData/BseData/
+
+#MF NAV Properties
+mutualfundurl=https://www.amfiindia.com/spages/NAVAll.txt
+mutualfundfilename=C:/MyDocuments/03Business/03DailyData/MutualFunds/
+
+#screener properites
+screenerloginurl=https://www.screener.in/login/
+screenerusername=sudhir.kulaye@gmail.com
+screenerpassword=Aprx2018
+screenerdownloadurl=https://www.screener.in/api/export/screen/?sort=market+capitalization&order=desc&url_name=goto_watchlist
+screenerfilename=C:/MyDocuments/03Business/03DailyData/core-watchlist.csv
+csvfilepath=C:/MyDocuments/03Business/03DailyData/core-watchlist.csv
+xlsxfilepath=C:/MyDocuments/03Business/03DailyData/ScreenerDaily/
+
+indexfilepath=C:/MyDocuments/03Business/03DailyData/IndexData/
+nsefilebseurl=https://archives.nseindia.com/content/indices/

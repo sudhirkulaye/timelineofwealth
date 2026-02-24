@@ -1,0 +1,5224 @@
+# === [1, 41] Common
+[1]
+name = Quarterly Market Cap (Rs. k Cr)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 13
+date_column_start = B
+date_column_end = R
+
+[2]
+name = Annaul Market Cap (Rs. k Cr)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 45
+date_column_start = B
+date_column_end = O
+
+[3]
+name = EV / EBITA (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 192
+date_column_start = B
+date_column_end = O
+
+[4]
+name = Implied 1Yr Fwd (EV / EBITA) (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 193
+date_column_start = B
+date_column_end = O
+
+[5]
+name = Quarterly Revenue (Rs. Cr)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 4
+date_column_start = B
+date_column_end = R
+
+[6]
+name = Quarterly TTM Revenue (Rs. Cr)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 20
+date_column_start = B
+date_column_end = R
+
+[7]
+name = Quarterly Revenue Growth (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 19
+date_column_start = B
+date_column_end = R
+
+[8]
+name = Quarterly TTM Revenue Growth (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 28
+date_column_start = B
+date_column_end = R
+
+[9]
+name = 3 Years CAGR Revenue Growth (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 168
+date_column_start = B
+date_column_end = O
+
+[10]
+name = 5 Years CAGR Revenue Growth (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 169
+date_column_start = B
+date_column_end = O
+
+[11]
+name = Quarterly OPM (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 16
+date_column_start = B
+date_column_end = R
+
+[12]
+name = Quarterly TTM OPM (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 26
+date_column_start = B
+date_column_end = R
+
+[13]
+name = Quarterly NOPLAT (Rs. Cr)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 23
+date_column_start = B
+date_column_end = R
+
+[14]
+name = Quarterly TTM NOPLAT (Rs. Cr)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 24
+date_column_start = B
+date_column_end = R
+
+[15]
+name = Quarterly PAT (Rs. Cr)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 12
+date_column_start = B
+date_column_end = R
+
+[16]
+name = Quarterly TTM PAT (Rs. Cr)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 35
+date_column_start = B
+date_column_end = R
+
+[17]
+name = Annaul Revenue (Rs. Cr)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 30
+date_column_start = B
+date_column_end = O
+
+[18]
+name = Annaul NOPLAT (Rs. Cr)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 89
+date_column_start = B
+date_column_end = O
+
+[19]
+name = Annaul PAT (Rs. Cr)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 43
+date_column_start = B
+date_column_end = O
+
+[20]
+name = Annaul OPM (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 72
+date_column_start = B
+date_column_end = O
+
+[21]
+name = Annaul Net Profit Margin (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 74
+date_column_start = B
+date_column_end = O
+
+[22]
+name = Annaul RoIC (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 95
+date_column_start = B
+date_column_end = O
+
+[23]
+name = Annaul Total Equity and Liabilities (Rs. Cr)
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 57
+date_column_start = B
+date_column_end = O
+
+[24]
+name = Annaul Borrowings (Rs. Cr) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 39
+date_column_start = B
+date_column_end = O
+
+[25]
+name = Annaul Property, Plant and Equipment (Rs. Cr) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 60
+date_column_start = B
+date_column_end = O
+
+[26]
+name = Annaul Inventories (Rs. Cr)
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 75
+date_column_start = B
+date_column_end = O
+
+[27]
+name = Annaul Cash and Cash Equivalents (Rs. Cr)
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 78
+date_column_start = B
+date_column_end = O
+
+[28]
+name = Annaul Trade Receivables (Rs. Cr) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 82
+date_column_start = B
+date_column_end = O
+
+[29]
+name = RoIC Ex Goodwill (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 139
+date_column_start = B
+date_column_end = O
+
+[30]
+name = Revenue / Invested Capital (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 150
+date_column_start = B
+date_column_end = O
+
+[31]
+name = EBITA / Interest (Int. Coverage) (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 179
+date_column_start = B
+date_column_end = O
+
+[32]
+name = Debt / EBITA (Debt Multiple) (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 180
+date_column_start = B
+date_column_end = O
+
+[33]
+name = Dep. / Net PP&E (t-1) (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 198
+date_column_start = B
+date_column_end = O
+
+[34]
+name = Dep. / Net PP&E (Avg) (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 199
+date_column_start = B
+date_column_end = O
+
+[35]
+name = Int. Exp. / Fin. Liability (t-1) (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 202
+date_column_start = B
+date_column_end = O
+
+[36]
+name = Int. Exp. / Fin. Liability (Avg) (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 203
+date_column_start = B
+date_column_end = O
+
+[37]
+name = Net Fixed Assets / Revenue (%) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 220
+date_column_start = B
+date_column_end = O
+
+[38]
+name = Inventory Days (x) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 223
+date_column_start = B
+date_column_end = O
+
+[39]
+name = Receivables Days (x) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 224
+date_column_start = B
+date_column_end = O
+
+[40]
+name = Payable Days (x) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 225
+date_column_start = B
+date_column_end = O
+
+[41]
+name = Net Operating Working Capital Days (x) 
+sheet_name = History&Ratio
+date_row = 2
+parameter_row = 226
+date_column_start = B
+date_column_end = O
+
+
+# === Custom QuarterP&Ls === 
+[71]
+name = QuarterP&L  
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 222
+date_column_start = B
+date_column_end = R
+
+[72]
+name = QuarterP&L  
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 223
+date_column_start = B
+date_column_end = R
+
+[73]
+name = QuarterP&L  
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 224
+date_column_start = B
+date_column_end = R
+
+[74]
+name = QuarterP&L  
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 226
+date_column_start = B
+date_column_end = R
+
+[75]
+name = QuarterP&L  
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 227
+date_column_start = B
+date_column_end = R
+
+# === Custom AnnualResults Rows === 
+
+[81]
+name = AnnualResults Row  
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 104
+date_column_start = B
+date_column_end = O
+
+[82]
+name = AnnualResults Row  
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 105
+date_column_start = B
+date_column_end = O
+
+[83]
+name = AnnualResults Row  
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 106
+date_column_start = B
+date_column_end = O
+
+[84]
+name = AnnualResults Row 
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 108
+date_column_start = B
+date_column_end = O
+
+[85]
+name = AnnualResults Row  
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 109
+date_column_start = B
+date_column_end = O
+
+[86]
+name = AnnualResults Row  
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 116
+date_column_start = B
+date_column_end = O
+
+# === Custom SegmentAnalysis Rows ====
+
+[91]
+name = SegmentAnalysis Row  
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 173
+date_column_start = B
+date_column_end = N
+
+[92]
+name = SegmentAnalysis Row  
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 174
+date_column_start = B
+date_column_end = N
+
+[93]
+name = SegmentAnalysis Row  
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 175
+date_column_start = B
+date_column_end = N
+
+
+# === IT Services ===
+
+[101]
+name = Quarterly Total Revenue ($)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 52
+date_column_start = B
+date_column_end = R
+
+[102]
+name = Quarterly The Largest Segment Revenue ($)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 53
+date_column_start = B
+date_column_end = R
+
+[103]
+name = Quarterly Second Largest Segment Revenue ($)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 54
+date_column_start = B
+date_column_end = R
+
+[104]
+name = Quarterly Third Largest Segment Revenue ($)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 55
+date_column_start = B
+date_column_end = R
+
+[105]
+name = Quarterly The Largest Geography Revenue ($)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 61
+date_column_start = B
+date_column_end = R
+
+[106]
+name = Quarterly Second Largest Geography Revenue ($)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 62
+date_column_start = B
+date_column_end = R
+
+[107]
+name = Quarterly Third Largest Geography Revenue ($)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 63
+date_column_start = B
+date_column_end = R
+
+[108]
+name = Quarterly The Largest Segment Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 71
+date_column_start = B
+date_column_end = R
+
+[109]
+name = Quarterly Second Largest Segment $ Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 72
+date_column_start = B
+date_column_end = R
+
+[110]
+name = Quarterly Third Largest Segment $ Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 73
+date_column_start = B
+date_column_end = R
+
+[111]
+name = Quarterly The Largest Geography $ Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 79
+date_column_start = B
+date_column_end = R
+
+[112]
+name = Quarterly Second Largest Geography $ Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 80
+date_column_start = B
+date_column_end = R
+
+[113]
+name = Quarterly Third Largest Geography $ Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 81
+date_column_start = B
+date_column_end = R
+
+
+[114]
+name = Quarterly Total $ Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 104
+date_column_start = B
+date_column_end = R
+
+[115]
+name = Quarterly The Largest Segment $ Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 105
+date_column_start = B
+date_column_end = R
+
+[116]
+name = Quarterly Second Largest Segment $ Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 106
+date_column_start = B
+date_column_end = R
+
+[117]
+name = Quarterly Third Largest Segment $ Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 107
+date_column_start = B
+date_column_end = R
+
+
+[118]
+name = Quarterly The Largest Geography $ Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 113
+date_column_start = B
+date_column_end = R
+
+[119]
+name = Quarterly Second Largest Geography $ Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 114
+date_column_start = B
+date_column_end = R
+
+[120]
+name = Quarterly Third Largest Geography $ Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 115
+date_column_start = B
+date_column_end = R
+
+
+[121]
+name = Quarterly EBIT Margin (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 17
+date_column_start = B
+date_column_end = R
+
+[122]
+name = Quarterly TTM Total Revenue ($)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 87
+date_column_start = B
+date_column_end = R
+
+[123]
+name = Quarterly TTM Total $ Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 121
+date_column_start = B
+date_column_end = R
+
+[124]
+name = Annual Total Revenue ($)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 3
+date_column_start = B
+date_column_end = M
+
+[125]
+name = Annual Total $ Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 35
+date_column_start = B
+date_column_end = M
+
+[126]
+name = Annual Total Revenue CC Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 25
+date_column_start = B
+date_column_end = M
+
+[127]
+name = Annual Largest Segment Revenue ($)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 4
+date_column_start = B
+date_column_end = M
+
+[128]
+name = Annual Second Largest Segment Revenue ($)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 5
+date_column_start = B
+date_column_end = M
+
+[129]
+name = Annual Third Larget Segment Revenue ($)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 6
+date_column_start = B
+date_column_end = M
+
+[130]
+name = Annual Largest Segment $ Revenue Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 16
+date_column_start = B
+date_column_end = M
+
+[131]
+name = Annual Second Largest Segment $ Revenue Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 17
+date_column_start = B
+date_column_end = M
+
+[132]
+name = Annual Third Largest Segment $ Revenue Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 18
+date_column_start = B
+date_column_end = M
+
+[133]
+name = Annual Largest Segment $ Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 36
+date_column_start = B
+date_column_end = M
+
+[134]
+name = Annual Second Largest Segment $ Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 37
+date_column_start = B
+date_column_end = M
+
+[135]
+name = Annual Third Largest Segment $ Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 38
+date_column_start = B
+date_column_end = M
+
+[136]
+name = Annual Largest Geography Revenue ($)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 45
+date_column_start = B
+date_column_end = M
+
+[137]
+name = Annual Second Largest Geography Revenue ($)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 46
+date_column_start = B
+date_column_end = M
+
+[138]
+name = Annual Third Largest Geography Revenue ($)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 47
+date_column_start = B
+date_column_end = M
+
+[139]
+name = Annual Largest Geography $ Revenue Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 54
+date_column_start = B
+date_column_end = M
+
+[140]
+name = Annual Second Largest Geography $ Revenue Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 55
+date_column_start = B
+date_column_end = M
+
+[141]
+name = Annual Third Largest Geography $ Revenue Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 56
+date_column_start = B
+date_column_end = M
+
+[142]
+name = Annual Largest Geography $ Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 72
+date_column_start = B
+date_column_end = M
+
+[143]
+name = Annual Second Largest Geography $ Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 73
+date_column_start = B
+date_column_end = M
+
+[144]
+name = Annual Third Largest Geography $ Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 74
+date_column_start = B
+date_column_end = M
+
+[145]
+name = Annual Employees (#)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 81
+date_column_start = B
+date_column_end = M
+
+[146]
+name = Annual Employees Addition (#)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 82
+date_column_start = B
+date_column_end = M
+
+[147]
+name = Annual TCV ($)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 101
+date_column_start = B
+date_column_end = M
+
+[148]
+name = Quarterly TCV ($)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 69
+date_column_start = B
+date_column_end = R
+
+[149]
+name = Quarterly TTM TCV ($)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 138
+date_column_start = B
+date_column_end = R
+
+# === General Insurance === 
+[201]
+name = Qyarterly Gross Written Premium (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 222
+date_column_start = B
+date_column_end = R
+
+[202]
+name = Qyarterly Nel Premium Writlen (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 238
+date_column_start = B
+date_column_end = R
+
+[203]
+name = Qyarterly GDPI (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 224
+date_column_start = B
+date_column_end = R
+
+[204]
+name = Qyarterly Motor OD GDPI (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 226
+date_column_start = B
+date_column_end = R
+
+[205]
+name = Qyarterly Motor TP GDPI (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 227
+date_column_start = B
+date_column_end = R
+
+[206]
+name = Qyarterly Health, Travel & PA GDPI (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 228
+date_column_start = B
+date_column_end = R
+
+[207]
+name = Qyarterly Property & Casualty GDPI (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 229
+date_column_start = B
+date_column_end = R
+
+[208]
+name = Qyarterly Motor OD GDPI Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 233
+date_column_start = B
+date_column_end = R
+
+[209]
+name = Qyarterly Motor TP GDPI Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 234
+date_column_start = B
+date_column_end = R
+
+[210]
+name = Qyarterly Health, Travel & PA GDPI Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 235
+date_column_start = B
+date_column_end = R
+
+[211]
+name = Qyarterly Property & Casualty Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 235
+date_column_start = B
+date_column_end = R
+
+[212]
+name = Qyarterly Claims (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 241
+date_column_start = B
+date_column_end = R
+
+[213]
+name = Qyarterly PAT (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 244
+date_column_start = B
+date_column_end = R
+
+[214]
+name = Qyarterly Investment Book (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 247
+date_column_start = B
+date_column_end = R
+
+[215]
+name = Qyarterly Total Loss Ratio (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 250
+date_column_start = B
+date_column_end = R
+
+[216]
+name = Qyarterly Motor OD Loss Ratio (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 252
+date_column_start = B
+date_column_end = R
+
+[217]
+name = Qyarterly Motor TP Loss Ratio (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 253
+date_column_start = B
+date_column_end = R
+
+[218]
+name = Qyarterly Health, Travel & PA Loss Ratio (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 254
+date_column_start = B
+date_column_end = R
+
+[219]
+name = Qyarterly Property & Casualty Loss Ratio (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 256
+date_column_start = B
+date_column_end = R
+
+[220]
+name = Qyarterly Gross Written Premium YoY Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 287
+date_column_start = B
+date_column_end = R
+
+[221]
+name = Qyarterly Net Premium YoY Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 295
+date_column_start = B
+date_column_end = R
+
+[222]
+name = Qyarterly Total GDPI YoY Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 288
+date_column_start = B
+date_column_end = R
+
+[223]
+name = Qyarterly Motor OD GDPI YoY Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 290
+date_column_start = B
+date_column_end = R
+
+[224]
+name = Qyarterly Motor TP GDPI YoY Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 291
+date_column_start = B
+date_column_end = R
+
+[225]
+name = Qyarterly Health, Travel & PA GDPI YoY Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 292
+date_column_start = B
+date_column_end = R
+
+[226]
+name = Qyarterly Property & Casualty GDPI YoY Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 293
+date_column_start = B
+date_column_end = R
+
+[227]
+name = Qyarterly Claims YoY Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 298
+date_column_start = B
+date_column_end = R
+
+[228]
+name = Qyarterly PAT YoY Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 299
+date_column_start = B
+date_column_end = R
+
+[229]
+name = Qyarterly TTM Gross Written Premium YoY Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 303
+date_column_start = B
+date_column_end = R
+
+[230]
+name = Qyarterly TTM Net Premium YoY Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 311
+date_column_start = B
+date_column_end = R
+
+[231]
+name = Qyarterly TTM Total GDPI YoY Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 304
+date_column_start = B
+date_column_end = R
+
+[232]
+name = Annual Gross Written Premium (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 104
+date_column_start = B
+date_column_end = O
+
+[233]
+name = Annual Nel Premium Writlen (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 120
+date_column_start = B
+date_column_end = O
+
+[234]
+name = Annual Total GDPI (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 106
+date_column_start = B
+date_column_end = O
+
+[235]
+name = Annual Motor OD GDPI (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 108
+date_column_start = B
+date_column_end = O
+
+[236]
+name = Annual Motor TP GDPI (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 109
+date_column_start = B
+date_column_end = O
+
+[237]
+name = Annual Health, Travel & PA GDPI (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 110
+date_column_start = B
+date_column_end = O
+
+[238]
+name = Annual Property & Casualty GDPI (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 111
+date_column_start = B
+date_column_end = O
+
+[239]
+name = Annual Motor OD GDPI Contribution (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 115
+date_column_start = B
+date_column_end = O
+
+[240]
+name = Annual Motor TP GDPI Contribution (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 116
+date_column_start = B
+date_column_end = O
+
+[241]
+name = Annual Health, Travel & PA GDPI Contribution (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 117
+date_column_start = B
+date_column_end = O
+
+[242]
+name = Annual Property & Casualty GDPI Contribution (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 118
+date_column_start = B
+date_column_end = O
+
+[243]
+name = Annual Claims (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 123
+date_column_start = B
+date_column_end = O
+
+[244]
+name = Annual PAT (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 126
+date_column_start = B
+date_column_end = O
+
+[245]
+name = Annual Investment Book (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 129
+date_column_start = B
+date_column_end = O
+
+[246]
+name = Annual RoE (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 130
+date_column_start = B
+date_column_end = O
+
+[247]
+name = Annual Total Loss Ratio (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 132
+date_column_start = B
+date_column_end = O
+
+[248]
+name = Annual Motor OD Loss Ratio (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 134
+date_column_start = B
+date_column_end = O
+
+[249]
+name = Annual Motor TP Loss Ratio (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 135
+date_column_start = B
+date_column_end = O
+
+[250]
+name = Annual Health, Travel & PA Loss Ratio (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 136
+date_column_start = B
+date_column_end = O
+
+[251]
+name = Annual Property & Casualty Loss Ratio (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 138
+date_column_start = B
+date_column_end = O
+
+[252]
+name = Annual Commission Ratio (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 141
+date_column_start = B
+date_column_end = O
+
+[253]
+name = Annual Expense Ratio (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 142
+date_column_start = B
+date_column_end = O
+
+[254]
+name = Annual Combined Ratio (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 143
+date_column_start = B
+date_column_end = O
+
+[255]
+name = Annual Underwriting Profit/(Loss) Ratio (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 144
+date_column_start = B
+date_column_end = O
+
+[256]
+name = Annual Gross Written Prem. Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 153
+date_column_start = B
+date_column_end = O
+
+[257]
+name = Annual Net Premium Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 161
+date_column_start = B
+date_column_end = O
+
+[258]
+name = Annual Total GDPI Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 154
+date_column_start = B
+date_column_end = O
+
+[259]
+name = Annual Motor OD GDPI Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 156
+date_column_start = B
+date_column_end = O
+
+[260]
+name = Annual Motor TP GDPI Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 157
+date_column_start = B
+date_column_end = O
+
+[261]
+name = Annual Health, Travel & PA GDPI Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 158
+date_column_start = B
+date_column_end = O
+
+[262]
+name = Annual Property & Casualty GDPI Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 159
+date_column_start = B
+date_column_end = O
+
+
+# === Life Insurance === 
+[301]
+name = Quarterly First & Single Premium (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 222
+date_column_start = B
+date_column_end = R
+
+[302]
+name = Quarterly Renewal Premium (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 223
+date_column_start = B
+date_column_end = R
+
+[303]
+name = Quarterly Net Premium Income (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 224
+date_column_start = B
+date_column_end = R
+
+[304]
+name = Quarterly Investment Income (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 225
+date_column_start = B
+date_column_end = R
+
+[305]
+name = Quarterly AUM (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 241
+date_column_start = B
+date_column_end = R
+
+[306]
+name = Quarterly Total Income (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 226
+date_column_start = B
+date_column_end = R
+
+[307]
+name = Quarterly PAT (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 231
+date_column_start = B
+date_column_end = R
+
+[308]
+name = Quarterly Total APE (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 233
+date_column_start = B
+date_column_end = R
+
+[309]
+name = Quarterly VNB (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 239
+date_column_start = B
+date_column_end = R
+
+[310]
+name = Quarterly VNB Margin (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 249
+date_column_start = B
+date_column_end = R
+
+[311]
+name = Quarterly Enterprise Value (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 242
+date_column_start = B
+date_column_end = R
+
+[312]
+name = Quarterly TTM First & Single Premium (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 260
+date_column_start = B
+date_column_end = R
+
+[313]
+name = Quarterly TTM Renewal Premium (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 261
+date_column_start = B
+date_column_end = R
+
+[314]
+name = Quarterly TTM Net Premium Income (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 262
+date_column_start = B
+date_column_end = R
+
+[315]
+name = Quarterly TTM Investment Income (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 263
+date_column_start = B
+date_column_end = R
+
+[316]
+name = Quarterly TTM Total Income (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 264
+date_column_start = B
+date_column_end = R
+
+[317]
+name = Quarterly TTM PAT (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 267
+date_column_start = B
+date_column_end = R
+
+[318]
+name = Quarterly TTM Total APE (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 269
+date_column_start = B
+date_column_end = R
+
+[319]
+name = Quarterly First & Single Premium Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 277
+date_column_start = B
+date_column_end = R
+
+[320]
+name = Quarterly Renewal Premium Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 278
+date_column_start = B
+date_column_end = R
+
+[321]
+name = Quarterly Net Premium Income Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 279
+date_column_start = B
+date_column_end = R
+
+[322]
+name = Quarterly Investment Income Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 280
+date_column_start = B
+date_column_end = R
+
+[323]
+name = Quarterly Total Income Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 281
+date_column_start = B
+date_column_end = R
+
+[324]
+name = Quarterly PAT Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 284
+date_column_start = B
+date_column_end = R
+
+[325]
+name = Quarterly Total APE Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 286
+date_column_start = B
+date_column_end = R
+
+[326]
+name = Quarterly VNB Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 292
+date_column_start = B
+date_column_end = R
+
+[327]
+name = Quarterly AUM Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 310
+date_column_start = B
+date_column_end = R
+
+[328]
+name = Quarterly Enterprise Value Growth Rate (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 311
+date_column_start = B
+date_column_end = R
+
+[329]
+name = Annual First & Single Premium (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 104
+date_column_start = B
+date_column_end = O
+
+[330]
+name = Annual Renewal Premium (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 105
+date_column_start = B
+date_column_end = O
+
+[331]
+name = Annual Net Premium Income (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 106
+date_column_start = B
+date_column_end = O
+
+[332]
+name = Annual Investment Income (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 107
+date_column_start = B
+date_column_end = O
+
+[333]
+name = Annual Total Income (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 107
+date_column_start = B
+date_column_end = O
+
+[334]
+name = Annual PAT (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 113
+date_column_start = B
+date_column_end = O
+
+[335]
+name = Annual Total APE (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 115
+date_column_start = B
+date_column_end = O
+
+[336]
+name = Annual VNB (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 121
+date_column_start = B
+date_column_end = O
+
+[337]
+name = Annual VNB Margin (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 130
+date_column_start = B
+date_column_end = O
+
+[338]
+name = Annual AUM (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 127
+date_column_start = B
+date_column_end = O
+
+[339]
+name = Annual EV (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 128
+date_column_start = B
+date_column_end = O
+
+[340]
+name = Annual RoEV (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 135
+date_column_start = B
+date_column_end = O
+
+[341]
+name = Annual RoE (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 136
+date_column_start = B
+date_column_end = O
+
+[342]
+name = Annual First & Single Premium Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 156
+date_column_start = B
+date_column_end = O
+
+[343]
+name = Annual Renewal Premium Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 157
+date_column_start = B
+date_column_end = O
+
+[344]
+name = Annual Net Premium Income Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 158
+date_column_start = B
+date_column_end = O
+
+[345]
+name = Annual Investment Income Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 159
+date_column_start = B
+date_column_end = O
+
+[346]
+name = Annual Total Income Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 160
+date_column_start = B
+date_column_end = O
+
+[347]
+name = Annual PAT Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 163
+date_column_start = B
+date_column_end = O
+
+[348]
+name = Annual VNB Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 171
+date_column_start = B
+date_column_end = O
+
+[349]
+name = Annual AUM Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 177
+date_column_start = B
+date_column_end = O
+
+[350]
+name = Annual EV Growth Rate (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 178
+date_column_start = B
+date_column_end = O
+
+[351]
+name = Annual 13th Month Persistency (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 1
+date_column_start = B
+date_column_end = O
+
+[352]
+name = Annual 61St Month Persistency (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 132
+date_column_start = B
+date_column_end = O
+
+# === Health Insurance === 
+[361]
+name = Quarterly Gross Premium (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 222
+date_column_start = B
+date_column_end = R
+
+[362]
+name = Quarterly TTM Gross Premium (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 248
+date_column_start = B
+date_column_end = R
+
+[363]
+name = Quarterly Gross premium g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 258
+date_column_start = B
+date_column_end = R
+
+[364]
+name = Quarterly Net Earned Premium (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 223
+date_column_start = B
+date_column_end = R
+
+[365]
+name = Quarterly TTM Net Earned Premium (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 249
+date_column_start = B
+date_column_end = R
+
+[366]
+name = Quarterly Net Earned Premium g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 259
+date_column_start = B
+date_column_end = R
+
+[367]
+name = Quarterly Investment Income (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 224
+date_column_start = B
+date_column_end = R
+
+[368]
+name = Quarterly TTM Investment Income (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 250
+date_column_start = B
+date_column_end = R
+
+[369]
+name = Quarterly Investment Income g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 260
+date_column_start = B
+date_column_end = R
+
+[370]
+name = Quarterly Investment SH + PH (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 245
+date_column_start = B
+date_column_end = R
+
+[371]
+name = Quarterly Total Income (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 225
+date_column_start = B
+date_column_end = R
+
+[372]
+name = Quarterly TTM Total Income (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 251
+date_column_start = B
+date_column_end = R
+
+[373]
+name = Quarterly Total Income g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 261
+date_column_start = B
+date_column_end = R
+
+[374]
+name = Quarterly Incurred claims (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 226
+date_column_start = B
+date_column_end = R
+
+[375]
+name = Quarterly TTM Incurred Claims (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 252
+date_column_start = B
+date_column_end = R
+
+[376]
+name = Quarterly Incurred claims g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 262
+date_column_start = B
+date_column_end = R
+
+[377]
+name = Quarterly Net commission (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 227
+date_column_start = B
+date_column_end = R
+
+[378]
+name = Quarterly TTM Net commission (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 253
+date_column_start = B
+date_column_end = R
+
+[379]
+name = Quarterly Net Commission g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 263
+date_column_start = B
+date_column_end = R
+
+[380]
+name = Quarterly Employee expense (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 228
+date_column_start = B
+date_column_end = R
+
+[381]
+name = Quarterly TTM Employee expense (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 254
+date_column_start = B
+date_column_end = R
+
+[382]
+name = Quarterly Employee Expenses g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 264
+date_column_start = B
+date_column_end = R
+
+[383]
+name = Quarterly Total Operating Exp. (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 229
+date_column_start = B
+date_column_end = R
+
+[384]
+name = Quarterly TTM Total Operating Exp. (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 255
+date_column_start = B
+date_column_end = R
+
+[385]
+name = Quarterly Total Operating Expenses g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 265
+date_column_start = B
+date_column_end = R
+
+[386]
+name = Quarterly Underwriting profit (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 230
+date_column_start = B
+date_column_end = R
+
+[387]
+name = Quarterly TTM Underwriting profit (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 256
+date_column_start = B
+date_column_end = R
+
+[388]
+name = Quarterly Underwriting Profit g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 266
+date_column_start = B
+date_column_end = R
+
+[389]
+name = Quarterly Claims Ratio (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 238
+date_column_start = B
+date_column_end = R
+
+[390]
+name = Quarterly Commission Ratio (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 239
+date_column_start = B
+date_column_end = R
+
+[391]
+name = Quarterly Expense Ratio (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 240
+date_column_start = B
+date_column_end = R
+
+[392]
+name = Quarterly Combined Ratio (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 241
+date_column_start = B
+date_column_end = R
+
+[393]
+name = Quarterly Total Agency Force (# K)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 244
+date_column_start = B
+date_column_end = R
+
+[394]
+name = Annual Gross Premium (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 104
+date_column_start = B
+date_column_end = O
+
+[395]
+name = Annual Total Income (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 107
+date_column_start = B
+date_column_end = O
+
+[396]
+name = Annual Incurred claims (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 108
+date_column_start = B
+date_column_end = O
+
+
+[397]
+name = Annual Total Operating Exp. (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 111
+date_column_start = B
+date_column_end = O
+
+
+[398]
+name = Annual Underwriting Profit (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 112
+date_column_start = B
+date_column_end = O
+
+[399]
+name = Annual Claim Ratio (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 120
+date_column_start = B
+date_column_end = O
+
+[400]
+name = Annual Combined Ratio (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 123
+date_column_start = B
+date_column_end = O
+
+# === Banks === 
+[401]
+name = Quarterly Net Interest Income (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 224
+date_column_start = B
+date_column_end = R
+
+[402]
+name = Quarterly Net Interest Margin (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 249
+date_column_start = B
+date_column_end = R
+
+[403]
+name = Quarterly Net Interest Income Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 281
+date_column_start = B
+date_column_end = R
+
+[404]
+name = Quarterly Other Income  (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 225
+date_column_start = B
+date_column_end = R
+
+[405]
+name = Quarterly Other Income Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 282
+date_column_start = B
+date_column_end = R
+
+[406]
+name = Quarterly Total Income (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 226
+date_column_start = B
+date_column_end = R
+
+[407]
+name = Quarterly Total Income Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 283
+date_column_start = B
+date_column_end = R
+
+[408]
+name = Quarterly Pre Provision Profit (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 227
+date_column_start = B
+date_column_end = R
+
+[409]
+name = Quarterly Pre Provision Profit Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 284
+date_column_start = B
+date_column_end = R
+
+[410]
+name = Quarterly Provision (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 228
+date_column_start = B
+date_column_end = R
+
+[411]
+name = Quarterly GNPA (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 244
+date_column_start = B
+date_column_end = R
+
+[412]
+name = Quarterly NNPA (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 245
+date_column_start = B
+date_column_end = R
+
+[413]
+name = Quarterly GNPA (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 246
+date_column_start = B
+date_column_end = R
+
+[414]
+name = Quarterly NNPA (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 247
+date_column_start = B
+date_column_end = R
+
+[415]
+name = Quarterly Slippages (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 239
+date_column_start = B
+date_column_end = R
+
+[416]
+name = Quarterly Slippages (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 248
+date_column_start = B
+date_column_end = R
+
+[417]
+name = Quarterly PCR (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 250
+date_column_start = B
+date_column_end = R
+
+[418]
+name = Quarterly St. PAT (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 231
+date_column_start = B
+date_column_end = R
+
+[419]
+name = Quarterly St. PAT Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 286
+date_column_start = B
+date_column_end = R
+
+[420]
+name = Quarterly All Subsidiary PAT (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 233
+date_column_start = B
+date_column_end = R
+
+[421]
+name = Quarterly All Subsidiary PAT Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 288
+date_column_start = B
+date_column_end = R
+
+[422]
+name = Quarterly Subsidiary1 PAT (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 234
+date_column_start = B
+date_column_end = R
+
+[423]
+name = Quarterly Subsidiary1 PAT Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 289
+date_column_start = B
+date_column_end = R
+
+[424]
+name = Quarterly Subsidiary2 PAT (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 235
+date_column_start = B
+date_column_end = R
+
+[425]
+name = Quarterly Subsidiary2 PAT Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 290
+date_column_start = B
+date_column_end = R
+
+[426]
+name = Quarterly Subsidiary3 PAT (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 236
+date_column_start = B
+date_column_end = R
+
+[427]
+name = Quarterly Subsidiary3 PAT Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 291
+date_column_start = B
+date_column_end = R
+
+[428]
+name = Quarterly Subsidiary4 PAT (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 237
+date_column_start = B
+date_column_end = R
+
+[429]
+name = Quarterly Subsidiary4 PAT Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 292
+date_column_start = B
+date_column_end = R
+
+[430]
+name = Quarterly Subsidiary5 PAT (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 238
+date_column_start = B
+date_column_end = R
+
+[431]
+name = Quarterly Subsidiary5 PAT Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 293
+date_column_start = B
+date_column_end = R
+
+[432]
+name = Quarterly Deposits (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 240
+date_column_start = B
+date_column_end = R
+
+[433]
+name = Quarterly Deposits Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 309
+date_column_start = B
+date_column_end = R
+
+[434]
+name = Quarterly Loans (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 241
+date_column_start = B
+date_column_end = R
+
+[435]
+name = Quarterly Loans Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 310
+date_column_start = B
+date_column_end = R
+
+
+[436]
+name = Quarterly Cost To Core Income (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 251
+date_column_start = B
+date_column_end = R
+
+[437]
+name = Quarterly Casa (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 252
+date_column_start = B
+date_column_end = R
+
+[438]
+name = Quarterly RoA (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 253
+date_column_start = B
+date_column_end = R
+
+[439]
+name = Quarterly RoE (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 254
+date_column_start = B
+date_column_end = R
+
+[440]
+name = Quarterly Branches (#)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 255
+date_column_start = B
+date_column_end = R
+
+[441]
+name = Quarterly Branch Addition (#)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 327
+date_column_start = B
+date_column_end = R
+
+[442]
+name = Quarterly ATM (#)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 256
+date_column_start = B
+date_column_end = R
+
+[443]
+name = Quarterly ATM Addition (#)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 328
+date_column_start = B
+date_column_end = R
+
+[444]
+name = Quarterly Employees (#)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 257
+date_column_start = B
+date_column_end = R
+
+[445]
+name = Quarterly Employees Addition (#)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 329
+date_column_start = B
+date_column_end = R
+
+[446]
+name = Quarterly Home Loan (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 333
+date_column_start = B
+date_column_end = R
+
+[447]
+name = Quarterly Home Loan Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 352
+date_column_start = B
+date_column_end = R
+
+[448]
+name = Quarterly Home Loan Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 371
+date_column_start = B
+date_column_end = R
+
+[449]
+name = Quarterly Auto Loan (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 334
+date_column_start = B
+date_column_end = R
+
+[450]
+name = Quarterly Auto Loan Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 353
+date_column_start = B
+date_column_end = R
+
+[451]
+name = Quarterly Auto Loan Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 372
+date_column_start = B
+date_column_end = R
+
+[452]
+name = Quarterly Personal Loan (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 335
+date_column_start = B
+date_column_end = R
+
+[453]
+name = Quarterly Personal Loan Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 354
+date_column_start = B
+date_column_end = R
+
+[454]
+name = Quarterly Personal Loan Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 373
+date_column_start = B
+date_column_end = R
+
+[455]
+name = Quarterly Credit Card Loan (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 336
+date_column_start = B
+date_column_end = R
+
+[456]
+name = Quarterly Credit Card Loan Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 355
+date_column_start = B
+date_column_end = R
+
+[457]
+name = Quarterly Credit Card Loan Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 374
+date_column_start = B
+date_column_end = R
+
+[458]
+name = Quarterly Gold Loan (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 337
+date_column_start = B
+date_column_end = R
+
+[459]
+name = Quarterly Gold Loan Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 356
+date_column_start = B
+date_column_end = R
+
+[460]
+name = Quarterly Gold Loan Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 375
+date_column_start = B
+date_column_end = R
+
+[461]
+name = Quarterly Retail Loan (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 342
+date_column_start = B
+date_column_end = R
+
+[462]
+name = Quarterly Retail Loan Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 361
+date_column_start = B
+date_column_end = R
+
+[463]
+name = Quarterly Retail Loan Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 380
+date_column_start = B
+date_column_end = R
+
+[464]
+name = Quarterly Agri Loan (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 343
+date_column_start = B
+date_column_end = R
+
+[465]
+name = Quarterly Agri Loan Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 362
+date_column_start = B
+date_column_end = R
+
+[466]
+name = Quarterly Agri Loan Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 381
+date_column_start = B
+date_column_end = R
+
+[467]
+name = Quarterly Business Loan (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 344
+date_column_start = B
+date_column_end = R
+
+[468]
+name = Quarterly Business Loan Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 363
+date_column_start = B
+date_column_end = R
+
+[469]
+name = Quarterly Business Loan Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 382
+date_column_start = B
+date_column_end = R
+
+[470]
+name = Quarterly Non Retail Loan (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 349
+date_column_start = B
+date_column_end = R
+
+[471]
+name = Quarterly Non Retail Loan Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 368
+date_column_start = B
+date_column_end = R
+
+[472]
+name = Quarterly Non Retail Loan Growth Y-o-Y (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 387
+date_column_start = B
+date_column_end = R
+
+[473]
+name = Annual Net Interest Income (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 106
+date_column_start = B
+date_column_end = O
+
+[474]
+name = Annual Net Interest Income Growth (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 147
+date_column_start = B
+date_column_end = O
+
+[475]
+name = Annual Net Interest Margin (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 131
+date_column_start = B
+date_column_end = O
+
+[476]
+name = Annual Other Income (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 107
+date_column_start = B
+date_column_end = O
+
+[477]
+name = Annual Other Income Growth (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 148
+date_column_start = B
+date_column_end = O
+
+[478]
+name = Annual Total Income (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 108
+date_column_start = B
+date_column_end = O
+
+[479]
+name = Annual Total Income Growth (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 149
+date_column_start = B
+date_column_end = O
+
+[480]
+name = Annual Pre Provision Profit (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 109
+date_column_start = B
+date_column_end = O
+
+[481]
+name = Annual Pre Provision Profit Growth (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 150
+date_column_start = B
+date_column_end = O
+
+[482]
+name = Annual Provision (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 110
+date_column_start = B
+date_column_end = O
+
+[483]
+name = Annual Slippages (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 121
+date_column_start = B
+date_column_end = O
+
+[484]
+name = Annual Slippages (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 130
+date_column_start = B
+date_column_end = O
+
+[485]
+name = Annual GNPA (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 126
+date_column_start = B
+date_column_end = O
+
+[486]
+name = Annual NNPA (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 127
+date_column_start = B
+date_column_end = O
+
+[487]
+name = Annual GNPA (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 128
+date_column_start = B
+date_column_end = O
+
+[488]
+name = Annual NNPA (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 129
+date_column_start = B
+date_column_end = O
+
+[489]
+name = Annual PCR (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 132
+date_column_start = B
+date_column_end = O
+
+[490]
+name = Annual Standalone PAT (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 113
+date_column_start = B
+date_column_end = O
+
+[491]
+name = Annual Standalone PAT Growth (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 152
+date_column_start = B
+date_column_end = O
+
+[492]
+name = Annual All Subsidiary PAT (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 115
+date_column_start = B
+date_column_end = O
+
+[493]
+name = Annual All Subsidiary PAT Growth (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 154
+date_column_start = B
+date_column_end = O
+
+[494]
+name = Annual Deposits (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 122
+date_column_start = B
+date_column_end = O
+
+[495]
+name = Annual Deposits Growth (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 161
+date_column_start = B
+date_column_end = O
+
+[496]
+name = Annual Loans (Rs. Cr.)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 123
+date_column_start = B
+date_column_end = O
+
+[497]
+name = Annual Loans Growth (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 162
+date_column_start = B
+date_column_end = O
+
+[498]
+name = Annual Cost to Core Income (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 133
+date_column_start = B
+date_column_end = O
+
+[499]
+name = Annual Casa (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 134
+date_column_start = B
+date_column_end = O
+
+[500]
+name = Annual RoA (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 135
+date_column_start = B
+date_column_end = O
+
+[501]
+name = Annual RoE (%)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 136
+date_column_start = B
+date_column_end = O
+
+[502]
+name = Annual Branch (#)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 137
+date_column_start = B
+date_column_end = O
+
+[503]
+name = Annual Branch Addition (#)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 179
+date_column_start = B
+date_column_end = O
+
+[504]
+name = Annual ATM (#)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 138
+date_column_start = B
+date_column_end = O
+
+[505]
+name = Annual Branch Addition (#)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 180
+date_column_start = B
+date_column_end = O
+
+[506]
+name = Annual Employees (#)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 139
+date_column_start = B
+date_column_end = O
+
+[507]
+name = Annual Employees Addition (#)
+sheet_name = AnnualResults
+date_row = 3
+parameter_row = 181
+date_column_start = B
+date_column_end = O
+
+[508]
+name = Quarterly Market Cap (Rs. k Cr)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 13
+date_column_start = B
+date_column_end = R
+
+# === Non IT ===
+
+[601]
+name = Quarterly Total Revenue (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 52
+date_column_start = B
+date_column_end = R
+
+[602]
+name = Quarterly The Largest Segment Revenue (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 53
+date_column_start = B
+date_column_end = R
+
+[603]
+name = Quarterly Second Largest Segment Revenue (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 54
+date_column_start = B
+date_column_end = R
+
+[604]
+name = Quarterly Third Largest Segment Revenue (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 55
+date_column_start = B
+date_column_end = R
+
+[605]
+name = Quarterly The Largest Geography Revenue (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 61
+date_column_start = B
+date_column_end = R
+
+[606]
+name = Quarterly Second Largest Geography Revenue (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 62
+date_column_start = B
+date_column_end = R
+
+[607]
+name = Quarterly Third Largest Geography Revenue (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 63
+date_column_start = B
+date_column_end = R
+
+[608]
+name = Quarterly The Largest Segment Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 71
+date_column_start = B
+date_column_end = R
+
+[609]
+name = Quarterly Second Largest Segment Rs.  Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 72
+date_column_start = B
+date_column_end = R
+
+[610]
+name = Quarterly Third Largest Segment Rs.  Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 73
+date_column_start = B
+date_column_end = R
+
+[611]
+name = Quarterly The Largest Geography Rs.  Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 79
+date_column_start = B
+date_column_end = R
+
+[612]
+name = Quarterly Second Largest Geography Rs.  Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 80
+date_column_start = B
+date_column_end = R
+
+[613]
+name = Quarterly Third Largest Geography Rs.  Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 81
+date_column_start = B
+date_column_end = R
+
+
+[614]
+name = Quarterly Total Rs.  Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 104
+date_column_start = B
+date_column_end = R
+
+[615]
+name = Quarterly The Largest Segment Rs.  Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 105
+date_column_start = B
+date_column_end = R
+
+[616]
+name = Quarterly Second Largest Segment Rs.  Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 106
+date_column_start = B
+date_column_end = R
+
+[617]
+name = Quarterly Third Largest Segment Rs.  Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 107
+date_column_start = B
+date_column_end = R
+
+
+[618]
+name = Quarterly The Largest Geography Rs.  Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 113
+date_column_start = B
+date_column_end = R
+
+[619]
+name = Quarterly Second Largest Geography Rs.  Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 114
+date_column_start = B
+date_column_end = R
+
+[620]
+name = Quarterly Third Largest Geography Rs.  Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 115
+date_column_start = B
+date_column_end = R
+
+
+[621]
+name = Quarterly EBIT Margin (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 17
+date_column_start = B
+date_column_end = R
+
+[622]
+name = Quarterly TTM Total Revenue (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 87
+date_column_start = B
+date_column_end = R
+
+[623]
+name = Quarterly TTM Total Rs.  Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 121
+date_column_start = B
+date_column_end = R
+
+[624]
+name = Annual Total Revenue (Rs. )
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 3
+date_column_start = B
+date_column_end = M
+
+[625]
+name = Annual Total Rs.  Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 35
+date_column_start = B
+date_column_end = M
+
+[626]
+name = Annual Total Revenue CC Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 25
+date_column_start = B
+date_column_end = M
+
+[627]
+name = Annual Largest Segment Revenue (Rs. )
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 4
+date_column_start = B
+date_column_end = M
+
+[628]
+name = Annual Second Largest Segment Revenue (Rs. )
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 5
+date_column_start = B
+date_column_end = M
+
+[629]
+name = Annual Third Larget Segment Revenue (Rs. )
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 6
+date_column_start = B
+date_column_end = M
+
+[630]
+name = Annual Largest Segment Rs.  Revenue Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 16
+date_column_start = B
+date_column_end = M
+
+[631]
+name = Annual Second Largest Segment Rs.  Revenue Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 17
+date_column_start = B
+date_column_end = M
+
+[632]
+name = Annual Third Largest Segment Rs.  Revenue Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 18
+date_column_start = B
+date_column_end = M
+
+[633]
+name = Annual Largest Segment Rs.  Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 36
+date_column_start = B
+date_column_end = M
+
+[634]
+name = Annual Second Largest Segment Rs.  Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 37
+date_column_start = B
+date_column_end = M
+
+[635]
+name = Annual Third Largest Segment Rs.  Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 38
+date_column_start = B
+date_column_end = M
+
+[636]
+name = Annual Largest Geography Revenue (Rs. )
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 45
+date_column_start = B
+date_column_end = M
+
+[637]
+name = Annual Second Largest Geography Revenue (Rs. )
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 46
+date_column_start = B
+date_column_end = M
+
+[638]
+name = Annual Third Largest Geography Revenue (Rs. )
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 47
+date_column_start = B
+date_column_end = M
+
+[639]
+name = Annual Largest Geography Rs.  Revenue Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 54
+date_column_start = B
+date_column_end = M
+
+[640]
+name = Annual Second Largest Geography Rs.  Revenue Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 55
+date_column_start = B
+date_column_end = M
+
+[641]
+name = Annual Third Largest Geography Rs.  Revenue Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 56
+date_column_start = B
+date_column_end = M
+
+[642]
+name = Annual Largest Geography Rs.  Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 72
+date_column_start = B
+date_column_end = M
+
+[643]
+name = Annual Second Largest Geography Rs.  Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 73
+date_column_start = B
+date_column_end = M
+
+[644]
+name = Annual Third Largest Geography Rs.  Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 74
+date_column_start = B
+date_column_end = M
+
+[645]
+name = Annual Employees (#)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 81
+date_column_start = B
+date_column_end = M
+
+[646]
+name = Annual Employees Addition (#)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 82
+date_column_start = B
+date_column_end = M
+
+[647]
+name = Annual Order Book (Rs. )
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 101
+date_column_start = B
+date_column_end = M
+
+[648]
+name = Quarterly Order Book (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 69
+date_column_start = B
+date_column_end = R
+
+[649]
+name = Quarterly Largest Segment Order Book (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 141
+date_column_start = B
+date_column_end = R
+
+[650]
+name = Quarterly Second Largest Segment Order Book (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 142
+date_column_start = B
+date_column_end = R
+
+[651]
+name = Quarterly Third Largest Segment Order Book (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 143
+date_column_start = B
+date_column_end = R
+
+[652]
+name = Quarterly Forth Largest Segment Order Book (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 144
+date_column_start = B
+date_column_end = R
+
+[653]
+name = Quarterly Fifth Largest Segment Order Book (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 145
+date_column_start = B
+date_column_end = R
+
+[654]
+name = Quarterly Sixth Largest Segment Order Book (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 146
+date_column_start = B
+date_column_end = R
+
+[655]
+name = Quarterly Seventh Largest Segment Order Book (Rs. )
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 147
+date_column_start = B
+date_column_end = R
+
+# === FMCG & Other QuarterP&Ls === 
+# ===  [701, 704] Qt. Total Rev, Qt TTM Total Rev, Qt. Total Rev. g%, Qt. TTM Total Rev. g%, Total EBITA Margin, TTM Total EBITA Margin
+[701]
+name = Quarterly Total Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 52
+date_column_start = B
+date_column_end = R
+
+[702]
+name = Quarterly Total Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 104
+date_column_start = B
+date_column_end = R
+
+[703]
+name = Quarterly TTM Total Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 87
+date_column_start = B
+date_column_end = R
+
+[704]
+name = Quarterly TTM Total Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 121
+date_column_start = B
+date_column_end = R
+
+
+# ===  [705, 725] Qt. Segment Rev, Qt. Segment Contribution, Qt. Segment g% (For Segment 1 to 7)
+
+[705]
+name = Quarterly Segment1 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 53
+date_column_start = B
+date_column_end = R
+
+[706]
+name = Quarterly Segment1 Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 71
+date_column_start = B
+date_column_end = R
+
+[707]
+name = Quarterly Segment1 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 105
+date_column_start = B
+date_column_end = R
+
+[708]
+name = Quarterly Segment2 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 54
+date_column_start = B
+date_column_end = R
+
+[709]
+name = Quarterly Segment2 Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 72
+date_column_start = B
+date_column_end = R
+
+[710]
+name = Quarterly Segment2 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 106
+date_column_start = B
+date_column_end = R
+
+[711]
+name = Quarterly Segment3 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 55
+date_column_start = B
+date_column_end = R
+
+[712]
+name = Quarterly Segment3 Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 73
+date_column_start = B
+date_column_end = R
+
+[713]
+name = Quarterly Segment3 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 107
+date_column_start = B
+date_column_end = R
+
+[714]
+name = Quarterly Segment4 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 56
+date_column_start = B
+date_column_end = R
+
+[715]
+name = Quarterly Segment4 Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 74
+date_column_start = B
+date_column_end = R
+
+[716]
+name = Quarterly Segment4 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 108
+date_column_start = B
+date_column_end = R
+
+[717]
+name = Quarterly Segment5 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 57
+date_column_start = B
+date_column_end = R
+
+[718]
+name = Quarterly Segment5 Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 75
+date_column_start = B
+date_column_end = R
+
+[719]
+name = Quarterly Segment5 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 109
+date_column_start = B
+date_column_end = R
+
+[720]
+name = Quarterly Segment6 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 58
+date_column_start = B
+date_column_end = R
+
+[721]
+name = Quarterly Segment6 Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 76
+date_column_start = B
+date_column_end = R
+
+[722]
+name = Quarterly Segment6 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 110
+date_column_start = B
+date_column_end = R
+
+[723]
+name = Quarterly Segment7 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 59
+date_column_start = B
+date_column_end = R
+
+[724]
+name = Quarterly Segment7 Revenue Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 77
+date_column_start = B
+date_column_end = R
+
+[725]
+name = Quarterly Segment7 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 111
+date_column_start = B
+date_column_end = R
+
+# === [726, 746] Qt. Geography Rev, Qt. Geography Contribution, Qt. Geography g% (For Geography 1 to 7)
+
+[726]
+name = Quarterly Geography1 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 61
+date_column_start = B
+date_column_end = R
+
+[727]
+name = Quarterly Geography1 Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 79
+date_column_start = B
+date_column_end = R
+
+[728]
+name = Quarterly Geography1 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 113
+date_column_start = B
+date_column_end = R
+
+[729]
+name = Quarterly Geography2 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 62
+date_column_start = B
+date_column_end = R
+
+[730]
+name = Quarterly Geography2 Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 80
+date_column_start = B
+date_column_end = R
+
+[731]
+name = Quarterly Geography2 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 114
+date_column_start = B
+date_column_end = R
+
+[732]
+name = Quarterly Geography3 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 63
+date_column_start = B
+date_column_end = R
+
+[733]
+name = Quarterly Geography3 Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 81
+date_column_start = B
+date_column_end = R
+
+[734]
+name = Quarterly Geography3 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 115
+date_column_start = B
+date_column_end = R
+
+[735]
+name = Quarterly Geography4 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 64
+date_column_start = B
+date_column_end = R
+
+[736]
+name = Quarterly Geography4 Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 82
+date_column_start = B
+date_column_end = R
+
+[737]
+name = Quarterly Geography4 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 116
+date_column_start = B
+date_column_end = R
+
+[738]
+name = Quarterly Geography5 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 65
+date_column_start = B
+date_column_end = R
+
+[739]
+name = Quarterly Geography5 Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 83
+date_column_start = B
+date_column_end = R
+
+[740]
+name = Quarterly Geography5 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 117
+date_column_start = B
+date_column_end = R
+
+[741]
+name = Quarterly Geography6 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 66
+date_column_start = B
+date_column_end = R
+
+[742]
+name = Quarterly Geography6 Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 84
+date_column_start = B
+date_column_end = R
+
+[743]
+name = Quarterly Geography6 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 118
+date_column_start = B
+date_column_end = R
+
+[744]
+name = Quarterly Geography7 Revenue (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 67
+date_column_start = B
+date_column_end = R
+
+[745]
+name = Quarterly Geography7 Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 85
+date_column_start = B
+date_column_end = R
+
+[746]
+name = Quarterly Geography7 Revenue Growth YoY (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 119
+date_column_start = B
+date_column_end = R
+
+
+# === [747, 748] Qt. Total EBITA or Order Book, Qt. Total EBITA or Order Book g%
+[747]
+name = Quarterly EBITA/Order Book  (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 69
+date_column_start = B
+date_column_end = R
+
+[748]
+name = Quarterly EBITA/Order Book Grwoth (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 139
+date_column_start = B
+date_column_end = R
+
+# === [749, 769] Qt. Segment EBITA/Order Book, Qt. Segment EBITA/Order Book Contribution, Qt. Segment EBITA/Order Book g% (For Segment 1 to 7)
+[749]
+name = Quarterly Segment1 EBITA/Order Book  (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 141
+date_column_start = B
+date_column_end = R
+
+[750]
+name = Quarterly Segment1 EBITA/Order Book Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 150
+date_column_start = B
+date_column_end = R
+
+[751]
+name = Quarterly Segment1 EBITA/Order Book Growth (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 168
+date_column_start = B
+date_column_end = R
+
+[752]
+name = Quarterly Segment2 EBITA/Order Book  (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 142
+date_column_start = B
+date_column_end = R
+
+[753]
+name = Quarterly Segment2 EBITA/Order Book Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 151
+date_column_start = B
+date_column_end = R
+
+[754]
+name = Quarterly Segment2 EBITA/Order Book Growth (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 169
+date_column_start = B
+date_column_end = R
+
+[755]
+name = Quarterly Segment3 EBITA/Order Book  (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 143
+date_column_start = B
+date_column_end = R
+
+[756]
+name = Quarterly Segment3 EBITA/Order Book Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 152
+date_column_start = B
+date_column_end = R
+
+[757]
+name = Quarterly Segment3 EBITA/Order Book Growth (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 170
+date_column_start = B
+date_column_end = R
+
+[758]
+name = Quarterly Segment4 EBITA/Order Book  (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 144
+date_column_start = B
+date_column_end = R
+
+[759]
+name = Quarterly Segment4 EBITA/Order Book Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 153
+date_column_start = B
+date_column_end = R
+
+[760]
+name = Quarterly Segment4 EBITA/Order Book Growth (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 171
+date_column_start = B
+date_column_end = R
+
+[761]
+name = Quarterly Segment5 EBITA/Order Book  (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 145
+date_column_start = B
+date_column_end = R
+
+[762]
+name = Quarterly Segment5 EBITA/Order Book Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 154
+date_column_start = B
+date_column_end = R
+
+[763]
+name = Quarterly Segment5 EBITA/Order Book Growth (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 172
+date_column_start = B
+date_column_end = R
+
+[764]
+name = Quarterly Segment6 EBITA/Order Book  (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 146
+date_column_start = B
+date_column_end = R
+
+[765]
+name = Quarterly Segment6 EBITA/Order Book Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 155
+date_column_start = B
+date_column_end = R
+
+[766]
+name = Quarterly Segment6 EBITA/Order Book Growth (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 173
+date_column_start = B
+date_column_end = R
+
+[767]
+name = Quarterly Segment7 EBITA/Order Book  (Rs. Cr.)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 147
+date_column_start = B
+date_column_end = R
+
+[768]
+name = Quarterly Segment7 EBITA/Order Book Contribution (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 156
+date_column_start = B
+date_column_end = R
+
+[769]
+name = Quarterly Segment7 EBITA/Order Book Growth (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 174
+date_column_start = B
+date_column_end = R
+
+# === [770, 773] Qt. Total Volume, Volume 1 to 3 
+[770]
+name = Quarterly Total Volume (#)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 203
+date_column_start = B
+date_column_end = R
+
+[771]
+name = Quarterly Volume1 (#)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 204
+date_column_start = B
+date_column_end = R
+
+[772]
+name = Quarterly Volume2 (#)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 205
+date_column_start = B
+date_column_end = R
+
+[773]
+name = Quarterly Volume3 (#)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 206
+date_column_start = B
+date_column_end = R
+
+# === [774, 777] Total Volume g%, Volume 1 to 3 g%
+[774]
+name = Quarterly Total Volume g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 212
+date_column_start = B
+date_column_end = R
+
+[775]
+name = Quarterly Volume1 g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 213
+date_column_start = B
+date_column_end = R
+
+[776]
+name = Quarterly Volume2 g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 214
+date_column_start = B
+date_column_end = R
+
+[777]
+name = Quarterly Volume3 g% (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 215
+date_column_start = B
+date_column_end = R
+
+# === [778, 779] Annual Total Rev, Annual Total Rev. g%, Annual Total EBITA Margin
+[778]
+name = Annual Total Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 3
+date_column_start = B
+date_column_end = M
+
+[779]
+name = Annual Total Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 35
+date_column_start = B
+date_column_end = M
+
+# === [780, 800] Annual Segment Rev, Annual Segment Contribution, Annual Segment g% (For Segment 1 to 7)
+
+[780]
+name = Annual Segment1 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 4
+date_column_start = B
+date_column_end = M
+
+[781]
+name = Annual Segment1 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 16
+date_column_start = B
+date_column_end = M
+
+[782]
+name = Annual Segment1 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 36
+date_column_start = B
+date_column_end = M
+
+[783]
+name = Annual Segment2 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 5
+date_column_start = B
+date_column_end = M
+
+[784]
+name = Annual Segment2 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 17
+date_column_start = B
+date_column_end = M
+
+[785]
+name = Annual Segment2 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 37
+date_column_start = B
+date_column_end = M
+
+[786]
+name = Annual Segment3 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 6
+date_column_start = B
+date_column_end = M
+
+[787]
+name = Annual Segment3 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 18
+date_column_start = B
+date_column_end = M
+
+[788]
+name = Annual Segment3 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 38
+date_column_start = B
+date_column_end = M
+
+[789]
+name = Annual Segment4 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 7
+date_column_start = B
+date_column_end = M
+
+[790]
+name = Annual Segment4 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 19
+date_column_start = B
+date_column_end = M
+
+[791]
+name = Annual Segment4 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 39
+date_column_start = B
+date_column_end = M
+
+[792]
+name = Annual Segment5 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 8
+date_column_start = B
+date_column_end = M
+
+[793]
+name = Annual Segment5 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 20
+date_column_start = B
+date_column_end = M
+
+[794]
+name = Annual Segment5 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 40
+date_column_start = B
+date_column_end = M
+
+[795]
+name = Annual Segment6 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 9
+date_column_start = B
+date_column_end = M
+
+[796]
+name = Annual Segment6 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 21
+date_column_start = B
+date_column_end = M
+
+[797]
+name = Annual Segment6 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 41
+date_column_start = B
+date_column_end = M
+
+[798]
+name = Annual Segment7 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 10
+date_column_start = B
+date_column_end = M
+
+[799]
+name = Annual Segment7 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 22
+date_column_start = B
+date_column_end = M
+
+[800]
+name = Annual Segment7 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 42
+date_column_start = B
+date_column_end = M
+
+# === [801, 821] Annual Geography Rev, Annual Geography Contribution, Annual Geography g% (For Segment 1 to 7)
+[801]
+name = Annual Geography1 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 45
+date_column_start = B
+date_column_end = M
+
+[802]
+name = Annual Geography1 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 54
+date_column_start = B
+date_column_end = M
+
+[803]
+name = Annual Geography1 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 72
+date_column_start = B
+date_column_end = M
+
+[804]
+name = Annual Geography2 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 46
+date_column_start = B
+date_column_end = M
+
+[805]
+name = Annual Geography2 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 55
+date_column_start = B
+date_column_end = M
+
+[806]
+name = Annual Geography2 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 73
+date_column_start = B
+date_column_end = M
+
+[807]
+name = Annual Geography3 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 47
+date_column_start = B
+date_column_end = M
+
+[808]
+name = Annual Geography3 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 56
+date_column_start = B
+date_column_end = M
+
+[809]
+name = Annual Geography3 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 74
+date_column_start = B
+date_column_end = M
+
+[810]
+name = Annual Geography4 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 48
+date_column_start = B
+date_column_end = M
+
+[811]
+name = Annual Geography4 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 57
+date_column_start = B
+date_column_end = M
+
+[812]
+name = Annual Geography4 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 75
+date_column_start = B
+date_column_end = M
+
+[813]
+name = Annual Geography5 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 49
+date_column_start = B
+date_column_end = M
+
+[814]
+name = Annual Geography5 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 58
+date_column_start = B
+date_column_end = M
+
+[815]
+name = Annual Geography5 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 76
+date_column_start = B
+date_column_end = M
+
+[816]
+name = Annual Geography6 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 50
+date_column_start = B
+date_column_end = M
+
+[817]
+name = Annual Geography6 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 59
+date_column_start = B
+date_column_end = M
+
+[818]
+name = Annual Geography6 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 77
+date_column_start = B
+date_column_end = M
+
+[819]
+name = Annual Geography7 Revenue (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 51
+date_column_start = B
+date_column_end = M
+
+[820]
+name = Annual Geography7 Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 60
+date_column_start = B
+date_column_end = M
+
+[821]
+name = Annual Geography7 Revenue Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 78
+date_column_start = B
+date_column_end = M
+
+# === [822, 824] Annual Total EBITA, Annual Total EBITA g%, Annual Total EBITA Margin%
+[822]
+name = Annual Total EBITA / Order Book (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 101
+date_column_start = B
+date_column_end = M
+
+[823]
+name = Annual Total EBITA / Order Book Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 102
+date_column_start = B
+date_column_end = M
+
+[824]
+name = Annual Total EBITA Margin (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 128
+date_column_start = B
+date_column_end = M
+
+# === [825, 845] Qt. Segment EBITA/Order Book, Qt. Segment EBITA/Order Book Contribution, Qt. Segment/Order Book EBITA g% (For Segment 1 to 7)
+[825]
+name = Annual Segment1 EBITA/Order Book (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 103
+date_column_start = B
+date_column_end = M
+
+[826]
+name = Annual Segment1 EBITA/Order Book Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 112
+date_column_start = B
+date_column_end = M
+
+[827]
+name = Annual Segment1 EBITA/Order Book Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 120
+date_column_start = B
+date_column_end = M
+
+[828]
+name = Annual Segment2 EBITA (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 104
+date_column_start = B
+date_column_end = M
+
+[829]
+name = Annual Segment2 EBITA Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 113
+date_column_start = B
+date_column_end = M
+
+[830]
+name = Annual Segment2 EBITA Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 121
+date_column_start = B
+date_column_end = M
+
+[831]
+name = Annual Segment3 EBITA (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 105
+date_column_start = B
+date_column_end = M
+
+[832]
+name = Annual Segment3 EBITA Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 114
+date_column_start = B
+date_column_end = M
+
+[833]
+name = Annual Segment3 EBITA Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 122
+date_column_start = B
+date_column_end = M
+
+[834]
+name = Annual Segment4 EBITA (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 106
+date_column_start = B
+date_column_end = M
+
+[835]
+name = Annual Segment4 EBITA Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 115
+date_column_start = B
+date_column_end = M
+
+[836]
+name = Annual Segment4 EBITA Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 123
+date_column_start = B
+date_column_end = M
+
+[837]
+name = Annual Segment5 EBITA (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 107
+date_column_start = B
+date_column_end = M
+
+[838]
+name = Annual Segment5 EBITA Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 116
+date_column_start = B
+date_column_end = M
+
+[839]
+name = Annual Segment5 EBITA Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 124
+date_column_start = B
+date_column_end = M
+
+[840]
+name = Annual Segment6 EBITA (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 108
+date_column_start = B
+date_column_end = M
+
+[841]
+name = Annual Segment6 EBITA Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 117
+date_column_start = B
+date_column_end = M
+
+[842]
+name = Annual Segment6 EBITA Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 125
+date_column_start = B
+date_column_end = M
+
+[843]
+name = Annual Segment7 EBITA (Rs. Cr.)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 109
+date_column_start = B
+date_column_end = M
+
+[844]
+name = Annual Segment7 EBITA Contribution (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 118
+date_column_start = B
+date_column_end = M
+
+[845]
+name = Annual Segment7 EBITA Growth (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 126
+date_column_start = B
+date_column_end = M
+
+# === [846, 852] Annual Segment EBITA Margin (For Segment 1 to 7) 
+[846]
+name = Annual Segment1 EBITA/Order Book Margin (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 129
+date_column_start = B
+date_column_end = M
+
+[847]
+name = Annual Segment2 EBITA Margin (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 130
+date_column_start = B
+date_column_end = M
+
+[848]
+name = Annual Segment3 EBITA Margin (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 131
+date_column_start = B
+date_column_end = M
+
+[849]
+name = Annual Segment4 EBITA Margin (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 132
+date_column_start = B
+date_column_end = M
+
+[850]
+name = Annual Segment5 EBITA Margin (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 133
+date_column_start = B
+date_column_end = M
+
+[851]
+name = Annual Segment6 EBITA Margin (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 134
+date_column_start = B
+date_column_end = M
+
+[852]
+name = Annual Segment7 EBITA Margin (%)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 135
+date_column_start = B
+date_column_end = M
+
+# === [853, 861] Annual Volume Or Other Parameters
+
+[853]
+name = Annual Total Parameter
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 137
+date_column_start = B
+date_column_end = M
+
+[854]
+name = Annual Parameter 1
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 138
+date_column_start = B
+date_column_end = M
+
+[855]
+name = Annual Parameter 2
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 139
+date_column_start = B
+date_column_end = M
+
+[856]
+name = Annual Parameter 3
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 140
+date_column_start = B
+date_column_end = M
+
+[857]
+name = Annual Parameter 4
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 141
+date_column_start = B
+date_column_end = M
+
+[858]
+name = Annual Parameter 5
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 142
+date_column_start = B
+date_column_end = M
+
+[859]
+name = Annual Parameter 6
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 143
+date_column_start = B
+date_column_end = M
+
+[860]
+name = Annual Parameter 7
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 144
+date_column_start = B
+date_column_end = M
+
+[861]
+name = Annual Parameter 8
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 145
+date_column_start = B
+date_column_end = M
+
+# === [862, 870] Volume Growth Or Other Parameters Growth or Addition
+
+[862]
+name = Annual Total Parameter Growth / Addition
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 146
+date_column_start = B
+date_column_end = M
+
+[863]
+name = Annual Parameter 1 Growth / Addition
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 147
+date_column_start = B
+date_column_end = M
+
+[864]
+name = Annual Parameter 2 Growth / Addition
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 148
+date_column_start = B
+date_column_end = M
+
+[865]
+name = Annual Parameter 3 Growth / Addition
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 149
+date_column_start = B
+date_column_end = M
+
+[866]
+name = Annual Parameter 4 Growth / Addition
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 150
+date_column_start = B
+date_column_end = M
+
+[867]
+name = Annual Parameter 5 Growth / Addition
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 151
+date_column_start = B
+date_column_end = M
+
+[868]
+name = Annual Parameter 6 Growth / Addition
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 152
+date_column_start = B
+date_column_end = M
+
+[869]
+name = Annual Parameter 7 Growth / Addition
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 153
+date_column_start = B
+date_column_end = M
+
+[870]
+name = Annual Parameter 8 Growth / Addition
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 154
+date_column_start = B
+date_column_end = M
+
+# === Employees 
+
+[871]
+name = Annual Employees (#)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 81
+date_column_start = B
+date_column_end = M
+
+[872]
+name = Annual Employees Addition (#)
+sheet_name = SegmentAnalysis
+date_row = 2
+parameter_row = 82
+date_column_start = B
+date_column_end = M
+
+# === Additional Parameters for GREENPANEL
+
+[873]
+name = MDF Annual Capacity (CBM)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 204
+date_column_start = B
+date_column_end = R
+
+[874]
+name = MDF Domestic Sales Volume (CBM)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 205
+date_column_start = B
+date_column_end = R
+
+[875]
+name = MDF Exports Sales Volume (CBM)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 206
+date_column_start = B
+date_column_end = R
+
+[876]
+name = MDF Total Sales Volume (CBM)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 207
+date_column_start = B
+date_column_end = R
+
+[877]
+name = MDF Blended Realisation (Rs./CBM)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 208
+date_column_start = B
+date_column_end = R
+
+[878]
+name = MDF Domestic Realisation (Rs./CBM)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 209
+date_column_start = B
+date_column_end = R
+
+[879]
+name = MDF Export Realisation (Rs./CBM)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 210
+date_column_start = B
+date_column_end = R
+
+[880]
+name = MDF Capacity Utilization (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 211
+date_column_start = B
+date_column_end = R
+
+[881]
+name = Plywood Annual Capacity (Mn Sqm)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 212
+date_column_start = B
+date_column_end = R
+
+[882]
+name = Plywood Sales Volume (Mn Sqm) 
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 213
+date_column_start = B
+date_column_end = R
+
+[883]
+name = Plywood Average Realisation (Rs./Sqm)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 214
+date_column_start = B
+date_column_end = R
+
+[884]
+name = Plywood Capacity Utilisation (%)
+sheet_name = QuarterP&L
+date_row = 3
+parameter_row = 215
+date_column_start = B
+date_column_end = R
+
+# === [1001, 1008] New Sheets
+
+[1001]
+name = Quarterly Total Revenue
+sheet_name = HistoricalData
+date_row = 90
+parameter_row = 94
+date_column_start = J
+date_column_end = U
+name_column = D
+
+[1002]
+name = Annual Total Revenue
+sheet_name = HistoricalData
+date_row = 6
+parameter_row = 10
+date_column_start = J
+date_column_end = U
+name_column = D
+
+# =============================
+# Quarterly segment trend (bar)
+# =============================
+[1003]
+name = Quarterly Segment Revenue Trend
+sheet_name = HistoricalData
+date_row = 90
+parameter_row = 98
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 98
+series_row_end = 107
+chart_type = bar
+series_chart_type = bar
+stacked = true
+show_legend = true
+
+# =============================
+# Quarterly geographical revenue trend (bar)
+# =============================
+[1004]
+name = Quarterly Geographical Revenue Trend
+sheet_name = HistoricalData
+date_row = 90
+parameter_row = 111
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 111
+series_row_end = 118
+chart_type = bar
+series_chart_type = bar
+stacked = true
+show_legend = true
+
+# =============================
+# Annual segment trend (bar)
+# =============================
+[1005]
+name = Annual Segment Revenue Trend
+sheet_name = HistoricalData
+date_row = 6
+parameter_row = 14
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 14
+series_row_end = 23
+chart_type = bar
+series_chart_type = bar
+stacked = true
+show_legend = true
+
+# =============================
+# Annual geographical revenue trend (bar)
+# =============================
+[1006]
+name = Annual Geographical Revenue Trend
+sheet_name = HistoricalData
+date_row = 6
+parameter_row = 27
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 27
+series_row_end = 34
+chart_type = bar
+series_chart_type = bar
+stacked = true
+show_legend = true
+
+# =============================
+# Annual Capacity (Stacked)
+# =============================
+[1007]
+name = Annual Capacity
+sheet_name = HistoricalData
+date_row = 6
+parameter_row = 53
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 53
+series_row_end = 55
+chart_type = bar
+series_chart_type = bar
+stacked = true
+show_legend = true
+
+# =============================
+# Annual Volume (Stacked)
+# =============================
+[1008]
+name = Annual Volume
+sheet_name = HistoricalData
+date_row = 6
+parameter_row = 60
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 60
+series_row_end = 63
+chart_type = bar
+series_chart_type = bar
+stacked = true
+show_legend = true
+
+
+# =============================
+# Annual volume growth trend (multi-line)
+# =============================
+[1009]
+name = Annual Volume Growth Trend (%)
+sheet_name = HistoricalData
+date_row = 6
+parameter_row = 67
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 67
+series_row_end = 70
+chart_type = line
+series_chart_type = line
+stacked = false
+show_legend = true
+
+
+
+# =============================
+# Quarterly Head count trend 
+# =============================
+[1010]
+name = Quarterly Headcount Trend
+sheet_name = HistoricalData
+date_row = 90
+parameter_row = 137
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 137
+series_row_end = 137
+chart_type = line
+series_chart_type = line
+stacked = false
+show_legend = true
+
+# =============================
+# Quarterly TCV trend 
+# =============================
+[1011]
+name = Quarterly TCV Trend
+sheet_name = HistoricalData
+date_row = 90
+parameter_row = 140
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 140
+series_row_end = 140
+chart_type = line
+series_chart_type = line
+stacked = false
+show_legend = true
+
+# =============================
+# Quarterly Client Contribution 
+# =============================
+[1012]
+name = Quarterly Client Contribution
+sheet_name = HistoricalData
+date_row = 90
+parameter_row = 142
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 142
+series_row_end = 145
+chart_type = bar
+series_chart_type = bar
+stacked = true
+show_legend = true
+
+# =============================
+# Quarterly CC Rev. Growth by Industry 
+# =============================
+[1013]
+name = Quarterly CC Rev. Growth by Industry (%)
+sheet_name = HistoricalData
+date_row = 90
+parameter_row = 147
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 147
+series_row_end = 154
+chart_type = line
+series_chart_type = line
+stacked = false
+show_legend = true
+
+# =============================
+# Quarterly CC Rev. Growth by Geography 
+# =============================
+[1014]
+name = Quarterly CC Rev. Growth by Geography (%)
+sheet_name = HistoricalData
+date_row = 90
+parameter_row = 157
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 157
+series_row_end = 163
+chart_type = line
+series_chart_type = line
+stacked = false
+show_legend = true
+
+
+
+
+# =============================
+# Annual Head count trend 
+# =============================
+[1015]
+name = Annual Headcount Trend
+sheet_name = HistoricalData
+date_row = 6
+parameter_row = 53
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 53
+series_row_end = 53
+chart_type = line
+series_chart_type = line
+stacked = false
+show_legend = true
+
+# =============================
+# Annual TCV trend 
+# =============================
+[1016]
+name = Annual TCV Trend
+sheet_name = HistoricalData
+date_row = 6
+parameter_row = 56
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 56
+series_row_end = 56
+chart_type = line
+series_chart_type = line
+stacked = false
+show_legend = true
+
+# =============================
+# Annual Client Contribution 
+# =============================
+[1017]
+name = Annual Client Contribution
+sheet_name = HistoricalData
+date_row = 6
+parameter_row = 58
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 58
+series_row_end = 61
+chart_type = bar
+series_chart_type = bar
+stacked = true
+show_legend = true
+
+# =============================
+# Annual CC Rev. Growth by Industry 
+# =============================
+[1018]
+name = Annual CC Rev. Growth by Industry (%)
+sheet_name = HistoricalData
+date_row = 6
+parameter_row = 63
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 63
+series_row_end = 70
+chart_type = line
+series_chart_type = line
+stacked = false
+show_legend = true
+
+# =============================
+# Annual CC Rev. Growth by Geography 
+# =============================
+[1019]
+name = Annual CC Rev. Growth by Geography (%)
+sheet_name = HistoricalData
+date_row = 6
+parameter_row = 73
+date_column_start = J
+date_column_end = U
+name_column = D
+series_row_start = 73
+series_row_end = 79
+chart_type = line
+series_chart_type = line
+stacked = false
+show_legend = true
