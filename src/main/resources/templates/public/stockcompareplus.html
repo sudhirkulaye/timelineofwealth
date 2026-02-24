@@ -24,10 +24,14 @@
 <script src="../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
 <!-- ui-bootstrap-tpls.js -->
 <script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
-<!-- Chart.js -->
+<!-- Chart.js v2 - used by angular-chart directives -->
 <script src="../../static/vendors/Chart.js/dist/Chart.min.js" th:src="@{/vendors/Chart.js/dist/Chart.min.js}"></script>
-<!-- angular.chartjs -->
+<!-- Save v2 reference before v4 overwrites it -->
+<script>window.ChartV2 = window.Chart;</script>
+<!-- angular.chartjs - must load after ChartV2 is saved -->
 <script src="../../static/vendors/angular.chartjs/angular-chart.min.js" th:src="@{/vendors/angular.chartjs/angular-chart.min.js}"></script>
+<!-- Chart.js v4 - for all direct new Chart() calls -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>-->
 <!-- custom angular script -->
 <script type="text/javascript" src="../../static/custom/public/stockcompareplus.js" th:src="@{/custom/public/stockcompareplus.js}"></script>

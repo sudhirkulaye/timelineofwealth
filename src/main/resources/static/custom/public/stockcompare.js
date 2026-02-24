@@ -136,7 +136,7 @@ module.controller('StockCompareController', function($scope, $http, $filter, $wi
         $scope.selectedCombinations = orderedByFirstStock;
 
         renderComparisonCharts();
-        renderComparisonNotes();
+//        renderComparisonNotes();
     }
 
     // === Render All Comparison Charts ===
