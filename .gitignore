@@ -27,3 +27,6 @@
 ### Logs and archives ###
 *.log
 *.gz
+
+# Claude AI worktrees (should never be tracked)
+src/main/.claude/

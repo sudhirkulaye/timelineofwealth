@@ -1,336 +1,676 @@
 package com.timelineofwealth.service;
 
-// if (file.lastModified() > yesterday.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
-
 import java.io.*;
 import java.nio.file.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
+/**
+ * FileCopier — Smart incremental folder sync / mirror utility.
+ *
+ * HOW TO USE:
+ *   1. Set ACTIVE_PROFILE to the profile you want to run (see PROFILES section below)
+ *   2. Set DRY_RUN = true to preview what will happen, false to actually sync
+ *   3. Run main()
+ *
+ * FILES (both at C:\MyDocuments\03Business\02workspace\timelineofwealth\):
+ *   FileSyncLog.properties  — stores LastTransferTime per profile, one file for ALL profiles
+ *   FileSyncLog.log         — appended each run, never auto-cleared (clear manually when needed)
+ */
 public class FileCopier {
-    public static void main(String[] args) throws IOException {
-        // Set the source and destination folders
 
-        String localLaptop = "C:\\MyDocuments\\03Business";
-        String paragLaptop = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business";
-        String redMILaptop = "\\\\REDMIBOOK15\\MyDocuments\\03Business";
-        String hpSpectreLaptop = "\\DESKTOP-UV0PRDE\03Business";
-        String dailyData = "\\03DailyData";
-        String excels = "\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-        String reports = "\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
-        String clientReports = "\\06ClientData\\PMS\\ClientReports";
-        String researchAndAnalysis = "\\05ResearchAndAnalysis";
-        String javaWorkspace = "\\02workspace\\timelineofwealth";
-        String pythonWorkspace = "\\02workspace\\PythonDev";
-
-        //*********************************************** From Local to OneDrive ***********************************************
-
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-//        String dstFolder = "C:\\Users\\sudhi\\OneDrive\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
-//        String dstFolder = "C:\\Users\\sudhi\\OneDrive\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
-
-        //*********************************************** From HP to Redmi ***********************************************
-
-        // Move Jupyter Notes projects to 02workspace
-//        String srcFolder = "C:\\Users\\Sudhir Kulaye\\JupyterProjects";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
-
-        String srcFolder = "\\\\HPSpectre\\MyDocuments\\";
-        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\";
-
-        //Move Daily Data from HP to Redmii
-//        String srcFolder = "\\\\HPSpectre\\MyDocuments\\03Business\\03DailyData";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\03DailyData";
-
-        //Move Daily Data from HP to Redmii
-//        String srcFolder = "\\\\HPSpectre\\CFA2025";
-//        String dstFolder = "\\\\REDMIBOOK15\\CFA2025";
-
-        //Move latest reports from HP to Redmi
-//        String srcFolder = "\\\\HPSpectre\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q2";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY24Q2";
-
-        //Move Daily Data from HP to Redmii
-//        String srcFolder = "\\\\HPSpectre\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
-
-        //*********************************************** From redmi to HP ***********************************************
-
-        // Move Jupyter Notes projects to 02workspace
-//        String srcFolder = "C:\\Users\\sudhi\\JupyterProjects";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
-
-//        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\";
-//        String dstFolder = "\\\\HPSpectre\\MyDocuments\\";
-
-        //Move latest DailyData redmi to HP
-//        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\03DailyData";
-//        String dstFolder = "\\\\HPSpectre\\03Business\\03DailyData";
-
-        //Move latest reports redmi to HP
-//        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
-//        String dstFolder = "\\\\HPSpectre\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports";
-
-        //Move latest Excels from redmi to HP
-//        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-//        String dstFolder = "\\\\HPSpectre\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-
-        //Move latest Code from redmi to HP
-//        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\06ClientData\\PMS";
-//        String dstFolder = "\\\\HPSpectre\\03Business\\06ClientData\\PMS";
-
-        //Move latest JAVA Code from redmi to HP
-//        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
-//        String dstFolder = "\\\\HPSpectre\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
-
-        //Move latest SQL Code from redmi to HP
-//        String srcFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql";
-//        String dstFolder = "\\\\HPSpectre\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql";
-
-        //*********************************************** From Local Laptop to Parag's Laptop ***********************************************
-
-//        String srcFolder = localLaptop + reports;
-//        String dstFolder = paragLaptop + reports;
-
-//        String srcFolder = localLaptop + excels;
-//        String dstFolder = paragLaptop + excels;
-
-//        String srcFolder = localLaptop + dailyData;
-//        String dstFolder = paragLaptop +
-
-//        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\JupyterProjects";
-//        //String srcFolder = "C:\\MyDocuments\\03Business\\03DailyData";
-//        //String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\03DailyData";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\YahooConsensus";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\YahooConsensus";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports";
-//        String dstFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports";
+    // =========================================================================
+    //  STEP 1 — SET THE ACTIVE PROFILE  (must match a key in PROFILES map below)
+    // =========================================================================
 
 
-        //*********************************************** From Parag's Laptop to Local Laptop ***********************************************
-
-//        String srcFolder = localLaptop + reports;
-//        String dstFolder = paragLaptop + reports;
-
-//        String srcFolder = localLaptop + excels;
-//        String dstFolder = paragLaptop + excels;
-
-//        String srcFolder = localLaptop + dailyData;
-//        String dstFolder = paragLaptop +
-
-//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\03DailyData";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\03DailyData";
-
-//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2025Q4";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2025Q4";
-
-//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
-
-//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert";
-
-//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Charts";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Charts";
-
-//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
-
-//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
-
-//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
-
-//        String srcFolder = "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports";
-//        String dstFolder = "C:\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports";
+//    private static final String ACTIVE_PROFILE = "HPUser_to_Workspace_JupyterProjects";
+//    private static final String ACTIVE_PROFILE = "RedmiUser_to_Workspace_JupyterProjects";
 
 
-//        String srcFolder = "C:\\MyDocuments\\02UsefulSoftwares\\EditPlus 3";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\02UsefulSoftwares\\EditPlus 3";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\02workspace\\timelineofwealth";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\03DailyData";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\03DailyData";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2024Q2";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\2024Q2";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY23Q2";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\FY23Q2";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\AMBITDaily";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\AMBITDaily";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\KotakDaily";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\KotakDaily";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\MOSLMorningIndia";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\MOSLMorningIndia";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\05ResearchAndAnalysis";
-//        String srcFolder = "C:\\MyDocuments\\03Business\\06ClientData\\";
-//        String dstFolder = "\\\\REDMIBOOK15\\MyDocuments\\03Business\\06ClientData\\";
+    private static final String ACTIVE_PROFILE = "HP_to_Redmi_Full";
+//    private static final String ACTIVE_PROFILE = "HP_to_Redmi_DailyData";
 
-        // Create the destination folder structure
-        createFolderStructure(srcFolder, dstFolder);
+//    private static final String ACTIVE_PROFILE = "Redmi_to_HP_Full"; // Set DRY_RUN = TRUE
+//    private static final String ACTIVE_PROFILE = "Redmi_to_HP_DailyData";
 
-        // Copy all files from the source to the destination
-        copyFiles(srcFolder, dstFolder);
+//    private static final String ACTIVE_PROFILE = "Local_to_Parag_JavaCode";
+//    private static final String ACTIVE_PROFILE = "Local_to_Parag_SQL";
+//    private static final String ACTIVE_PROFILE = "Local_to_Parag_JupyterProjects";
+//    private static final String ACTIVE_PROFILE = "Local_to_Parag_DailyData";
+//    private static final String ACTIVE_PROFILE = "Local_to_Parag_Excels";
+//    private static final String ACTIVE_PROFILE = "Local_to_Parag_MacroEconomy";
+//    private static final String ACTIVE_PROFILE = "Local_to_Parag_SectorReports";
+//    private static final String ACTIVE_PROFILE = "Local_to_Parag_YahooConsensus";
+//    private static final String ACTIVE_PROFILE = "Local_to_Parag_CompanyReports";
+//    private static final String ACTIVE_PROFILE = "Local_to_Parag_ClientReports";
+
+//    private static final String ACTIVE_PROFILE = "Local_to_OneDrive_Excels";
+//    private static final String ACTIVE_PROFILE = "Local_to_OneDrive_Reports";
+
+    // =========================================================================
+    //  STEP 2 — SET DRY RUN FLAG
+    //    true  = only show what WOULD happen, no changes made
+    //    false = actually copy, replace and delete files
+    // =========================================================================
+
+    private static final boolean DRY_RUN = false;
+//    private static final boolean DRY_RUN = true;
+
+    // =========================================================================
+    //  FIXED PATHS — same on every machine, property file and log file location
+    // =========================================================================
+
+    private static final String BASE_DIR  = "C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\";
+    private static final String PROP_FILE = BASE_DIR + "FileSyncLog.properties";
+    private static final String LOG_FILE  = BASE_DIR + "FileSyncLog.log";
+
+    // =========================================================================
+    //  PROFILES — all your folder combinations, named for easy selection
+    //  Format: PROFILES.put("ProfileName", p("srcFolder", "dstFolder"));
+    // =========================================================================
+
+    private static final Map<String, String[]> PROFILES = new LinkedHashMap<>();
+
+    static {
+
+        // ── HP Spectre → Redmi ───────────────────────────────────────────────
+        PROFILES.put("HP_to_Redmi_Full",
+                new String[]{"\\\\HPSpectre\\MyDocuments\\",
+                        "\\\\REDMIBOOK15\\MyDocuments\\"});
+
+        PROFILES.put("HP_to_Redmi_DailyData",
+                new String[]{"\\\\HPSpectre\\MyDocuments\\03Business\\03DailyData",
+                        "\\\\REDMIBOOK15\\MyDocuments\\03Business\\03DailyData"});
+
+        PROFILES.put("HP_to_Redmi_CFA2025",
+                new String[]{"\\\\HPSpectre\\CFA2025",
+                        "\\\\REDMIBOOK15\\CFA2025"});
+
+        // ── Redmi → HP Spectre ───────────────────────────────────────────────
+        PROFILES.put("Redmi_to_HP_Full",
+                new String[]{"\\\\REDMIBOOK15\\MyDocuments\\",
+                        "\\\\HPSpectre\\MyDocuments\\"});
+
+        PROFILES.put("Redmi_to_HP_DailyData",
+                new String[]{"\\\\REDMIBOOK15\\MyDocuments\\03Business\\03DailyData",
+                        "\\\\HPSpectre\\MyDocuments\\03Business\\03DailyData"});
+
+        // ── Local (HP) → Parag's Laptop (DESKTOP-UV0PRDE) ───────────────────
+        PROFILES.put("Local_to_Parag_JavaCode",
+                new String[]{"C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth",
+                        "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\java\\com\\timelineofwealth"});
+
+        PROFILES.put("Local_to_Parag_SQL",
+                new String[]{"C:\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql",
+                        "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\timelineofwealth\\src\\main\\sql"});
+
+        PROFILES.put("Local_to_Parag_JupyterProjects",
+                new String[]{"C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects",
+                        "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\02workspace\\JupyterProjects"});
+
+        PROFILES.put("Local_to_Parag_DailyData",
+                new String[]{"C:\\MyDocuments\\03Business\\03DailyData",
+                        "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\03DailyData"});
+
+        PROFILES.put("Local_to_Parag_Excels",
+                new String[]{"C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels",
+                        "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels"});
+
+        PROFILES.put("Local_to_Parag_MacroEconomy",
+                new String[]{"C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy",
+                        "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy"});
+
+        PROFILES.put("Local_to_Parag_SectorReports",
+                new String[]{"C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector",
+                        "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector"});
+
+        PROFILES.put("Local_to_Parag_YahooConsensus",
+                new String[]{"C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\YahooConsensus",
+                        "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\YahooConsensus"});
+
+        PROFILES.put("Local_to_Parag_CompanyReports",
+                new String[]{"C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports",
+                        "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports"});
+
+        PROFILES.put("Local_to_Parag_ClientReports",
+                new String[]{"C:\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports",
+                        "\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports"});
+
+        // ── Parag's Laptop (DESKTOP-UV0PRDE) → Local ────────────────────────
+        PROFILES.put("Parag_to_Local_DailyData",
+                new String[]{"\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\03DailyData",
+                        "C:\\MyDocuments\\03Business\\03DailyData"});
+
+        PROFILES.put("Parag_to_Local_Excels_Analysis",
+                new String[]{"\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis",
+                        "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis"});
+
+        PROFILES.put("Parag_to_Local_Excels_DBInsert",
+                new String[]{"\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert",
+                        "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert"});
+
+        PROFILES.put("Parag_to_Local_CompanyReports",
+                new String[]{"\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports",
+                        "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports"});
+
+        PROFILES.put("Parag_to_Local_MacroEconomy",
+                new String[]{"\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy",
+                        "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\MacroEconomy"});
+
+        PROFILES.put("Parag_to_Local_SectorReports",
+                new String[]{"\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector",
+                        "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\Sector"});
+
+        PROFILES.put("Parag_to_Local_ClientReports",
+                new String[]{"\\\\DESKTOP-UV0PRDE\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports",
+                        "C:\\MyDocuments\\03Business\\06ClientData\\PMS\\ClientReports"});
+
+        // ── Local → OneDrive ─────────────────────────────────────────────────
+        PROFILES.put("Local_to_OneDrive_Excels",
+                new String[]{"C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels",
+                        "C:\\Users\\sudhi\\OneDrive\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels"});
+
+        PROFILES.put("Local_to_OneDrive_Reports",
+                new String[]{"C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports",
+                        "C:\\Users\\sudhi\\OneDrive\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports"});
+
+        // ── HP Spectre (Local User Folder) → Workspace ─────────────────────────────
+        PROFILES.put("HPUser_to_Workspace_JupyterProjects",
+                new String[]{"C:\\Users\\Sudhir Kulaye\\JupyterProjects",
+                        "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects"});
+
+        // ── Redmi (Local User Folder) → Workspace ───────────────────────────────────
+        PROFILES.put("RedmiUser_to_Workspace_JupyterProjects",
+                new String[]{"C:\\Users\\sudhi\\JupyterProjects",
+                        "C:\\MyDocuments\\03Business\\02workspace\\JupyterProjects"});
     }
-    private static void createFolderStructure(String srcFolder, String dstFolder) throws IOException {
-        // Get the list of all subfolders in the source folder
-        File srcDir = new File(srcFolder);
-        File[] srcSubfolders = srcDir.listFiles(File::isDirectory);
 
-        // Create the subfolders in the destination folder
-        if (srcSubfolders != null) {
-            for (File srcSubfolder : srcSubfolders) {
-                String subfolderName = srcSubfolder.getName();
-                String dstSubfolder = dstFolder + "\\" + subfolderName;
-                Files.createDirectories(Paths.get(dstSubfolder));
+    // =========================================================================
+    //  INTERNALS — no need to edit below this line
+    // =========================================================================
 
-                // Recursively create the folder structure for the subfolder
-                createFolderStructure(srcSubfolder.getAbsolutePath(), dstSubfolder);
+    private static final DateTimeFormatter FMT       = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FMT_SHORT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+    // Deletion list — built during Phase 2 scan, used for prompt + execute
+    private static final List<String[]> toDelete      = new ArrayList<>(); // [path, "FILE"|"FOLDER"]
+
+    // Conflicts — collected during Phase 1 scan+copy, reported afterwards
+    private static final List<String[]> needAttention = new ArrayList<>(); // [srcPath, srcDate, dstDate]
+
+    // DRY_RUN only — lists for report (not used in live mode)
+    private static final List<String[]> toCopy        = new ArrayList<>(); // [srcPath, srcDate, "NEW"]
+    private static final List<String[]> toReplace     = new ArrayList<>(); // [srcPath, srcDate, dstDate]
+
+    // Live mode counters
+    private static int copiedCount   = 0;
+    private static int replacedCount = 0;
+
+    // Set after profile lookup
+    private static String SRC_FOLDER;
+    private static String DST_FOLDER;
+
+    // =========================================================================
+    //  MAIN
+    // =========================================================================
+
+    public static void main(String[] args) throws IOException {
+
+        // ── Resolve profile ──────────────────────────────────────────────────
+        String[] profile = PROFILES.get(ACTIVE_PROFILE);
+        if (profile == null) {
+            System.out.println("ERROR: Profile not found: " + ACTIVE_PROFILE);
+            System.out.println("Available profiles:");
+            PROFILES.keySet().forEach(k -> System.out.println("  " + k));
+            return;
+        }
+        SRC_FOLDER = profile[0];
+        DST_FOLDER = profile[1];
+
+        // ── Print + log header ───────────────────────────────────────────────
+        String header = buildHeader();
+        print(header);
+        appendToLog(header);
+
+        // ── Validate folders ─────────────────────────────────────────────────
+        File srcDir = new File(SRC_FOLDER);
+        File dstDir = new File(DST_FOLDER);
+        if (!srcDir.exists() || !srcDir.isDirectory()) {
+            String msg = "ERROR: Source folder not found: " + SRC_FOLDER;
+            print(msg); appendToLog(msg); return;
+        }
+        if (!dstDir.exists() || !dstDir.isDirectory()) {
+            String msg = "ERROR: Destination folder not found: " + DST_FOLDER;
+            print(msg); appendToLog(msg); return;
+        }
+
+        // ── Read last transfer time from property file ───────────────────────
+        long lastTransferEpoch = readLastTransferTime(ACTIVE_PROFILE);
+        String lastSyncMsg = lastTransferEpoch > 0
+                ? " Last Sync   : " + epochToStr(lastTransferEpoch)
+                : " Last Sync   : NONE — full scan will run";
+        print(lastSyncMsg);
+        appendToLog(lastSyncMsg);
+        print("=================================================\n");
+
+        // ── Phase 1: Scan + Copy / Replace in one pass ──────────────────────
+        print("[ Phase 1 ] Copying / replacing files...");
+        scanAndCopy(srcDir, dstDir, lastTransferEpoch);
+
+        if (DRY_RUN) {
+            print("            Would copy " + toCopy.size() + " new,  replace "
+                    + toReplace.size() + ",  " + needAttention.size() + " conflict(s).\n");
+        } else {
+            print("            Copied " + copiedCount + " new,  replaced "
+                    + replacedCount + ",  " + needAttention.size() + " conflict(s).\n");
+            writeLastTransferTime(ACTIVE_PROFILE);
+            String attentionReport = buildAttentionReport();
+            print(attentionReport);
+            appendToLog(attentionReport);
+        }
+
+        // ── Phase 2: Deletion detection + interactive prompt ─────────────────
+        print("[ Phase 2 ] Scanning for deletions...");
+        detectDeletions(srcDir, dstDir);
+        print("            Found " + toDelete.size() + " item(s) to delete.\n");
+
+        if (DRY_RUN) {
+            String report = buildDryRunReport();
+            print(report);
+            appendToLog(report);
+        } else if (toDelete.isEmpty()) {
+            print("No extra items in destination. Done.\n");
+        } else {
+            print("The following items exist in destination but NOT in source:");
+            for (String[] r : toDelete)
+                print("  [" + r[1] + "] " + r[0]);
+            System.out.print("\nDelete these " + toDelete.size() + " item(s)? (yes/no): ");
+            Scanner scanner = new Scanner(System.in);
+            String answer = scanner.nextLine().trim().toLowerCase();
+            if (answer.equals("yes") || answer.equals("y")) {
+                executeDeletes();
+                print("Deletion complete.\n");
+            } else {
+                print("Skipping deletion. Copy/replace already done.\n");
             }
         }
     }
-    private static void copyFiles(String srcFolder, String dstFolder) throws IOException {
-        // Get the list of all files in the source and destination folders
-        File srcDir = new File(srcFolder);
-        File dstDir = new File(dstFolder);
+
+    // =========================================================================
+    //  PHASE 1 — DELETION DETECTION  (recursive count-narrowing, top-down)
+    //  Only loads filenames into memory at folders where count mismatch occurs
+    // =========================================================================
+
+    private static void detectDeletions(File srcDir, File dstDir) {
+
+        // ── Files directly in this folder (non-recursive count) ──────────────
         File[] srcFiles = srcDir.listFiles(File::isFile);
         File[] dstFiles = dstDir.listFiles(File::isFile);
+        int srcCount = srcFiles == null ? 0 : srcFiles.length;
+        int dstCount = dstFiles == null ? 0 : dstFiles.length;
 
-        // Delete any additional files in the destination
-        if (dstFiles != null) {
-            for (File dstFile : dstFiles) {
-                String dstFileName = dstFile.getName();
-                boolean found = false;
-                if (srcFiles != null) {
-                    for (File srcFile : srcFiles) {
-                        if (srcFile.getName().equals(dstFileName)) {
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-                if (!found) {
-                    System.out.println("Deleteing File " + dstFile);
-                    dstFile.delete();
-                }
-            }
+        if (srcCount != dstCount) {
+            // Mismatch here — load ONLY this folder's names to find what was deleted
+            Set<String> srcNames = new HashSet<>();
+            if (srcFiles != null)
+                for (File f : srcFiles) srcNames.add(f.getName());
+            if (dstFiles != null)
+                for (File f : dstFiles)
+                    if (!srcNames.contains(f.getName()))
+                        toDelete.add(new String[]{ f.getAbsolutePath(), "FILE" });
         }
 
-        // Copy the files from the source to the destination
+        // ── Subfolders directly in this folder ───────────────────────────────
+        File[] srcDirs = srcDir.listFiles(File::isDirectory);
+        File[] dstDirs = dstDir.listFiles(File::isDirectory);
+        int srcDirCount = srcDirs == null ? 0 : srcDirs.length;
+        int dstDirCount = dstDirs == null ? 0 : dstDirs.length;
+
+        // Build dst dir map for O(1) lookup (used both for diff and recursion)
+        Map<String, File> dstDirMap = new HashMap<>();
+        if (dstDirs != null)
+            for (File d : dstDirs) dstDirMap.put(d.getName(), d);
+
+        if (srcDirCount != dstDirCount) {
+            // Mismatch — find which subfolder(s) were deleted from source
+            Set<String> srcDirNames = new HashSet<>();
+            if (srcDirs != null)
+                for (File d : srcDirs) srcDirNames.add(d.getName());
+            for (Map.Entry<String, File> e : dstDirMap.entrySet())
+                if (!srcDirNames.contains(e.getKey()))
+                    collectFolderForDeletion(e.getValue());
+        }
+
+        // ── Recurse only into folders present on BOTH sides ──────────────────
+        if (srcDirs != null)
+            for (File srcSub : srcDirs) {
+                File dstSub = dstDirMap.get(srcSub.getName());
+                if (dstSub != null)
+                    detectDeletions(srcSub, dstSub);
+            }
+    }
+
+    /** Recursively collect all files + the folder itself for deletion */
+    private static void collectFolderForDeletion(File dir) {
+        File[] entries = dir.listFiles();
+        if (entries != null)
+            for (File f : entries) {
+                if (f.isDirectory()) collectFolderForDeletion(f);
+                else toDelete.add(new String[]{ f.getAbsolutePath(), "FILE" });
+            }
+        toDelete.add(new String[]{ dir.getAbsolutePath(), "FOLDER" });
+    }
+
+    // =========================================================================
+    //  PHASE 1 — SCAN + COPY / REPLACE IN ONE PASS
+    //  Eliminates the separate scan-then-act double traversal.
+    //  In live mode: copies/replaces each file immediately as it is found.
+    //  In dry-run mode: collects into toCopy/toReplace lists for reporting.
+    // =========================================================================
+
+    private static void scanAndCopy(File srcDir, File dstDir, long lastTransferEpoch) throws IOException {
+
+        // O(1) lookup for dst files — one listFiles() call per folder
+        File[] dstFiles = dstDir.listFiles(File::isFile);
+        Map<String, File> dstFileMap = new HashMap<>();
+        if (dstFiles != null)
+            for (File f : dstFiles) dstFileMap.put(f.getName(), f);
+
+        File[] srcFiles = srcDir.listFiles(File::isFile);
         if (srcFiles != null) {
             for (File srcFile : srcFiles) {
-                String srcFilePath = srcFile.getAbsolutePath();
-                String fileName = srcFile.getName();
-                String dstFilePath = dstFolder + "\\" + fileName;
+                long   srcMs   = srcFile.lastModified();
+                String dstPath = srcFile.getAbsolutePath().replace(SRC_FOLDER, DST_FOLDER);
+                File   dstFile = dstFileMap.get(srcFile.getName());
 
-                copyFile(srcFilePath, dstFilePath);
-            }
-        }
+                if (dstFile == null || !dstFile.exists()) {
+                    // New file — copy immediately
+                    if (DRY_RUN) toCopy.add(new String[]{ srcFile.getAbsolutePath(), msToDate(srcMs), "NEW" });
+                    else        { performCopy(srcFile.getAbsolutePath(), dstPath, "Copying  "); copiedCount++; }
 
-        // Get the list of all subfolders in the source and destination folders
-        File[] srcSubfolders = srcDir.listFiles(File::isDirectory);
-        File[] dstSubfolders = dstDir.listFiles(File::isDirectory);
+                } else {
+                    long dstMs = dstFile.lastModified();
 
-        // Delete any additional subfolders in the destination
-        if (dstSubfolders != null) {
-            for (File dstSubfolder : dstSubfolders) {
-                String dstSubfolderName = dstSubfolder.getName();
-                boolean found = false;
-                if (srcSubfolders != null) {
-                    for (File srcSubfolder : srcSubfolders) {
-                        if (srcSubfolder.getName().equals(dstSubfolderName)) {
-                            found = true;
-                            break;
+                    if (dstMs > srcMs) {
+                        // Destination is NEWER — flag, never auto-overwrite
+                        needAttention.add(new String[]{ srcFile.getAbsolutePath(), msToDate(srcMs), msToDate(dstMs) });
+
+                    } else if (srcMs > dstMs) {
+                        if (lastTransferEpoch > 0 && srcMs < lastTransferEpoch) {
+                            // Already synced in a previous run — skip silently
+                        } else {
+                            // Source is newer — replace immediately
+                            if (DRY_RUN) toReplace.add(new String[]{ srcFile.getAbsolutePath(), msToDate(srcMs), msToDate(dstMs) });
+                            else        { performCopy(srcFile.getAbsolutePath(), dstPath, "Replacing"); replacedCount++; }
                         }
                     }
-                }
-                if (!found) {
-                    System.out.println("Deleting Folder " + dstSubfolder.getAbsolutePath() );
-                    deleteFolder(dstSubfolder.getAbsolutePath());
+                    // Same timestamp — already in sync, skip silently
                 }
             }
         }
 
-        // Recursively copy the files from the subfolders
-        if (srcSubfolders != null) {
-            for (File srcSubfolder : srcSubfolders) {
-                String srcSubfolderPath = srcSubfolder.getAbsolutePath();
-                String subfolderName = srcSubfolder.getName();
-                String dstSubfolderPath = dstFolder + "\\" + subfolderName;
-
-                copyFiles(srcSubfolderPath, dstSubfolderPath);
-            }
-        }
-    }
-
-    private static void deleteFolder(String folder) throws IOException {
-        File dir = new File(folder);
-        File[] files = dir.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    deleteFolder(file.getAbsolutePath());
+        // ── Recurse into subfolders ──────────────────────────────────────────
+        File[] srcSubDirs = srcDir.listFiles(File::isDirectory);
+        if (srcSubDirs != null) {
+            for (File srcSub : srcSubDirs) {
+                File dstSub = new File(dstDir.getAbsolutePath() + File.separator + srcSub.getName());
+                if (!dstSub.exists()) {
+                    if (!DRY_RUN) dstSub.mkdirs();
+                    copyEntireFolder(srcSub, dstSub);   // brand new folder on source side
                 } else {
-                    System.out.println("Deleting file " + file.getAbsolutePath() );
-                    file.delete();
+                    scanAndCopy(srcSub, dstSub, lastTransferEpoch);
                 }
             }
         }
-        dir.delete();
     }
 
-    private static void copyFile(String srcFile, String dstFile) throws IOException {
-        // Get the last modified time of the source and destination files
-        File src = new File(srcFile);
-        File dst = new File(dstFile);
-        long srcLastModified = src.lastModified();
-        long dstLastModified = dst.lastModified();
+    /** Copies an entire new src folder to dst (no timestamp checks needed — everything is new). */
+    private static void copyEntireFolder(File srcDir, File dstDir) throws IOException {
+        File[] entries = srcDir.listFiles();
+        if (entries != null) {
+            for (File f : entries) {
+                if (f.isDirectory()) {
+                    File dstSub = new File(dstDir.getAbsolutePath() + File.separator + f.getName());
+                    if (!DRY_RUN) dstSub.mkdirs();
+                    copyEntireFolder(f, dstSub);
+                } else {
+                    if (DRY_RUN) toCopy.add(new String[]{ f.getAbsolutePath(), msToDate(f.lastModified()), "NEW" });
+                    else        { performCopy(f.getAbsolutePath(), f.getAbsolutePath().replace(SRC_FOLDER, DST_FOLDER), "Copying  "); copiedCount++; }
+                }
+            }
+        }
+    }
 
-        // Check if the destination file is missing or if its last modified time is older than the source file's
-        if (!dst.exists() || dstLastModified < srcLastModified) {
-            System.out.println("Copying File " + srcFile );
-            /*try (InputStream in = new FileInputStream(srcFile)) {
-                try (OutputStream out = new FileOutputStream(dstFile)) {
-                    // Transfer bytes from in to out
-                    byte[] buf = new byte[1024];
-                    int len;
-                    while ((len = in.read(buf)) > 0) {
-                        out.write(buf, 0, len);
+    // =========================================================================
+    //  PHASE 3a — DRY RUN REPORT
+    // =========================================================================
+
+    private static String buildDryRunReport() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n========== DRY RUN REPORT ==========\n\n");
+
+        sb.append("Files to be COPIED (new — not in destination):  ").append(toCopy.size()).append("\n");
+        for (String[] r : toCopy)
+            sb.append("  + ").append(rel(r[0])).append("  [src: ").append(r[1]).append("]\n");
+
+        sb.append("\nFiles to be REPLACED (source is newer than destination):  ").append(toReplace.size()).append("\n");
+        for (String[] r : toReplace)
+            sb.append("  ~ ").append(rel(r[0]))
+                    .append("  [src: ").append(r[1]).append("  dst: ").append(r[2]).append("]\n");
+
+        sb.append("\nFiles / Folders to be DELETED (removed from source):  ").append(toDelete.size()).append("\n");
+        for (String[] r : toDelete)
+            sb.append("  - [").append(r[1]).append("] ").append(r[0]).append("\n");
+
+        sb.append("\nFiles needing ATTENTION (destination is NEWER — will NOT be auto-replaced):  ")
+                .append(needAttention.size()).append("\n");
+        for (String[] r : needAttention)
+            sb.append("  ! ").append(rel(r[0]))
+                    .append("  [src: ").append(r[1]).append("  dst: ").append(r[2]).append("]\n");
+
+        sb.append("\n=====================================\n");
+        sb.append(String.format("Summary:  %d to copy,  %d to replace,  %d to delete,  %d need attention%n",
+                toCopy.size(), toReplace.size(), toDelete.size(), needAttention.size()));
+        sb.append("No changes made — dry run mode.\n");
+        return sb.toString();
+    }
+
+    // =========================================================================
+    //  DELETE EXECUTION
+    // =========================================================================
+
+    private static void executeDeletes() {
+        // Reverse order ensures files are deleted before their parent folder
+        List<String[]> reversedDeletes = new ArrayList<>(toDelete);
+        Collections.reverse(reversedDeletes);
+        for (String[] r : reversedDeletes) {
+            File f = new File(r[0]);
+            if (f.exists()) {
+                boolean ok = f.delete();
+                String msg = (ok ? "  Deleted " : "  FAILED to delete ") + r[1] + ": " + r[0];
+                print(msg); appendToLog(msg);
+            }
+        }
+    }
+
+    private static void performCopy(String srcPath, String dstPath, String label) {
+        try {
+            Path src = Paths.get(srcPath);
+            Path dst = Paths.get(dstPath);
+            Files.createDirectories(dst.getParent());
+            Files.copy(src, dst,
+                    StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.COPY_ATTRIBUTES,
+                    LinkOption.NOFOLLOW_LINKS);
+            String msg = "  " + label + ": " + rel(srcPath);
+            print(msg); appendToLog(msg);
+        } catch (Exception e) {
+            String msg = "  ERROR " + label.trim() + ": " + srcPath + " — " + e.getMessage();
+            print(msg); appendToLog(msg);
+        }
+    }
+
+    // =========================================================================
+    //  ATTENTION REPORT — shown at end of live run
+    // =========================================================================
+
+    private static String buildAttentionReport() {
+        if (needAttention.isEmpty())
+            return "\nAll done. No conflicts found.\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n========== ATTENTION NEEDED ==========\n");
+        sb.append("These files were NOT replaced — destination is NEWER than source.\n");
+        sb.append("Review manually:\n\n");
+        for (String[] r : needAttention)
+            sb.append("  ! ").append(rel(r[0]))
+                    .append("\n      src: ").append(r[1]).append("   dst: ").append(r[2]).append("\n");
+        sb.append("======================================\n");
+        return sb.toString();
+    }
+
+    // =========================================================================
+    //  PROPERTY FILE — single file, all profiles, keyed by profile name
+    //
+    //  Format example:
+    //    [HP_to_Redmi_DailyData]
+    //    SourceFolder=\\HPSpectre\MyDocuments\03Business\03DailyData
+    //    DestinationFolder=\\REDMIBOOK15\MyDocuments\03Business\03DailyData
+    //    LastTransferTime=2025-04-23 22:30:00
+    //
+    //    [Local_to_Parag_JavaCode]
+    //    ...
+    // =========================================================================
+
+    private static long readLastTransferTime(String profileName) {
+        File propFile = new File(PROP_FILE);
+        if (!propFile.exists()) return 0;
+        try (BufferedReader br = new BufferedReader(new FileReader(propFile))) {
+            String line;
+            boolean inSection = false;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.equals("[" + profileName + "]"))       { inSection = true; }
+                else if (line.startsWith("[") && line.endsWith("]")) { inSection = false; }
+                else if (inSection && line.startsWith("LastTransferTime=")) {
+                    String val = line.substring("LastTransferTime=".length()).trim();
+                    if (!val.isEmpty()) {
+                        LocalDateTime ldt = LocalDateTime.parse(val, FMT);
+                        return ldt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
                     }
                 }
-            }*/
-            try {
-                Path srcPath = Paths.get(srcFile);
-                Path dstPath = Paths.get(dstFile);
-                Files.copy(srcPath, dstPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES, LinkOption.NOFOLLOW_LINKS);
-            } catch (Exception e) {}
+            }
+        } catch (Exception e) {
+            print("Warning: Could not read property file — " + e.getMessage());
+        }
+        return 0;
+    }
+
+    private static void writeLastTransferTime(String profileName) {
+        try {
+            // Read all existing lines
+            File propFile = new File(PROP_FILE);
+            List<String> lines = new ArrayList<>();
+            if (propFile.exists()) {
+                try (BufferedReader br = new BufferedReader(new FileReader(propFile))) {
+                    String line;
+                    while ((line = br.readLine()) != null) lines.add(line);
+                }
+            }
+
+            String now = LocalDateTime.now().format(FMT);
+            boolean sectionFound = false;
+            boolean inSection = false;
+
+            // Update existing section if found
+            for (int i = 0; i < lines.size(); i++) {
+                String l = lines.get(i).trim();
+                if (l.equals("[" + profileName + "]"))          { inSection = true; sectionFound = true; }
+                else if (l.startsWith("[") && l.endsWith("]"))  { inSection = false; }
+                else if (inSection && l.startsWith("LastTransferTime=")) {
+                    lines.set(i, "LastTransferTime=" + now);
+                    inSection = false;
+                }
+            }
+
+            // Append new section if not found
+            if (!sectionFound) {
+                if (!lines.isEmpty()) lines.add("");
+                lines.add("[" + profileName + "]");
+                lines.add("SourceFolder=" + SRC_FOLDER);
+                lines.add("DestinationFolder=" + DST_FOLDER);
+                lines.add("LastTransferTime=" + now);
+            }
+
+            // Write all lines back
+            Files.createDirectories(Paths.get(BASE_DIR));
+            try (PrintWriter pw = new PrintWriter(new FileWriter(propFile))) {
+                for (String l : lines) pw.println(l);
+            }
+            String msg = "\nProperty file updated — [" + profileName + "] LastTransferTime=" + now;
+            print(msg); appendToLog(msg);
+
+        } catch (Exception e) {
+            print("Warning: Could not write property file — " + e.getMessage());
         }
     }
 
+    // =========================================================================
+    //  LOG FILE — appended every run, never auto-cleared
+    // =========================================================================
+
+    private static void appendToLog(String text) {
+        try {
+            Files.createDirectories(Paths.get(BASE_DIR));
+            try (FileWriter fw = new FileWriter(LOG_FILE, true)) {
+                fw.write(text);
+                fw.write(System.lineSeparator());
+            }
+        } catch (Exception e) {
+            System.out.println("Warning: Could not write log — " + e.getMessage());
+        }
+    }
+
+    // =========================================================================
+    //  HELPERS
+    // =========================================================================
+
+    private static String buildHeader() {
+        return "\n=================================================" +
+                "\n FileCopier  |  Profile : " + ACTIVE_PROFILE +
+                "\n Mode        : " + (DRY_RUN ? "DRY RUN (no changes will be made)" : "LIVE SYNC") +
+                "\n Run Time    : " + LocalDateTime.now().format(FMT) +
+                "\n Source      : " + SRC_FOLDER +
+                "\n Destination : " + DST_FOLDER;
+    }
+
+    /** Relative path for cleaner output — strips the source root prefix */
+    private static String rel(String fullPath) {
+        if (SRC_FOLDER != null && fullPath.startsWith(SRC_FOLDER))
+            return fullPath.substring(SRC_FOLDER.length());
+        return fullPath;
+    }
+
+    private static String msToDate(long ms) {
+        if (ms <= 0) return "---";
+        return LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(ms), ZoneId.systemDefault())
+                .format(FMT_SHORT);
+    }
+
+    private static String epochToStr(long ms) {
+        return LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(ms), ZoneId.systemDefault())
+                .format(FMT);
+    }
+
+    /** Shorthand for creating src/dst pair in static initialiser */
+    private static String[] p(String src, String dst) {
+        return new String[]{ src, dst };
+    }
+
+    /** Single print method — easy to extend to a GUI later if needed */
+    private static void print(String msg) {
+        System.out.println(msg);
+    }
 }
