@@ -529,7 +529,7 @@ public class AnalystRecoExtractor {
     }
 
     private void loadAnalystNames(String analystNamesFilePath){
-        if (kotakAanalystNames.isEmpty() && moslAnalystNames.isEmpty() && ambitAnalystNames.isEmpty() && plAnalystNames.isEmpty()) {
+        /*if (kotakAanalystNames.isEmpty() && moslAnalystNames.isEmpty() && ambitAnalystNames.isEmpty() && plAnalystNames.isEmpty()) {
             try {
                 FileInputStream file = new FileInputStream(new File(analystNamesFilePath));
                 XSSFWorkbook wb = new XSSFWorkbook(file);
@@ -606,7 +606,7 @@ public class AnalystRecoExtractor {
                 System.out.println("Exception in loadAnalystNames " + e.getMessage());
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     private ReportDataExtractConfig loadReportDataExtractConfig(String reportDataExtractConfigFilePath, String quarter, String ticker, String brokerName) {

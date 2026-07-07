@@ -211,7 +211,7 @@ select 'INDEX', b.ticker, b.short_name, c.sector_name_display, c.industry_name_d
 (return_YTD/100), (return_1Y/100), (up_52w_min/100), (down_52w_max/100), (return_2Y/100), (return_3Y/100), 
 0, 0, 0, 0, 0, 0, 0, 1w_min, 1w_max, 2w_min, 2w_max, 1m_min, 1m_max, 2m_min, 2m_max, 3m_min, 3m_max, 6m_min, 6m_max
 from stock_universe b, subindustry c, stock_price_movement d
-where b.ticker in ('NIFTYBEES', 'JUNIORBEES', 'BANKBEES') and 
+where b.ticker in ('NIFTYBEES', 'JUNIORBEES', 'BANKBEES', 'LTGILTBEES') and 
 b.subindustryid = c.subindustryid and 
 -- (b.is_bse500 = 1 or b.is_nse500 = 1) and
 b.ticker = d.ticker
