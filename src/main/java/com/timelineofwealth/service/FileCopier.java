@@ -30,8 +30,8 @@ public class FileCopier {
 //    private static final String ACTIVE_PROFILE = "RedmiUser_to_Workspace_JupyterProjects";
 
 
-    private static final String ACTIVE_PROFILE = "HP_to_Redmi_Full";
-//    private static final String ACTIVE_PROFILE = "HP_to_Redmi_DailyData";
+//    private static final String ACTIVE_PROFILE = "HP_to_Redmi_Full";
+    private static final String ACTIVE_PROFILE = "HP_to_Redmi_DailyData";
 
 //    private static final String ACTIVE_PROFILE = "Redmi_to_HP_Full"; // Set DRY_RUN = TRUE
 //    private static final String ACTIVE_PROFILE = "Redmi_to_HP_DailyData";
