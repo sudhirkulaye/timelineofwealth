@@ -1060,138 +1060,121 @@ public class DownloadEODFiles {
             String indexFilePath = properties.getProperty("indexfilepath");
             String nseFileBaseURL = properties.getProperty("nsefilebseurl");
 
-            // Format the date to match the URL pattern (ddmmyyyy)
+            // Format date
             SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy");
             String formattedDate = dateFormat.format(date);
             String fileName = "ind_close_all_" + formattedDate + ".csv";
 
-            // Construct the URL
+            String fullDownloadPath = indexFilePath + fileName;
+            File downloadedFile = new File(fullDownloadPath);
+
+            // ⭐ NEW LOGIC: If file already exists, skip download
+            if (downloadedFile.exists()) {
+                System.out.println("File already exists. Skipping download: " + fullDownloadPath);
+                return parseAndSaveIndexData(downloadedFile);
+            }
+
+            // ⭐ OLD LOGIC continues: Download only if file does NOT exist
             String url = nseFileBaseURL + fileName;
 
-            /*// Initialize an HttpClient - Old Code
-            HttpClient httpClient = HttpClients.createDefault();
-            HttpGet httpGet = new HttpGet(url);
-            // Execute the HTTP request
-            HttpResponse response = httpClient.execute(httpGet);*/
-
-            // Create a custom RequestConfig with a timeout of 60 seconds (60000 milliseconds)
             RequestConfig requestConfig = RequestConfig.custom()
-                    .setSocketTimeout(180000) // Socket timeout (data retrieval)
-                    .setConnectTimeout(180000) // Connection timeout (establishing a connection)
+                    .setSocketTimeout(180000)
+                    .setConnectTimeout(180000)
                     .build();
 
-            // Create a CloseableHttpClient with the custom RequestConfig
             CloseableHttpClient httpClient = HttpClients.custom()
                     .setDefaultRequestConfig(requestConfig)
                     .build();
 
-            // Create an HttpGet request with the custom RequestConfig
             HttpGet httpGet = new HttpGet(url);
             httpGet.setConfig(requestConfig);
 
             try {
-                // Execute the HTTP request
-                System.out.println("Before executing URL "+ url);
+                System.out.println("Downloading URL: " + url);
                 CloseableHttpResponse response = httpClient.execute(httpGet);
-                System.out.println("Captured response of URL.");
 
-                // Check if the response status code is 200 (OK)
                 if (response.getStatusLine().getStatusCode() == 200) {
-                    //Save the file
-                    System.out.println("Captured response is 200.");
                     byte[] content = EntityUtils.toByteArray(response.getEntity());
 
-                    // Construct the full download path
-                    String fullDownloadPath = indexFilePath + fileName;
-
-                    // Save the content to a local file
                     try (FileOutputStream fileOutputStream = new FileOutputStream(fullDownloadPath)) {
                         fileOutputStream.write(content);
                     }
 
-                    boolean isNiftyFound = false, isNifty200Found = false;
-                    // Read and parse the CSV data
-                    File downloadedFile = new File(fullDownloadPath);
-                    if (downloadedFile.exists()) {
-                        try (FileReader fileReader = new FileReader(downloadedFile);
-                             CSVParser csvParser = new CSVParser(fileReader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
-                            for (CSVRecord csvRecord : csvParser) {
-                                String indexName = csvRecord.get("Index Name");
-                                if ("Nifty 50".equals(indexName) || "Nifty 200".equals(indexName)) {
-                                    String ticker = null;
-                                    if ("Nifty 50".equals(indexName) || "Nifty 200".equals(indexName)) {
-                                        if ("Nifty 50".equals(indexName)) {
-                                            ticker = "NIFTY";
-                                            isNiftyFound = true;
-                                        } else if ("Nifty 200".equals(indexName)) {
-                                            ticker = "NIFTY200";
-                                            isNifty200Found = false;
-                                        }
-//                                    Date indexDate = date; // Use the provided date
-                                        String indexDateString = csvRecord.get("Index Date"); // Use the provided date
-                                        SimpleDateFormat inputFormat = new SimpleDateFormat("dd-MM-yyyy");
-                                        Date utilDate = inputFormat.parse(indexDateString);
-                                        java.sql.Date indexDate = new java.sql.Date(utilDate.getTime());
-
-                                        BigDecimal pe = new BigDecimal(csvRecord.get("P/E"));
-                                        BigDecimal pb = new BigDecimal(csvRecord.get("P/B"));
-                                        BigDecimal divYield = new BigDecimal(csvRecord.get("Div Yield"));
-                                        BigDecimal value = new BigDecimal(csvRecord.get("Closing Index Value"));
-                                        BigDecimal turnover = new BigDecimal(csvRecord.get("Turnover (Rs. Cr.)"));
-                                        BigDecimal impliedEarnings = new BigDecimal(0);
-                                        if(value.doubleValue() > 0 && pe.doubleValue() > 0) {
-                                            impliedEarnings = value.divide(pe, 2, BigDecimal.ROUND_HALF_UP);
-                                        }
-
-                                        // Create and save the IndexValuation entity
-                                        IndexValuation indexValuation = new IndexValuation();
-                                        indexValuation.setKey(new IndexValuation.IndexValuationKey());
-                                        indexValuation.getKey().setTicker(ticker);
-                                        indexValuation.getKey().setDate(indexDate);
-                                        indexValuation.setPe(pe);
-                                        indexValuation.setPb(pb);
-                                        indexValuation.setDivYield(divYield);
-                                        indexValuation.setValue(value);
-                                        indexValuation.setTurnover(turnover);
-                                        indexValuation.setImpliedEarnings(impliedEarnings);
-
-                                        indexValuationRepository.save(indexValuation);
-                                    }
-
-                                    if (isNiftyFound && isNifty200Found) {
-                                        System.out.println("Saved NSE Index Data.");
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    return parseAndSaveIndexData(new File(fullDownloadPath));
                 } else {
-                    // Handle the case when the HTTP request fails
                     System.out.println("Failed to download NSE Index Data file.");
                     return -1;
                 }
-                // Ensure the response is closed to release resources
-                response.close();
             } catch (Exception e) {
                 e.printStackTrace();
-                // Handle any exceptions, such as timeouts
-                System.out.println("Time out occurred while to download NSE Index Data file. " + e.getMessage());
+                System.out.println("Timeout or error while downloading NSE Index Data file. " + e.getMessage());
                 return -1;
             } finally {
-                // Close the HttpClient to release resources
-                try {
-                    httpClient.close();
-                } catch (Exception e) {
-                    System.out.println("Error in closing the HTTP Client connection while downloading NSE Index Data file.");
-                    return -1;
-                }
+                try { httpClient.close(); } catch (Exception ignored) {}
             }
-        } catch (Exception e){
+
+        } catch (Exception e) {
             System.out.println("Failed to download NSE Index Data file.");
             return -1;
         }
-        return 0;
+    }
+
+    private int parseAndSaveIndexData(File downloadedFile) {
+        try (FileReader fileReader = new FileReader(downloadedFile);
+             CSVParser csvParser = new CSVParser(fileReader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+
+            boolean isNiftyFound = false, isNifty200Found = false;
+
+            for (CSVRecord csvRecord : csvParser) {
+                String indexName = csvRecord.get("Index Name");
+
+                if ("Nifty 50".equals(indexName) || "Nifty 200".equals(indexName)) {
+                    String ticker = indexName.equals("Nifty 50") ? "NIFTY" : "NIFTY200";
+
+                    if (indexName.equals("Nifty 50")) isNiftyFound = true;
+                    if (indexName.equals("Nifty 200")) isNifty200Found = true;
+
+                    SimpleDateFormat inputFormat = new SimpleDateFormat("dd-MM-yyyy");
+                    Date utilDate = inputFormat.parse(csvRecord.get("Index Date"));
+                    java.sql.Date indexDate = new java.sql.Date(utilDate.getTime());
+
+                    BigDecimal pe = new BigDecimal(csvRecord.get("P/E"));
+                    BigDecimal pb = new BigDecimal(csvRecord.get("P/B"));
+                    BigDecimal divYield = new BigDecimal(csvRecord.get("Div Yield"));
+                    BigDecimal value = new BigDecimal(csvRecord.get("Closing Index Value"));
+                    BigDecimal turnover = new BigDecimal(csvRecord.get("Turnover (Rs. Cr.)"));
+
+                    BigDecimal impliedEarnings = BigDecimal.ZERO;
+                    if (value.doubleValue() > 0 && pe.doubleValue() > 0) {
+                        impliedEarnings = value.divide(pe, 2, BigDecimal.ROUND_HALF_UP);
+                    }
+
+                    IndexValuation indexValuation = new IndexValuation();
+                    indexValuation.setKey(new IndexValuation.IndexValuationKey());
+                    indexValuation.getKey().setTicker(ticker);
+                    indexValuation.getKey().setDate(indexDate);
+                    indexValuation.setPe(pe);
+                    indexValuation.setPb(pb);
+                    indexValuation.setDivYield(divYield);
+                    indexValuation.setValue(value);
+                    indexValuation.setTurnover(turnover);
+                    indexValuation.setImpliedEarnings(impliedEarnings);
+
+                    indexValuationRepository.save(indexValuation);
+
+                    if (isNiftyFound && isNifty200Found) {
+                        System.out.println("Saved NSE Index Data.");
+                        break;
+                    }
+                }
+            }
+            return 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error parsing NSE Index Data file.");
+            return -1;
+        }
     }
 
     public void downloadAndSaveBSEIndexData(String indexName, String ticker, String period, java.sql.Date fromDate, java.sql.Date toDate) {

@@ -4,11 +4,58 @@ Commit;
 -- Stock Split, Bonus
 select * from stock_split_probability a where a.is_processed = 'YES' order by date desc;
 select * from stock_split_probability a where a.is_processed != 'YES' order by date desc;
-select a.* from stock_split_probability a, stock_universe b where a.ticker = b.ticker and (b.is_nse500 = 1 or b.is_bse500 = 1) and a.is_processed != 'YES' order by date desc;
+select a.* from stock_split_probability a, stock_universe b where a.ticker = b.ticker and a.is_processed != 'YES' and a.ticker in (select name from daily_data_s where date = (select date_today from setup_dates)) order by date;
 -- For 1:1 Bonus update price as 1/2  (Newly Issued Stocks : Origianl Stocks)
 -- FOr 1:2 Bonus update price as 2/3 and so on (i.e. Original Stocks / (sum of newly issued stocks + original stocks)
 -- For 2:10 Stock Split update price as (New FV/Old FV) i.e. (2/10) or (1/5)
 
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:5' WHERE (ticker = 'ZFCVINDIA') and (date = '2026-06-24');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 2:1' WHERE (ticker = 'TRENT') and (date = '2026-06-04');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'ANANDRATHI') and (date = '2026-06-03');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'LICI') and (date = '2026-05-29');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'NA' WHERE (ticker = 'VEDL') and (date = '2026-04-30');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:10' WHERE (ticker = 'V2RETAIL') and (date = '2026-03-25');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 2:10' WHERE (ticker = 'BECTORFOOD') and (date = '2025-12-12');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:10' WHERE (ticker = 'WEBELSOLAR') and (date = '2025-11-14');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'SHILPAMED') and (date = '2025-10-03');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'TIMETECHNO') and (date = '2025-09-23');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:2' WHERE (ticker = 'SANDUMA') and (date = '2025-09-22');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'VRLLOG') and (date = '2025-08-14');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:10' WHERE (ticker = 'VESUVIUS') and (date = '2025-06-10');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'GREENLAM') and (date = '2025-03-21');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:3' WHERE (ticker = 'REDTAPE') and (date = '2025-02-04');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 5:10' WHERE (ticker = 'SENCO') and (date = '2025-01-31');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 2:1' WHERE (ticker = 'KPIGREEN') and (date = '2025-01-03');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'SURYAROSNI') and (date = '2025-01-01');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:10' WHERE (ticker = 'PCJEWELLER') and (date = '2024-12-16');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'NA' WHERE (ticker = 'STAR') and (date = '2024-12-06');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:5' WHERE (ticker = 'SHAKTIPUMP') and (date = '2024-11-25');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:2' WHERE (ticker = 'JTLIND') and (date = '2024-11-14');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'POWERMECH') and (date = '2024-10-08');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 5:10' WHERE (ticker = 'KPIGREEN') and (date = '2024-07-18');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'AURIONPRO') and (date = '2024-06-27');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 2:10' WHERE (ticker = 'REFEX') and (date = '2024-03-22');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:2' WHERE (ticker = 'RAMASTEEL') and (date = '2024-03-19');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 2:10' WHERE (ticker = 'MANORAMA') and (date = '2024-03-07');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 2:1' WHERE (ticker = 'KPIGREEN') and (date = '2024-02-15');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:5' WHERE (ticker = 'SANDUMA') and (date = '2024-02-02');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 2:10' WHERE (ticker = 'SHAILY') and (date = '2023-11-23');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 5:10' WHERE (ticker = 'SURYAROSNI') and (date = '2023-10-06');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:2' WHERE (ticker = 'JTLIND') and (date = '2023-09-07');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'SHRIPISTON') and (date = '2023-07-24');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'THANGAMAYL') and (date = '2023-07-17');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:10' WHERE (ticker = 'IONEXCHANG') and (date = '2023-06-12');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:10' WHERE (ticker = 'HITECH') and (date = '2023-03-17');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'NA' WHERE (ticker = 'AARTIPHARM') and (date = '2023-01-30');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'KPIGREEN') and (date = '2023-01-18');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:4' WHERE (ticker = 'RAMASTEEL') and (date = '2023-01-06');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 2:10' WHERE (ticker = 'TDPOWERSYS') and (date = '2022-10-31');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 2:1' WHERE (ticker = 'SBCL') and (date = '2022-10-12');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 2:10' WHERE (ticker = 'PDSL') and (date = '2022-08-26');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:5' WHERE (ticker = 'RAMASTEEL') and (date = '2022-08-25');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 2:10' WHERE (ticker = 'HNDFDS') and (date = '2022-07-21');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 2:10' WHERE (ticker = 'BBOX') and (date = '2022-05-13');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:5' WHERE (ticker = 'GREENLAM') and (date = '2022-02-10');
 -- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'IRB') and (date = '2026-03-30');
 -- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:3' WHERE (ticker = 'METROPOLIS') and (date = '2026-03-20');
 -- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'ECLERX') and (date = '2026-03-13');
@@ -177,7 +224,7 @@ select a.* from stock_split_probability a, stock_universe b where a.ticker = b.t
 -- update rest of the stocks as ignored
 -- update stock_split_probability set is_processed = 'YES', note = 'Ignored' where is_processed = 'NO' and ticker not in (select ticker from stock_universe where is_nse500 = 1 or is_bse500 = 1);
 
-SELECT date, close_price, a.* from nse_price_history a where a.nse_ticker = 'ANUP' and date <= '2024-04-23' order by date desc;
+SELECT date, close_price, a.* from nse_price_history a where a.nse_ticker = 'LICI' and date <= '2026-05-29' order by date desc;
 SELECT date, close_price from bse_price_history a where a.bse_ticker = '000000' and date <= '2019-12-05' order by date desc;
 select * from stock_price_movement_history a where a.ticker = 'TTKPRESTIG' and date >= '2021-12-14';
 SELECT * from wealth_details a where ticker = 'SAFARI';
@@ -194,6 +241,53 @@ update portfolio_holdings set quantity = quantity * 2, rate = rate * (1/2), net_
 -- Copy this below and then replace ticker XXX to right one and replace date and most imp. replace fraction
 update nse_price_history a set close_price = close_price * ( 1 / 1	) where a.nse_ticker = 'XXX' and date < 'XXXX-XX-XX' ;
 
+update nse_price_history a set close_price = close_price * ( 1 / 6 ) where a.nse_ticker = 'ZFCVINDIA' and date < '2026-06-24' ;
+update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'TRENT' and date < '2026-06-04' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'ANANDRATHI' and date < '2026-06-03' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'LICI' and date < '2026-05-29' ;
+update nse_price_history a set close_price = close_price * (  1 / 1 ) where a.nse_ticker = 'VEDL' and date < '2026-04-30' ;
+update nse_price_history a set close_price = close_price * ( 1 /  10 ) where a.nse_ticker = 'V2RETAIL' and date < '2026-03-25' ;
+update nse_price_history a set close_price = close_price * ( 2 /  10 ) where a.nse_ticker = 'BECTORFOOD' and date < '2025-12-12' ;
+update nse_price_history a set close_price = close_price * ( 1 /  10 ) where a.nse_ticker = 'WEBELSOLAR' and date < '2025-11-14' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'SHILPAMED' and date < '2025-10-03' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'TIMETECHNO' and date < '2025-09-23' ;
+update nse_price_history a set close_price = close_price * ( 1 / 3 ) where a.nse_ticker = 'SANDUMA' and date < '2025-09-22' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'VRLLOG' and date < '2025-08-14' ;
+update nse_price_history a set close_price = close_price * ( 1 /  10 ) where a.nse_ticker = 'VESUVIUS' and date < '2025-06-10' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'GREENLAM' and date < '2025-03-21' ;
+update nse_price_history a set close_price = close_price * ( 1 / 4 ) where a.nse_ticker = 'REDTAPE' and date < '2025-02-04' ;
+update nse_price_history a set close_price = close_price * ( 5 /  10 ) where a.nse_ticker = 'SENCO' and date < '2025-01-31' ;
+update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'KPIGREEN' and date < '2025-01-03' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'SURYAROSNI' and date < '2025-01-01' ;
+update nse_price_history a set close_price = close_price * ( 1 /  10 ) where a.nse_ticker = 'PCJEWELLER' and date < '2024-12-16' ;
+update nse_price_history a set close_price = close_price * (  1 / 1 ) where a.nse_ticker = 'STAR' and date < '2024-12-06' ;
+update nse_price_history a set close_price = close_price * ( 1 / 6 ) where a.nse_ticker = 'SHAKTIPUMP' and date < '2024-11-25' ;
+update nse_price_history a set close_price = close_price * ( 1 /  2 ) where a.nse_ticker = 'JTLIND' and date < '2024-11-14' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'POWERMECH' and date < '2024-10-08' ;
+update nse_price_history a set close_price = close_price * ( 5 /  10 ) where a.nse_ticker = 'KPIGREEN' and date < '2024-07-18' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'AURIONPRO' and date < '2024-06-27' ;
+update nse_price_history a set close_price = close_price * ( 2 /  10 ) where a.nse_ticker = 'REFEX' and date < '2024-03-22' ;
+update nse_price_history a set close_price = close_price * ( 1 / 3 ) where a.nse_ticker = 'RAMASTEEL' and date < '2024-03-19' ;
+update nse_price_history a set close_price = close_price * ( 2 /  10 ) where a.nse_ticker = 'MANORAMA' and date < '2024-03-07' ;
+update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'KPIGREEN' and date < '2024-02-15' ;
+update nse_price_history a set close_price = close_price * ( 1 / 6 ) where a.nse_ticker = 'SANDUMA' and date < '2024-02-02' ;
+update nse_price_history a set close_price = close_price * ( 2 /  10 ) where a.nse_ticker = 'SHAILY' and date < '2023-11-23' ;
+update nse_price_history a set close_price = close_price * ( 5 /  10 ) where a.nse_ticker = 'SURYAROSNI' and date < '2023-10-06' ;
+update nse_price_history a set close_price = close_price * ( 1 /  2 ) where a.nse_ticker = 'JTLIND' and date < '2023-09-07' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'SHRIPISTON' and date < '2023-07-24' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'THANGAMAYL' and date < '2023-07-17' ;
+update nse_price_history a set close_price = close_price * ( 1 /  10 ) where a.nse_ticker = 'IONEXCHANG' and date < '2023-06-12' ;
+update nse_price_history a set close_price = close_price * ( 1 /  10 ) where a.nse_ticker = 'HITECH' and date < '2023-03-17' ;
+update nse_price_history a set close_price = close_price * (  1 / 1 ) where a.nse_ticker = 'AARTIPHARM' and date < '2023-01-30' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'KPIGREEN' and date < '2023-01-18' ;
+update nse_price_history a set close_price = close_price * ( 1 / 5 ) where a.nse_ticker = 'RAMASTEEL' and date < '2023-01-06' ;
+update nse_price_history a set close_price = close_price * ( 2 /  10 ) where a.nse_ticker = 'TDPOWERSYS' and date < '2022-10-31' ;
+update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'SBCL' and date < '2022-10-12' ;
+update nse_price_history a set close_price = close_price * ( 2 /  10 ) where a.nse_ticker = 'PDSL' and date < '2022-08-26' ;
+update nse_price_history a set close_price = close_price * ( 1 /  5 ) where a.nse_ticker = 'RAMASTEEL' and date < '2022-08-25' ;
+update nse_price_history a set close_price = close_price * ( 2 /  10 ) where a.nse_ticker = 'HNDFDS' and date < '2022-07-21' ;
+update nse_price_history a set close_price = close_price * ( 2 /  10 ) where a.nse_ticker = 'BBOX' and date < '2022-05-13' ;
+update nse_price_history a set close_price = close_price * ( 1 /  5 ) where a.nse_ticker = 'GREENLAM' and date < '2022-02-10' ;
 update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'IRB' and date < '2026-03-30' ;
 update nse_price_history a set close_price = close_price * ( 1 / 4 ) where a.nse_ticker = 'METROPOLIS' and date < '2026-03-20' ;
 update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'ECLERX' and date < '2026-03-13' ;
@@ -369,6 +463,53 @@ update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse
 -- Copy this below and then replace ticker XXX to right one and replace date and most imp. replace fraction
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 1 ) where b.ticker = 'XXX' and b.ticker5 = a.name  and date < 'XXXX-XX-XX' ;
 
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 6 ) where b.ticker = 'ZFCVINDIA' and b.ticker5 = a.name  and date < '2026-06-24' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 / 3 ) where b.ticker = 'TRENT' and b.ticker5 = a.name  and date < '2026-06-04' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'ANANDRATHI' and b.ticker5 = a.name  and date < '2026-06-03' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'LICI' and b.ticker5 = a.name  and date < '2026-05-29' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * (  1 / 1 ) where b.ticker = 'VEDL' and b.ticker5 = a.name  and date < '2026-04-30' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 /  10 ) where b.ticker = 'V2RETAIL' and b.ticker5 = a.name  and date < '2026-03-25' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 /  10 ) where b.ticker = 'BECTORFOOD' and b.ticker5 = a.name  and date < '2025-12-12' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 /  10 ) where b.ticker = 'WEBELSOLAR' and b.ticker5 = a.name  and date < '2025-11-14' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'SHILPAMED' and b.ticker5 = a.name  and date < '2025-10-03' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'TIMETECHNO' and b.ticker5 = a.name  and date < '2025-09-23' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 3 ) where b.ticker = 'SANDUMA' and b.ticker5 = a.name  and date < '2025-09-22' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'VRLLOG' and b.ticker5 = a.name  and date < '2025-08-14' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 /  10 ) where b.ticker = 'VESUVIUS' and b.ticker5 = a.name  and date < '2025-06-10' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'GREENLAM' and b.ticker5 = a.name  and date < '2025-03-21' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 4 ) where b.ticker = 'REDTAPE' and b.ticker5 = a.name  and date < '2025-02-04' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 5 /  10 ) where b.ticker = 'SENCO' and b.ticker5 = a.name  and date < '2025-01-31' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 / 3 ) where b.ticker = 'KPIGREEN' and b.ticker5 = a.name  and date < '2025-01-03' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'SURYAROSNI' and b.ticker5 = a.name  and date < '2025-01-01' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 /  10 ) where b.ticker = 'PCJEWELLER' and b.ticker5 = a.name  and date < '2024-12-16' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * (  1 / 1 ) where b.ticker = 'STAR' and b.ticker5 = a.name  and date < '2024-12-06' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 6 ) where b.ticker = 'SHAKTIPUMP' and b.ticker5 = a.name  and date < '2024-11-25' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 /  2 ) where b.ticker = 'JTLIND' and b.ticker5 = a.name  and date < '2024-11-14' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'POWERMECH' and b.ticker5 = a.name  and date < '2024-10-08' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 5 /  10 ) where b.ticker = 'KPIGREEN' and b.ticker5 = a.name  and date < '2024-07-18' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'AURIONPRO' and b.ticker5 = a.name  and date < '2024-06-27' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 /  10 ) where b.ticker = 'REFEX' and b.ticker5 = a.name  and date < '2024-03-22' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 3 ) where b.ticker = 'RAMASTEEL' and b.ticker5 = a.name  and date < '2024-03-19' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 /  10 ) where b.ticker = 'MANORAMA' and b.ticker5 = a.name  and date < '2024-03-07' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 / 3 ) where b.ticker = 'KPIGREEN' and b.ticker5 = a.name  and date < '2024-02-15' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 6 ) where b.ticker = 'SANDUMA' and b.ticker5 = a.name  and date < '2024-02-02' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 /  10 ) where b.ticker = 'SHAILY' and b.ticker5 = a.name  and date < '2023-11-23' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 5 /  10 ) where b.ticker = 'SURYAROSNI' and b.ticker5 = a.name  and date < '2023-10-06' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 /  2 ) where b.ticker = 'JTLIND' and b.ticker5 = a.name  and date < '2023-09-07' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'SHRIPISTON' and b.ticker5 = a.name  and date < '2023-07-24' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'THANGAMAYL' and b.ticker5 = a.name  and date < '2023-07-17' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 /  10 ) where b.ticker = 'IONEXCHANG' and b.ticker5 = a.name  and date < '2023-06-12' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 /  10 ) where b.ticker = 'HITECH' and b.ticker5 = a.name  and date < '2023-03-17' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * (  1 / 1 ) where b.ticker = 'AARTIPHARM' and b.ticker5 = a.name  and date < '2023-01-30' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'KPIGREEN' and b.ticker5 = a.name  and date < '2023-01-18' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 5 ) where b.ticker = 'RAMASTEEL' and b.ticker5 = a.name  and date < '2023-01-06' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 /  10 ) where b.ticker = 'TDPOWERSYS' and b.ticker5 = a.name  and date < '2022-10-31' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 / 3 ) where b.ticker = 'SBCL' and b.ticker5 = a.name  and date < '2022-10-12' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 /  10 ) where b.ticker = 'PDSL' and b.ticker5 = a.name  and date < '2022-08-26' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 /  5 ) where b.ticker = 'RAMASTEEL' and b.ticker5 = a.name  and date < '2022-08-25' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 /  10 ) where b.ticker = 'HNDFDS' and b.ticker5 = a.name  and date < '2022-07-21' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 /  10 ) where b.ticker = 'BBOX' and b.ticker5 = a.name  and date < '2022-05-13' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 /  5 ) where b.ticker = 'GREENLAM' and b.ticker5 = a.name  and date < '2022-02-10' ;
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'IRB' and b.ticker5 = a.name  and date < '2026-03-30' ;
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 4 ) where b.ticker = 'METROPOLIS' and b.ticker5 = a.name  and date < '2026-03-20' ;
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'ECLERX' and b.ticker5 = a.name  and date < '2026-03-13' ;
@@ -548,3 +689,14 @@ update stock_valuation a set a.price = a.price * (1 / 1), min_fair_price = min_f
 update stock_analyst_reco a set a.cmp = a.cmp * (1 / 1), target = target * (1 / 1) where a.ticker = 'BLUESTARCO'; 
 
 */
+
+
+
+
+
+
+
+
+
+
+
