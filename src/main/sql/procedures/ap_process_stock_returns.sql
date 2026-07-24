@@ -1,12 +1,11 @@
-DROP PROCEDURE IF EXISTS ap_process_stock_returns;
-CREATE PROCEDURE ap_process_stock_returns()
+CREATE DEFINER=`towdevuser`@`localhost` PROCEDURE `ap_process_stock_returns`()
 BEGIN
 
   DECLARE var_finished, var_count INT DEFAULT 0;
   DECLARE var_price_today, var_price_history, var_52w_min, var_52w_max,
 		  var_price_1w_min, var_price_1w_max, var_price_2w_min, var_price_2w_max, var_price_1m_min, var_price_1m_max,
 		  var_price_2m_min, var_price_2m_max, var_price_3m_min, var_price_3m_max, var_price_6m_min, var_price_6m_max DECIMAL(20,3);
-  DECLARE var_date_today, var_date_last_trading_day, var_date_current_year_start,
+  DECLARE var_date_today, var_date_last_trading_day, var_date_current_year_start, var_date_price_today,
 		  var_date_1_w_before, var_date_2_w_before, var_date_1_mt_before,
           var_date_2_mt_before, var_date_3_mt_before, var_date_6_mt_before, var_date_9_mt_before,
 		  var_date_1_yr_before, var_date_2_yr_before, var_date_3_yr_before, var_date_5_yr_before, var_date_10_yr_before DATE;
@@ -33,8 +32,8 @@ BEGIN
   FROM   setup_dates;
 
   INSERT INTO stock_price_movement (ticker)
-    (select name from daily_data_s a where date = (select date_today from setup_dates) AND
-     name NOT IN (SELECT ticker FROM stock_price_movement));
+  (select name from daily_data_s a where date = (select date_today from setup_dates) AND
+   name NOT IN (SELECT ticker FROM stock_price_movement));
 
   UPDATE stock_price_movement
   SET CMP = 0, 52w_min = 0, 52w_max = 0, up_52w_min = 0, down_52w_max = 0,
@@ -84,20 +83,33 @@ BEGIN
 
     SET var_count = 0;
     SET var_price_today = 0;
+    SET var_date_price_today = NULL;
+    SET var_price_1w_min = 0;
+    SET var_price_1w_max = 0;
+    SET var_price_2w_min = 0;
+    SET var_price_2w_max = 0;
+    SET var_price_1m_min = 0;
+    SET var_price_1m_max = 0;
+    SET var_price_2m_min = 0;
+    SET var_price_2m_max = 0;
+    SET var_price_3m_min = 0;
+    SET var_price_3m_max = 0;
+    SET var_price_6m_min = 0;
+    SET var_price_6m_max = 0;
 
 	IF (var_is_nse_ticker = 'Y') THEN
-		SELECT count(1)
-		INTO var_count
+		SELECT MAX(date)
+		INTO var_date_price_today
 		FROM nse_price_history
 		WHERE nse_ticker = var_ticker AND
-        date = var_date_today;
+        date <= var_date_today;
 
-        IF (var_count > 0) THEN
+        IF (var_date_price_today IS NOT NULL) THEN
 			SELECT close_price
 			INTO var_price_today
 			FROM nse_price_history
 			WHERE nse_ticker = var_ticker AND
-			date = var_date_today;
+			date = var_date_price_today;
 
 			SELECT min(close_price)
 			INTO var_price_1w_min
@@ -173,18 +185,18 @@ BEGIN
 
         END IF;
     ELSE
-		SELECT count(1)
-		INTO var_count
+		SELECT MAX(date)
+		INTO var_date_price_today
 		FROM bse_price_history
 		WHERE bse_ticker = var_ticker AND
-        date = var_date_today;
+        date <= var_date_today;
 
-        IF (var_count > 0) THEN
+        IF (var_date_price_today IS NOT NULL) THEN
 			SELECT close_price
 			INTO var_price_today
 			FROM bse_price_history
 			WHERE bse_ticker = var_ticker AND
-			date = var_date_today;
+			date = var_date_price_today;
 
 			SELECT min(close_price)
 			INTO var_price_1w_min
@@ -277,7 +289,7 @@ BEGIN
 		INTO var_count
 		FROM nse_price_history
 		WHERE nse_ticker = var_ticker AND
-		date = var_date_last_trading_day;
+		date < var_date_price_today;
 
 		IF (var_count > 0) THEN
 			SELECT close_price
@@ -287,7 +299,7 @@ BEGIN
 			date = (SELECT MAX(date)
 					FROM nse_price_history
 					WHERE nse_ticker = var_ticker AND
-					date = var_date_last_trading_day);
+					date < var_date_price_today);
 		END IF;
 	END IF;
     IF (var_price_today > 0 AND var_is_nse_ticker = 'N') THEN
@@ -295,7 +307,7 @@ BEGIN
 		INTO var_count
 		FROM bse_price_history
 		WHERE bse_ticker = var_ticker AND
-		date = var_date_last_trading_day;
+		date < var_date_price_today;
 
 		IF (var_count > 0) THEN
 			SELECT close_price
@@ -305,7 +317,7 @@ BEGIN
 			date = (SELECT MAX(date)
 					FROM bse_price_history
 					WHERE bse_ticker = var_ticker AND
-					date = var_date_last_trading_day);
+					date < var_date_price_today);
 		END IF;
     END IF;
 
