@@ -1,4 +1,4 @@
-var module = angular.module('StockCompareManagement', ['angular.filter','chart.js', 'ui.bootstrap']);
+var module = angular.module('StockCompareManagement', ['angular.filter', 'ui.bootstrap']);
 
 module.controller('StockCompareController', function($scope, $http, $filter, $window) {
 
@@ -102,6 +102,8 @@ module.controller('StockCompareController', function($scope, $http, $filter, $wi
             allPromises.push($http.get(urlBase + url));
         });
 
+        var status = document.getElementById('cmpStatus');
+        if (status) status.textContent = 'Loading…';
         Promise.all(allPromises).then(function(responses) {
             responses.forEach(function(response) {
                 if (response && response.data) {
@@ -139,199 +141,94 @@ module.controller('StockCompareController', function($scope, $http, $filter, $wi
 //        renderComparisonNotes();
     }
 
-    // === Render All Comparison Charts ===
+    // === Render All Comparison Charts (themed ECharts via /custom/twcharts.js) ===
+    // A workbook chart holds one series (values) or several (series[], e.g. segments). With one stock every series
+    // is drawn; with several stocks one series is compared at a time, picked from the list of series names.
+    function chartSeries(c) {
+        if (c.series && c.series.length) return c.series.map(function (s) { return { name: s.label, values: s.values || [] }; });
+        return [{ name: c.fieldName || c.title, values: c.values || [] }];
+    }
+    function isPct(c, list) {
+        if (!/%/.test(c.title)) return false;
+        var mx = 0;
+        list.forEach(function (a) { a.forEach(function (v) { if (v != null && isFinite(v)) mx = Math.max(mx, Math.abs(v)); }); });
+        return mx <= 3;   // stored as fractions
+    }
+    function periodLabel(l) {
+        var m = /^FY(\d{2})Q([1-4])$/.exec(l);
+        return m ? 'Q' + m[2] + ' FY' + m[1] : l;
+    }
+    function aligned(c, s, labels) {   // workbook values line up with the end of the chart's labels
+        var map = {}, off = (c.labels || []).length - s.values.length;
+        s.values.forEach(function (v, k) { var l = c.labels[off + k]; if (l != null) map[l] = v; });
+        return labels.map(function (l) { return map[l] != null && isFinite(map[l]) ? map[l] : null; });
+    }
+    function lastOf(a) { for (var i = a.length - 1; i >= 0; i--) if (a[i] != null) return a[i]; return null; }
+    function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; }); }
+
     function renderComparisonCharts() {
-        let container = document.getElementById('compareChartsContainer');
-        container.innerHTML = "";
+        var container = document.getElementById('compareChartsContainer');
+        container.innerHTML = '';
+        var stocks = $scope.comparisonData.filter(function (s) { return s && s.excelCharts; });
+        var single = stocks.length === 1;
+        var P = TwChart.palette();
+        var status = document.getElementById('cmpStatus');
+        if (status) status.textContent = $scope.selectedCombinations.length ? '' : 'No charts in common for these stocks.';
 
-        $scope.selectedCombinations.forEach(function(combinationId, chartIndex) {
-            let panel = document.createElement('div');
-            panel.className = 'x_panel';
+        $scope.selectedCombinations.forEach(function (combinationId) {
+            var perStock = stocks.map(function (st) {
+                return { st: st, c: st.excelCharts.find(function (c) { return c.combinationId === combinationId; }) };
+            }).filter(function (x) { return x.c; });
+            if (!perStock.length) return;
+            var first = perStock[0].c;
+            var labelSet = {};
+            perStock.forEach(function (x) { (x.c.labels || []).forEach(function (l) { labelSet[l] = 1; }); });
+            var labels = Object.keys(labelSet).sort();
+            if (!labels.length) return;
+            var names = [];
+            perStock.forEach(function (x) { chartSeries(x.c).forEach(function (s) { if (names.indexOf(s.name) < 0) names.push(s.name); }); });
 
-            let titleDiv = document.createElement('div');
-            titleDiv.className = 'x_title';
+            var card = document.createElement('section');
+            card.className = 'tw-card';
+            var title = String(first.title).replace(/^annaul/i, 'Annual');
+            card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">' +
+                '<h2>' + escHtml(title) + '</h2>' +
+                (!single && names.length > 1 ? '<select class="form-control" style="width:auto;max-width:220px;height:30px;padding:2px 8px;font-size:12.5px">' +
+                    names.map(function (n) { return '<option>' + escHtml(n) + '</option>'; }).join('') + '</select>' : '') +
+                '</div><div class="tw-latest"></div><div class="tw-cmp-chart"></div>';
+            container.appendChild(card);
 
-            let excelChart = null;
-            for (let stock of $scope.comparisonData) {
-                excelChart = stock.excelCharts.find(c => c.combinationId === combinationId);
-                if (excelChart) break;
-            }
-
-            if (!excelChart) {
-                console.log("No chart found for combinationId: " + combinationId);
-                return;
-            }
-
-            let titleH2 = document.createElement('h2');
-            titleH2.innerHTML = `${excelChart.title} <small id="compare_chart_subtitle_${chartIndex}" style="
-                display: block;
-                font-size: 13px;
-                font-weight: normal;
-                color: #555;
-                margin-top: 6px;
-                line-height: 1.4;
-                white-space: normal;
-                word-break: break-word;
-            ">Loading...</small>`;
-            titleDiv.appendChild(titleH2);
-
-            let clearFix = document.createElement('div');
-            clearFix.className = 'clearfix';
-            titleDiv.appendChild(clearFix);
-            panel.appendChild(titleDiv);
-
-            let contentDiv = document.createElement('div');
-            contentDiv.className = 'x_content';
-
-            let canvas = document.createElement('canvas');
-            canvas.id = 'compare_chart_' + chartIndex;
-            canvas.style.height = "300px";
-            canvas.style.maxHeight = "300px";
-            contentDiv.appendChild(canvas);
-            panel.appendChild(contentDiv);
-
-            let wrapperColDiv = document.createElement('div');
-            wrapperColDiv.className = 'col-md-6 col-sm-12 col-xs-12';
-            wrapperColDiv.style.padding = "10px";
-            wrapperColDiv.appendChild(panel);
-            container.appendChild(wrapperColDiv);
-
-            let allLabelSets = [];
-            let datasets = [];
-
-            $scope.comparisonData.forEach(function(stock) {
-                let matchedChart = stock.excelCharts.find(c => c.combinationId === combinationId);
-                if (matchedChart) {
-                    allLabelSets.push(matchedChart.labels);
-                }
-            });
-
-            let allLabelsFlat = allLabelSets.flat();
-            let labelSet = Array.from(new Set(allLabelsFlat));
-            let commonLabels = labelSet.sort();
-
-            if (commonLabels.length === 0) {
-                console.log("No common labels for combinationId:", combinationId);
-                return;
-            }
-
-            $scope.comparisonData.forEach(function(stock, idx) {
-                let matchedChart = stock.excelCharts.find(c => c.combinationId === combinationId);
-                if (matchedChart) {
-                    let alignedValues = [];
-                    commonLabels.forEach(function(lbl) {
-                        const i = matchedChart.labels.indexOf(lbl);
-                        alignedValues.push(i >= 0 ? matchedChart.values[i] : null);
+            var draw = function (pick) {
+                var series = [], latest = [];
+                perStock.forEach(function (x) {
+                    var idx = stocks.indexOf(x.st);
+                    var list = chartSeries(x.c);
+                    if (!single && list.length > 1) list = list.filter(function (s) { return s.name === pick; });
+                    list.forEach(function (s, k) {
+                        var bar = single && x.c.chartType === 'bar';
+                        series.push({
+                            name: single ? s.name : x.st.ticker, data: aligned(x.c, s, labels), color: single ? k : idx,
+                            type: bar ? 'bar' : 'line', stack: bar && x.c.stacked ? 'a' : undefined
+                        });
                     });
-
-                    let formattedValues = alignedValues.map(function(val) {
-                        if (val == null) return null;
-                        if (Math.abs(val) <= 1) {
-                            return +(val * 100).toFixed(1);
-                        } else if (Math.abs(val) > 1000) {
-                            return Math.round(val);
-                        } else {
-                            return +val.toFixed(1);
-                        }
-                    });
-
-                    datasets.push({
-                        label: stock.ticker + ' - ' + matchedChart.fieldName,
-                        data: formattedValues,
-                        custom: {
-                            fieldName: matchedChart.fieldName
-                        },
-                        borderColor: $scope.newColors[idx % $scope.newColors.length],
-                        backgroundColor: $scope.newColors[idx % $scope.newColors.length],
-                        borderWidth: 2,
-                        fill: false
-                    });
-                }
-            });
-
-            let subtitleSegments = [];
-
-            datasets.forEach((ds, i) => {
-                let values = ds.data;
-                let latestVal = null;
-
-                for (let j = values.length - 1; j >= 0; j--) {
-                    if (values[j] !== null && values[j] !== undefined && !isNaN(values[j])) {
-                        latestVal = values[j];
-                        break;
-                    }
-                }
-
-                if (latestVal !== null) {
-                    let color = ds.borderColor;
-                    subtitleSegments.push(`<span style="color:${color};"><strong>${ds.label}</strong></span>: ${latestVal}`);
-                }
-            });
-
-            // Inject subtitle HTML
-            document.getElementById('compare_chart_subtitle_' + chartIndex).innerHTML = subtitleSegments.join(" | ");
-
-            new Chart(canvas.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: commonLabels,
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: {
-                            display: false
-                        },
-                        legend: {
-                            display: true
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let val = context.raw;
-                                    if (val == null) return '';
-
-                                    let parts = (context.dataset.label - '').split(' - ');
-                                    let ticker = parts[0] - '';
-                                    let fieldName = parts[1] - '';
-
-                                    let valueFormatted = '';
-                                    if (Math.abs(val) >= 1000) {
-                                        valueFormatted = Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
-                                    } else if (Math.abs(val) <= 100) {
-                                        valueFormatted = Number(val).toLocaleString('en-IN', { maximumFractionDigits: 1 });
-                                    } else {
-                                        valueFormatted = Number(val).toFixed(1);
-                                    }
-                                    return `${ticker} - ${fieldName}: ${valueFormatted}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                callback: function(value) {
-                                    if (Math.abs(value) >= 1000) {
-                                        return Number(value).toLocaleString('en-IN', { maximumFractionDigits: 0 });
-                                    } else if (Math.abs(value) <= 100) {
-                                        return Number(value).toLocaleString('en-IN', { maximumFractionDigits: 1 });
-                                    } else {
-                                        return Number(value).toFixed(1);
-                                    }
-                                }
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                autoSkip: true,
-                                maxTicksLimit: 10
-                            }
-                        }
-                    }
-                }
-            });
+                });
+                var pct = isPct(first, series.map(function (s) { return s.data; }));
+                if (pct) series.forEach(function (s) { s.data = s.data.map(function (v) { return v == null ? null : v * 100; }); });
+                var fmt = pct ? function (v) { return TwChart.num(v, 1) + '%'; } : TwChart.auto;
+                series.forEach(function (s) {
+                    var v = lastOf(s.data);
+                    if (v != null) latest.push('<span style="color:' + P[s.color % P.length] + '">&#9679;</span> ' + escHtml(s.name) + ' <b>' + fmt(v) + '</b>');
+                });
+                card.querySelector('.tw-latest').innerHTML = latest.length
+                    ? 'Latest (' + escHtml(periodLabel(labels[labels.length - 1])) + '): ' + latest.join(' &#183; ') : 'No values';
+                TwChart.line(card.querySelector('.tw-cmp-chart'), {
+                    labels: labels.map(periodLabel), series: series, yFmt: fmt,
+                    zero: series.some(function (s) { return s.type === 'bar'; }), measure: 'value', height: 280
+                });
+            };
+            var sel = card.querySelector('select');
+            if (sel) sel.onchange = function () { draw(sel.value); };
+            draw(names[0]);
         });
     }
 

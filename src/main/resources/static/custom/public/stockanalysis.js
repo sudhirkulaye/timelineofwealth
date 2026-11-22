@@ -590,8 +590,9 @@
     // Business details: extra charts configured per ticker for the result workbook
     // (ChartForSheet&Row.property / TickerChartCombination.property), delivered in getstockdetails.excelCharts
     // =====================================================================
-    // already covered by the Revenue / EBITDA / EPS card or the header tiles
-    var WB_CORE = /(market cap|revenue \(rs|ttm revenue|revenue growth|total revenue|\bopm\b|\bpat\b|net profit margin)/i;
+    // generic series (mostly repeat the Revenue / EBITDA / EPS card): shown only with "Show all".
+    // Market cap is deliberately not here: it stays with the company-specific charts.
+    var WB_CORE = /(noplat|revenue \(rs|ttm revenue|revenue growth|total revenue|\bopm\b|\bpat\b|net profit margin)/i;
 
     function wbIsAnnual(c) { return /^(annual|annaul)\b/i.test(c.title); }
     function wbTitle(t) { return t.replace(/^annaul/i, 'Annual').replace(/^(Quarterly|Annual)\s+/i, ''); }

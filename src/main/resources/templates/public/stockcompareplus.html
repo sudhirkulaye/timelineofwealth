@@ -2,279 +2,103 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: common-header" />
 <body class="nav-md" ng-app="StockComparePlusManagement" ng-controller="StockComparePlusController">
-<!-- iCheck -->
-<link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
-<!-- bootstrap-wysiwyg -->
-<link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" th:href="@{/vendors/google-code-prettify/bin/prettify.min.css}"  rel="stylesheet" />
-<!-- Select2 -->
-<link href="../../static/vendors/select2/dist/css/select2.min.css" th:href="@{/vendors/select2/dist/css/select2.min.css}"  rel="stylesheet" />
-<!-- Switchery -->
-<link href="../../static/vendors/switchery/dist/switchery.min.css" th:href="@{/vendors/switchery/dist/switchery.min.css}" rel="stylesheet" />
-<!-- starrr -->
-<link href="../../static/vendors/starrr/dist/starrr.css" th:href="@{/vendors/starrr/dist/starrr.css}"  rel="stylesheet" />
-<!-- bootstrap-daterangepicker -->
-<link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}"  rel="stylesheet" />
-<!-- Animate.css -->
-<link href="../../static/vendors/animate.css/animate.min.css" th:href="@{/vendors/animate.css/animate.min.css}" rel="stylesheet" />
-<!-- jQuery custom content scroller -->
-<link href="../../static/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" th:href="@{/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css}" rel="stylesheet" />
 <!--Angular JS-->
 <script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
-<!--Angular custom filter (for group by) JS-->
 <script src="../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
-<!-- ui-bootstrap-tpls.js -->
 <script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
-<!-- Chart.js v2 - used by angular-chart directives -->
-<script src="../../static/vendors/Chart.js/dist/Chart.min.js" th:src="@{/vendors/Chart.js/dist/Chart.min.js}"></script>
-<!-- Save v2 reference before v4 overwrites it -->
-<script>window.ChartV2 = window.Chart;</script>
-<!-- angular.chartjs - must load after ChartV2 is saved -->
-<script src="../../static/vendors/angular.chartjs/angular-chart.min.js" th:src="@{/vendors/angular.chartjs/angular-chart.min.js}"></script>
-<!-- Chart.js v4 - for all direct new Chart() calls -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>-->
-<!-- custom angular script -->
+<!-- charts: Apache ECharts + shared themed helper -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script src="../../static/custom/twcharts.js" th:src="@{/custom/twcharts.js}"></script>
 <script type="text/javascript" src="../../static/custom/public/stockcompareplus.js" th:src="@{/custom/public/stockcompareplus.js}"></script>
 <div class="container body">
     <div class="main_container">
-        <!-- sidebar menu -->
         <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
-        <!-- /sidebar menu -->
-
-        <!-- top navigation -->
         <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
-        <!-- /top navigation -->
 
-        <!-- page content -->
         <div class="right_col" role="main">
-            <div class="row">
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                    <br />
-                    <div class="x_panel">
-                        <div class="x_title">
-                            <h1><font color="green">Stock Comparison Plus [Forward & TTM PE, Volume, etc.]</font></h1>
-                            <p>
-                                Detailed Comparison of Stocks.<br/>
-                                <small>
-                                    <strong>Tip:</strong> For better and more meaningful comparison, select stocks from similar sectors such as:<br/>
-                                    - Large Cap Tech: TCS, INFY, HCLTECH, WIPRO<br/>
-                                    - Large Cap Banking: HDFCBANK, ICICIBANK, AXISBANK<br/>
-                                    - Life Insurance: HDFCLIFE, SBILIFE, ICICIPRULI<br/>
-                                    - Alternatively, input a single ticker symbol to view stock-specific charts<br/>
-                                </small>
-                            </p>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="col-md-12 col-sm-12 col-xs-12">
-                            <div class="x_panel">
-                                <div class="row" ng-repeat="stock in tickerInputs track by $index" style="margin-bottom: 15px;">
-                                    <div class="col-md-8">
-                                        <input type="text"
-                                               ng-model="tickerInputs[$index].searchText"
-                                               ng-change="onSearchTextChange($index)"
-                                               uib-typeahead="s as (s.shortName + ' (' + s.ticker + ')') for s in stocksFiltered($viewValue) | limitTo:8"
-                                               typeahead-on-select="setStockTicker($item, $index)"
-                                               class="form-control"
-                                               placeholder="Search Company Name or Ticker..." />
-                                    </div>
-                                    <div class="col-md-4">
-                                        <input type="text"
-                                               ng-model="tickerInputs[$index].ticker"
-                                               class="form-control"
-                                               placeholder="Ticker"
-                                               disabled />
-                                    </div>
-                                </div>
-                                <div style="margin-bottom: 10px;">
-                                    <select class="form-control" ng-model="selectedRange" style="width: 200px; display: inline-block;">
-                                        <option value="30D">Last 30 Days</option>
-                                        <option value="90D">Last 90 Days</option>
-                                        <option value="1Y">Last 1 Year</option>
-                                        <option value="3Y">Last 3 Years</option>
-                                        <option value="5Y">Last 5 Years</option>
-                                        <option value="ALL">All Available</option>
-                                        <option value="custom">From Specific Date</option>
-                                    </select>
-                                    <input type="date" class="form-control"
-                                           ng-model="customStartDate"
-                                           ng-disabled="selectedRange !== 'custom'"
-                                           style="width: 180px; display: inline-block; margin-left: 10px;"
-                                           placeholder="From Date" />
+            <div class="tw-page">
+                <header class="tw-head">
+                    <h1>Compare stock valuations</h1>
+                    <p>Market cap, returns against NIFTY 50, trailing and forward PE, price to book, EV/EBITA and trading activity for up to five stocks.
+                        Drag across any chart to measure the change between two dates.</p>
+                </header>
 
-                                    <input type="date" class="form-control"
-                                           ng-model="customEndDate"
-                                           ng-disabled="selectedRange !== 'custom'"
-                                           style="width: 180px; display: inline-block; margin-left: 10px;"
-                                           placeholder="To Date" />
-                                </div>
-                                <!-- Compare Button -->
-                                <button class="btn btn-success" ng-click="compareStocks()">Compare</button>
-                                <div class="row" id="compareChartsContainer" style="display: none;">
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>Market Cap Chart <small id="marketCapSubtitle">Loading...</small></h2>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <div id="marketCapChartPanel"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>Absolute Return Chart <small id="returnSubtitle">Loading...</small></h2>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <div id="returnChartPanel"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>TTM PE Chart <small id="ttmPeSubtitle">Loading...</small></h2>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <div id="ttmPeChartPanel"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>Implied Forward PE Chart <small id="forwardPeSubtitle">Loading...</small></h2>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <div id="forwardPeChartPanel"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>Relative TTM PE Chart <small id="relativeTtmPeSubtitle">Loading...</small></h2>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <div id="relativeTtmPeChartPanel"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>Relative Forward PE Chart <small id="relativeForwardPeSubtitle">Loading...</small></h2>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <div id="relativeForwardPeChartPanel"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>TTM PB Chart <small id="pbSubtitle">Loading...</small></h2>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <div id="pbChartPanel"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>EV to EBITA Chart <small id="evtoebitSubtitle">Loading...</small></h2>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <div id="evToEbitChartPanel"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div id="tradeVolumeValueChartsContainer">
-                                        <div ng-repeat="stock in tradeChartStocks" class="col-md-12 col-sm-12" style="padding: 10px;">
-                                            <div class="x_panel">
-                                                <div class="x_title">
-                                                    <h2>{{stock.ticker}} - Trade Volume & Value</h2>
-                                                    <div class="clearfix"></div>
-                                                </div>
-                                                <div class="x_content">
-                                                    <canvas class="chart chart-bar"
-                                                            chart-data="stock.data"
-                                                            chart-labels="stock.labels"
-                                                            chart-series="stock.series"
-                                                            chart-options="stock.options"
-                                                            chart-dataset-override="stock.datasetOverride"
-                                                            height="300">
-                                                    </canvas>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <br />
-                            <strong>Note: </strong> Values are in Cr. INR. First preference is given to consolidated data and ratios. Data Sources: Publicly available information on NSE India, BSE India, MorningStar.in, Screener.in, ValueResearchOnline.com, MoneyControl.com, Motilal Oswal, Prabhudas Lilladher, Edelweiss, HDFC Securities, ICICI Direct, Kotak Securities, tradingeconomics.com and Internal Data Processing
+                <section class="tw-card">
+                    <div class="tw-pickers">
+                        <div class="tw-pick" ng-repeat="stock in tickerInputs track by $index">
+                            <input type="text"
+                                   ng-model="tickerInputs[$index].searchText"
+                                   ng-change="onSearchTextChange($index)"
+                                   uib-typeahead="s as (s.shortName + ' (' + s.ticker + ')') for s in stocksFiltered($viewValue) | limitTo:8"
+                                   typeahead-on-select="setStockTicker($item, $index)"
+                                   class="form-control"
+                                   placeholder="{{'Stock ' + ($index + 1)}}" />
+                            <span class="tw-pick-t" ng-if="tickerInputs[$index].ticker">{{tickerInputs[$index].ticker}}</span>
                         </div>
                     </div>
+                    <div class="tw-actions">
+                        <div class="tw-seg" role="group" aria-label="Range">
+                            <button type="button" ng-repeat="r in [['30D','1M'],['90D','3M'],['1Y','1Y'],['3Y','3Y'],['5Y','5Y'],['ALL','Max'],['custom','Custom']]"
+                                    ng-class="{on: selectedRange === r[0]}" ng-click="$parent.selectedRange = r[0]">{{r[1]}}</button>
+                        </div>
+                        <span ng-show="selectedRange === 'custom'" style="display:inline-flex;gap:6px;align-items:center">
+                            <input type="date" class="form-control" ng-model="customStartDate" style="width:160px;height:32px" aria-label="From date" />
+                            <span class="tw-muted">to</span>
+                            <input type="date" class="form-control" ng-model="customEndDate" style="width:160px;height:32px" aria-label="To date" />
+                        </span>
+                        <button class="btn btn-primary" type="button" ng-click="compareStocks()">Compare</button>
+                        <span class="tw-muted tw-small" id="cmpStatus"></span>
+                    </div>
+                    <p class="tw-tips"><b>Tip:</b> compare stocks from the same sector, for example TCS, INFY, HCLTECH, WIPRO &#183;
+                        HDFCBANK, ICICIBANK, AXISBANK &#183; HDFCLIFE, SBILIFE, ICICIPRULI.</p>
+                </section>
+
+                <div class="tw-grid2" id="compareChartsContainer" hidden="hidden">
+                    <section class="tw-card">
+                        <h2>Market cap</h2><div class="tw-latest" id="marketCapSubtitle"></div>
+                        <div id="marketCapChartPanel"></div>
+                    </section>
+                    <section class="tw-card">
+                        <h2>Return vs NIFTY 50</h2><div class="tw-latest" id="returnSubtitle"></div>
+                        <div id="returnChartPanel"></div>
+                    </section>
+                    <section class="tw-card">
+                        <h2>Trailing PE</h2><div class="tw-latest" id="ttmPeSubtitle"></div>
+                        <div id="ttmPeChartPanel"></div>
+                    </section>
+                    <section class="tw-card">
+                        <h2>Implied forward PE</h2><div class="tw-latest" id="forwardPeSubtitle"></div>
+                        <div id="forwardPeChartPanel"></div>
+                    </section>
+                    <section class="tw-card">
+                        <h2>Trailing PE relative to NIFTY 50</h2><div class="tw-latest" id="relativeTtmPeSubtitle"></div>
+                        <div id="relativeTtmPeChartPanel"></div>
+                    </section>
+                    <section class="tw-card">
+                        <h2>Forward PE relative to NIFTY 50</h2><div class="tw-latest" id="relativeForwardPeSubtitle"></div>
+                        <div id="relativeForwardPeChartPanel"></div>
+                    </section>
+                    <section class="tw-card">
+                        <h2>Price to book (trailing)</h2><div class="tw-latest" id="pbSubtitle"></div>
+                        <div id="pbChartPanel"></div>
+                    </section>
+                    <section class="tw-card">
+                        <h2>EV / EBITA</h2><div class="tw-latest" id="evtoebitSubtitle"></div>
+                        <div id="evToEbitChartPanel"></div>
+                    </section>
+                    <div class="tw-wide" id="tradeVolumeValueChartsContainer"></div>
                 </div>
+
+                <p class="tw-muted tw-small">Values in &#8377; crore unless stated. Consolidated figures preferred. Prices: NSE.
+                    Sources also include BSE India, Screener.in, company filings and broker research. For information only; not investment advice.</p>
             </div>
         </div>
-        <!-- /page content -->
 
-        <!-- footer content -->
         <div th:replace="fragments/publicfooter :: common-publicfooter" />
-        <!-- /footer content -->
     </div>
 </div>
-<!-- jQuery -->
 <script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
-<!-- Bootstrap -->
 <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
-<!-- FastClick -->
-<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
-<!-- NProgress -->
-<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
-<!-- bootstrap-progressbar -->
-<script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js" th:src="@{/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js}"></script>
-<!-- iCheck -->
-<script src="../../static/vendors/iCheck/icheck.min.js" th:src="@{/vendors/iCheck/icheck.min.js}"></script>
-<!-- jquery.inputmask -->
-<script src="../../static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js" th:src="@{/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js}"></script>
-<!-- bootstrap-daterangepicker -->
-<script src="../../static/vendors/moment/min/moment.min.js" th:src="@{/vendors/moment/min/moment.min.js}"></script>
-<script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js" th:src="@{/vendors/bootstrap-daterangepicker/daterangepicker.js}"></script>
-<!-- bootstrap-wysiwyg -->
-<script src="../../static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js" th:src="@{/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js}"></script>
-<script src="../../static/vendors/jquery.hotkeys/jquery.hotkeys.js" th:src="@{/vendors/jquery.hotkeys/jquery.hotkeys.js}"></script>
-<script src="../../static/vendors/google-code-prettify/src/prettify.js" th:src="@{/vendors/google-code-prettify/src/prettify.js}"></script>
-<!-- jQuery Tags Input -->
-<script src="../../static/vendors/jquery.tagsinput/src/jquery.tagsinput.js" th:src="@{/vendors/jquery.tagsinput/src/jquery.tagsinput.js}"></script>
-<!-- Switchery -->
-<script src="../../static/vendors/switchery/dist/switchery.min.js" th:src="@{/vendors/switchery/dist/switchery.min.js}"></script>
-<!-- Select2 -->
-<script src="../../static/vendors/select2/dist/js/select2.full.min.js" th:src="@{/vendors/select2/dist/js/select2.full.min.js}"></script>
-<!-- Parsley -->
-<script src="../../static/vendors/parsleyjs/dist/parsley.min.js" th:src="@{/vendors/parsleyjs/dist/parsley.min.js}"></script>
-<!-- Autosize -->
-<script src="../../static/vendors/autosize/dist/autosize.min.js" th:src="@{/vendors/autosize/dist/autosize.min.js}"></script>
-<!-- jQuery autocomplete -->
-<script src="../../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js" th:src="@{/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js}"></script>
-<!-- starrr -->
-<script src="../../static/vendors/starrr/dist/starrr.js" th:src="@{/vendors/starrr/dist/starrr.js}"></script>
-
-<!-- Custom Theme Scripts -->
 <script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
 </body>
 </html>

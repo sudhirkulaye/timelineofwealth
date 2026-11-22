@@ -1,130 +1,68 @@
-var module = angular.module('IndexStatsManagement', ['angular.filter','chart.js','dx']);
+var module = angular.module('IndexStatsManagement', ['angular.filter']);
 
-module.controller('IndexStatController', function($scope, $http, $filter, $locale) {
-    var urlBase="/public/api";
+module.controller('IndexStatController', function($scope, $http, $filter) {
+    var urlBase = "/public/api";
     $scope.indexStatRecords = [];
     $scope.indexConsolidatedStatistics = [];
     $scope.indexMonthlyReturns = [];
-    $scope.chartData = [];
-    $scope.labelsDates = [];
-    $scope.chartSeries = ['Index Trailing PE', 'Index Value'];
-    $scope.newColors = ['#26B99A', '#03586A', '#1E947B', '#1a3c33', '#DCDCDC', '#46BFBD', '#FDB45C'];
-    $scope.chartDatasetOverride = [{ yAxisID: 'y-axis-1', borderDash: [], borderWidth: 2, pointRadius: 0, tension: 0.4 }, { yAxisID: 'y-axis-2', borderDash: [], borderWidth: 2, pointRadius: 0, tension: 0.4 }];
-    //$scope.chartOptions = { scales: { yAxes: [{ ticks: { min:0 } }] } };
-    $scope.chartOptions = {
-        scales: {
-          yAxes: [
-            {
-              id: 'y-axis-1',
-              type: 'linear',
-              display: true,
-              position: 'left'
-            },
-            {
-              id: 'y-axis-2',
-              type: 'linear',
-              display: true,
-              position: 'right'
-            }
-          ]
-        }
-      };
-    $scope.labelsDates = [];
-    $scope.chartData = [];
-    $scope.getCellColor = function(value) {
-        if (value < -0.02) {
-            return '#FF0000'; // Light Red
-        } else if (value >= -0.02 && value < 0) {
-            return '#D32F2F'; // Darker Red
-        } else if (value > 0 && value <= 0.02) {
-            return '#00FF00'; // Light Green
-        } else if (value > 0.02) {
-            return '#4CAF50'; // Darker Green
-        } else {
-            return ''; // Default color if value is not in any range
-        }
+    $scope.yearFilter = 1;
+    $scope.months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+
+    // soft green / red cell backgrounds for the calendar-returns table (value is a fraction)
+    $scope.heat = function (value) {
+        if (value == null || isNaN(value)) return {};
+        var a = Math.min(Math.abs(value) / 0.08, 1) * 0.30 + 0.05;
+        return { 'background-color': value >= 0 ? 'rgba(27,175,122,' + a.toFixed(2) + ')' : 'rgba(208,59,59,' + a.toFixed(2) + ')' };
     };
 
-    showRecords();
+    $http.get(urlBase + "/getindexmonthlyreturns/NIFTY").then(function (response) {
+        $scope.indexMonthlyReturns = (response && response.data) || [];
+    });
+    $http.get(urlBase + "/getindexvaluation").then(function (response) {
+        $scope.indexStatRecords = (response && response.data) || [];
+        drawChart();
+    });
+    $http.get(urlBase + "/getindexstatistics").then(function (response) {
+        $scope.indexConsolidatedStatistics = (response && response.data) || [];
+    });
 
-    function showRecords(){
-        $scope.indexStatRecords = new Map;
+    $scope.setYears = function (y) { $scope.yearFilter = y; drawChart(); };
 
-        url = "/getindexmonthlyreturns/NIFTY";
-        $http.get(urlBase + url).
-            then(function (response) {
-                if (response != undefined) {
-                    $scope.indexMonthlyReturns = response.data;
-                } else {
-                    $scope.indexMonthlyReturns = [];
-                }
-            });
+    // lastUpdated arrives as [yyyy, m, d] (or an ISO string)
+    $scope.updated = function () {
+        var s = $scope.indexConsolidatedStatistics[0], u = s && s.lastUpdated;
+        if (!u) return '';
+        var d = Array.isArray(u) ? new Date(u[0], u[1] - 1, u[2]) : new Date(u);
+        return isNaN(d) ? String(u) : $filter('date')(d, 'd MMM yyyy');
+    };
 
-        url = "/getindexvaluation";
-        $http.get(urlBase + url).
-            then(function (response) {
-                if (response != undefined) {
-                    $scope.indexStatRecords = response.data;
-                    setChartData();
-                } else {
-                    $scope.indexStatRecords = [];
-                }
-            });
-
-        url = "/getindexstatistics";
-        $http.get(urlBase + url).
-            then(function (response) {
-                if (response != undefined) {
-                    $scope.indexConsolidatedStatistics = response.data;
-                    setChartData();
-                } else {
-                    $scope.indexConsolidatedStatistics = [];
-                }
-            });
+    // daily points for the last year, weekly (Fridays) before that, as before
+    function drawChart() {
+        var recs = $scope.indexStatRecords;
+        if (!recs || !recs.length || !window.TwChart) return;
+        var filterDate = new Date(), oneYear = new Date();
+        filterDate.setDate(filterDate.getDate() - $scope.yearFilter * 365);
+        oneYear.setDate(oneYear.getDate() - 365);
+        var dates = [], pe = [], value = [];
+        recs.forEach(function (r) {
+            var d = new Date(r.key.date);
+            if (d <= filterDate) return;
+            if (d > oneYear || d.getDay() === 5) {
+                dates.push($filter('date')(d, 'yyyy-MM-dd'));
+                pe.push(r.pe);
+                value.push(r.value);
+            }
+        });
+        TwChart.line('n50-pe-chart', {
+            labels: dates,
+            series: [
+                { name: 'Trailing PE', data: pe, color: 0 },
+                { name: 'NIFTY 50', data: value, axis: 1, index: true }
+            ],
+            yName: 'PE (x)', y2Name: 'Index',
+            yFmt: function (v) { return Number(v).toFixed(1) + 'x'; },
+            y2Fmt: function (v) { return TwChart.num(v, 0); },
+            measure: 'value', height: 380
+        });
     }
-
-    function setChartData(){
-        //console.log("index data length" + $scope.indexStatRecords.length);
-        $scope.labelsDates = [];
-        $scope.chartData = [];
-
-        var dates = [];
-        var peData = [];
-        var indexValue = [];
-        var filterDate = new Date();
-        var oneYearBeforeDate = new Date();
-        //console.log("$scope.yearFilter " + $scope.yearFilter);
-        if ($scope.yearFilter == undefined){
-            $scope.yearFilter = 1;
-        }
-        filterDate.setDate(filterDate.getDate() - $scope.yearFilter*365);
-        oneYearBeforeDate.setDate(oneYearBeforeDate.getDate() - 365);
-        //console.log("filterDate " + filterDate);
-        //console.log("oneYearBeforeDate " + oneYearBeforeDate);
-        for (var i = 0; i < $scope.indexStatRecords.length; i++ ) {
-          if (new Date(filterDate) < new Date($scope.indexStatRecords[i].key.date)){
-              if (new Date(oneYearBeforeDate) < new Date($scope.indexStatRecords[i].key.date)) { // put all records
-                  dates.push($filter('date')(new Date($scope.indexStatRecords[i].key.date),'yyyy-MM-dd'));
-                  peData.push($scope.indexStatRecords[i].pe);
-                  indexValue.push($scope.indexStatRecords[i].value);
-              } else { // put only weekly data
-                  //console.log("Day"+ (new Date($scope.indexStatRecords[i].key.date)).getDay());
-                  if ((new Date($scope.indexStatRecords[i].key.date)).getDay() == "5") {
-                      dates.push($filter('date')(new Date($scope.indexStatRecords[i].key.date),'yyyy-MM-dd'));
-                      peData.push($scope.indexStatRecords[i].pe);
-                      indexValue.push($scope.indexStatRecords[i].value);
-                  }
-              }
-          }
-        }
-        //console.log(peData);
-        $scope.labelsDates = dates;
-        $scope.chartData.push(peData);
-        $scope.chartData.push(indexValue);
-    }
-
-    $scope.callSetChartData = function callSetChartData() {
-        setChartData();
-    }
-
 });

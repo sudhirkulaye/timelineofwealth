@@ -108,8 +108,15 @@ public class PublicViewController {
         return "public/contactus";
     }
 
+    /**
+     * The only blog post (chapter notes on the book "Financial Shenanigans") follows the book's structure, headings and
+     * case examples closely, so it is not published. The template stays in the repo; set to true to serve it again.
+     */
+    private static final boolean BLOG_ENABLED = false;
+
     @RequestMapping(value = "/public/blog0001")
     public String blog0001(HttpServletRequest request, Model model){
+        if (!BLOG_ENABLED) return "redirect:/";
         String ipAddress = request.getRemoteAddr();
         String browser = request.getHeader("User-Agent");
         String os = System.getProperty("os.name");

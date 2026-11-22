@@ -355,3 +355,33 @@ footer a { color: var(--ink2); }
 @media (min-width: 992px) {
     .nav-md .container.body .col-md-3.left_col { position: fixed; top: 0; bottom: 0; height: 100vh; overflow-y: auto; overflow-x: hidden; }
 }
+
+/* ---------- TwChart blocks (comparison and statistics pages) ---------- */
+.tw-head { margin: 4px 0 16px; }
+.tw-head h1 { margin: 0 0 4px; font-size: 26px; font-weight: 650; letter-spacing: -.02em; }
+.tw-head p { margin: 0; color: var(--ink2); font-size: 13.5px; }
+.tw-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; }
+.tw-grid2 > .tw-wide { grid-column: 1 / -1; }
+@media (max-width: 991px) { .tw-grid2 { grid-template-columns: minmax(0, 1fr); } }
+.tw-card .tw-latest { font-size: 12.5px; color: var(--ink2); margin: 2px 0 6px; line-height: 1.6; font-variant-numeric: tabular-nums; }
+.tw-card .tw-latest b { color: var(--ink); }
+.tw-chartbox { width: 100%; }
+.tw-chart { width: 100%; }
+.tw-chart-measure { cursor: crosshair; user-select: none; -webkit-user-select: none; }
+.tw-readout {
+    display: flex; align-items: center; gap: 4px 14px; flex-wrap: wrap; min-height: 36px; padding: 7px 12px; margin: 4px 0 6px;
+    border-radius: 10px; background: var(--chip); font-size: 12.5px; color: var(--ink2); font-variant-numeric: tabular-nums;
+}
+.tw-readout b { color: var(--ink); font-weight: 600; }
+.tw-readout .x { margin-left: auto; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 13px; padding: 2px 6px; border-radius: 6px; }
+.tw-readout .x:hover { background: var(--hover); color: var(--ink); }
+.tw-pickers { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin: 6px 0 12px; }
+.tw-pickers .tw-pick { position: relative; }
+.tw-pickers .tw-pick .tw-pick-t { position: absolute; right: 10px; top: 8px; font-size: 11.5px; color: var(--muted); pointer-events: none; }
+.tw-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.tw-tips { font-size: 12.5px; color: var(--muted); margin: 10px 0 0; }
+.tw-tips b { color: var(--ink2); font-weight: 600; }
+.tw-heat td { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tw-heat td:first-child, .tw-heat th:first-child { text-align: left; }
+.tw-heat th { text-align: right; }
+.tw-scroll { overflow-x: auto; }
