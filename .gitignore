@@ -30,3 +30,7 @@
 
 # Claude AI worktrees (should never be tracked)
 src/main/.claude/
+
+# Local-only files with user credentials (never commit)
+src/main/java/com/timelineofwealth/service/GeneratePassword.java
+src/main/sql/queries/CreateUser.sql
