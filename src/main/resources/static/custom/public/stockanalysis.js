@@ -1,1038 +1,554 @@
-var module = angular.module('StockAnalysisManagement', ['angular.filter','chart.js']);
+/*
+ * /public/stockanalysis/{ticker} — chart-first stock page (Apache ECharts 5).
+ *   Price:        /public/api/getstockohlc/{t}     (nse_price_history)
+ *   Details:      /public/api/getstockdetails/{t}  (sector, market cap, ratios)
+ *   Fundamentals: /public/api/getstockpnl/{t}, /public/api/getstockquarter/{t}
+ *   Consensus:    /public/api/getconsensus/{t}     (yahoo_consensus)
+ */
+(function () {
+    'use strict';
+    var root = document.getElementById('sa');
+    if (!root || !window.echarts) return;
+    var TICKER = root.getAttribute('data-ticker');
 
-module.controller('StockAnalysisController', function($scope, $http, $filter, $window) {
-    var urlBase="/public/api";
-    $scope.newColors = ['#26B99A', '#03586A', '#1E947B', '#1a3c33', '#DCDCDC', '#46BFBD', '#FDB45C'];
-    $scope.newColors1 = ['#26B99A', '#03586A', '#1a53ff'];
-    $scope.chartOptions = { scales: { yAxes: [{ ticks: { min:0 } }] } };
-    $http.defaults.headers.post["Content-Type"] = "application/json";
-
-    $scope.ticker = $window.location.href.split("/")[5];
-    //console.log($scope.ticker);
-
-    $scope.stockQuarter = [];
-    $scope.stockQuarterOriginal = [];
-    $scope.labelsYearsStockQuarter = [];
-    $scope.stockQuarterDataOverride = [];
-    $scope.chartOptionsStockQuarter = {};
-
-    $scope.stockPnl = [];
-    $scope.stockPnlOriginal = [];
-    $scope.labelsYearsStockPnl = [];
-    $scope.stockPnlDataOverride = [];
-    $scope.chartOptionsStockPnl = {};
-
-    $scope.stockMargin = [];
-    $scope.labelsYearsStockMargin = [];
-    $scope.stockMarginDataOverride = [];
-    $scope.chartOptionsStockMargin = {};
-    $scope.chartStockGrowthSeries = [];
-
-    $scope.stockGrowth = [];
-    $scope.labelsYearsStockGrowth = [];
-    $scope.stockGrowthDataOverride = [];
-    $scope.chartOptionsStockGrowth = {};
-
-    $scope.stockValuation = [];
-    $scope.labelsYearsStockValuation = [];
-    $scope.stockValuationDataOverride = [];
-    $scope.chartOptionsStockValuation = {};
-
-    $scope.recentValuations = [];
-    $scope.dataRecentPE = [];
-    $scope.dataRecentMCap = []; // Added new variable
-    $scope.chartOptionsMCapAndPrice = {};
-    $scope.chartMCapAndPriceDatasetOverride = [];
-    $scope.chartMCapAndPriceSeries = [];
-    $scope.dataRecentMarketPrice = [];
-    $scope.dataRecentMCapAndPrice = [];
-    $scope.dataRecentPB = [];
-    $scope.dataRecentEvToEbita = [];
-    $scope.labelsRecentPE = [];
-    $scope.chartOptionsRecentPE = {};
-    $scope.chartRecentPEDatasetOverride = [];
-    $scope.chartOptionsRecentPB = {};
-    $scope.chartRecentPBDatasetOverride = [];
-    $scope.chartOptionsRecentEvToEbita = {};
-    $scope.chartRecentEvToEbitaDatasetOverride = [];
-
-    $scope.priceMovements = [];
-    $scope.dataPriceMovements = [];
-    $scope.data1DPriceMovements = [];
-    $scope.data1WPriceMovements = [];
-    $scope.data2WPriceMovements = [];
-    $scope.data1MPriceMovements = [];
-    $scope.labelsPriceMovements = [];
-    $scope.mean1D = 0.00;
-    $scope.median1D = 0.00;
-    $scope.mean1W = 0.00;
-    $scope.median1W = 0.00;
-    $scope.mean2W = 0.00;
-    $scope.median2W = 0.00;
-    $scope.mean1M = 0.00;
-    $scope.median1M = 0.00;
-
-    $scope.salesGrowth3Yr = 0.00;
-    $scope.salesGrowth5Yr = 0.00;
-    $scope.salesGrowth10Yr = 0.00;
-    $scope.operatingProfitGrowth3Yr = 0.00;
-    $scope.operatingProfitGrowth3Yr = 0.00;
-    $scope.operatingProfitGrowth3Yr = 0.00;
-    $scope.opm3Yr = 0.00;
-    $scope.opm5Yr = 0.00;
-    $scope.opm10Yr = 0.00;
-    $scope.roic3Yr = 0.00;
-    $scope.roic5Yr = 0.00;
-    $scope.roic10Yr = 0.00;
-
-    $scope.stockPnlSales = [];
-    $scope.stockQuarterSales = [];
-
-    showRecords();
-
-    function showRecords() {
-        $scope.stockPnl = [];
-
-        var url = "/getstockdetails/" + $scope.ticker;
-        $http.get(urlBase + url)
-            .then(function (response) {
-                if (response != undefined) {
-                    $scope.stockDetails = response.data;
-                    renderExcelCharts();
-                    renderReportNotes();
-                } else {
-                    $scope.stockDetails = [];
-                }
-
-                // After getStockDetails done
-                url = "/getstockquarter/" + $scope.ticker;
-                return $http.get(urlBase + url);
-            })
-            .then(function (response) {
-                if (response != undefined) {
-                    $scope.stockQuarter = response.data;
-                    $scope.stockQuarterOriginal = response.data;
-                    populateStockQuarterChart();
-
-                    // After getStockQuarter done
-                    url = "/getstockpnl/" + $scope.ticker;
-                    return $http.get(urlBase + url);
-                } else {
-                    $scope.stockQuarter = [];
-                    $scope.stockQuarterOriginal = [];
-                }
-            })
-            .then(function (response) {
-                if (response != undefined) {
-                    $scope.stockPnl = response.data;
-                    $scope.stockPnlOriginal = response.data;
-                    populateStockPnlChart();
-                } else {
-                    $scope.stockPnl = [];
-                    $scope.stockPnlOriginal = [];
-                }
-
-                // Now call getrecentvaluations
-                url = "/getrecentvaluations/" + $scope.ticker;
-                return $http.get(urlBase + url);
-            })
-            .then(function (response) {
-                if (response != undefined) {
-                    $scope.recentValuations = response.data;
-                    populateStockRecentPE();
-                } else {
-                    $scope.recentValuations = [];
-                }
-            });
+    // ---------- helpers ----------
+    var $ = function (id) { return document.getElementById(id); };
+    var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+    function pal() {
+        return {
+            ink: css('--ink'), ink2: css('--ink2'), muted: css('--muted'), grid: css('--grid'), axis: css('--axis'),
+            surface: css('--surface'), page: css('--page'), s1: css('--s1'), s2: css('--s2'), s3: css('--s3'), s4: css('--s4'),
+            pos: css('--pos'), neg: css('--neg'), font: css('--font') || 'Inter, system-ui, sans-serif'
+        };
+    }
+    function parseD(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+    function fmtD(s) { var d = parseD(s); return d.getDate() + ' ' + MON[d.getMonth()] + ' ' + d.getFullYear(); }
+    function fmtShort(s) { var d = parseD(s); return MON[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2); }
+    function num(v, dp) {
+        if (v == null || isNaN(v)) return '–';
+        return Number(v).toLocaleString('en-IN', { minimumFractionDigits: dp || 0, maximumFractionDigits: dp || 0 });
+    }
+    function px(v) { return v == null ? '–' : '₹' + num(v, v < 100 ? 2 : (v < 1000 ? 1 : 0)); }
+    function pct(v, dp) { if (v == null || !isFinite(v)) return '–'; return (v > 0 ? '+' : '') + (v * 100).toFixed(dp == null ? 1 : dp) + '%'; }
+    function cls(v) { return v > 0 ? 'tw-pos' : (v < 0 ? 'tw-neg' : ''); }
+    function cr(v) {
+        if (v == null || isNaN(v)) return '–';
+        var a = Math.abs(v);
+        if (a >= 100000) return '₹' + num(v / 100000, 2) + ' L Cr';
+        return '₹' + num(v, 0) + ' Cr';
+    }
+    function compact(v) {
+        var a = Math.abs(v);
+        if (a >= 1e7) return (v / 1e7).toFixed(a >= 1e8 ? 0 : 1) + ' Cr';
+        if (a >= 1e5) return (v / 1e5).toFixed(a >= 1e6 ? 0 : 1) + ' L';
+        if (a >= 1e3) return (v / 1e3).toFixed(0) + 'K';
+        return String(Math.round(v));
+    }
+    function axisNum(v) {
+        var a = Math.abs(v);
+        if (a >= 100000) return num(v / 1000, 0) + 'K';
+        return num(v, a < 10 && a !== 0 ? 1 : 0);
+    }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; }); }
+    function getJSON(url) {
+        return fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status + ' ' + url); return r.json(); });
+    }
+    function tile(label, value, sub, valueCls) {
+        return '<div class="tw-tile"><div class="tl">' + esc(label) + '</div><div class="tv ' + (valueCls || '') + '">' + value +
+            '</div>' + (sub ? '<div class="ts">' + sub + '</div>' : '') + '</div>';
+    }
+    function empty(el, msg) { el.innerHTML = '<div class="sa-empty">' + esc(msg) + '</div>'; }
+    function baseText(P) { return { color: P.muted, fontFamily: P.font, fontSize: 11 }; }
+    function tooltipBase(P) {
+        return {
+            backgroundColor: P.surface, borderColor: P.grid, borderWidth: 1, padding: [8, 10],
+            textStyle: { color: P.ink, fontFamily: P.font, fontSize: 12 },
+            extraCssText: 'box-shadow:0 8px 24px rgba(0,0,0,.14);border-radius:10px;'
+        };
+    }
+    function alpha(hex, a) {
+        var h = hex.replace('#', '');
+        if (h.length === 3) h = h.replace(/./g, '$&$&');
+        var n = parseInt(h, 16);
+        return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')';
     }
 
-    function populateStockPnlChart() {
+    var charts = {};
+    function chart(id) {
+        var el = $(id);
+        if (!charts[id] || charts[id].isDisposed()) charts[id] = echarts.init(el, null, { renderer: 'canvas' });
+        return charts[id];
+    }
+    window.addEventListener('resize', function () { Object.keys(charts).forEach(function (k) { charts[k].resize(); }); });
 
-        /* Begin: Populate Annual Sales and Profit */
-        var sortedStockPnl = $filter('orderBy')($scope.stockPnl,'key.date');
-        var map = $filter('groupBy')(sortedStockPnl, 'key.date');
-        //console.log(map);
+    // ---------- state ----------
+    var S = { ohlc: null, details: null, pnl: null, qtr: null, cons: null, range: '1Y', kind: 'line', period: 'A',
+              sel: null, pending: null, drag: null };
 
-        var years = [];
-        var sales = [];
-        var noplat = [];
-        var salesG3yr = [];
-        var salesG5yr = [];
-        var salesG10yr = [];
-        var salesGrowth = [];
-        var operatingProfitGrowth = [];
-        var margin = [];
-        var pe = [];
-        var i = Object.keys(map).length;
-
-        for(var yr in map){
-           i = i - 1;
-           if (i > 10) {
-             continue;
-           }
-           years.push(yr);
-           $scope.labelsYearsStockGrowth.push(yr);
-           //console.log(yr);
-           sales.push(Math.round(map[yr][0].sales*100)/100);
-           //console.log(map[yr][0].sales);
-           noplat.push(Math.round(map[yr][0].noplat*100)/100);
-//           salesGrowth.push(Math.round(map[yr][0].salesG*100)/100);
-//           operatingProfitGrowth.push(Math.round(map[yr][0].ebitdaG*100)/100);
-           salesG3yr.push(Number(Math.round(map[yr][0].salesG3yr*100 * 100)/100 || 1));
-           salesG5yr.push(Number(Math.round(map[yr][0].salesG5yr*100 * 100)/100 || 1));
-           salesG10yr.push(Number(Math.round(map[yr][0].salesG10yr*100 * 100)/100 || 1));
-           salesGrowth.push(Number(Math.round(map[yr][0].salesG*100 * 100)/100 || 1));
-           operatingProfitGrowth.push(Number(Math.round(map[yr][0].ebitdaG*100 * 100)/100 || 1));
-           pe.push(Math.round(map[yr][0].pe*100)/100);
-           $scope.salesGrowth3Yr = map[yr][0].salesG3yr;
-           $scope.salesGrowth5Yr = map[yr][0].salesG5yr;
-           $scope.salesGrowth10Yr = map[yr][0].salesG10yr;
-           $scope.operatingProfitGrowth3Yr = map[yr][0].ebitdaG3yr;
-           $scope.operatingProfitGrowth5Yr = map[yr][0].ebitdaG5yr;
-           $scope.operatingProfitGrowth10Yr = map[yr][0].ebitdaG10yr;
-           $scope.opm3Yr = map[yr][0].avgOpm3yr;
-           $scope.opm5Yr = map[yr][0].avgOpm5yr;
-           $scope.opm10Yr = map[yr][0].avgOpm10yr;
-           $scope.roic3Yr = map[yr][0].avgRoic3yr;
-           $scope.roic5Yr = map[yr][0].avgRoic5yr;
-           $scope.roic10Yr = map[yr][0].avgRoic10yr;
-
-           margin.push(Number(Math.round(map[yr][0].opm*100 * 100)/100 || 1));
-
-        }
-
-        var reverseSortedStockQuarter = $filter('orderBy')($scope.stockQuarterOriginal,'key.date',true);
-        var map1 = $filter('groupBy')(reverseSortedStockQuarter, 'key.date');
-        i = 0;
-        var ttmSales = Number(0.00||0);
-        var ttmNoplat = Number(0.00||0);
-        var ttmSalesGrowth = Number(0.00||0);
-        var ttmOperatingProfitGrowth = Number(0.00||0);
-
-        for(var yr in map1){
-           i = i + 1;
-           if (i > 1) {
-             break;
-           }
-           ttmSales = Number(map1[yr][0].ttmSales || 0);
-           ttmNoplat = Number(map1[yr][0].ttmNoplat || 0);
-//           ttmSalesGrowth = ttmSalesGrowth + Number(map1[yr][0].ttmSalesG || 0);
-//           ttmOperatingProfitGrowth = ttmOperatingProfitGrowth + Number(map1[yr][0].ttmEbitdaG || 0);
-           ttmSalesGrowth = Number(Math.round(map1[yr][0].ttmSalesG*100 * 100) / 100 || 1);
-           ttmOperatingProfitGrowth = Number(Math.round(map1[yr][0].ttmEbitdaG*100 * 100) / 100 || 1);
-//           computedNpm = (Number(map1[yr][0].netProfit || 0)/Number(map1[yr][0].sales || 0));
-//           computedNpm = Math.round(computedNpm * 100)/100;
-//           ttmNpm = ttmNpm + computedNpm;
-           margin.push(Number(Math.round(map1[yr][0].ttmOpm*100 * 100)/100 || 1));
-        }
-//        ttmOpm = ttmOperatingProfit/ttmSales;
-//        ttmNpm = ttmNpm/4;
-//        ttmOpm = Math.round(ttmOpm*100)/100;
-//        ttmNpm = Math.round(ttmNpm*100)/100;
-
-        //years.push($filter('date')(new Date(), 'yyyy-MM-dd'));
-        years.push("TTM");
-        sales.push(Math.round(ttmSales*100)/100);
-        noplat.push(Math.round(ttmNoplat*100)/100);
-        salesGrowth.push(ttmSalesGrowth);
-        operatingProfitGrowth.push(ttmOperatingProfitGrowth);
-
-        $scope.labelsYearsStockPnl = years;
-        $scope.stockPnl = [];
-        //$scope.stockPnl.push(sales);
-        $scope.stockPnl.push(noplat);
-        //$scope.stockPnl.push(salesGrowth);
-        $scope.stockPnl.push(margin);
-        //$scope.stockPnl.push(operatingProfitGrowth);
-        //$scope.stockPnl.push(margin);
-
-        $scope.labelsYearsStockMargin = years;
-        $scope.stockMargin = [];
-        $scope.stockMargin.push(margin);
-
-        $scope.stockGrowth = [];
-        $scope.stockGrowth.push(salesG3yr);
-        //console.log(salesG3yr);
-        $scope.stockGrowth.push(salesG5yr);
-        //console.log(salesG5yr);
-        $scope.stockGrowth.push(salesG10yr);
-        //console.log(salesG10yr);
-        //console.log($scope.stockGrowth);
-
-
-        $scope.labelsYearsStockValuation = years;
-        $scope.stockValuation = [];
-        pe.push($scope.stockDetails.dailyDataS.peTtm);
-        $scope.stockValuation.push(pe);
-
-        /*$scope.stockValuationDataOverride = [
-            {
-                label: "PE",
-                yAxisID: 'y-axis-1',
-                type: 'line',
-                borderDash: [],
-                borderWidth: 2,
-                pointRadius: 0,
-                tension: 0.4
-            }
-        ];*/
-
-
-        $scope.chartOptionsStockPnl = { scales: {
-                                            yAxes: [
-                                                {
-                                                    id: 'y-axis-1',
-                                                    type: 'linear',
-                                                    display: true,
-                                                    position: 'left',
-                                                    ticks: { min:0 }
-                                                },
-                                                {
-                                                    id: 'y-axis-2',
-                                                    type: 'linear',
-                                                    display: true,
-                                                    position: 'right',
-                                                    ticks: { min:0 }
-                                                }
-                                            ]
-                                       } };
-
-        $scope.stockPnlDataOverride = [
-//              {
-//                label: "Sales",
-//                yAxisID: 'y-axis-1',
-//                type: 'bar'
-//              },
-              {
-                label: "NOPLAT",
-                yAxisID: 'y-axis-1',
-                type: 'bar'
-              },
-              {
-                label: "OPM%",
-                yAxisID: 'y-axis-2',
-                type: 'line'
-              },
-//              {
-//                label: "EBIT%",
-//                yAxisID: 'y-axis-2',
-//                type: 'line'
-//              },
-        ];
-
-        $scope.chartStockGrowthSeries = ['3 Yr Sales g%', '5 Yr Sales g%', '10 Yr Sales g%'];
-
-        $scope.chartOptionsStockGrowth = { scales: {
-                                            yAxes: [
-                                                {
-                                                    id: 'y-axis-1',
-                                                    type: 'linear',
-                                                    display: true,
-                                                    position: 'left',
-                                                    ticks: { min:0 }
-                                                }
-                                            ]
-                                       } };
-
-        $scope.stockGrowthDataOverride = [
-              {
-                label: "3 Yr Sales g%",
-                yAxisID: 'y-axis-1',
-                type: 'line'
-              },
-              {
-                label: "5 Yr Sales g%",
-                yAxisID: 'y-axis-1',
-                type: 'line'
-              },
-              {
-                label: "10 Yr Sales g%",
-                yAxisID: 'y-axis-1',
-                type: 'line'
-              },
-        ];
-
-        $scope.stockPnlSales = [sales];
-
-        $scope.stockPnlSalesDataOverride = [
-          {
-            label: "Sales",
-            yAxisID: 'y-axis-1',
-            type: 'bar'
-          }
-        ];
-
-        $scope.chartOptionsStockPnlSales = {
-          scales: {
-            yAxes: [
-              {
-                id: 'y-axis-1',
-                type: 'linear',
-                display: true,
-                position: 'left',
-                ticks: { min: 0 }
-              }
-            ]
-          }
-        };
-
+    // =====================================================================
+    // Price chart
+    // =====================================================================
+    function sliceRange() {
+        var d = S.ohlc.d, n = d.length;
+        if (!n) return { from: 0, to: -1 };
+        if (S.range === 'MAX') return { from: 0, to: n - 1 };
+        var last = parseD(d[n - 1]);
+        var months = { '1M': 1, '6M': 6, '1Y': 12, '3Y': 36, '5Y': 60 }[S.range];
+        var start = new Date(last.getFullYear(), last.getMonth() - months, last.getDate());
+        var i = 0;
+        while (i < n - 1 && parseD(d[i]) < start) i++;
+        return { from: i, to: n - 1 };
     }
 
-    function populateStockPriceMovements() {
-        var data1dpricemovements = [];
-        var data1wpricemovements = [];
-        var data2wpricemovements = [];
-        var data1mpricemovements = [];
-        var labelspricemovements = [];
-
-        for (var i = 0; i < $scope.priceMovements.length; i++) {
-            data1dpricemovements.push($scope.priceMovements[i].return1D);
-            data1wpricemovements.push($scope.priceMovements[i].return1W);
-            data2wpricemovements.push($scope.priceMovements[i].return2W);
-            data1mpricemovements.push($scope.priceMovements[i].return1M);
-            labelspricemovements.push($scope.priceMovements[i].key.date);
-        }
-        $scope.data1DPriceMovements.push(data1dpricemovements);
-        $scope.data1WPriceMovements.push(data1wpricemovements);
-        $scope.data2WPriceMovements.push(data2wpricemovements);
-        $scope.data1MPriceMovements.push(data1mpricemovements);
-       /* $scope.dataPriceMovements.push(data1dpricemovements);
-        $scope.dataPriceMovements.push(data1wpricemovements);
-        $scope.dataPriceMovements.push(data2wpricemovements);
-        $scope.dataPriceMovements.push(data1mpricemovements);*/
-
-        $scope.labelsPriceMovements = labelspricemovements;
-
-        var count1D = data1dpricemovements.length;
-        var sum1D = data1dpricemovements.reduce((previous, current) => current += previous);
-        $scope.mean1D = sum1D/count1D;
-        var dummyArray1D = Array.from(data1dpricemovements);
-        dummyArray1D.sort((a, b) => a - b);
-        var lowMiddle1D = Math.floor((dummyArray1D.length - 1) / 2);
-        var highMiddle1D = Math.ceil((dummyArray1D.length - 1) / 2);
-        $scope.median1D = (dummyArray1D[lowMiddle1D] + dummyArray1D[highMiddle1D]) / 2;
-
-        var count1W = data1wpricemovements.length;
-        var sum1W = data1wpricemovements.reduce((previous, current) => current += previous);
-        $scope.mean1W = sum1W/count1W;
-        var dummyArray1W = Array.from(data1wpricemovements);
-        dummyArray1W.sort((a, b) => a - b);
-        var lowMiddle1W = Math.floor((dummyArray1W.length - 1) / 2);
-        var highMiddle1W = Math.ceil((dummyArray1W.length - 1) / 2);
-        $scope.median1W = (dummyArray1W[lowMiddle1W] + dummyArray1W[highMiddle1W]) / 2;
-
-        var count2W = data2wpricemovements.length;
-        var sum2W = data2wpricemovements.reduce((previous, current) => current += previous);
-        $scope.mean2W = sum2W/count2W;
-        var dummyArray2W = Array.from(data2wpricemovements);
-        dummyArray2W.sort((a, b) => a - b);
-        var lowMiddle2W = Math.floor((dummyArray2W.length - 1) / 2);
-        var highMiddle2W = Math.ceil((dummyArray2W.length - 1) / 2);
-        $scope.median2W = (dummyArray2W[lowMiddle2W] + dummyArray2W[highMiddle2W]) / 2;
-
-        var count1M = data1mpricemovements.length;
-        var sum1M = data1mpricemovements.reduce((previous, current) => current += previous);
-        $scope.mean1M = sum1M/count1M;
-        var dummyArray1M = Array.from(data1mpricemovements);
-        dummyArray1M.sort((a, b) => a - b);
-        var lowMiddle1M = Math.floor((dummyArray1M.length - 1) / 2);
-        var highMiddle1M = Math.ceil((dummyArray1M.length - 1) / 2);
-        $scope.median1M = (dummyArray1M[lowMiddle1M] + dummyArray1M[highMiddle1M]) / 2;
-
+    function viewData() {
+        var r = sliceRange(), o = S.ohlc;
+        return {
+            from: r.from,
+            d: o.d.slice(r.from, r.to + 1), o: o.o.slice(r.from, r.to + 1), h: o.h.slice(r.from, r.to + 1),
+            l: o.l.slice(r.from, r.to + 1), c: o.c.slice(r.from, r.to + 1), v: o.v.slice(r.from, r.to + 1)
+        };
     }
 
-    function populateStockRecentPE() {
-        //console.log($scope.stockRecentPE);
-        var recentpe = [];
-        var recentmcap = [];
-        var recentMarketPrice = [];
-        var recentpb = [];
-        var recentevtoebita = [];
-        var recentpedate = [];
-        var resultDateMCap = [];
+    function renderPrice() {
+        var el = $('sa-price-chart');
+        if (!S.ohlc || !S.ohlc.d.length) { empty(el, 'No NSE price history for ' + TICKER + '.'); $('sa-readout').innerHTML = '&#160;'; return; }
+        var P = pal(), V = viewData(), n = V.d.length;
+        S.view = V;
+        var first = V.c[0], last = V.c[n - 1], up = last >= first;
+        var lineCol = up ? P.pos : P.neg;
+        var sel = S.sel;
+        var selUp = sel ? V.c[sel[1]] >= V.c[sel[0]] : up;
+        var selCol = selUp ? P.pos : P.neg;
 
-        for (var i = 0; i < $scope.recentValuations.length; i++) {
-            recentpe.push($scope.recentValuations[i].pe);
-            recentmcap.push($scope.recentValuations[i].marketCap); //populate
-            recentMarketPrice.push($scope.recentValuations[i].marketPrice);
-            recentpb.push($scope.recentValuations[i].pb);
-            recentevtoebita.push($scope.recentValuations[i].evToEbita);
-            recentpedate.push($scope.recentValuations[i].date);
-            var resultMCap = $scope.recentValuations[i].resultDateMCap;
-            resultDateMCap.push((resultMCap && resultMCap > 0) ? resultMCap : null);
+        var volColors = V.c.map(function (c, i) { return (i === 0 ? c >= V.o[i] : c >= V.c[i - 1]) ? alpha(P.pos, .45) : alpha(P.neg, .45); });
+        var mainSeries;
+        if (S.kind === 'candle') {
+            mainSeries = {
+                name: 'Price', type: 'candlestick', xAxisIndex: 0, yAxisIndex: 0,
+                data: V.d.map(function (_, i) { return [V.o[i], V.c[i], V.l[i], V.h[i]]; }),
+                itemStyle: { color: P.pos, color0: P.neg, borderColor: P.pos, borderColor0: P.neg },
+                large: n > 600
+            };
+        } else {
+            mainSeries = {
+                name: 'Price', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: V.c, showSymbol: false, symbolSize: 7,
+                lineStyle: { width: 2, color: lineCol }, itemStyle: { color: lineCol },
+                areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: alpha(lineCol, .22) }, { offset: 1, color: alpha(lineCol, 0) }]) },
+                emphasis: { disabled: true }
+            };
         }
-        $scope.dataRecentPE.push(recentpe);
-        $scope.dataRecentMCap.push(recentmcap);
-        $scope.dataRecentMarketPrice.push(recentMarketPrice);
-        $scope.dataRecentMCapAndPrice.push(recentmcap);
-        $scope.dataRecentMCapAndPrice.push(recentMarketPrice);
-        $scope.dataRecentMCapAndPrice.push(resultDateMCap);
-        //console.log(resultDateMCap);
-        $scope.dataRecentPB.push(recentpb);
-        $scope.dataRecentEvToEbita.push(recentevtoebita);
-        $scope.labelsRecentPE = recentpedate;
-
-        $scope.chartOptionsMCapAndPrice = { scales: {
-                                            yAxes: [
-                                                {
-                                                    id: 'y-axis-1',
-                                                    type: 'linear',
-                                                    display: true,
-                                                    position: 'left',
-                                                    ticks: { min:0 }
-                                                },
-                                                {
-                                                    id: 'y-axis-2',
-                                                    type: 'linear',
-                                                    display: true,
-                                                    position: 'right',
-                                                    ticks: { min:0 }
-                                                }
-                                            ]
-                                       } };
-        $scope.chartMCapAndPriceDatasetOverride = [
-            {
-                label: "MCap",
-                yAxisID: 'y-axis-1',
-                type: 'line',
-                borderDash: [],
-                borderWidth: 2,
-                pointRadius: 0,
-                lineTension: 0.4
-            },
-            {
-                label: "Price",
-                yAxisID: 'y-axis-2',
-                type: 'line',
-                borderDash: [],
-                borderWidth: 2,
-                pointRadius: 0,
-                lineTension: 0.4
-            },
-            {
-                label: "Result MCap",
-                yAxisID: 'y-axis-1',
-                type: 'line',
-                showLine: false,
-                pointRadius: 8,
-                pointHoverRadius: 10,
-                pointStyle: 'triangle',
-                borderWidth: 0,
-                backgroundColor: '#d9534f',
-                borderColor: '#d9534f',
-                pointBackgroundColor: '#d9534f',
-                pointBorderColor: '#d9534f'
-            }
-        ];
-        $scope.chartMCapAndPriceSeries = ['Market Cap', 'Price', 'Result MCap'];
-
-        $scope.chartOptionsRecentPE = {
-            scales: {
-                yAxes: [{
-                    id: 'y-axis-1',
-                    type: 'linear',
-                    position: 'left',
-                    ticks: {
-                        min: 0
-                    }
-                }]
-            }
-        };
-        $scope.chartRecentPEDatasetOverride = [
-            {
-                label: "TTM PE",
-                yAxisID: 'y-axis-1',
-                type: 'line',
-                borderDash: [],
-                borderWidth: 2,
-                pointRadius: 0,
-                tension: 0.4
-            }
-        ];
-        $scope.chartOptionsRecentPB = {
-            scales: {
-                yAxes: [{
-                    id: 'y-axis-1',
-                    type: 'linear',
-                    position: 'left',
-                    ticks: {
-                        min: 0
-                    }
-                }]
-            }
-        };
-
-        $scope.chartRecentPBDatasetOverride = [
-            {
-                label: "TTM PB",
-                yAxisID: 'y-axis-1',
-                type: 'line',
-                borderDash: [],
-                borderWidth: 2,
-                pointRadius: 0,
-                tension: 0.4
-            }
-        ];
-
-        $scope.chartOptionsRecentEvToEbita = {
-            scales: {
-                yAxes: [{
-                    id: 'y-axis-1',
-                    type: 'linear',
-                    position: 'left',
-                    ticks: {
-                        min: 0
-                    }
-                }]
-            }
-        };
-
-        $scope.chartRecentEvToEbitaDatasetOverride = [
-            {
-                label: "EV/EBITA",
-                yAxisID: 'y-axis-1',
-                type: 'line',
-                borderDash: [],
-                borderWidth: 2,
-                pointRadius: 0,
-                tension: 0.4
-            }
-        ];
-
-
-    }
-
-    function populateStockQuarterChart() {
-
-        /* Begin: Populate Quarter Sales and Profit */
-        var sortedStockQuarter = $filter('orderBy')($scope.stockQuarter,'key.date');
-        //console.log("$scope.stockQuarter"+$scope.stockQuarter);
-        var map = $filter('groupBy')(sortedStockQuarter, 'key.date');
-        //console.log("map"+map);
-
-        var years = [];
-        var sales = [];
-        var noplat = [];
-        var salesGrowth = [];
-        var opm = [];
-        var operatingProfitGrowth = [];
-//        var computedNpm = 0.00;
-        var i = Object.keys(map).length;
-
-        for(var yr in map){
-           i = i - 1;
-           if (i > 10) {
-             continue;
-           }
-           years.push(yr);
-           //console.log(yr);
-           sales.push(map[yr][0].sales);
-           //console.log(map[yr][0].sales);
-           noplat.push(map[yr][0].noplat);
-           salesGrowth.push(Number(Math.round(map[yr][0].salesG*100 * 100)/100 || 1));
-           operatingProfitGrowth.push(Number(Math.round(map[yr][0].ebitdaG*100 * 100)/100 || 1));
-           opm.push(Number(Math.round(map[yr][0].opm*100 * 100)/100 || 1));
+        // selection overlay
+        var a = sel ? sel : (S.pending != null ? [S.pending, S.pending] : null);
+        if (a) {
+            mainSeries.markArea = sel ? {
+                silent: true, itemStyle: { color: alpha(selCol, .10) },
+                data: [[{ xAxis: V.d[a[0]] }, { xAxis: V.d[a[1]] }]]
+            } : undefined;
+            mainSeries.markLine = {
+                silent: true, symbol: 'none', label: { show: false },
+                lineStyle: { color: sel ? selCol : P.ink2, type: 'solid', width: 1 },
+                data: (sel ? [a[0], a[1]] : [a[0]]).map(function (i) { return { xAxis: V.d[i] }; })
+            };
+            mainSeries.markPoint = {
+                silent: true, symbol: 'circle', symbolSize: 9,
+                itemStyle: { color: sel ? selCol : P.ink2, borderColor: P.surface, borderWidth: 2 }, label: { show: false },
+                data: (sel ? [a[0], a[1]] : [a[0]]).map(function (i) { return { coord: [V.d[i], V.c[i]] }; })
+            };
         }
 
-        $scope.labelsYearsStockQuarter = years;
-        $scope.stockQuarter = [];
-        $scope.stockQuarter.push(noplat);
-        $scope.stockQuarter.push(opm);
-
-        $scope.chartOptionsStockQuarter = { scales: {
-                                            yAxes: [
-                                                {
-                                                    id: 'y-axis-1',
-                                                    type: 'linear',
-                                                    display: true,
-                                                    position: 'left',
-                                                    ticks: { min:0 }
-                                                },
-                                                {
-                                                    id: 'y-axis-2',
-                                                    type: 'linear',
-                                                    display: true,
-                                                    position: 'right',
-                                                    ticks: { min:0 }
-                                                }
-                                            ]
-                                       } };
-
-        $scope.stockQuarterDataOverride = [
-              {
-                label: "NOPLAT",
-                yAxisID: 'y-axis-1',
-                type: 'bar'
-              },
-              {
-                label: "OPM%",
-                yAxisID: 'y-axis-2',
-                type: 'line', borderDash: [], borderWidth: 2, pointRadius: 0, tension: 0.4
-              },
-        ];
-
-        $scope.stockQuarterSales = [sales];
-
-        $scope.stockQuarterSalesDataOverride = [
-          {
-            label: "Sales",
-            yAxisID: 'y-axis-1',
-            type: 'bar'
-          }
-        ];
-
-        $scope.chartOptionsStockQuarterSales = {
-          scales: {
-            yAxes: [
-              {
-                id: 'y-axis-1',
-                type: 'linear',
-                display: true,
-                position: 'left',
-                ticks: { min: 0 }
-              }
-            ]
-          }
-        };
-
-
-    }
-
-    function renderExcelCharts() {
-        if ($scope.stockDetails.excelCharts && $scope.stockDetails.excelCharts.length > 0) {
-            let container = document.getElementById('dynamicCustomChartsContainer');
-            container.innerHTML = ""; // Clear previous charts
-
-            $scope.stockDetails.excelCharts.forEach(function (chartInfo, index) {
-
-                if (index % 2 === 0) {
-                    // Create new row every 2 charts
-                    rowDiv = document.createElement('div');
-                    rowDiv.className = 'row';
-                    container.appendChild(rowDiv);
-                }
-                // === Outer Column Wrapper ===
-                let wrapperColDiv = document.createElement('div');
-                wrapperColDiv.className = 'col-md-6 col-sm-12 col-xs-12';
-                wrapperColDiv.style.padding = "10px";
-
-                // === x_panel ===
-                let panel = document.createElement('div');
-                panel.className = 'x_panel';
-
-                // === x_title ===
-                let titleDiv = document.createElement('div');
-                titleDiv.className = 'x_title';
-
-                let titleH2 = document.createElement('h2');
-
-                let chartSeries = (chartInfo.series && chartInfo.series.length > 0)
-                    ? chartInfo.series
-                    : [{ label: chartInfo.fieldName || chartInfo.title, values: chartInfo.values, chartType: chartInfo.chartType || 'line' }];
-                let isStacked = chartInfo.stacked === true;
-                let showLegend = (chartInfo.showLegend === true) || chartSeries.length > 1;
-
-                let latestVal = null;
-                let latestSeriesName = '';
-                let latestBySeries = [];
-                chartSeries.forEach(function (series) {
-                    if (!series || !series.values) return;
-                    for (let i = series.values.length - 1; i >= 0; i--) {
-                        if (series.values[i] != null && isFinite(series.values[i])) {
-                            latestBySeries.push({
-                                name: series.label || '',
-                                value: series.values[i]
-                            });
-                            if (latestVal == null) {
-                                latestVal = series.values[i];
-                                latestSeriesName = series.label || '';
-                            }
-                            break;
-                        }
-                    }
-                });
-
-                // Format value
-                let formattedLatest = "";
-                if (latestVal != null) {
-                    if (Math.abs(latestVal) <= 1) {
-                        formattedLatest = (latestVal * 100).toFixed(1) + "%";
-                    } else if (Math.abs(latestVal) > 1000) {
-                        formattedLatest = Math.round(latestVal).toLocaleString('en-IN');
+        var c = chart('sa-price-chart');
+        c.setOption({
+            animation: false,
+            textStyle: { fontFamily: P.font },
+            axisPointer: { link: [{ xAxisIndex: 'all' }], lineStyle: { color: P.axis }, label: { backgroundColor: P.ink2 } },
+            tooltip: Object.assign(tooltipBase(P), {
+                trigger: 'axis', axisPointer: { type: 'line', lineStyle: { color: P.axis } },
+                formatter: function (ps) {
+                    var i = ps[0].dataIndex, chg = i > 0 ? V.c[i] / V.c[i - 1] - 1 : null;
+                    var s = '<div style="font-weight:600;margin-bottom:4px">' + fmtD(V.d[i]) + '</div>';
+                    if (S.kind === 'candle') {
+                        s += 'O ' + px(V.o[i]) + ' &nbsp;H ' + px(V.h[i]) + '<br/>L ' + px(V.l[i]) + ' &nbsp;C <b>' + px(V.c[i]) + '</b>';
                     } else {
-                        formattedLatest = latestVal.toFixed(1);
+                        s += 'Close <b>' + px(V.c[i]) + '</b>';
                     }
+                    if (chg != null) s += ' <span style="color:' + (chg >= 0 ? P.pos : P.neg) + '">' + pct(chg, 2) + '</span>';
+                    s += '<br/><span style="color:' + P.muted + '">Volume ' + compact(V.v[i]) + '</span>';
+                    return s;
                 }
+            }),
+            grid: [{ left: 8, right: 64, top: 10, height: '70%' }, { left: 8, right: 64, top: '80%', bottom: 26 }],
+            xAxis: [
+                { type: 'category', data: V.d, boundaryGap: S.kind === 'candle', axisLine: { lineStyle: { color: P.axis } },
+                  axisTick: { show: false }, axisLabel: { show: false }, splitLine: { show: false } },
+                { type: 'category', gridIndex: 1, data: V.d, boundaryGap: S.kind === 'candle', axisLine: { lineStyle: { color: P.axis } },
+                  axisTick: { show: false }, splitLine: { show: false },
+                  axisLabel: Object.assign(baseText(P), { hideOverlap: true,
+                      formatter: function (s) { return n <= 40 ? fmtD(s).replace(/ \d{4}$/, '') : fmtShort(s); } }) }
+            ],
+            yAxis: [
+                { scale: true, position: 'right', splitNumber: 5, axisLabel: Object.assign(baseText(P), { formatter: axisNum }),
+                  splitLine: { lineStyle: { color: P.grid } }, axisLine: { show: false } },
+                { gridIndex: 1, position: 'right', splitNumber: 2, axisLabel: Object.assign(baseText(P), { formatter: compact }),
+                  splitLine: { show: false }, axisLine: { show: false } }
+            ],
+            series: [
+                mainSeries,
+                { name: 'Volume', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, barCategoryGap: '20%', large: n > 600,
+                  data: V.v.map(function (v, i) { return { value: v, itemStyle: { color: volColors[i] } }; }) }
+            ]
+        }, true);
+        renderReadout();
+    }
 
-                let latestSummary = '';
-                if (latestBySeries.length > 0) {
-                    latestSummary = latestBySeries
-                        .slice(0, 10)
-                        .map(function(item) {
-                            let val = item.value;
-                            let fmt = '';
-                            if (Math.abs(val) <= 1) {
-                                fmt = (val * 100).toFixed(1) + '%';
-                            } else if (Math.abs(val) > 1000) {
-                                fmt = Math.round(val).toLocaleString('en-IN');
-                            } else {
-                                fmt = val.toFixed(1);
-                            }
-                            return `${item.name}: ${fmt}`;
-                        })
-                        .join(' | ');
-                }
-
-                // Title text with subtitle
-                titleH2.innerHTML = `${chartInfo.title} <small style="
-                    display: block;
-                    font-size: 13px;
-                    font-weight: normal;
-                    color: #555;
-                    margin-top: 6px;
-                    line-height: 1.6;
-                    white-space: normal;
-                    word-break: break-word;
-                    overflow-wrap: break-word;
-                ">(${latestSummary || (latestSeriesName ? `Series: ${latestSeriesName}` : `Field: ${chartInfo.fieldName}`)}${(!latestSummary && formattedLatest) ? `, Latest: ${formattedLatest}` : ''})</small>`;
-
-                titleDiv.appendChild(titleH2);
-
-                let toolbox = document.createElement('ul');
-                toolbox.className = 'nav navbar-right panel_toolbox';
-                toolbox.innerHTML = `
-                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            <i class="fa fa-wrench"></i>
-                        </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Settings 1</a></li>
-                            <li><a href="#">Settings 2</a></li>
-                        </ul>
-                    </li>
-                    <li><a class="close-link"><i class="fa fa-close"></i></a></li>
-                `;
-                titleDiv.appendChild(toolbox);
-
-                let clearFix = document.createElement('div');
-                clearFix.className = 'clearfix';
-                titleDiv.appendChild(clearFix);
-
-                panel.appendChild(titleDiv);
-
-                // === x_content ===
-                let contentDiv = document.createElement('div');
-                contentDiv.className = 'x_content';
-
-                let canvas = document.createElement('canvas');
-                canvas.style.width = '100%';
-                canvas.style.height = '320px';
-                contentDiv.appendChild(canvas);
-
-                panel.appendChild(contentDiv);
-                wrapperColDiv.appendChild(panel);
-                rowDiv.appendChild(wrapperColDiv);
-
-                const palette = ['#26B99A', '#3498DB', '#9B59B6', '#F39C12', '#E74C3C', '#1ABC9C', '#2ECC71', '#34495E'];
-                let datasets = [];
-
-                chartSeries.forEach(function(series, idx) {
-                    if (!series || !series.values) return;
-                    let formattedValues = series.values.map(function(val) {
-                        if (val == null) return null;
-                        if (Math.abs(val) <= 1) {
-                            return +(val * 100).toFixed(1);
-                        } else if (Math.abs(val) > 1000) {
-                            return Math.round(val);
-                        } else {
-                            return +val.toFixed(1);
-                        }
-                    });
-
-                    const color = palette[idx % palette.length];
-                    let datasetType = series.chartType || chartInfo.chartType || 'line';
-                    let validPointCount = formattedValues.filter(function(v) {
-                        return v !== null && v !== undefined && !isNaN(v);
-                    }).length;
-
-                    datasets.push({
-                        label: series.label || ('Series ' + (idx + 1)),
-                        data: formattedValues,
-                        borderWidth: 2,
-                        borderColor: color,
-                        backgroundColor: color,
-                        fill: false,
-                        type: datasetType,
-                        pointRadius: (datasetType === 'bar') ? 0 : 2,
-                        tension: 0,
-                        showLine: (datasetType === 'line') ? (validPointCount > 1) : true,
-                        spanGaps: true,
-                        stack: isStacked ? 'stack-group-1' : undefined   // ADD THIS LINE
-                    });
-                });
-
-                datasets = datasets.filter(function(ds) {
-                    return ds.data && ds.data.some(function(v) { return v !== null && v !== undefined && !isNaN(v); });
-                });
-                if (datasets.length === 0) {
-                    return;
-                }
-
-                let primaryType = datasets[0].type || 'line';
-                let normalizedLabels = (chartInfo.labels || []).map(function(lbl, idx) {
-                    if (lbl === null || lbl === undefined || lbl === '') {
-                        return 'P' + (idx + 1);
-                    }
-                    return lbl;
-                });
-
-                let maxDataPoints = datasets.reduce(function(maxLen, ds) {
-                    return Math.max(maxLen, (ds.data && ds.data.length) ? ds.data.length : 0);
-                }, 0);
-
-                if (normalizedLabels.length === 0 && maxDataPoints > 0) {
-                    normalizedLabels = Array.from({ length: maxDataPoints }, function(_, idx) {
-                        return 'P' + (idx + 1);
-                    });
-                } else if (normalizedLabels.length < maxDataPoints) {
-                    for (let i = normalizedLabels.length; i < maxDataPoints; i++) {
-                        normalizedLabels.push('P' + (i + 1));
-                    }
-                }
-
-                datasets = datasets.map(function(ds) {
-                    let nextData = (ds.data || []).slice(0, normalizedLabels.length);
-                    while (nextData.length < normalizedLabels.length) {
-                        nextData.push(null);
-                    }
-                    ds.data = nextData;
-                    return ds;
-                });
-
-                // === Create Chart ===
-                try {
-                    new Chart(canvas.getContext('2d'), {
-                    type: primaryType,
-                    data: {
-                        labels: normalizedLabels,
-                        datasets: datasets
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            title: {
-                                display: false
-                            },
-                            legend: {
-                                display: showLegend
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let val = context.raw;
-                                        if (val == null) return '';
-                                        if (Math.abs(val) >= 1000) {
-                                            return Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
-                                        } else if (Math.abs(val) <= 100) {
-                                            return Number(val).toLocaleString('en-IN', { maximumFractionDigits: 1 });
-                                        } else {
-                                            return Number(val).toFixed(1);
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                stacked: isStacked,
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        if (Math.abs(value) >= 1000) {
-                                            return Number(value).toLocaleString('en-IN', { maximumFractionDigits: 0 });
-                                        } else if (Math.abs(value) <= 100) {
-                                            return Number(value).toLocaleString('en-IN', { maximumFractionDigits: 1 });
-                                        } else {
-                                            return Number(value).toFixed(1);
-                                        }
-                                    }
-                                }
-                            },
-                            x: {
-                                stacked: isStacked,
-                                ticks: {
-                                    autoSkip: true,
-                                    maxTicksLimit: 10
-                                }
-                            }
-                        }
-                    }
-                });
-                } catch (e) {
-                    console.error('Failed rendering custom excel chart', chartInfo, e);
-                }
-            });
+    function renderReadout() {
+        var V = S.view, el = $('sa-readout');
+        if (!V || !V.d.length) return;
+        var n = V.d.length;
+        function span(i, j, label) {
+            var r = V.c[j] / V.c[i] - 1, abs = V.c[j] - V.c[i];
+            var days = Math.round((parseD(V.d[j]) - parseD(V.d[i])) / 864e5);
+            var cagr = days > 400 ? Math.pow(V.c[j] / V.c[i], 365 / days) - 1 : null;
+            return (label ? '<span>' + label + '</span>' : '') +
+                '<span class="big ' + cls(r) + '">' + pct(r, 2) + '</span>' +
+                '<span class="' + cls(abs) + '">' + (abs >= 0 ? '+' : '−') + px(Math.abs(abs)) + '</span>' +
+                '<span><b>' + fmtD(V.d[i]) + '</b> ' + px(V.c[i]) + ' → <b>' + fmtD(V.d[j]) + '</b> ' + px(V.c[j]) + '</span>' +
+                '<span>' + num(days) + ' days' + (cagr != null ? ' · CAGR <b class="' + cls(cagr) + '">' + pct(cagr, 1) + '</b>' : '') + '</span>';
+        }
+        if (S.sel) {
+            var i = Math.min(S.sel[0], S.sel[1]), j = Math.max(S.sel[0], S.sel[1]);
+            el.innerHTML = span(i, j, '<i class="fa fa-arrows-h"></i> Selected') +
+                '<button class="x" type="button" id="sa-clear" title="Clear selection (Esc)">✕ Clear</button>';
+            $('sa-clear').onclick = clearSel;
+        } else if (S.pending != null) {
+            el.innerHTML = '<span><i class="fa fa-crosshairs"></i> Start: <b>' + fmtD(V.d[S.pending]) + '</b> ' + px(V.c[S.pending]) +
+                '</span><span class="tw-muted">Click a second point to measure the return.</span>' +
+                '<button class="x" type="button" id="sa-clear">✕ Cancel</button>';
+            $('sa-clear').onclick = clearSel;
+        } else {
+            el.innerHTML = span(0, n - 1, '<b>' + (S.range === 'MAX' ? 'Max' : S.range) + '</b>');
         }
     }
 
-    // === Extended: Display Notes Section for Each Ticker ===
-    function renderReportNotes() {
-        let container = document.getElementById("reportNotesContainer");
-        if (!container) {
-            return;
-        }
-        container.innerHTML = "";
+    function clearSel() { S.sel = null; S.pending = null; S.drag = null; renderPrice(); }
 
-        let notes = $scope.stockDetails.reportNotes;
-        if (!notes || notes.length === 0) {
-            container.innerHTML = "<p>No notes available.</p>";
-            return;
-        }
+    function idxAt(c, x) {
+        var V = S.view; if (!V) return null;
+        var v = c.convertFromPixel({ xAxisIndex: 0 }, x);
+        if (v == null || isNaN(v)) return null;
+        return Math.max(0, Math.min(V.d.length - 1, Math.round(v)));
+    }
+    function inPlot(c, e) { return c.containPixel({ gridIndex: 0 }, [e.offsetX, e.offsetY]) || c.containPixel({ gridIndex: 1 }, [e.offsetX, e.offsetY]); }
 
-        // === Group notes by "ticker|date|documentSource"
-        let grouped = {};
-        notes.forEach(note => {
-            let mainKey = `${note.ticker}|${note.date}|${note.documentSource}`;
-            let subKey = `${note.documentSection}|${note.infoCategory}`;
-            if (!grouped[mainKey]) grouped[mainKey] = {};
-            if (!grouped[mainKey][subKey]) grouped[mainKey][subKey] = [];
-            grouped[mainKey][subKey].push(note);
+    function bindMeasure() {
+        var c = chart('sa-price-chart'), zr = c.getZr();
+        zr.on('mousedown', function (e) {
+            if (!S.view || !inPlot(c, e)) return;
+            var i = idxAt(c, e.offsetX); if (i == null) return;
+            S.drag = { start: i, x: e.offsetX, moved: false };
         });
+        zr.on('mousemove', function (e) {
+            if (!S.drag) return;
+            if (Math.abs(e.offsetX - S.drag.x) < 6 && !S.drag.moved) return;
+            var i = idxAt(c, e.offsetX); if (i == null) return;
+            S.drag.moved = true; S.pending = null;
+            var next = [Math.min(S.drag.start, i), Math.max(S.drag.start, i)];
+            if (next[0] === next[1]) return;
+            if (!S.sel || S.sel[0] !== next[0] || S.sel[1] !== next[1]) { S.sel = next; renderPrice(); }
+        });
+        function up(e) {
+            if (!S.drag) return;
+            var d = S.drag; S.drag = null;
+            if (d.moved) return;                         // drag finished; selection already shown
+            var i = d.start;                             // a click: two clicks make a selection
+            if (S.pending == null || S.sel) { S.sel = null; S.pending = i; }
+            else if (i !== S.pending) { S.sel = [Math.min(S.pending, i), Math.max(S.pending, i)]; S.pending = null; }
+            renderPrice();
+        }
+        zr.on('mouseup', up);
+        zr.on('globalout', function () { if (S.drag && S.drag.moved) S.drag = null; });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && (S.sel || S.pending != null)) clearSel(); });
+    }
 
-        Object.keys(grouped).forEach(mainKey => {
-            let [ticker, rawDate, documentSource] = mainKey.split("|");
-            let formattedDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : rawDate;
-
-            // === Big Bold Header ===
-            let h2 = document.createElement("h2");
-            h2.innerText = `${ticker} - ${formattedDate} - ${documentSource}`;
-            h2.style.fontWeight = "bold";
-            h2.style.marginTop = "30px";
-            container.appendChild(h2);
-
-            let subGroup = grouped[mainKey];
-            Object.keys(subGroup).forEach(subKey => {
-                let [docSection, infoCategory] = subKey.split("|");
-
-                // === Sub Header (smaller bold) ===
-                let h4 = document.createElement("h4");
-                h4.innerText = `${docSection} - ${infoCategory}`;
-                h4.style.fontWeight = "bold";
-                h4.style.marginTop = "15px";
-                h4.style.fontSize = "16px";
-                container.appendChild(h4);
-
-                // === Bullet List ===
-                subGroup[subKey].forEach(note => {
-                    let bullet = document.createElement("div");
-                    bullet.innerText = `${note.infoSubCategory}: ${note.information}`;
-                    bullet.style.marginLeft = "20px";
-                    bullet.style.fontSize = "14px";
-                    bullet.style.marginBottom = "4px";
-                    container.appendChild(bullet);
-                });
-            });
+    function bindSeg(id, attr, key, cb) {
+        $(id).addEventListener('click', function (e) {
+            var b = e.target.closest('button'); if (!b) return;
+            Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.classList.toggle('on', x === b); });
+            S[key] = b.getAttribute(attr); cb();
         });
     }
-});
+
+    // =====================================================================
+    // Header + tiles
+    // =====================================================================
+    function renderHeader() {
+        var D = S.details, O = S.ohlc;
+        if (D) {
+            if (D.name) $('sa-name').textContent = D.name;
+            var crumbs = [D.sectorNameDisplay, D.industryNameDisplay, D.subIndustryNameDisplay].filter(Boolean);
+            $('sa-crumbs').textContent = crumbs.join('  ›  ') || ' ';
+            var idx = D.includedIndexName || (D.isNifty50 ? 'NIFTY 50' : '');
+            if (idx) { $('sa-index').hidden = false; $('sa-index').textContent = idx; }
+            document.title = (D.shortName || D.name || TICKER) + ' · Stock analysis';
+        }
+        if (O && O.d.length) {
+            var n = O.d.length, last = O.c[n - 1], prev = n > 1 ? O.c[n - 2] : null;
+            $('sa-price').textContent = px(last);
+            if (prev) {
+                var ch = last - prev, r = last / prev - 1;
+                $('sa-chg').className = 'sa-chg ' + cls(ch);
+                $('sa-chg').textContent = (ch >= 0 ? '+' : '−') + px(Math.abs(ch)).replace('₹', '₹') + '  (' + pct(r, 2) + ')  1D';
+            }
+            $('sa-asof').textContent = 'NSE close · ' + fmtD(O.d[n - 1]);
+        }
+        renderTiles();
+    }
+
+    function renderTiles() {
+        var D = S.details, O = S.ohlc, html = '';
+        var dd = D && D.dailyDataS;
+        if (dd) {
+            html += tile('Market cap', cr(dd.marketCap), D.marketcapRank ? 'Rank ' + D.marketcapRank : '');
+            html += tile('P/E (TTM)', dd.peTtm ? num(dd.peTtm, 1) + '×' : '–', dd.historicalPe3years ? '3Y avg ' + num(dd.historicalPe3years, 1) + '×' : '');
+            html += tile('P/B', dd.pbTtm ? num(dd.pbTtm, 1) + '×' : '–', '');
+            html += tile('ROCE', dd.roce != null ? num(dd.roce, 1) + '%' : '–', dd.avgRoce3years != null ? '3Y avg ' + num(dd.avgRoce3years, 1) + '%' : '');
+            html += tile('ROE', dd.roe != null ? num(dd.roe, 1) + '%' : '–', dd.avgRoe3years != null ? '3Y avg ' + num(dd.avgRoe3years, 1) + '%' : '');
+        }
+        if (O && O.d.length) {
+            var n = O.d.length, lastD = parseD(O.d[n - 1]);
+            var yAgo = new Date(lastD.getFullYear() - 1, lastD.getMonth(), lastD.getDate());
+            var hi = -Infinity, lo = Infinity;
+            for (var i = n - 1; i >= 0 && parseD(O.d[i]) >= yAgo; i--) { hi = Math.max(hi, O.h[i]); lo = Math.min(lo, O.l[i]); }
+            var last = O.c[n - 1];
+            html += tile('52-week range', px(lo) + ' – ' + px(hi), pct(last / hi - 1, 1) + ' from high');
+        }
+        var C = S.cons;
+        if (C && C.dates && C.dates.length) {
+            var k = C.dates.length - 1, tp = C.tpAvg[k], price = O && O.c.length ? O.c[O.c.length - 1] : C.price[k];
+            if (tp && price) html += tile('Consensus TP', px(tp), '<span class="' + cls(tp / price - 1) + '">' + pct(tp / price - 1, 1) + '</span> upside · ' + (C.analysts[k] || '–') + ' analysts');
+        }
+        $('sa-tiles').innerHTML = html;
+    }
+
+    // =====================================================================
+    // Fundamentals
+    // =====================================================================
+    function fyLabel(dateStr) { var d = parseD(dateStr); var y = d.getMonth() >= 3 ? d.getFullYear() + 1 : d.getFullYear(); return 'FY' + String(y).slice(2); }
+    function qLabel(dateStr) { var d = parseD(dateStr); return MON[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2); }
+    function preferConsolidated(rows) {
+        var hasC = rows.some(function (r) { return r.key.consStandalone === 'C'; });
+        return rows.filter(function (r) { return r.key.consStandalone === (hasC ? 'C' : 'S'); })
+            .sort(function (a, b) { return a.key.date < b.key.date ? -1 : 1; });
+    }
+    function isFinancial() {
+        var D = S.details || {};
+        return /financ|bank/i.test((D.sectorNameDisplay || '') + ' ' + (D.industryNameDisplay || ''));
+    }
+    // share count (crore) for split-consistent EPS: today's market cap / today's price (both post any split or bonus),
+    // else the latest quarter's market cap / price, else latest annual NP / EPS
+    function sharesCr(pnl, qtr) {
+        var dd = S.details && S.details.dailyDataS, O = S.ohlc;
+        if (dd && dd.marketCap > 0 && O && O.c.length) return dd.marketCap / O.c[O.c.length - 1];
+        for (var i = qtr.length - 1; i >= 0; i--) if (qtr[i].mcap > 0 && qtr[i].price > 0) return qtr[i].mcap / qtr[i].price;
+        for (var j = pnl.length - 1; j >= 0; j--) if (pnl[j].eps > 0 && pnl[j].netProfit) return pnl[j].netProfit / pnl[j].eps;
+        return null;
+    }
+
+    function renderFundamentals() {
+        var pnl = preferConsolidated(S.pnl || []), qtr = preferConsolidated(S.qtr || []);
+        var fin = isFinancial(), sh = sharesCr(pnl, qtr), annual = S.period === 'A';
+        var rows = annual ? pnl.slice(-10) : qtr.slice(-12);
+        var labels = rows.map(function (r) { return annual ? fyLabel(r.key.date) : qLabel(r.key.date); });
+        var rev = rows.map(function (r) { return r.sales; });
+        var ebitda = rows.map(function (r) { return r.operatingProfit; });
+        var eps = rows.map(function (r) { return sh ? r.netProfit / sh : null; });
+        var nAct = rows.length;
+
+        // append consensus estimates (annual view only)
+        var C = S.cons, estRev = [], estEps = [];
+        if (annual && C && C.dates && C.dates.length && nAct) {
+            var lastFy = +labels[nAct - 1].slice(2), k = C.dates.length - 1;
+            Object.keys(C.fy).sort().forEach(function (fy) {
+                var y = +fy.replace(/\D/g, ''); if (!(y > lastFy)) return;
+                labels.push(fy + 'E');
+                var f = C.fy[fy];
+                rev.push(f.revAvg[k]); ebitda.push(null); eps.push(f.epsAvg[k]);
+            });
+        }
+
+        var last = rows.length ? rows[rows.length - 1] : null;
+        $('sa-fin-asof').textContent = last ? 'Data as of ' + (annual ? labels[nAct - 1] + ' (' + fmtD(last.key.date) + ')' : fmtD(last.key.date)) : 'No data';
+        $('sa-fin-sub').textContent = annual ? 'Last 10 fiscal years' + (labels.length > nAct ? ', plus consensus estimates (E)' : '') + '. Hover for YoY growth.'
+            : 'Last 12 quarters. Hover for YoY growth.';
+        var notes = [];
+        if (sh) notes.push('EPS = net profit ÷ current share count, so it is comparable across splits and bonuses.');
+        if (fin) notes.push('Financial company: EBITDA is not meaningful for lenders; a dedicated banking view is planned.');
+        if (last && (Date.now() - parseD(last.key.date)) / 864e5 > (annual ? 550 : 200)) notes.push('Source financials have not been refreshed recently.');
+        $('sa-fin-note').textContent = notes.join(' ');
+
+        if (!rows.length) {
+            ['sa-rev', 'sa-ebitda', 'sa-eps'].forEach(function (id) { if (charts[id]) charts[id].dispose(); empty($(id), 'No financials available.'); });
+            return;
+        }
+        var lag = annual ? 1 : 4;
+        bars('sa-rev', labels, rev, nAct, lag, 's1');
+        if (fin) { if (charts['sa-ebitda']) charts['sa-ebitda'].dispose(); empty($('sa-ebitda'), 'Not shown for financial companies.'); }
+        else bars('sa-ebitda', labels.slice(0, nAct), ebitda.slice(0, nAct), nAct, lag, 's3');
+        if (sh) bars('sa-eps', labels, eps, nAct, lag, 's4', 1);
+        else { if (charts['sa-eps']) charts['sa-eps'].dispose(); empty($('sa-eps'), 'EPS not available.'); }
+    }
+
+    function bars(id, labels, vals, nAct, lag, colorVar, dp) {
+        var P = pal(), col = P[colorVar];
+        var el = $(id);
+        if (el.querySelector('.sa-empty')) { el.innerHTML = ''; if (charts[id]) charts[id].dispose(); }
+        chart(id).setOption({
+            animationDuration: 300,
+            textStyle: { fontFamily: P.font },
+            grid: { left: 4, right: 6, top: 18, bottom: 4, containLabel: true },
+            tooltip: Object.assign(tooltipBase(P), {
+                trigger: 'axis', axisPointer: { type: 'shadow', shadowStyle: { color: alpha(P.ink, .04) } },
+                formatter: function (ps) {
+                    var i = ps[0].dataIndex, v = vals[i], prev = i - lag >= 0 ? vals[i - lag] : null;
+                    var g = (v != null && prev) ? v / prev - 1 : null;
+                    return '<b>' + labels[i] + '</b>' + (i >= nAct ? ' <span style="color:' + P.muted + '">consensus</span>' : '') +
+                        '<br/>' + num(v, dp || 0) + (g != null && prev > 0 ? ' <span style="color:' + (g >= 0 ? P.pos : P.neg) + '">' + pct(g, 1) + ' YoY</span>' : '');
+                }
+            }),
+            xAxis: { type: 'category', data: labels, axisTick: { show: false }, axisLine: { lineStyle: { color: P.axis } },
+                     axisLabel: Object.assign(baseText(P), { hideOverlap: true, interval: 'auto' }) },
+            yAxis: { type: 'value', splitNumber: 3, axisLabel: Object.assign(baseText(P), { formatter: axisNum }),
+                     splitLine: { lineStyle: { color: P.grid } } },
+            series: [{
+                type: 'bar', barMaxWidth: 26,
+                data: vals.map(function (v, i) {
+                    var est = i >= nAct;
+                    return { value: v, itemStyle: {
+                        color: est ? alpha(col, .18) : (v < 0 ? P.neg : col),
+                        borderColor: est ? col : 'transparent', borderWidth: est ? 1 : 0, borderType: 'dashed',
+                        borderRadius: v < 0 ? [0, 0, 3, 3] : [3, 3, 0, 0] } };
+                })
+            }]
+        }, true);
+    }
+
+    // =====================================================================
+    // Consensus
+    // =====================================================================
+    function renderConsensus() {
+        var C = S.cons, card = $('sa-cons-card');
+        if (!C || !C.dates || !C.dates.length) { card.hidden = true; return; }
+        card.hidden = false;
+        var P = pal(), d = C.dates, k = d.length - 1;
+        $('sa-cons-asof').textContent = 'As of ' + fmtD(d[k]) + ' · ' + d.length + ' weeks';
+
+        // tiles
+        var price = C.price[k], html = '';
+        function chg(arr, weeks) { var j = k - weeks; return j >= 0 && arr[j] ? arr[k] / arr[j] - 1 : null; }
+        if (C.tpAvg[k]) {
+            html += tile('Target price (avg)', px(C.tpAvg[k]), price ? '<span class="' + cls(C.tpAvg[k] / price - 1) + '">' + pct(C.tpAvg[k] / price - 1, 1) + '</span> vs ' + px(price) : '');
+            html += tile('Target range', px(C.tpMin[k]) + ' – ' + px(C.tpMax[k]), C.tpAvg[k] ? 'spread ' + pct((C.tpMax[k] - C.tpMin[k]) / C.tpAvg[k], 0).replace('+', '') : '');
+            var t13 = chg(C.tpAvg, 13);
+            html += tile('TP change, 13 weeks', '<span class="' + cls(t13) + '">' + pct(t13, 1) + '</span>', '4 weeks: ' + pct(chg(C.tpAvg, 4), 1));
+        }
+        html += tile('Analysts', C.analysts[k] != null ? String(C.analysts[k]) : '–', k >= 13 && C.analysts[k - 13] != null ? (C.analysts[k] - C.analysts[k - 13] >= 0 ? '+' : '') + (C.analysts[k] - C.analysts[k - 13]) + ' in 13 weeks' : '');
+        var fys = Object.keys(C.fy).sort().filter(function (fy) { return C.fy[fy].epsAvg[k] != null; });
+        fys.slice(0, 2).forEach(function (fy) {
+            var e = C.fy[fy].epsAvg, c13 = chg(e, 13);
+            html += tile(fy + ' EPS (avg)', '₹' + num(e[k], 1), '13W revision <span class="' + cls(c13) + '">' + pct(c13, 1) + '</span>');
+        });
+        $('sa-cons-tiles').innerHTML = html;
+
+        // price vs target: band = tpMin + (tpMax - tpMin) stacked
+        var labels = d;
+        chart('sa-cons-tp').setOption({
+            animationDuration: 300, textStyle: { fontFamily: P.font },
+            grid: { left: 4, right: 58, top: 12, bottom: 4, containLabel: true },
+            tooltip: Object.assign(tooltipBase(P), {
+                trigger: 'axis', axisPointer: { lineStyle: { color: P.axis } },
+                formatter: function (ps) {
+                    var i = ps[0].dataIndex;
+                    return '<b>' + fmtD(d[i]) + '</b><br/>Price ' + px(C.price[i]) + '<br/>TP avg <b>' + px(C.tpAvg[i]) + '</b>' +
+                        (C.price[i] && C.tpAvg[i] ? ' <span style="color:' + (C.tpAvg[i] >= C.price[i] ? P.pos : P.neg) + '">' + pct(C.tpAvg[i] / C.price[i] - 1, 1) + '</span>' : '') +
+                        '<br/><span style="color:' + P.muted + '">Range ' + px(C.tpMin[i]) + ' – ' + px(C.tpMax[i]) + ' · ' + (C.analysts[i] || '–') + ' analysts</span>';
+                }
+            }),
+            xAxis: { type: 'category', data: labels, boundaryGap: false, axisTick: { show: false }, axisLine: { lineStyle: { color: P.axis } },
+                     axisLabel: Object.assign(baseText(P), { hideOverlap: true, formatter: fmtShort }) },
+            yAxis: { type: 'value', scale: true, splitNumber: 4, axisLabel: Object.assign(baseText(P), { formatter: axisNum }), splitLine: { lineStyle: { color: P.grid } } },
+            series: [
+                { name: 'min', type: 'line', stack: 'band', data: C.tpMin, symbol: 'none', lineStyle: { opacity: 0 }, silent: true },
+                { name: 'range', type: 'line', stack: 'band', symbol: 'none', lineStyle: { opacity: 0 }, silent: true,
+                  areaStyle: { color: alpha(P.s2, .14) },
+                  data: C.tpMax.map(function (v, i) { return v != null && C.tpMin[i] != null ? v - C.tpMin[i] : null; }) },
+                { name: 'TP avg', type: 'line', data: C.tpAvg, symbol: 'none', lineStyle: { width: 2, color: P.s2 }, itemStyle: { color: P.s2 },
+                  endLabel: { show: true, formatter: function () { return px(C.tpAvg[k]); }, color: P.s2, fontSize: 11, fontWeight: 600 } },
+                { name: 'Price', type: 'line', data: C.price, symbol: 'none', lineStyle: { width: 2, color: P.s1 }, itemStyle: { color: P.s1 },
+                  endLabel: { show: true, formatter: function () { return px(C.price[k]); }, color: P.s1, fontSize: 11, fontWeight: 600 } }
+            ]
+        }, true);
+
+        // EPS by FY: show the fiscal years that still have a current estimate (max 3)
+        var cols = [P.s1, P.s2, P.s3];
+        var show = fys.slice(0, 3);
+        $('sa-cons-eps-legend').innerHTML = show.map(function (fy, i) { return '<span><i style="background:' + cols[i] + '"></i>' + esc(fy) + ' EPS (avg)</span>'; }).join('');
+        chart('sa-cons-eps').setOption({
+            animationDuration: 300, textStyle: { fontFamily: P.font },
+            grid: { left: 4, right: 44, top: 12, bottom: 4, containLabel: true },
+            tooltip: Object.assign(tooltipBase(P), {
+                trigger: 'axis', axisPointer: { lineStyle: { color: P.axis } },
+                formatter: function (ps) {
+                    var i = ps[0].dataIndex, s = '<b>' + fmtD(d[i]) + '</b>';
+                    show.forEach(function (fy, j) {
+                        var f = C.fy[fy]; if (f.epsAvg[i] == null) return;
+                        s += '<br/><span style="color:' + cols[j] + '">●</span> ' + fy + ' <b>₹' + num(f.epsAvg[i], 1) + '</b>' +
+                            ' <span style="color:' + P.muted + '">(' + num(f.epsMin[i], 1) + '–' + num(f.epsMax[i], 1) + ')</span>';
+                    });
+                    return s;
+                }
+            }),
+            xAxis: { type: 'category', data: labels, boundaryGap: false, axisTick: { show: false }, axisLine: { lineStyle: { color: P.axis } },
+                     axisLabel: Object.assign(baseText(P), { hideOverlap: true, formatter: fmtShort }) },
+            yAxis: { type: 'value', scale: true, splitNumber: 4, axisLabel: Object.assign(baseText(P), { formatter: function (v) { return num(v, v < 10 ? 1 : 0); } }), splitLine: { lineStyle: { color: P.grid } } },
+            series: show.map(function (fy, i) {
+                return { name: fy, type: 'line', data: C.fy[fy].epsAvg, symbol: 'none', connectNulls: false,
+                         lineStyle: { width: 2, color: cols[i] }, itemStyle: { color: cols[i] },
+                         endLabel: { show: true, formatter: fy, color: cols[i], fontSize: 11, fontWeight: 600 } };
+            })
+        }, true);
+    }
+
+    // =====================================================================
+    // boot
+    // =====================================================================
+    function renderAll() {
+        renderHeader();
+        if (S.ohlc) renderPrice();
+        if (S.pnl || S.qtr) renderFundamentals();
+        renderConsensus();
+    }
+
+    bindSeg('sa-range', 'data-r', 'range', function () { S.sel = null; S.pending = null; renderPrice(); });
+    bindSeg('sa-kind', 'data-k', 'kind', renderPrice);
+    bindSeg('sa-period', 'data-p', 'period', renderFundamentals);
+    document.addEventListener('tw-themechange', renderAll);
+    if (window.matchMedia) {
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        (mq.addEventListener ? mq.addEventListener.bind(mq, 'change') : mq.addListener.bind(mq))(renderAll);
+    }
+
+    chart('sa-price-chart').showLoading('default', { text: '', color: pal().s1, maskColor: 'transparent' });
+    bindMeasure();
+
+    var t = encodeURIComponent(TICKER);
+    var pOhlc = getJSON('/public/api/getstockohlc/' + t).then(function (r) { S.ohlc = r; }).catch(function () { S.ohlc = { d: [] }; })
+        .then(function () { chart('sa-price-chart').hideLoading(); renderHeader(); renderPrice(); });
+    var pDet = getJSON('/public/api/getstockdetails/' + t).then(function (r) { S.details = r; renderHeader(); }).catch(function () {});
+    var pCons = getJSON('/public/api/getconsensus/' + t).then(function (r) { S.cons = r; }).catch(function () { S.cons = null; });
+    var pFin = Promise.all([
+        getJSON('/public/api/getstockpnl/' + t).catch(function () { return []; }),
+        getJSON('/public/api/getstockquarter/' + t).catch(function () { return []; })
+    ]).then(function (r) { S.pnl = r[0]; S.qtr = r[1]; });
+    Promise.all([pDet, pCons, pFin, pOhlc]).then(function () { renderTiles(); renderFundamentals(); renderConsensus(); });
+})();

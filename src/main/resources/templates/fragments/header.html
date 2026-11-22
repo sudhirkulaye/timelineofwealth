@@ -34,6 +34,15 @@
     <link href="../../static/vendors/nprogress/nprogress.css" th:href="@{/vendors/nprogress/nprogress.css}"  rel="stylesheet" />
     <!-- Custom Theme Style -->
     <link href="../../static/custom/custom.min.css" th:href="@{/custom/custom.min.css}" rel="stylesheet" />
+    <!-- Site theme (typography, palette, dark mode) layered over Gentelella -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="../../static/custom/theme.css" th:href="@{/custom/theme.css}" rel="stylesheet" />
+    <script>
+      (function () { try { var t = localStorage.getItem('tw-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+    </script>
+    <script defer="defer" src="../../static/custom/theme.js" th:src="@{/custom/theme.js}"></script>
 
     <!--&lt;!&ndash; googleAnalytics &ndash;&gt;-->
     <!--&lt;!&ndash;<script src="../../static/vendors/google-analytics/analytics.min.js" th:src="@{/js/googleAnalytics.js}"></script>&ndash;&gt;-->

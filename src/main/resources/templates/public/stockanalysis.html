@@ -1,546 +1,110 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: common-header" />
-<body class="nav-md" ng-app="StockAnalysisManagement" ng-controller="StockAnalysisController">
-<!-- iCheck -->
-<link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
-<!-- bootstrap-wysiwyg -->
-<link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" th:href="@{/vendors/google-code-prettify/bin/prettify.min.css}"  rel="stylesheet" />
-<!-- Select2 -->
-<link href="../../static/vendors/select2/dist/css/select2.min.css" th:href="@{/vendors/select2/dist/css/select2.min.css}"  rel="stylesheet" />
-<!-- Switchery -->
-<link href="../../static/vendors/switchery/dist/switchery.min.css" th:href="@{/vendors/switchery/dist/switchery.min.css}" rel="stylesheet" />
-<!-- starrr -->
-<link href="../../static/vendors/starrr/dist/starrr.css" th:href="@{/vendors/starrr/dist/starrr.css}"  rel="stylesheet" />
-<!-- bootstrap-daterangepicker -->
-<link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}"  rel="stylesheet" />
-<!-- Animate.css -->
-<link href="../../static/vendors/animate.css/animate.min.css" th:href="@{/vendors/animate.css/animate.min.css}" rel="stylesheet" />
-<!-- jQuery custom content scroller -->
-<link href="../../static/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" th:href="@{/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css}" rel="stylesheet" />
-<!--Angular JS-->
-<script src="../../static/vendors/angular/angular.min.js" th:src="@{/vendors/angular/angular.min.js}"></script>
-<!--Angular custom filter (for group by) JS-->
-<script src="../static/custom/angular-filter.js" th:src="@{/custom/angular-filter.js}"></script>
-<!-- Chart.js v2 - used by angular-chart directives (PE, PB, MCap charts) -->
-<script src="../../static/vendors/Chart.js/dist/Chart.min.js" th:src="@{/vendors/Chart.js/dist/Chart.min.js}"></script>
-<!-- Save v2 reference before v4 overwrites the global -->
-<script>window.ChartV2 = window.Chart;</script>
-<!-- angular.chartjs - must load after ChartV2 is saved -->
-<script src="../../static/vendors/angular.chartjs/angular-chart.min.js" th:src="@{/vendors/angular.chartjs/angular-chart.min.js}"></script>
-<!-- Chart.js v4 - only for dynamic excel charts in renderExcelCharts() -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>-->
-<!-- custom angular script -->
-<script type="text/javascript" src="../../static/custom/public/stockanalysis.js" th:src="@{/custom/public/stockanalysis.js}"></script>
+<body class="nav-md">
+<link href="../../static/custom/public/stockanalysis.css" th:href="@{/custom/public/stockanalysis.css}" rel="stylesheet" />
 <div class="container body">
     <div class="main_container">
-        <!-- sidebar menu -->
         <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
-        <!-- /sidebar menu -->
-
-        <!-- top navigation -->
         <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
-        <!-- /top navigation -->
 
-        <!-- page content -->
         <div class="right_col" role="main">
-            <div class="row">
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                    <br />
-                    <div class="x_panel">
-                        <div class="x_title">
-                            <h1><font color="green">Stock Analysis: {{stockDetails.shortName}}</font></h1>
-                            <p />Detailed Analysis of Stock
-                            <div class="clearfix"></div>
+            <div class="tw-page sa" id="sa" th:attr="data-ticker=${ticker}" data-ticker="TCS">
+
+                <!-- ===== header ===== -->
+                <header class="sa-head">
+                    <div class="sa-id">
+                        <div class="sa-crumbs" id="sa-crumbs">&#160;</div>
+                        <h1 id="sa-name" th:text="${title}">Company</h1>
+                        <div class="sa-tags"><span class="tw-chip" id="sa-ticker" th:text="${ticker}">TCS</span><span class="tw-chip" id="sa-index" hidden="hidden"></span></div>
+                    </div>
+                    <div class="sa-quote">
+                        <div class="sa-price" id="sa-price">&#8212;</div>
+                        <div class="sa-chg" id="sa-chg">&#160;</div>
+                        <div class="tw-muted tw-small" id="sa-asof">&#160;</div>
+                    </div>
+                </header>
+
+                <div class="tw-tiles sa-tiles" id="sa-tiles"></div>
+
+                <!-- ===== price ===== -->
+                <section class="tw-card">
+                    <div class="sa-bar">
+                        <div>
+                            <h2>Price</h2>
+                            <p class="tw-sub" style="margin:0">Drag across the chart, or click two points, to measure the return between them.</p>
                         </div>
-                        <div class="x_content">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Sector</th>
-                                        <td>{{stockDetails.sectorNameDisplay}}</td>
-                                        <th>Industry</th>
-                                        <td>{{stockDetails.industryNameDisplay}}</td>
-                                        <th>Sub-Industry</th>
-                                        <td>{{stockDetails.subIndustryNameDisplay}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Market Cap. (Cr)</th>
-                                        <td>{{stockDetails.dailyDataS.marketCap | currency:"&#8377;":0}}</td>
-                                        <th>TTM PE</th>
-                                        <td>{{stockDetails.dailyDataS.peTtm}}</td>
-                                        <th>TTM PB</th>
-                                        <td>{{stockDetails.dailyDataS.pbTtm}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>3 Yr Sales g%</th>
-                                        <td>{{salesGrowth3Yr*100 | number:2}}%</td>
-                                        <th>5 Yr Sales g%</th>
-                                        <td>{{salesGrowth5Yr*100 | number:2}}%</td>
-                                        <th>10 Yr Sales g%</th>
-                                        <td>{{salesGrowth10Yr*100 | number:2}}%</td>
-                                    </tr>
-                                    <tr>
-                                        <th>3 Yr Op. Profit g%</th>
-                                        <td>{{operatingProfitGrowth3Yr*100 | number:2}}%</td>
-                                        <th>5 Yr Op. Profit g%</th>
-                                        <td>{{operatingProfitGrowth5Yr*100 | number:2}}%</td>
-                                        <th>10 Yr Op. Profit g%</th>
-                                        <td>{{operatingProfitGrowth10Yr*100 | number:2}}%</td>
-                                    </tr>
-                                    <tr>
-                                        <th>3 Avg. OPM g%</th>
-                                        <td>{{opm3Yr*100 | number:2}}%</td>
-                                        <th>5 Avg. OPM g%</th>
-                                        <td>{{opm5Yr*100 | number:2}}%</td>
-                                        <th>10 Avg. OPM g%</th>
-                                        <td>{{opm10Yr*100 | number:2}}%</td>
-                                    </tr>
-                                    <tr>
-                                        <th>3 Avg. RoIC g%</th>
-                                        <td>{{roic3Yr*100 | number:2}}%</td>
-                                        <th>5 Avg. RoIC g%</th>
-                                        <td>{{roic3Yr*100 | number:2}}%</td>
-                                        <th>10 Avg. RoIC g%</th>
-                                        <td>{{roic3Yr*100 | number:2}}%</td>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                        <div class="col-md-12 col-sm-12 col-xs-12">
-                            <div class="x_panel">
-                                <div class="x_panel">
-                                    <div class="x_title">
-                                        <h2>
-                                            Recent Market Capital and Price
-                                            <small>
-                                                (Latest: ₹{{stockDetails.dailyDataS.marketCap | number:0}} Cr, Price: ₹{{stockDetails.dailyDataS.cmp | number:2}})
-                                            </small>
-                                        </h2>
-                                        <ul class="nav navbar-right panel_toolbox">
-                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                            </li>
-                                            <li class="dropdown">
-                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <li><a href="#">Settings 1</a>
-                                                    </li>
-                                                    <li><a href="#">Settings 2</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                            </li>
-                                        </ul>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <canvas id="recentmcapandprice"  class="chart chart-bar" chart-colors="newColors1" chart-options="chartOptionsMCapAndPrice"
-                                                chart-data="dataRecentMCapAndPrice" chart-dataset-override="chartMCapAndPriceDatasetOverride"  chart-labels="labelsRecentPE" chart-series="chartMCapAndPriceSeries" ></canvas>
-                                    </div>
-                                </div>
-                                <!-- Excel-based Dynamic Charts Will Appear Here -->
-                                <div id="dynamicCustomChartsContainer" style="margin-top: 30px;"></div>
-                                <!--<div class="x_panel">
-                                    <div class="x_title">
-                                        <h2>Annual Sales <small>Consolidated Sales (or Standalone in case consolidated not available)</small></h2>
-                                        <ul class="nav navbar-right panel_toolbox">
-                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-                                            <li class="dropdown">
-                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                                    <i class="fa fa-wrench"></i>
-                                                </a>
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <li><a href="#">Settings 1</a></li>
-                                                    <li><a href="#">Settings 2</a></li>
-                                                </ul>
-                                            </li>
-                                            <li><a class="close-link"><i class="fa fa-close"></i></a></li>
-                                        </ul>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <canvas id="annualsaleschart" class="chart chart-bar" chart-colors="newColors1"
-                                                chart-options="chartOptionsStockPnlSales" chart-data="stockPnlSales"
-                                                chart-labels="labelsYearsStockPnl" chart-dataset-override="stockPnlSalesDataOverride"></canvas>
-                                    </div>
-                                </div>
-                                <div class="x_title">
-                                    <h2>Annual NOPLAT <small>Consolidated NOPLAT (or Standalone in case consolidated not available)</small></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <canvas id="pnlchart"  class="chart chart-bar" chart-colors="newColors1" chart-options="chartOptionsStockPnl"
-                                            chart-data="stockPnl" chart-labels="labelsYearsStockPnl" chart-dataset-override="stockPnlDataOverride"  ></canvas>
-                                </div>-->
-                                <div class="row">
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>
-                                                    Valuation Levels
-                                                    <small>
-                                                        (Field: PE, Latest: {{stockDetails.dailyDataS.peTtm | number:2}}x)
-                                                    </small>
-                                                </h2>
-                                                <ul class="nav navbar-right panel_toolbox">
-                                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-                                                    <li class="dropdown">
-                                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></a>
-                                                        <ul class="dropdown-menu"><li><a href="#">Settings 1</a></li><li><a href="#">Settings 2</a></li></ul>
-                                                    </li>
-                                                    <li><a class="close-link"><i class="fa fa-close"></i></a></li>
-                                                </ul>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <canvas id="valuationchart" class="chart chart-line"
-                                                        chart-colors="newColors"
-                                                        chart-options="chartOptions"
-                                                        chart-data="stockValuation"
-                                                        chart-labels="labelsYearsStockValuation">
-                                                </canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>
-                                                    Recent TTM PE
-                                                    <small>
-                                                        (Field: PE, Latest: {{stockDetails.dailyDataS.peTtm | number:2}}x)
-                                                    </small>
-                                                </h2>
-                                                <ul class="nav navbar-right panel_toolbox">
-                                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-                                                    <li class="dropdown">
-                                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></a>
-                                                        <ul class="dropdown-menu"><li><a href="#">Settings 1</a></li><li><a href="#">Settings 2</a></li></ul>
-                                                    </li>
-                                                    <li><a class="close-link"><i class="fa fa-close"></i></a></li>
-                                                </ul>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <canvas id="recentpe" class="chart chart-line"
-                                                        chart-colors="newColors"
-                                                        chart-data="dataRecentPE"
-                                                        chart-labels="labelsRecentPE"
-                                                        chart-dataset-override="chartRecentPEDatasetOverride"
-                                                        chart-options="chartOptionsRecentPE">
-                                                </canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>
-                                                    Recent TTM PB
-                                                    <small>(Field: PB, Latest: {{stockDetails.dailyDataS.pbTtm | number:2}}x)</small>
-                                                </h2>
-                                                <ul class="nav navbar-right panel_toolbox">
-                                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-                                                    <li class="dropdown">
-                                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></a>
-                                                        <ul class="dropdown-menu"><li><a href="#">Settings 1</a></li><li><a href="#">Settings 2</a></li></ul>
-                                                    </li>
-                                                    <li><a class="close-link"><i class="fa fa-close"></i></a></li>
-                                                </ul>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <canvas id="recentpb" class="chart chart-line"
-                                                        chart-colors="newColors"
-                                                        chart-data="dataRecentPB"
-                                                        chart-labels="labelsRecentPE"
-                                                        chart-dataset-override="chartRecentPBDatasetOverride"
-                                                        chart-options="chartOptionsRecentPB">
-                                                </canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-sm-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>
-                                                    Recent TTM EV-to-EBITA
-                                                    <small>(Field: EV-to-EBITA, Latest: {{stockDetails.dailyDataS.evToEbit | number:2}}x)</small>
-                                                </h2>
-                                                <ul class="nav navbar-right panel_toolbox">
-                                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-                                                    <li class="dropdown">
-                                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></a>
-                                                        <ul class="dropdown-menu"><li><a href="#">Settings 1</a></li><li><a href="#">Settings 2</a></li></ul>
-                                                    </li>
-                                                    <li><a class="close-link"><i class="fa fa-close"></i></a></li>
-                                                </ul>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <canvas id="recentevtoebita" class="chart chart-line"
-                                                        chart-colors="newColors"
-                                                        chart-data="dataRecentEvToEbita"
-                                                        chart-labels="labelsRecentPE"
-                                                        chart-dataset-override="chartRecentEvToEbitaDatasetOverride"
-                                                        chart-options="chartOptionsRecentEvToEbita">
-                                                </canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--<div class="x_panel">
-                                    <div class="x_title">
-                                        <h2>Quarterly Sales <small>Consolidated Sales (or Standalone in case consolidated not available)</small></h2>
-                                        <ul class="nav navbar-right panel_toolbox">
-                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-                                            <li class="dropdown">
-                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                                    <i class="fa fa-wrench"></i>
-                                                </a>
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <li><a href="#">Settings 1</a></li>
-                                                    <li><a href="#">Settings 2</a></li>
-                                                </ul>
-                                            </li>
-                                            <li><a class="close-link"><i class="fa fa-close"></i></a></li>
-                                        </ul>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <canvas id="quarterlysaleschart" class="chart chart-bar" chart-colors="newColors1"
-                                                chart-options="chartOptionsStockQuarterSales" chart-data="stockQuarterSales"
-                                                chart-labels="labelsYearsStockQuarter" chart-dataset-override="stockQuarterSalesDataOverride"></canvas>
-                                    </div>
-                                </div>
-                                <div class="x_panel">
-                                    <div class="x_title">
-                                        <h2>Quarterly NOPLAT <small>Consolidated NOPLAT (or Standalone in case consolidated not available)</small></h2>
-                                        <ul class="nav navbar-right panel_toolbox">
-                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                            </li>
-                                            <li class="dropdown">
-                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <li><a href="#">Settings 1</a>
-                                                    </li>
-                                                    <li><a href="#">Settings 2</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                            </li>
-                                        </ul>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <canvas id="quarterchart"  class="chart chart-bar" chart-colors="newColors1" chart-options="chartOptionsStockQuarter"
-                                                chart-data="stockQuarter" chart-labels="labelsYearsStockQuarter" chart-dataset-override="stockQuarterDataOverride"  ></canvas>
-                                    </div>
-                                </div>
-                                <div class="x_panel">
-                                    <div class="x_title">
-                                        <h2>Growth Trend<small>3 yr, 5 yr and 10 yr priceChange growth trend</small></h2>
-                                        <ul class="nav navbar-right panel_toolbox">
-                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                            </li>
-                                            <li class="dropdown">
-                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <li><a href="#">Settings 1</a>
-                                                    </li>
-                                                    <li><a href="#">Settings 2</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                            </li>
-                                        </ul>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <canvas id="growthchart"  class="chart chart-line" chart-colors="newColors1" chart-options="chartOptionsStockGrowth"
-                                                chart-data="stockGrowth" chart-labels="labelsYearsStockGrowth" chart-dataset-override="stockGrowthDataOverride" chart-series="chartStockGrowthSeries" ></canvas>
-                                    </div>
-                                </div>-->
-                            <!--<div class="x_panel">-->
-                                <!--<div class="x_title">-->
-                                    <!--<h2>Notes from Con Call and Annual Reports</h2>-->
-                                    <!--<div class="clearfix"></div>-->
-                                <!--</div>-->
-                                <!--<div class="x_content" id="reportNotesContainer"></div>-->
-                            <!--</div>-->
-                            <!--<div class="x_panel">-->
-                                <!--<div class="x_title">-->
-                                    <!--<h2>Recent Price Movments<small>Last one year 1D Price Movements: Mean {{mean1D | number:2}}%, Median {{median1D | number:2}}% </small></h2>-->
-                                    <!--<ul class="nav navbar-right panel_toolbox">-->
-                                        <!--<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>-->
-                                        <!--</li>-->
-                                        <!--<li class="dropdown">-->
-                                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>-->
-                                            <!--<ul class="dropdown-menu" role="menu">-->
-                                                <!--<li><a href="#">Settings 1</a>-->
-                                                <!--</li>-->
-                                                <!--<li><a href="#">Settings 2</a>-->
-                                                <!--</li>-->
-                                            <!--</ul>-->
-                                        <!--</li>-->
-                                        <!--<li><a class="close-link"><i class="fa fa-close"></i></a>-->
-                                        <!--</li>-->
-                                    <!--</ul>-->
-                                    <!--<div class="clearfix"></div>-->
-                                <!--</div>-->
-                                <!--<div class="x_content">-->
-                                    <!--<canvas id="recent1Dpricemovements"  class="chart chart-line" chart-colors="newColors"-->
-                                            <!--chart-data="data1DPriceMovements" chart-labels="labelsPriceMovements" ></canvas>-->
-                                <!--</div>-->
-                            <!--</div>-->
-                            <!--<div class="x_panel">-->
-                                <!--<div class="x_title">-->
-                                    <!--<h2>Recent Price Movments<small>Last one year 1W Price Movements: Mean {{mean1W | number:2}}%, Median {{median1W | number:2}}% </small></h2>-->
-                                    <!--<ul class="nav navbar-right panel_toolbox">-->
-                                        <!--<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>-->
-                                        <!--</li>-->
-                                        <!--<li class="dropdown">-->
-                                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>-->
-                                            <!--<ul class="dropdown-menu" role="menu">-->
-                                                <!--<li><a href="#">Settings 1</a>-->
-                                                <!--</li>-->
-                                                <!--<li><a href="#">Settings 2</a>-->
-                                                <!--</li>-->
-                                            <!--</ul>-->
-                                        <!--</li>-->
-                                        <!--<li><a class="close-link"><i class="fa fa-close"></i></a>-->
-                                        <!--</li>-->
-                                    <!--</ul>-->
-                                    <!--<div class="clearfix"></div>-->
-                                <!--</div>-->
-                                <!--<div class="x_content">-->
-                                    <!--<canvas id="recent1Wpricemovements"  class="chart chart-line" chart-colors="newColors"-->
-                                            <!--chart-data="data1WPriceMovements" chart-labels="labelsPriceMovements" ></canvas>-->
-                                <!--</div>-->
-                            <!--</div>-->
-                            <!--<div class="x_panel">-->
-                                <!--<div class="x_title">-->
-                                    <!--<h2>Recent Price Movments<small>Last one year 2W Price Movements: Mean {{mean2W | number:2}}%, Median {{median2W | number:2}}% </small></h2>-->
-                                    <!--<ul class="nav navbar-right panel_toolbox">-->
-                                        <!--<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>-->
-                                        <!--</li>-->
-                                        <!--<li class="dropdown">-->
-                                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>-->
-                                            <!--<ul class="dropdown-menu" role="menu">-->
-                                                <!--<li><a href="#">Settings 1</a>-->
-                                                <!--</li>-->
-                                                <!--<li><a href="#">Settings 2</a>-->
-                                                <!--</li>-->
-                                            <!--</ul>-->
-                                        <!--</li>-->
-                                        <!--<li><a class="close-link"><i class="fa fa-close"></i></a>-->
-                                        <!--</li>-->
-                                    <!--</ul>-->
-                                    <!--<div class="clearfix"></div>-->
-                                <!--</div>-->
-                                <!--<div class="x_content">-->
-                                    <!--<canvas id="recent2Wpricemovements"  class="chart chart-line" chart-colors="newColors"-->
-                                            <!--chart-data="data2WPriceMovements" chart-labels="labelsPriceMovements" ></canvas>-->
-                                <!--</div>-->
-                            <!--</div>-->
-                            <!--<div class="x_panel">-->
-                                <!--<div class="x_title">-->
-                                    <!--<h2>Recent Price Movments<small>Last one year 1M Price Movements: Mean {{mean1M | number:2}}%, Median {{median1M | number:2}}% </small></h2>-->
-                                    <!--<ul class="nav navbar-right panel_toolbox">-->
-                                        <!--<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>-->
-                                        <!--</li>-->
-                                        <!--<li class="dropdown">-->
-                                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>-->
-                                            <!--<ul class="dropdown-menu" role="menu">-->
-                                                <!--<li><a href="#">Settings 1</a>-->
-                                                <!--</li>-->
-                                                <!--<li><a href="#">Settings 2</a>-->
-                                                <!--</li>-->
-                                            <!--</ul>-->
-                                        <!--</li>-->
-                                        <!--<li><a class="close-link"><i class="fa fa-close"></i></a>-->
-                                        <!--</li>-->
-                                    <!--</ul>-->
-                                    <!--<div class="clearfix"></div>-->
-                                <!--</div>-->
-                                <!--<div class="x_content">-->
-                                    <!--<canvas id="recent1Mpricemovements"  class="chart chart-line" chart-colors="newColors"-->
-                                            <!--chart-data="data1MPriceMovements" chart-labels="labelsPriceMovements" ></canvas>-->
-                                <!--</div>-->
-                            <!--</div>-->
-                            <br />
-                            <strong>Note: </strong> Values are in Cr. INR. First preference is given to consolidated data and ratios. Data Sources: Publicly available information on NSE India, BSE India, MorningStar.in, Screener.in, ValueResearchOnline.com, MoneyControl.com, Motilal Oswal, Prabhudas Lilladher, Edelweiss, HDFC Securities, ICICI Direct, Kotak Securities, tradingeconomics.com and Internal Data Processing
+                        <div class="sa-controls">
+                            <div class="tw-seg" id="sa-range" role="group" aria-label="Range">
+                                <button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1Y" class="on">1Y</button><button data-r="3Y">3Y</button><button data-r="5Y">5Y</button><button data-r="MAX">Max</button>
+                            </div>
+                            <div class="tw-seg" id="sa-kind" role="group" aria-label="Chart type">
+                                <button data-k="line" class="on" title="Line"><i class="fa fa-area-chart"></i></button><button data-k="candle" title="Candles"><i class="fa fa-bar-chart"></i></button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <div class="sa-readout" id="sa-readout" aria-live="polite">&#160;</div>
+                    <div class="sa-chart sa-chart-price" id="sa-price-chart"></div>
+                </section>
+
+                <!-- ===== fundamentals ===== -->
+                <section class="tw-card" id="sa-fin-card">
+                    <div class="sa-bar">
+                        <div>
+                            <h2>Revenue, EBITDA and EPS</h2>
+                            <p class="tw-sub" style="margin:0" id="sa-fin-sub">&#160;</p>
+                        </div>
+                        <div class="sa-controls">
+                            <span class="tw-chip" id="sa-fin-asof"></span>
+                            <div class="tw-seg" id="sa-period" role="group" aria-label="Period">
+                                <button data-p="A" class="on">Annual</button><button data-p="Q">Quarterly</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sa-fin-grid">
+                        <div><h3 class="sa-mini">Revenue <span class="tw-muted">&#8377; Cr</span></h3><div class="sa-chart sa-chart-bar" id="sa-rev"></div></div>
+                        <div><h3 class="sa-mini">EBITDA <span class="tw-muted">&#8377; Cr</span></h3><div class="sa-chart sa-chart-bar" id="sa-ebitda"></div></div>
+                        <div><h3 class="sa-mini">EPS <span class="tw-muted">&#8377;</span></h3><div class="sa-chart sa-chart-bar" id="sa-eps"></div></div>
+                    </div>
+                    <p class="tw-muted tw-small" id="sa-fin-note" style="margin:8px 0 0"></p>
+                </section>
+
+                <!-- ===== consensus ===== -->
+                <section class="tw-card" id="sa-cons-card" hidden="hidden">
+                    <div class="sa-bar">
+                        <div>
+                            <h2>Analyst consensus</h2>
+                            <p class="tw-sub" style="margin:0">Weekly Yahoo Finance consensus: target price and forward EPS estimates.</p>
+                        </div>
+                        <span class="tw-chip" id="sa-cons-asof"></span>
+                    </div>
+                    <div class="tw-tiles" id="sa-cons-tiles" style="margin:12px 0 6px"></div>
+                    <div class="sa-cons-grid">
+                        <div>
+                            <h3 class="sa-mini">Price vs consensus target</h3>
+                            <div class="tw-legend"><span><i style="background:var(--s1)"></i>Price</span><span><i style="background:var(--s2)"></i>Consensus TP (avg)</span><span><i class="band" style="background:var(--s2)"></i>TP range (min to max)</span></div>
+                            <div class="sa-chart sa-chart-cons" id="sa-cons-tp"></div>
+                        </div>
+                        <div>
+                            <h3 class="sa-mini">Consensus EPS by fiscal year</h3>
+                            <div class="tw-legend" id="sa-cons-eps-legend"></div>
+                            <div class="sa-chart sa-chart-cons" id="sa-cons-eps"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <p class="tw-muted tw-small">Values in &#8377; crore unless stated. Consolidated figures preferred. Prices: NSE. Consensus: Yahoo Finance.
+                    Sources also include BSE India, Screener.in and broker research. For information only; not investment advice.</p>
             </div>
         </div>
-        <!-- /page content -->
 
-        <!-- footer content -->
         <div th:replace="fragments/publicfooter :: common-publicfooter" />
-        <!-- /footer content -->
     </div>
 </div>
-<!-- jQuery -->
-<script src="../../static/vendors/jquery/dist/jquery.min.js"  th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
-<!-- Bootstrap -->
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
 <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
-<!-- FastClick -->
-<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
-<!-- NProgress -->
-<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
-<!-- bootstrap-progressbar -->
-<script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js" th:src="@{/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js}"></script>
-<!-- iCheck -->
-<script src="../../static/vendors/iCheck/icheck.min.js" th:src="@{/vendors/iCheck/icheck.min.js}"></script>
-<!-- jquery.inputmask -->
-<script src="../../static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js" th:src="@{/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js}"></script>
-<!-- bootstrap-daterangepicker -->
-<script src="../../static/vendors/moment/min/moment.min.js" th:src="@{/vendors/moment/min/moment.min.js}"></script>
-<script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js" th:src="@{/vendors/bootstrap-daterangepicker/daterangepicker.js}"></script>
-<!-- bootstrap-wysiwyg -->
-<script src="../../static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js" th:src="@{/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js}"></script>
-<script src="../../static/vendors/jquery.hotkeys/jquery.hotkeys.js" th:src="@{/vendors/jquery.hotkeys/jquery.hotkeys.js}"></script>
-<script src="../../static/vendors/google-code-prettify/src/prettify.js" th:src="@{/vendors/google-code-prettify/src/prettify.js}"></script>
-<!-- jQuery Tags Input -->
-<script src="../../static/vendors/jquery.tagsinput/src/jquery.tagsinput.js" th:src="@{/vendors/jquery.tagsinput/src/jquery.tagsinput.js}"></script>
-<!-- Switchery -->
-<script src="../../static/vendors/switchery/dist/switchery.min.js" th:src="@{/vendors/switchery/dist/switchery.min.js}"></script>
-<!-- Select2 -->
-<script src="../../static/vendors/select2/dist/js/select2.full.min.js" th:src="@{/vendors/select2/dist/js/select2.full.min.js}"></script>
-<!-- Parsley -->
-<script src="../../static/vendors/parsleyjs/dist/parsley.min.js" th:src="@{/vendors/parsleyjs/dist/parsley.min.js}"></script>
-<!-- Autosize -->
-<script src="../../static/vendors/autosize/dist/autosize.min.js" th:src="@{/vendors/autosize/dist/autosize.min.js}"></script>
-<!-- jQuery autocomplete -->
-<script src="../../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js" th:src="@{/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js}"></script>
-<!-- starrr -->
-<script src="../../static/vendors/starrr/dist/starrr.js" th:src="@{/vendors/starrr/dist/starrr.js}"></script>
-
-<!-- Custom Theme Scripts -->
 <script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script src="../../static/custom/public/stockanalysis.js" th:src="@{/custom/public/stockanalysis.js}"></script>
 </body>
 </html>

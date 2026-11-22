@@ -1,7 +1,10 @@
-<footer  th:fragment="common-publicfooter">
-    <div class="pull-right">
-        ©2023 All Rights Reserved.
-        <!--Sudhir Kulaye is a Gentelella - Bootstrap Admin Template. Developed in Java Spring Framework &amp; MySQL DB Server. Privacy &amp; Terms-->
+<footer th:fragment="common-publicfooter">
+    <div class="tw-footer">
+        <span>&#169; <span th:text="${#dates.year(#dates.createNow())}">2026</span> Sudhir Kulaye. All rights reserved.</span>
+        <nav>
+            <a href="/public/privacy">Privacy</a>
+            <a href="/public/contactus">Contact</a>
+        </nav>
     </div>
     <div class="clearfix"></div>
 </footer>

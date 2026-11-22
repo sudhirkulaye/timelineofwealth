@@ -1,0 +1,37 @@
+/* /public/stockanalysis/{ticker} — uses tokens from /custom/theme.css */
+.sa-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin: 4px 0 16px; }
+.sa-crumbs { color: var(--muted); font-size: 12.5px; margin-bottom: 2px; }
+.sa-head h1 { margin: 0 0 6px; font-size: 28px; font-weight: 650; letter-spacing: -.02em; }
+.sa-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.sa-quote { text-align: right; }
+.sa-price { font-size: 32px; font-weight: 650; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--ink); line-height: 1.1; }
+.sa-chg { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sa-tiles { margin-bottom: 18px; grid-template-columns: repeat(auto-fit, minmax(138px, 1fr)); }
+#sa-tiles .tv, #sa-cons-tiles .tv { font-size: 18px; white-space: nowrap; }
+#sa-cons-tiles { grid-template-columns: repeat(auto-fit, minmax(138px, 1fr)); }
+.sa-bar { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.sa-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.sa-readout {
+    display: flex; align-items: center; gap: 6px 14px; flex-wrap: wrap;
+    min-height: 40px; padding: 8px 12px; margin: 4px 0 6px;
+    border-radius: 10px; background: var(--chip); font-size: 13px; color: var(--ink2); font-variant-numeric: tabular-nums;
+}
+.sa-readout b { color: var(--ink); font-weight: 600; }
+.sa-readout .big { font-size: 16px; font-weight: 650; }
+.sa-readout .x { margin-left: auto; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 13px; padding: 2px 6px; border-radius: 6px; }
+.sa-readout .x:hover { background: var(--hover); color: var(--ink); }
+.sa-chart { width: 100%; }
+.sa-chart-price { height: 460px; cursor: crosshair; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
+.sa-chart-bar { height: 230px; }
+.sa-chart-cons { height: 280px; }
+.sa-mini { font-size: 13px; font-weight: 600; margin: 8px 0 2px; color: var(--ink); }
+.sa-fin-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 22px; }
+.sa-cons-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 26px; }
+.sa-empty { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted); font-size: 13px; text-align: center; padding: 0 12px; }
+@media (max-width: 1100px) { .sa-fin-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px) {
+    .sa-fin-grid, .sa-cons-grid { grid-template-columns: 1fr; }
+    .sa-chart-price { height: 360px; }
+    .sa-quote { text-align: left; }
+    .sa-head h1 { font-size: 23px; }
+}

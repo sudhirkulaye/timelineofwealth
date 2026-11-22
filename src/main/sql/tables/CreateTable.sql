@@ -1269,3 +1269,25 @@ CREATE TABLE wealth_history (
   KEY index_wealth_history_memberid (memberid),
   KEY index_wealth_history_date (date)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Historical Wealth Values';
+
+CREATE TABLE yahoo_consensus (
+  ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK stock_universe ticker (mapped from yahoo_ticker)',
+  date date NOT NULL COMMENT 'PK weekly snapshot date',
+  fin_year varchar(6) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK estimate fiscal year e.g. FY27',
+  yahoo_ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'symbol as downloaded from Yahoo Finance',
+  tp_avg decimal(20,3) DEFAULT NULL COMMENT 'consensus target price average',
+  tp_min decimal(20,3) DEFAULT NULL COMMENT 'consensus target price lowest',
+  tp_max decimal(20,3) DEFAULT NULL COMMENT 'consensus target price highest',
+  rev_avg decimal(20,3) DEFAULT NULL COMMENT 'consensus revenue average (Cr)',
+  rev_min decimal(20,3) DEFAULT NULL COMMENT 'consensus revenue lowest (Cr)',
+  rev_max decimal(20,3) DEFAULT NULL COMMENT 'consensus revenue highest (Cr)',
+  eps_avg decimal(20,3) DEFAULT NULL COMMENT 'consensus EPS average',
+  eps_min decimal(20,3) DEFAULT NULL COMMENT 'consensus EPS lowest',
+  eps_max decimal(20,3) DEFAULT NULL COMMENT 'consensus EPS highest',
+  analyst_count int(5) DEFAULT NULL COMMENT 'number of analysts',
+  year_ago_rev decimal(20,3) DEFAULT NULL COMMENT 'revenue of the year before fin_year',
+  year_ago_eps decimal(20,3) DEFAULT NULL COMMENT 'EPS of the year before fin_year',
+  current_price decimal(20,3) DEFAULT NULL COMMENT 'price on the snapshot date',
+  PRIMARY KEY (ticker, date, fin_year),
+  KEY index_yahoo_consensus_date (date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Weekly Yahoo Finance analyst consensus (loaded by YahooFinance/yahoo_consensus_download.py)';

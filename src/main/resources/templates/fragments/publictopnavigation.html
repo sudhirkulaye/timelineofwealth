@@ -2,11 +2,18 @@
     <div class="nav_menu">
         <nav>
             <div class="nav toggle">
-                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                <a id="menu_toggle" aria-label="Toggle menu"><i class="fa fa-bars"></i></a>
             </div>
-            <p />
-            <button type="button" class="btn btn-primary pull-right" onclick="location.href='/userlogin'"  >Sign in</button>
-
+            <form class="tw-search" role="search" autocomplete="off" onsubmit="return false;">
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <input id="tw-search-input" type="search" placeholder="Search a stock, e.g. TCS or Infosys" aria-label="Search stocks" />
+                <ul class="tw-search-list" id="tw-search-list" role="listbox"></ul>
+            </form>
+            <span class="tw-topnav-spacer"></span>
+            <button type="button" class="tw-icon-btn" id="tw-theme-toggle" aria-label="Switch light or dark theme" title="Light / dark">
+                <i class="fa fa-moon-o tw-moon" aria-hidden="true"></i><i class="fa fa-sun-o tw-sun" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="btn btn-primary btn-pill" style="margin:0" onclick="location.href='/userlogin'">Sign in</button>
         </nav>
     </div>
 </div>
