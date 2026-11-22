@@ -32,7 +32,7 @@ public class StockChartApi {
         this.stockFinancialsService = stockFinancialsService;
     }
 
-    /** Annual + quarterly revenue, EBITDA, net profit: latest result Excel, else stock_pnl / stock_quarter. */
+    /** Annual + quarterly revenue, EBITDA, net profit from the ticker's latest result workbook. */
     @RequestMapping(value = "/getstockfinancials/{ticker}", method = RequestMethod.GET)
     public Map<String, Object> getStockFinancials(@PathVariable String ticker) {
         return stockFinancialsService.getFinancials(ticker);

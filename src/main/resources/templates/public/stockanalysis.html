@@ -69,6 +69,23 @@
                     <p class="tw-muted tw-small" id="sa-fin-note" style="margin:8px 0 0"></p>
                 </section>
 
+                <!-- ===== extra series from the result workbook (segments, geography, $ revenue, KPIs) ===== -->
+                <section class="tw-card" id="sa-wb-card" hidden="hidden">
+                    <div class="sa-bar">
+                        <div>
+                            <h2>Business details</h2>
+                            <p class="tw-sub" style="margin:0" id="sa-wb-sub">Segments, geographies and operating metrics from the company result workbook.</p>
+                        </div>
+                        <div class="sa-controls">
+                            <label class="tw-chip" style="cursor:pointer"><input type="checkbox" id="sa-wb-all" style="margin:0 4px 0 0" /> Show all</label>
+                            <div class="tw-seg" id="sa-wb-period" role="group" aria-label="Period">
+                                <button data-p="Q" class="on">Quarterly</button><button data-p="A">Annual</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sa-wb-grid" id="sa-wb-grid"></div>
+                </section>
+
                 <!-- ===== consensus ===== -->
                 <section class="tw-card" id="sa-cons-card" hidden="hidden">
                     <div class="sa-bar">

@@ -83,7 +83,7 @@
     window.addEventListener('resize', function () { Object.keys(charts).forEach(function (k) { charts[k].resize(); }); });
 
     // ---------- state ----------
-    var S = { ohlc: null, details: null, pnl: null, qtr: null, cons: null, range: '1Y', kind: 'line', period: 'A',
+    var S = { ohlc: null, details: null, pnl: null, qtr: null, cons: null, range: '1Y', kind: 'line', period: 'A', wbPeriod: 'Q',
               sel: null, pending: null, drag: null };
 
     // =====================================================================
@@ -380,15 +380,14 @@
         $('sa-fin-sub').textContent = annual ? 'Fiscal years (April to March)' + (labels.length > nAct ? ', plus consensus estimates (E)' : '') + '. Hover for YoY growth.'
             : 'Last 12 quarters. Hover for YoY growth.';
         var notes = [];
-        notes.push(F.source === 'excel' ? 'Source: company result workbook (' + F.file + ').'
-            : F.source === 'db' ? 'Source: stock_pnl / stock_quarter tables (result workbook not found).' : '');
+        notes.push(F.source === 'excel' ? 'Source: company result workbook (' + F.file + ').' : '');
         if (sh) notes.push('EPS = net profit ÷ current share count, so it is comparable across splits and bonuses.');
         if (fin) notes.push('Financial company: EBITDA is not meaningful for lenders; a dedicated banking view is planned.');
         if (last && (Date.now() - parseD(last)) / 864e5 > (annual ? 550 : 200)) notes.push('These financials have not been refreshed recently.');
         $('sa-fin-note').textContent = notes.filter(Boolean).join(' ');
 
         if (!rows.length) {
-            ['sa-rev', 'sa-ebitda', 'sa-eps'].forEach(function (id) { if (charts[id]) charts[id].dispose(); empty($(id), 'No financials available.'); });
+            ['sa-rev', 'sa-ebitda', 'sa-eps'].forEach(function (id) { if (charts[id]) charts[id].dispose(); empty($(id), 'No result workbook for this stock yet.'); });
             return;
         }
         var lag = annual ? 1 : 4;
@@ -446,6 +445,98 @@
                 })
             }])
         }, true);
+    }
+
+    // =====================================================================
+    // Business details: extra charts configured per ticker for the result workbook
+    // (ChartForSheet&Row.property / TickerChartCombination.property), delivered in getstockdetails.excelCharts
+    // =====================================================================
+    // already covered by the Revenue / EBITDA / EPS card or the header tiles
+    var WB_CORE = /(market cap|revenue \(rs|ttm revenue|revenue growth|total revenue|\bopm\b|\bpat\b|net profit margin)/i;
+
+    function wbIsAnnual(c) { return /^(annual|annaul)\b/i.test(c.title); }
+    function wbTitle(t) { return t.replace(/^annaul/i, 'Annual').replace(/^(Quarterly|Annual)\s+/i, ''); }
+    function wbPct(c, series) {
+        if (!/%/.test(c.title)) return false;
+        var mx = 0;
+        series.forEach(function (s) { (s.values || []).forEach(function (v) { if (v != null && isFinite(v)) mx = Math.max(mx, Math.abs(v)); }); });
+        return mx <= 3;   // stored as fractions
+    }
+    function wbFmt(v, isPct) {
+        if (v == null || !isFinite(v)) return '–';
+        if (isPct) return (v * 100).toFixed(1) + '%';
+        var a = Math.abs(v);
+        return num(v, a >= 100 ? 0 : (a >= 10 ? 1 : 2));
+    }
+
+    function renderWorkbook() {
+        var card = $('sa-wb-card'), grid = $('sa-wb-grid');
+        var all = (S.details && S.details.excelCharts) || [];
+        Object.keys(charts).forEach(function (k) { if (k.indexOf('sa-wb-') === 0) { charts[k].dispose(); delete charts[k]; } });
+        if (!all.length) { card.hidden = true; return; }
+        card.hidden = false;
+        var showAll = $('sa-wb-all').checked, annual = S.wbPeriod === 'A';
+        var list = all.filter(function (c) { return wbIsAnnual(c) === annual && (showAll || !WB_CORE.test(c.title)); });
+        if (!list.length) {
+            grid.innerHTML = '<div class="sa-empty" style="grid-column:1/-1;height:80px">No ' + (annual ? 'annual' : 'quarterly') +
+                ' business charts' + (showAll ? '' : ' beyond the ones above; tick “Show all”') + '.</div>';
+            return;
+        }
+        grid.innerHTML = list.map(function (c, i) {
+            return '<div class="sa-wb-item"><h3 class="sa-mini">' + esc(wbTitle(c.title)) + '</h3><div class="sa-wb-latest" id="sa-wb-l' + i + '"></div>' +
+                '<div class="sa-chart sa-chart-wb" id="sa-wb-' + i + '"></div></div>';
+        }).join('');
+
+        var P = pal(), palette = [P.s1, P.s2, P.s3, P.s4, P.ink2, P.muted, alpha(P.s1, .55), alpha(P.s2, .55)];
+        list.forEach(function (c, i) {
+            var series = (c.series && c.series.length) ? c.series
+                : [{ label: c.fieldName || wbTitle(c.title), values: c.values, chartType: c.chartType || 'line' }];
+            var n = Math.max.apply(null, series.map(function (s) { return (s.values || []).length; }).concat([(c.labels || []).length]));
+            var labels = (c.labels || []).slice(-n);
+            while (labels.length < n) labels.unshift('');
+            labels = labels.map(function (l) {   // FY26Q2 -> Q2 FY26; 2026-09-30 -> Q2 FY27 (or FY27 for annual charts)
+                var s = String(l), m = /^FY(\d{2})Q([1-4])$/.exec(s);
+                if (m) return 'Q' + m[2] + ' FY' + m[1];
+                if (/^\d{4}-\d{2}-\d{2}/.test(s)) return wbIsAnnual(c) ? fyLabel(s.slice(0, 10)) : qName(s.slice(0, 10));
+                return s;
+            });
+            var isPct = wbPct(c, series), stacked = c.stacked === true;
+            var firstType = (series[0].chartType || c.chartType) === 'bar' ? 'bar' : 'line';
+
+            $('sa-wb-l' + i).innerHTML = series.slice(0, 6).map(function (s, j) {
+                var v = null;
+                for (var k = (s.values || []).length - 1; k >= 0; k--) if (s.values[k] != null && isFinite(s.values[k])) { v = s.values[k]; break; }
+                return (series.length > 1 ? '<span style="color:' + palette[j % palette.length] + '">●</span> ' + esc(s.label) + ' ' : 'Latest ') +
+                    '<b>' + wbFmt(v, isPct) + '</b>';
+            }).join(' &nbsp; ') + (labels.length ? ' <span class="tw-muted">· ' + esc(labels[labels.length - 1]) + '</span>' : '');
+
+            chart('sa-wb-' + i).setOption({
+                animationDuration: 300, textStyle: { fontFamily: P.font }, color: palette,
+                grid: { left: 4, right: 8, top: series.length > 1 ? 30 : 12, bottom: 4, containLabel: true },
+                legend: series.length > 1 ? { top: 0, left: 0, type: 'scroll', icon: 'roundRect', itemWidth: 10, itemHeight: 8,
+                                              textStyle: { color: P.ink2, fontSize: 11, fontFamily: P.font },
+                                              pageTextStyle: { color: P.muted } } : { show: false },
+                tooltip: Object.assign(tooltipBase(P), {
+                    trigger: 'axis',
+                    axisPointer: { type: firstType === 'bar' ? 'shadow' : 'line', shadowStyle: { color: alpha(P.ink, .04) }, lineStyle: { color: P.axis } },
+                    valueFormatter: function (v) { return wbFmt(v, isPct); }
+                }),
+                xAxis: { type: 'category', data: labels, axisTick: { show: false }, axisLine: { lineStyle: { color: P.axis } },
+                         axisLabel: Object.assign(baseText(P), { hideOverlap: true }) },
+                yAxis: { type: 'value', scale: !stacked && firstType === 'line', splitNumber: 3,
+                         axisLabel: Object.assign(baseText(P), { formatter: function (v) { return isPct ? Math.round(v * 100) + '%' : axisNum(v); } }),
+                         splitLine: { lineStyle: { color: P.grid } } },
+                series: series.map(function (s) {
+                    var type = (s.chartType || c.chartType) === 'bar' ? 'bar' : 'line';
+                    var vals = (s.values || []).slice(-n);
+                    while (vals.length < n) vals.unshift(null);
+                    return type === 'bar'
+                        ? { name: s.label, type: 'bar', stack: stacked ? 'all' : undefined, data: vals, barMaxWidth: 22 }
+                        : { name: s.label, type: 'line', data: vals, symbol: 'circle', symbolSize: 4, showSymbol: n <= 16,
+                            connectNulls: true, lineStyle: { width: 2 } };
+                })
+            }, true);
+        });
     }
 
     // =====================================================================
@@ -541,12 +632,15 @@
         renderHeader();
         if (S.ohlc) renderPrice();
         if (S.fin) renderFundamentals();
+        if (S.details) renderWorkbook();
         renderConsensus();
     }
 
     bindSeg('sa-range', 'data-r', 'range', function () { S.sel = null; S.pending = null; renderPrice(); });
     bindSeg('sa-kind', 'data-k', 'kind', renderPrice);
     bindSeg('sa-period', 'data-p', 'period', renderFundamentals);
+    bindSeg('sa-wb-period', 'data-p', 'wbPeriod', renderWorkbook);
+    $('sa-wb-all').addEventListener('change', renderWorkbook);
     document.addEventListener('tw-themechange', renderAll);
     if (window.matchMedia) {
         var mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -562,5 +656,5 @@
     var pDet = getJSON('/public/api/getstockdetails/' + t).then(function (r) { S.details = r; renderHeader(); }).catch(function () {});
     var pCons = getJSON('/public/api/getconsensus/' + t).then(function (r) { S.cons = r; }).catch(function () { S.cons = null; });
     var pFin = getJSON('/public/api/getstockfinancials/' + t).then(function (r) { S.fin = r; }).catch(function () { S.fin = null; });
-    Promise.all([pDet, pCons, pFin, pOhlc]).then(function () { renderTiles(); renderFundamentals(); renderConsensus(); });
+    Promise.all([pDet, pCons, pFin, pOhlc]).then(function () { renderTiles(); renderFundamentals(); renderWorkbook(); renderConsensus(); });
 })();
