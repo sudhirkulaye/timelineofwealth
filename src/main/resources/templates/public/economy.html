@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md">
+<link href="../../static/custom/public/guides.css" th:href="@{/custom/public/guides.css}" rel="stylesheet" />
+<div class="container body">
+    <div class="main_container">
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
+
+        <div class="right_col" role="main">
+            <div class="tw-page gd" id="ec-root">
+                <header class="tw-head" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+                    <div>
+                        <h1>Economy and markets</h1>
+                        <p>India's macro picture and what it means for the stock market, summarised from broker research. Ranked by how much each factor can move the market.</p>
+                    </div>
+                    <span class="tw-chip" id="ec-asof"></span>
+                </header>
+
+                <section class="tw-card">
+                    <h2>Bottom line</h2>
+                    <p class="ec-bottom" id="ec-bottom" style="margin-top:6px">Loading…</p>
+                </section>
+
+                <section class="tw-card">
+                    <h2>Market in a nutshell</h2>
+                    <p class="tw-sub">The ten things that matter most right now.</p>
+                    <ol class="ec-nut" id="ec-nut"></ol>
+                </section>
+
+                <section class="tw-card">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+                        <div>
+                            <h2>Critical points to track</h2>
+                            <p class="tw-sub" style="margin:0">Click a point for the latest reading, why it matters, sectors affected, broker views and what to watch.</p>
+                        </div>
+                        <div class="tw-seg" id="ec-imp" role="group" aria-label="Importance">
+                            <button type="button" data-v="" class="on">All</button><button type="button" data-v="critical">Critical</button><button type="button" data-v="high">High</button><button type="button" data-v="medium">Medium</button><button type="button" data-v="low">Low</button>
+                        </div>
+                    </div>
+                    <div id="ec-points" style="margin-top:8px"></div>
+                </section>
+
+                <section class="tw-card">
+                    <h2>Key indicators</h2>
+                    <p class="tw-sub">Latest prints, with the signal each sends for the market.</p>
+                    <div class="tw-scroll">
+                        <table class="table ec-ind" style="margin:0;font-size:13px">
+                            <thead><tr><th>Indicator</th><th>Latest (previous / reference)</th><th>Signal</th><th>As of</th></tr></thead>
+                            <tbody id="ec-ind"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <p class="tw-muted tw-small">Summary of broker research (brokers shown as Broker A and Broker B) and public data. For information only; not investment advice.</p>
+            </div>
+        </div>
+
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+<script src="../../static/custom/public/research.js" th:src="@{/custom/public/research.js}"></script>
+</body>
+</html>

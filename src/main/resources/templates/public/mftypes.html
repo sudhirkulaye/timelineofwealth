@@ -1,244 +1,224 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: common-header" />
 <body class="nav-md">
+<link href="../../static/custom/public/guides.css" th:href="@{/custom/public/guides.css}" rel="stylesheet" />
 <div class="container body">
     <div class="main_container">
-        <!-- sidebar menu -->
         <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
-        <!-- /sidebar menu -->
-
-        <!-- top navigation -->
         <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
-        <!-- /top navigation -->
 
-        <!-- page content -->
         <div class="right_col" role="main">
-            <div class="row">
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="x_panel">
-                        <div class="x_title">
-                            <font color="green"><strong><h1>Mutual Fund Types, Subtypes and Risk-Return Characteristics</h1></strong></font>
-                            <div class="clearfix"></div>
+            <div class="tw-page gd" id="mf">
+                <header class="tw-head">
+                    <h1>Mutual fund guide</h1>
+                    <p>What each type of Indian mutual fund does, in plain words, and what a professional looks at before choosing one.
+                        Categories follow SEBI's scheme classification.</p>
+                </header>
+
+                <div class="gd-toolbar">
+                    <div class="tw-seg" id="gd-mode" role="group" aria-label="Detail level">
+                        <button type="button" data-m="both" class="on">Both views</button><button type="button" data-m="plain">Plain English</button><button type="button" data-m="pro">Professional</button>
+                    </div>
+                    <nav class="gd-jump">
+                        <a href="#mf-basics">Basics</a><a href="#mf-equity">Equity</a><a href="#mf-debt">Debt</a><a href="#mf-hybrid">Hybrid</a><a href="#mf-passive">Index &amp; other</a><a href="#mf-choose">Choosing</a>
+                    </nav>
+                </div>
+
+                <!-- basics -->
+                <section class="tw-card" id="mf-basics">
+                    <h2>The basics</h2>
+                    <div class="gd-grid3">
+                        <div class="gd-box">
+                            <h3>What a mutual fund is</h3>
+                            <p class="plain">Many investors pool money; a professional manager buys shares, bonds or both with it. You own units, and the unit price (NAV) moves with the value of what the fund holds.</p>
+                            <p class="pro">A SEBI-regulated trust. NAV is struck daily at market value; costs are taken through the total expense ratio (TER), already netted in the NAV.</p>
                         </div>
-                        <div class="x_content">
-                            <p>
-                            <h2><i class="fa fa-check-square-o"></i><strong> General Caveat: Prefer Direct MFs. You could accumulate substantial amount over longer period especially in case of Equity MFs </strong>  </h2>
-                            </p>
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th width="15%"><h2><strong>MF Type</strong></h2></th>
-                                        <th width="15%"><h2><strong>Subtype</strong></h2></th>
-                                        <th width="70%"><h2><strong>Risk-Return Characteristics</strong></h2></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><h2><strong>Debt</strong></h2></td>
-                                        <td></td>
-                                        <td>
-                                            <p>
-                                                <h2><i class="fa fa-check-square-o"></i> Use Debt MF along with Bank FDs, PPF <strong>to diversify overall wealth</strong></h2>
-                                            </p>
-                                            <p>
-                                            <h2><i class="fa fa-check-square-o"></i> Usually <strong>protect capital</strong> and give returns around Bank FDs</h2>
-                                            </p>
-                                            <p>
-                                                <h2><i class="fa fa-check-square-o"></i> Increase exposure to Debt MF or Fixed Income Asset Class in general <p />(i.e. Bank FDs, Debt Mutual Funds etc.) when Equity Asset Class is over-valued <p />and expected to under-perform</h2>
-                                            </p>
-                                            <p>
-                                            <h2><i class="fa fa-check-square-o"></i> Main Exposures are <strong>Interest Rate Risk and Credit Risk:</strong> (Note: Check Debt MF style-box) </h2>
-                                            </p>
-                                            <ul>
-                                                <li><h2>Debt MF having short term debt securities are less sensitive to Interest Rate Risk</h2></li>
-                                                <li><h2>Debt mutual funds having long term debt securities are more sensitive to Interest Rate Risk </h2> </li>
-                                                <li><h2><strong>When interest rate goes down long term debt securities give much better returns than FD</strong> </h2></li>
-                                                <li><h2><strong>When interest rate goes up long term debt securities under-perform FD</strong> </h2></li>
-                                                <li><h2>When economy is going good usually low credit quality securities give better returns </h2></li>
-                                                <li><h2>During recession low credit quality securities usually under-perform </h2></li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Banking &amp; PSU</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Major debt securities are from Banking and PSU sectors</h2></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Corporate Bond</h2></td>
-                                        <td>
-                                            <h2><i class="fa fa-check-square-o"></i> Check Style Box for Credit Quality of underlying securities
-                                                <p /><i class="fa fa-check-square-o"></i> Increase exposure when economy is about to come out of recession
-                                            </h2>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Credit Risk</h2></td>
-                                        <td>
-                                            <h2><i class="fa fa-check-square-o"></i> Check Style Box for Credit Quality of underlying securities
-                                                <p /><i class="fa fa-check-square-o"></i> Increase exposure when economy is about to come out of recession
-                                            </h2>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Dynamic Bond</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Usually Interest Rate Risk sensitive</h2></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Floating Rate</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Prefer when inflation is expected to go up</h2></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Fixed Term Plan</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> There is a locking period, thus, low liquidity</h2></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Guilt </h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Long term Government Securities</h2></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Constant Maturity Gilt</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Long term Government Securities
-                                            <p /><i class="fa fa-check-square-o"></i> Usually Interest Rate Risk sensitive
-                                        </h2></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Duration</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Low Duration Funds (securities with short maturity) are less sensitive to interest rate risk
-                                            <p /><i class="fa fa-check-square-o"></i> High Duration Funds (securities with long maturity) are more sensitive to interest rate risk</h2>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Money Market/Liquid</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Short Duration Funds (securities with short maturity, usually in months) are least sensitive to interest rate risk
-                                            <p /><i class="fa fa-check-square-o"></i> Use to park money while switching between asset classes
-                                            <p /><i class="fa fa-check-square-o"></i> Highly liquid no exit load for short duration
-                                            <p /><i class="fa fa-check-square-o"></i> Low risk and usually behave like FDs
-                                        </h2>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><h2><strong>Equity</strong></h2></td>
-                                        <td></td>
-                                        <td>
-                                            <p>
-                                            <h2><i class="fa fa-check-square-o"></i> Use Equity MF (or Diversified Equity Asset Class) <strong>to hedge inflation risk</strong></h2>
-                                            </p>
-                                            <p>
-                                            <h2><i class="fa fa-check-square-o"></i> Usually use for <strong>capital appreciation over longer term (usually 10 Years)</strong> </h2>
-                                            </p>
-                                            <p>
-                                                <h2><i class="fa fa-check-square-o"></i> Increase exposure to Equity Asset Class in general when Equity Asset Class is under-valued
-                                                <p />and expected to out-perform. Especially when economy is bottoming out of recession.</h2>
-                                            </p>
-                                            <p>
-                                            <h2><i class="fa fa-check-square-o"></i> Main Risk is <strong>short term volatility:</strong> (Note: Check Equity MF style-box) </h2>
-                                            </p>
-                                            <ul>
-                                                <li><h2>Small Cap Equity MF returns are usually more volatile in short term than Large Cap Equity MF</h2></li>
-                                                <li><h2>Growth and Value are two main investment styles</h2> </li>
-                                                <li><h2><strong>Growth Style MFs invest in stocks showing higher revenue growth.
-                                                    <p />Usually stocks are expensive and returns depend on actual materialization of future growth </strong> </h2></li>
-                                                <li><h2><strong>Value Style MFs invest in stocks with stable business but not showing high revenue growth
-                                                    <p />Usually stocks are less expensive and returns depend on positive earning surprises </strong> </h2></li>
-                                                <li><h2>Use Sector exposed Equity MFs when that particular sector is about to outperform in coming quarters  </h2></li>
-                                                <li><h2>Use Thematic Equity MFs when that particular theme is expected to out-perform in coming quarters </h2></li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Large/Mid/Small</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Large Cap Equity MFs invest in stocks of stable large companies and relatively show lower volatility risk
-                                                <p /><i class="fa fa-check-square-o"></i> Mid-to-Small Cap Equity MFs invest in stocks of Mid to Small size companies and relatively show higher volatility risk
-                                            </h2>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Multi Cap</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Usually include stocks of large to small size companies
-                                            <p /><i class="fa fa-check-square-o"></i> Watch Equity style box for size exposure</h2>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Sector Exposure</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Exposure to stocks from either Pharma or IT or Infra or any other Sector
-                                            <p /><i class="fa fa-check-square-o"></i> Good when you anticipate sector might out perform broader market
-                                             <p />(<strong>IT and Pharma Sector MFs out performed in 2018, due to dollar appreciation and other factors </strong>)
-                                            <p /><i class="fa fa-check-square-o"></i> Risk of returns not inline with broader benchmarks i.e. SENSEX or NIFTY
-                                        </h2>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Thematic</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Useful when there is an anticipation of certain theme will outperform broader market
-                                            <p /><i class="fa fa-check-square-o"></i> Consumption Consumer Trend, Dividend Yield, Inflation-Interest Rate, Exchange Rate theme
-                                        </h2>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><h2><strong>Hybrid</strong></h2></td>
-                                        <td></td>
-                                        <td>
-                                            <h2><strong>Combination of Debt and Equity Mutual Fund</strong></h2>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Aggressive</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Higher percentage of allocation to Equity Class
-                                        </h2>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Conservative</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Higher percentage of allocation to Debt Class
-                                        </h2>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td><h2>Balanced</h2></td>
-                                        <td><h2><i class="fa fa-check-square-o"></i> Usually equal weighing to both Debt and Equity
-                                        </h2>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="gd-box">
+                            <h3>Direct vs regular plans</h3>
+                            <p class="plain">The same fund comes in two versions. The <b>direct</b> plan has no distributor commission, so it costs less and usually returns more over time.</p>
+                            <p class="pro">The TER gap is typically 0.5–1.5 pts a year in equity funds; compounded over 15–20 years it is a large share of final wealth. Compare direct-plan TERs.</p>
+                        </div>
+                        <div class="gd-box">
+                            <h3>The three big risks</h3>
+                            <p class="plain"><b>Market risk</b>: prices fall. <b>Interest-rate risk</b>: bond prices fall when rates rise. <b>Credit risk</b>: a borrower fails to repay.</p>
+                            <p class="pro">Equity: volatility and drawdown. Debt: duration (rate sensitivity) and credit quality. Check the SEBI riskometer and the potential risk class (PRC) matrix for debt funds.</p>
                         </div>
                     </div>
-                </div>
+                </section>
+
+                <!-- equity -->
+                <section class="tw-card" id="mf-equity">
+                    <h2>Equity funds</h2>
+                    <p class="tw-sub">For long-term growth and beating inflation. Expect years when they fall 20–40%; plan to stay invested 7–10 years or more.</p>
+                    <div class="gd-table">
+                        <div class="gd-row gd-hdr"><div>Category</div><div class="plain">In plain words</div><div class="pro">What professionals check</div></div>
+                        <div class="gd-row"><div><b>Large cap</b><span class="gd-rule">≥80% in the 100 largest companies</span></div>
+                            <div class="plain">Big, established companies. Steadier than smaller companies, but harder for a manager to beat the index.</div>
+                            <div class="pro">Rolling 3/5-yr alpha vs Nifty 100 TRI after costs; active share; many large-cap funds lag a low-cost index fund.</div></div>
+                        <div class="gd-row"><div><b>Mid cap</b><span class="gd-rule">≥65% in companies ranked 101–250</span></div>
+                            <div class="plain">Growing companies that can become tomorrow's large caps. Higher returns possible, with deeper falls.</div>
+                            <div class="pro">Valuation premium of mid caps to large caps; downside capture ratio; liquidity of holdings and fund size.</div></div>
+                        <div class="gd-row"><div><b>Small cap</b><span class="gd-rule">≥65% in companies ranked 251 and below</span></div>
+                            <div class="plain">Small companies: the most ups and downs. Only for money you will not need for many years.</div>
+                            <div class="pro">Days to liquidate the portfolio (SEBI stress test), AUM vs market depth, inflow restrictions, maximum drawdown.</div></div>
+                        <div class="gd-row"><div><b>Large &amp; mid cap</b><span class="gd-rule">≥35% each in large and mid caps</span></div>
+                            <div class="plain">A mix of big and growing companies in one fund.</div>
+                            <div class="pro">Benchmark is Nifty LargeMidcap 250; check the actual split stays near the mandate.</div></div>
+                        <div class="gd-row"><div><b>Flexi cap</b><span class="gd-rule">≥65% equity, any company size</span></div>
+                            <div class="plain">The manager chooses where to invest across big and small companies. A sensible single core fund.</div>
+                            <div class="pro">Market-cap drift over time; consistency of style; manager tenure and process.</div></div>
+                        <div class="gd-row"><div><b>Multi cap</b><span class="gd-rule">≥25% each in large, mid and small caps</span></div>
+                            <div class="plain">Always holds a fixed share of big, mid and small companies.</div>
+                            <div class="pro">Structural small-cap exposure (≥25%) makes it more volatile than flexi cap.</div></div>
+                        <div class="gd-row"><div><b>Focused</b><span class="gd-rule">At most 30 stocks</span></div>
+                            <div class="plain">A few high-conviction picks. Results depend heavily on the manager.</div>
+                            <div class="pro">Concentration (top-10 weight), tracking error, stock-specific risk.</div></div>
+                        <div class="gd-row"><div><b>Value / contra</b><span class="gd-rule">Value-investing or contrarian strategy</span></div>
+                            <div class="plain">Buys out-of-favour or cheap companies and waits for them to recover. Can lag for years, then catch up.</div>
+                            <div class="pro">Portfolio P/E and P/B vs market; style consistency; long periods of underperformance are normal.</div></div>
+                        <div class="gd-row"><div><b>Dividend yield</b><span class="gd-rule">Mostly dividend-paying stocks</span></div>
+                            <div class="plain">Companies that share profits regularly; usually steadier businesses.</div>
+                            <div class="pro">Portfolio dividend yield, sector tilt (often PSUs, utilities), payout sustainability.</div></div>
+                        <div class="gd-row"><div><b>Sectoral / thematic</b><span class="gd-rule">≥80% in one sector or theme</span></div>
+                            <div class="plain">Bets on one area such as banks, IT or infrastructure. Useful only if you have a view; not a core holding.</div>
+                            <div class="pro">Cyclicality and timing risk; overlap with existing holdings; benchmark sector valuation vs history.</div></div>
+                        <div class="gd-row"><div><b>ELSS (tax saver)</b><span class="gd-rule">≥80% equity, 3-year lock-in</span></div>
+                            <div class="plain">A diversified equity fund with a 3-year lock-in that can give a tax deduction under the old tax regime.</div>
+                            <div class="pro">Section 80C benefit applies only under the old regime; each SIP instalment has its own 3-year lock-in.</div></div>
+                    </div>
+                </section>
+
+                <!-- debt -->
+                <section class="tw-card" id="mf-debt">
+                    <h2>Debt funds</h2>
+                    <p class="tw-sub">For stability and income: an alternative to fixed deposits. Two dials matter: how long the bonds are (rate risk) and who borrowed (credit risk).</p>
+                    <div class="gd-callout">
+                        <b>Rule of thumb:</b> a fund with a modified duration of 5 years loses about 5% if interest rates rise by 1 percentage point, and gains about 5% if they fall by 1 point.
+                        Short-duration funds barely move; long-duration and gilt funds move a lot.
+                    </div>
+                    <div class="gd-table">
+                        <div class="gd-row gd-hdr"><div>Category</div><div class="plain">In plain words</div><div class="pro">What professionals check</div></div>
+                        <div class="gd-row"><div><b>Overnight</b><span class="gd-rule">1-day securities</span></div>
+                            <div class="plain">Almost no risk. A place to park money for days.</div>
+                            <div class="pro">Return tracks the overnight rate (TREPS); TER is most of the difference between funds.</div></div>
+                        <div class="gd-row"><div><b>Liquid</b><span class="gd-rule">Securities up to 91 days</span></div>
+                            <div class="plain">For emergency money or cash you need within months. Usually a little better than a savings account.</div>
+                            <div class="pro">Credit quality of commercial paper; graded exit load for the first 7 days; YTM minus TER.</div></div>
+                        <div class="gd-row"><div><b>Money market</b><span class="gd-rule">Money-market instruments up to 1 year</span></div>
+                            <div class="plain">For money needed within a year.</div>
+                            <div class="pro">Mix of T-bills, CDs and CPs; YTM; average maturity.</div></div>
+                        <div class="gd-row"><div><b>Ultra short / low duration</b><span class="gd-rule">Duration 3–6 / 6–12 months</span></div>
+                            <div class="plain">For 6–12 month goals; a small step up in risk from liquid funds.</div>
+                            <div class="pro">Credit exposure below AAA; YTM vs liquid funds; how much extra yield comes from credit.</div></div>
+                        <div class="gd-row"><div><b>Short duration</b><span class="gd-rule">Duration 1–3 years</span></div>
+                            <div class="plain">For 1–3 year goals. Moderate sensitivity to interest-rate changes.</div>
+                            <div class="pro">Modified duration, YTM, credit split; roll-down strategy.</div></div>
+                        <div class="gd-row"><div><b>Medium / medium-to-long / long duration</b><span class="gd-rule">Duration 3–4 / 4–7 / over 7 years</span></div>
+                            <div class="plain">Do well when interest rates fall and poorly when they rise. Not for short-term money.</div>
+                            <div class="pro">Rate-cycle view (RBI stance, inflation, G-Sec curve); duration bet vs benchmark; volatility close to equity at times.</div></div>
+                        <div class="gd-row"><div><b>Dynamic bond</b><span class="gd-rule">Any duration</span></div>
+                            <div class="plain">The manager changes how long the bonds are as interest rates change.</div>
+                            <div class="pro">Track record of duration calls; range of duration used historically.</div></div>
+                        <div class="gd-row"><div><b>Corporate bond</b><span class="gd-rule">≥80% in AA+ and above</span></div>
+                            <div class="plain">Lends to high-quality companies. Lower risk of default.</div>
+                            <div class="pro">Issuer concentration, rating distribution, spread over G-Sec.</div></div>
+                        <div class="gd-row"><div><b>Banking &amp; PSU</b><span class="gd-rule">≥80% in banks, PSUs and public financial institutions</span></div>
+                            <div class="plain">Lends mainly to banks and government-owned companies. Generally safe.</div>
+                            <div class="pro">Quasi-sovereign credit; duration; concentration in a few issuers.</div></div>
+                        <div class="gd-row"><div><b>Credit risk</b><span class="gd-rule">≥65% below the highest ratings</span></div>
+                            <div class="plain">Lends to weaker borrowers for extra return. A single default can cut the value sharply.</div>
+                            <div class="pro">Spread vs AAA, issuer-level research, side-pocketing history, liquidity; past defaults in this category.</div></div>
+                        <div class="gd-row"><div><b>Gilt / gilt 10-year constant duration</b><span class="gd-rule">≥80% in government securities</span></div>
+                            <div class="plain">Lends to the government: no default risk, but prices swing with interest rates.</div>
+                            <div class="pro">Pure duration play; G-Sec yield curve, inflation outlook, government borrowing calendar.</div></div>
+                        <div class="gd-row"><div><b>Floater</b><span class="gd-rule">≥65% in floating-rate bonds</span></div>
+                            <div class="plain">Interest resets with market rates, so it holds up better when rates are rising.</div>
+                            <div class="pro">Share of true floaters vs swapped fixed-rate bonds; reset frequency; benchmark.</div></div>
+                    </div>
+                </section>
+
+                <!-- hybrid -->
+                <section class="tw-card" id="mf-hybrid">
+                    <h2>Hybrid funds</h2>
+                    <p class="tw-sub">A mix of shares and bonds in one fund. The share of equity decides most of the risk.</p>
+                    <div class="gd-table">
+                        <div class="gd-row gd-hdr"><div>Category</div><div class="plain">In plain words</div><div class="pro">What professionals check</div></div>
+                        <div class="gd-row"><div><b>Conservative hybrid</b><span class="gd-rule">10–25% equity</span></div>
+                            <div class="plain">Mostly bonds with a little equity for extra return.</div>
+                            <div class="pro">Debt duration and credit quality drive most of the risk.</div></div>
+                        <div class="gd-row"><div><b>Balanced hybrid / aggressive hybrid</b><span class="gd-rule">40–60% / 65–80% equity</span></div>
+                            <div class="plain">A ready-made mix of shares and bonds that the fund rebalances for you.</div>
+                            <div class="pro">Equity share sets the tax treatment (65%+ equity is taxed as equity); quality of the debt portion.</div></div>
+                        <div class="gd-row"><div><b>Balanced advantage (dynamic asset allocation)</b><span class="gd-rule">0–100% equity, changed by a model</span></div>
+                            <div class="plain">Buys more shares when markets look cheap and fewer when they look expensive.</div>
+                            <div class="pro">The allocation model (valuation, trend), net vs gross equity (hedged through derivatives), behaviour in past drawdowns.</div></div>
+                        <div class="gd-row"><div><b>Multi-asset allocation</b><span class="gd-rule">≥10% each in at least 3 asset classes</span></div>
+                            <div class="plain">Shares, bonds and gold (or others) in one fund for a smoother ride.</div>
+                            <div class="pro">Weights and rebalancing rules; gold and international exposure; correlation benefits.</div></div>
+                        <div class="gd-row"><div><b>Arbitrage</b><span class="gd-rule">Buys in the cash market, sells in futures</span></div>
+                            <div class="plain">Earns small, low-risk returns from price gaps between markets; behaves like a liquid fund.</div>
+                            <div class="pro">Arbitrage spreads (fall in quiet markets); taxed as equity; compare with liquid funds after tax.</div></div>
+                        <div class="gd-row"><div><b>Equity savings</b><span class="gd-rule">Equity, arbitrage and debt</span></div>
+                            <div class="plain">A little real equity, plenty of hedged positions and some bonds: modest risk.</div>
+                            <div class="pro">Unhedged (net) equity share, typically 15–40%.</div></div>
+                    </div>
+                </section>
+
+                <!-- passive and other -->
+                <section class="tw-card" id="mf-passive">
+                    <h2>Index funds, ETFs and other types</h2>
+                    <div class="gd-table">
+                        <div class="gd-row gd-hdr"><div>Category</div><div class="plain">In plain words</div><div class="pro">What professionals check</div></div>
+                        <div class="gd-row"><div><b>Index fund / ETF</b><span class="gd-rule">≥95% in the index</span></div>
+                            <div class="plain">Copies an index such as the Nifty 50. Low cost, no stock-picking, and you get the market's return.</div>
+                            <div class="pro">TER, tracking difference and tracking error; ETF liquidity and the gap between price and NAV (iNAV).</div></div>
+                        <div class="gd-row"><div><b>Fund of funds</b><span class="gd-rule">Invests in other funds</span></div>
+                            <div class="plain">One fund that holds other funds, often for international or gold exposure.</div>
+                            <div class="pro">Total cost (both layers of TER); overseas investment limits; currency exposure.</div></div>
+                        <div class="gd-row"><div><b>Retirement / children's funds</b><span class="gd-rule">Lock-in of at least 5 years</span></div>
+                            <div class="plain">Funds tied to a goal, with a lock-in that discourages early withdrawal.</div>
+                            <div class="pro">The lock-in reduces flexibility; compare with an equivalent hybrid or equity fund without one.</div></div>
+                    </div>
+                </section>
+
+                <!-- choosing -->
+                <section class="tw-card" id="mf-choose">
+                    <h2>Choosing a fund: a simple checklist</h2>
+                    <div class="gd-grid2">
+                        <ol class="gd-list">
+                            <li><b>Start from the goal and the time horizon.</b> Money needed within 1 year: liquid or money-market. 1–3 years: short-duration or arbitrage. Over 5–7 years: mainly equity.</li>
+                            <li><b>Decide the asset mix first, the fund second.</b> The split between equity, debt and gold explains most of your result.</li>
+                            <li><b>Prefer direct plans and low costs,</b> especially for index and large-cap exposure.</li>
+                            <li><b>Keep it small:</b> 3–5 funds are usually enough. More funds often means the same stocks twice.</li>
+                        </ol>
+                        <ol class="gd-list" start="5">
+                            <li><b>Judge performance on rolling returns</b> over 3 and 5 years against the right benchmark (total-return index), not on last year's ranking.</li>
+                            <li><b>For debt funds, read the factsheet:</b> modified duration, yield to maturity and credit ratings tell you the risk.</li>
+                            <li><b>Use SIPs and rebalance yearly;</b> move more into equity when it is cheap and less when it is expensive.</li>
+                            <li><b>Check tax and exit loads</b> before switching: rules change, so confirm the current treatment.</li>
+                        </ol>
+                    </div>
+                    <p class="tw-muted tw-small" style="margin:10px 0 0">For education only; not investment advice. Category rules summarised from SEBI's scheme categorisation circulars; read the scheme information document before investing.</p>
+                </section>
             </div>
         </div>
-        <!-- /page content -->
 
-        <!-- footer content -->
         <div th:replace="fragments/publicfooter :: common-publicfooter" />
-        <!-- /footer content -->
     </div>
 </div>
 <script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
-<!-- Bootstrap -->
 <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
-<!-- FastClick -->
-<script src="../../static/vendors/fastclick/lib/fastclick.js" th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
-<!-- NProgress -->
-<script src="../../static/vendors/nprogress/nprogress.js" th:src="@{/vendors/nprogress/nprogress.js}"></script>
-<!-- Custom Theme Scripts -->
 <script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+<script>
+(function () {
+    var root = document.getElementById('mf'), seg = document.getElementById('gd-mode');
+    seg.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) return;
+        [].forEach.call(seg.children, function (x) { x.classList.toggle('on', x === b); });
+        root.setAttribute('data-mode', b.getAttribute('data-m'));
+    });
+})();
+</script>
 </body>
 </html>

@@ -44,11 +44,22 @@ public class AnalystViewService {
             Pattern.compile("\\bOswal\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\bMOFSL\\b|\\bMOSL\\b|\\bMOFS\\b", Pattern.CASE_INSENSITIVE)};
     private static final Pattern[] SCRUB_A = {
-            Pattern.compile("\\bAmbit(\\s+Capital)?('s)?\\b", Pattern.CASE_INSENSITIVE)};
+            Pattern.compile("\\bAmbit(\\s+Capital)?\\b", Pattern.CASE_INSENSITIVE)};
     private static final Pattern DUP = Pattern.compile("(Broker [AB])\\s*\\(\\s*\\1\\s*\\)");
+    /** workbook row pointers such as "(r1206)" or "(r1081–r1383)" in the summary sheets */
+    private static final Pattern ROW_REF = Pattern.compile("\\s*\\(\\s*r\\d+[^)]*\\)");
+    private static final Pattern MY_VIEW = Pattern.compile("\\bMyView\\b");
 
     private volatile long loadedStamp = -1;
     private volatile Map<String, Map<String, Object>> byTicker = Collections.emptyMap();
+    private volatile Map<String, Object> economy = Collections.emptyMap();
+    private volatile Map<String, Object> sectors = Collections.emptyMap();
+
+    /** Macro summary from the Economy sheet: bottom line, nutshell, ranked critical points, indicator dashboard. */
+    public Map<String, Object> getEconomy() { ensureLoaded(); return economy; }
+
+    /** Sector scoreboard and per-sector detail from the Sector sheet. */
+    public Map<String, Object> getSectors() { ensureLoaded(); return sectors; }
 
     public Map<String, Object> getViews(String ticker) {
         ensureLoaded();
@@ -76,8 +87,10 @@ public class AnalystViewService {
         if (stamp == loadedStamp) return;
         long t0 = System.currentTimeMillis();
         try {
-            Map<String, List<List<String>>> sheets = readSheets(f, new HashSet<>(Arrays.asList("ConsolidatedView", BROKERS[0][0], BROKERS[1][0])));
+            Map<String, List<List<String>>> sheets = readSheets(f, new HashSet<>(Arrays.asList("ConsolidatedView", BROKERS[0][0], BROKERS[1][0], "Economy", "Sector")));
             byTicker = build(sheets);
+            economy = buildEconomy(sheets.getOrDefault("Economy", Collections.emptyList()));
+            sectors = buildSectors(sheets.getOrDefault("Sector", Collections.emptyList()));
             loadedStamp = stamp;
             logger.debug("Loaded broker views for {} stocks in {} ms", byTicker.size(), System.currentTimeMillis() - t0);
         } catch (Exception e) {
@@ -144,6 +157,150 @@ public class AnalystViewService {
         return out;
     }
 
+    // ---------- Economy / Sector summary sheets ----------
+    // Layout: column B holds section titles (upper case) and row labels, column A the rank (1, 2, ...) of a point,
+    // columns C.. the values. Internal bookkeeping (source coverage, source rows, change log) is not published.
+
+    /** text for publication: broker names anonymised, row pointers removed */
+    static String clean(String s) {
+        if (s == null) return null;
+        String out = ROW_REF.matcher(s).replaceAll("");
+        out = MY_VIEW.matcher(out).replaceAll("own view");
+        return scrub(out);
+    }
+    private static boolean blank(String s) { return s == null || s.isEmpty(); }
+    private static boolean isRank(String s) { return s != null && s.matches("\\d+(\\.0)?"); }
+    private static int rank(String s) { return (int) Double.parseDouble(s); }
+    private static boolean isTitle(List<String> row) {
+        String b = at(row, 1);
+        if (!blank(at(row, 0)) || blank(b) || !blank(at(row, 2))) return false;
+        String head = b.split("\\s+[—–-]\\s+")[0];   // "MARKET IN A NUTSHELL — most critical first"
+        return head.equals(head.toUpperCase(Locale.ROOT)) && head.matches(".*[A-Z].*");
+    }
+    private static String sectionOf(String title, String current) {
+        String u = title.toUpperCase(Locale.ROOT);
+        if (u.startsWith("BOTTOM LINE")) return "bottom";
+        if (u.startsWith("MARKET IN A NUTSHELL")) return "nutshell";
+        if (u.startsWith("CRITICAL POINTS")) return "points";
+        if (u.startsWith("KEY INDICATORS")) return "dash";
+        if (u.startsWith("SECTOR SCOREBOARD")) return "score";
+        if (u.startsWith("SECTOR DETAIL")) return "detail";
+        if (u.startsWith("CHANGE LOG") || u.startsWith("SOURCE COVERAGE") || u.contains("SUMMARY")) return "skip";
+        return current;   // a group heading inside the current section
+    }
+    private static String titleCase(String s) {
+        StringBuilder b = new StringBuilder();
+        for (String w : s.toLowerCase(Locale.ROOT).split(" ")) {
+            if (b.length() > 0) b.append(' ');
+            if (w.equals("&") || w.equals("and") || w.equals("of")) b.append(w);
+            else if (!w.isEmpty()) b.append(Character.toUpperCase(w.charAt(0))).append(w.substring(1));
+        }
+        return b.toString();
+    }
+    private static Map<String, String> pair(String label, String text) {
+        Map<String, String> m = new LinkedHashMap<>();
+        m.put("label", clean(label));
+        m.put("text", clean(text));
+        return m;
+    }
+
+    private Map<String, Object> buildEconomy(List<List<String>> rows) {
+        Map<String, Object> out = new LinkedHashMap<>();
+        List<Map<String, Object>> nutshell = new ArrayList<>(), points = new ArrayList<>(), dash = new ArrayList<>();
+        String section = null, group = null, bottom = null, asOf = null;
+        Map<String, Object> cur = null;
+        for (List<String> row : rows) {
+            String a = at(row, 0), b = at(row, 1), c = at(row, 2);
+            if (blank(b)) continue;
+            if ("As of".equalsIgnoreCase(b)) { asOf = c; continue; }
+            if (isTitle(row)) {
+                String s = sectionOf(b, section);
+                if (s != null && s.equals(section) && "dash".equals(s)) group = titleCase(b);
+                section = s;
+                continue;
+            }
+            if (section == null || "skip".equals(section) || "#".equals(a)) continue;
+            switch (section) {
+                case "bottom":
+                    if ("View".equalsIgnoreCase(b)) bottom = clean(c);
+                    break;
+                case "nutshell":
+                    if (isRank(a)) {
+                        Map<String, Object> m = new LinkedHashMap<>();
+                        m.put("rank", rank(a)); m.put("headline", clean(b)); m.put("text", clean(c));
+                        nutshell.add(m);
+                    }
+                    break;
+                case "points":
+                    if (isRank(a)) {
+                        cur = new LinkedHashMap<>();
+                        cur.put("rank", rank(a)); cur.put("theme", clean(b)); cur.put("point", clean(c));
+                        cur.put("importance", at(row, 3)); cur.put("impact", at(row, 4));
+                        cur.put("status", at(row, 5)); cur.put("updated", at(row, 6));
+                        cur.put("details", new ArrayList<Map<String, String>>());
+                        points.add(cur);
+                    } else if (cur != null && !blank(c) && !b.toLowerCase(Locale.ROOT).startsWith("source")) {
+                        @SuppressWarnings("unchecked") List<Map<String, String>> d = (List<Map<String, String>>) cur.get("details");
+                        d.add(pair(b, c));
+                    }
+                    break;
+                case "dash":
+                    if ("Indicator".equalsIgnoreCase(b)) break;
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("group", group); m.put("indicator", clean(b)); m.put("latest", clean(c));
+                    m.put("signal", at(row, 3)); m.put("asOf", at(row, 4));
+                    dash.add(m);
+                    break;
+                default:
+            }
+        }
+        out.put("asOf", asOf);
+        out.put("bottomLine", bottom);
+        out.put("nutshell", nutshell);
+        out.put("points", points);
+        out.put("indicators", dash);
+        return out;
+    }
+
+    private Map<String, Object> buildSectors(List<List<String>> rows) {
+        Map<String, Object> out = new LinkedHashMap<>();
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<Integer, Map<String, Object>> byRank = new HashMap<>();
+        String section = null, group = null, asOf = null;
+        Map<String, Object> cur = null;
+        for (List<String> row : rows) {
+            String a = at(row, 0), b = at(row, 1), c = at(row, 2);
+            if (blank(b)) continue;
+            if ("As of".equalsIgnoreCase(b)) { asOf = c; continue; }
+            if (isTitle(row)) {
+                String s = sectionOf(b, section);
+                if (s != null && s.equals(section)) group = titleCase(b);
+                section = s;
+                continue;
+            }
+            if (section == null || "skip".equals(section) || "#".equals(a)) continue;
+            if ("score".equals(section) && isRank(a)) {
+                Map<String, Object> m = new LinkedHashMap<>();
+                m.put("rank", rank(a)); m.put("group", group); m.put("sector", clean(b)); m.put("view", clean(c));
+                m.put("brokerB", clean(at(row, 3)));   // MOSL column
+                m.put("brokerA", clean(at(row, 4)));   // Ambit column
+                m.put("trend", at(row, 5)); m.put("updated", at(row, 6));
+                m.put("details", new ArrayList<Map<String, String>>());
+                list.add(m);
+                byRank.put(rank(a), m);
+            } else if ("detail".equals(section)) {
+                if (isRank(a)) cur = byRank.get(rank(a));
+                else if (cur != null && !blank(c) && !b.toLowerCase(Locale.ROOT).startsWith("source")) {
+                    @SuppressWarnings("unchecked") List<Map<String, String>> d = (List<Map<String, String>>) cur.get("details");
+                    d.add(pair(b, c));
+                }
+            }
+        }
+        out.put("asOf", asOf);
+        out.put("sectors", list);
+        return out;
+    }
+
     private static Map<String, Object> entry(Map<String, Map<String, Object>> out, String ticker) {
         return out.computeIfAbsent(ticker.trim().toUpperCase(Locale.ROOT), k -> {
             Map<String, Object> m = new LinkedHashMap<>();
@@ -193,7 +350,9 @@ public class AnalystViewService {
     private static class IsoDateFormatter extends DataFormatter {
         @Override
         public String formatRawCellContents(double value, int formatIndex, String formatString) {
-            if (DateUtil.isADateFormat(formatIndex, formatString) && DateUtil.isValidExcelDate(value)) {
+            // only full dates; month-year cells ("Nov-26") keep their display text
+            if (DateUtil.isADateFormat(formatIndex, formatString) && DateUtil.isValidExcelDate(value)
+                    && formatString != null && formatString.toLowerCase(Locale.ROOT).contains("d")) {
                 return new SimpleDateFormat("yyyy-MM-dd").format(DateUtil.getJavaDate(value));
             }
             return super.formatRawCellContents(value, formatIndex, formatString);

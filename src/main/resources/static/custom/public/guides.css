@@ -1,0 +1,76 @@
+/* Mutual fund guide, Economy and Sectors pages — tokens from /custom/theme.css */
+.gd-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 14px; }
+.gd-jump { display: flex; gap: 4px 14px; flex-wrap: wrap; font-size: 13px; }
+.gd-jump a { color: var(--ink2); }
+.gd-jump a:hover { color: var(--accent); }
+.gd-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 22px; }
+.gd-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 18px; }
+@media (max-width: 991px) { .gd-grid2, .gd-grid3 { grid-template-columns: minmax(0, 1fr); } }
+.gd-box { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; background: var(--surface2); }
+.gd-box h3 { font-size: 14px; font-weight: 600; margin: 0 0 6px; }
+.gd-box p { margin: 0 0 6px; font-size: 13px; line-height: 1.55; }
+.gd .pro { color: var(--ink2); }
+.gd-box .pro, .gd-row .pro { border-left: 2px solid var(--accent-soft); padding-left: 8px; }
+.gd-box .plain::before { content: "In plain words · "; color: var(--muted); font-size: 11.5px; }
+.gd-box .pro::before { content: "Professional · "; color: var(--muted); font-size: 11.5px; }
+.gd[data-mode="plain"] .pro, .gd[data-mode="pro"] .plain { display: none !important; }
+.gd-table { display: grid; font-size: 13px; line-height: 1.5; }
+.gd-row { display: grid; grid-template-columns: minmax(170px, 1.1fr) 2fr 2fr; gap: 6px 18px; padding: 10px 0; border-top: 1px solid var(--grid); }
+.gd[data-mode="plain"] .gd-row, .gd[data-mode="pro"] .gd-row { grid-template-columns: minmax(170px, 1fr) 3fr; }
+.gd-row.gd-hdr { border-top: 0; padding-top: 0; color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+.gd-row.gd-hdr .pro { border-left: 0; padding-left: 0; }
+.gd-row b { color: var(--ink); display: block; }
+.gd-rule { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+@media (max-width: 767px) { .gd-row, .gd[data-mode] .gd-row { grid-template-columns: minmax(0, 1fr); } .gd-row.gd-hdr { display: none; } }
+.gd-callout { background: var(--accent-soft); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--ink2); margin: 0 0 12px; }
+.gd-list { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.55; }
+.gd-list li { margin-bottom: 8px; }
+
+/* chips for signals, importance and trend */
+.gd-chip { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; background: var(--chip); color: var(--ink2); }
+.gd-chip.pos { background: rgba(27, 175, 122, .14); color: var(--pos); }
+.gd-chip.neg { background: rgba(208, 59, 59, .12); color: var(--neg); }
+.gd-chip.mix { background: rgba(237, 161, 0, .16); color: #a26a00; }
+:root[data-theme="dark"] .gd-chip.mix { color: #e8b44a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .gd-chip.mix { color: #e8b44a; } }
+.gd-chip.crit { background: var(--ink); color: var(--page); }
+.gd-chip.high { background: var(--chip); color: var(--ink); border: 1px solid var(--axis); }
+
+/* Economy / Sectors */
+.ec-bottom { font-size: 15px; line-height: 1.6; color: var(--ink); margin: 0; }
+.ec-nut { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; margin: 0; padding: 0; list-style: none; }
+@media (max-width: 991px) { .ec-nut { grid-template-columns: minmax(0, 1fr); } }
+.ec-nut li { display: grid; grid-template-columns: 26px 1fr; gap: 2px 8px; font-size: 13px; line-height: 1.5; }
+.ec-nut .n { grid-row: span 2; width: 22px; height: 22px; border-radius: 50%; background: var(--chip); color: var(--ink); font-weight: 600; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+.ec-nut b { color: var(--ink); }
+.ec-pt { border-top: 1px solid var(--grid); }
+.ec-pt:first-of-type { border-top: 0; }
+.ec-pt summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 4px 12px; align-items: start; padding: 11px 0; }
+.ec-pt summary::-webkit-details-marker { display: none; }
+.ec-pt summary .rk { font-weight: 650; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ec-pt summary .th { color: var(--muted); font-size: 12px; }
+.ec-pt summary .pt { color: var(--ink); font-weight: 600; font-size: 14px; }
+.ec-pt summary .vw { color: var(--ink2); font-size: 13px; margin-top: 3px; line-height: 1.5; }
+.ec-pt summary .chips { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+.ec-pt summary:hover .pt { color: var(--accent); }
+.ec-pt[open] summary .pt { color: var(--accent); }
+.ec-det { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 6px 16px; padding: 0 0 14px 42px; font-size: 13px; line-height: 1.55; }
+.ec-det dt { color: var(--muted); font-weight: 500; }
+.ec-det dd { margin: 0; color: var(--ink2); }
+@media (max-width: 767px) {
+    .ec-det { grid-template-columns: minmax(0, 1fr); padding-left: 0; }
+    .ec-det dd { margin-bottom: 6px; }
+    .ec-pt summary { grid-template-columns: 24px minmax(0, 1fr); }
+    .ec-pt summary .chips { grid-column: 2; justify-content: flex-start; }
+}
+.ec-ind td, .ec-ind th { vertical-align: top; }
+.ec-ind .grp td { background: var(--surface2); color: var(--muted); font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.ec-ind td:first-child { color: var(--ink); font-weight: 500; white-space: nowrap; }
+.sc-brokers { display: flex; gap: 4px 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 4px; }
+.sc-brokers b { color: var(--ink2); font-weight: 600; }
+.sc-group { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 16px 0 0; }
+.sc-group:first-child { margin-top: 0; }
+.sc-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.sc-filter input { height: 32px; width: 220px; }
+.sc-count { font-size: 12px; color: var(--muted); }
+.sc-score { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; }

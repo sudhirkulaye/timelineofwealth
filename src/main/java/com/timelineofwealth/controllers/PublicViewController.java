@@ -108,6 +108,22 @@ public class PublicViewController {
         return "public/contactus";
     }
 
+    /** India macro summary (Economy sheet of the research workbook, via /public/api/geteconomy). */
+    @RequestMapping(value = "/public/economy")
+    public String economy(HttpServletRequest request, Model model){
+        logger.debug("Visited /public/economy - " + request.getRemoteAddr());
+        model.addAttribute("title", "Economy and markets");
+        return "public/economy";
+    }
+
+    /** Sector scoreboard (Sector sheet of the research workbook, via /public/api/getsectors). */
+    @RequestMapping(value = "/public/sectors")
+    public String sectors(HttpServletRequest request, Model model){
+        logger.debug("Visited /public/sectors - " + request.getRemoteAddr());
+        model.addAttribute("title", "Sectors");
+        return "public/sectors";
+    }
+
     /**
      * The only blog post (chapter notes on the book "Financial Shenanigans") follows the book's structure, headings and
      * case examples closely, so it is not published. The template stays in the repo; set to true to serve it again.
@@ -209,7 +225,7 @@ public class PublicViewController {
         logger.debug(String.format("Visited /public/mftypes - " + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Types of Mutual Funds");
+        model.addAttribute("title", "Mutual fund guide");
         return "public/mftypes";
     }
 

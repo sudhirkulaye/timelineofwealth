@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md">
+<link href="../../static/custom/public/guides.css" th:href="@{/custom/public/guides.css}" rel="stylesheet" />
+<div class="container body">
+    <div class="main_container">
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
+
+        <div class="right_col" role="main">
+            <div class="tw-page gd" id="sc-root">
+                <header class="tw-head" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+                    <div>
+                        <h1>Sectors</h1>
+                        <p>Where each Indian sector stands and which way it is heading, summarised from broker research.</p>
+                    </div>
+                    <span class="tw-chip" id="sc-asof"></span>
+                </header>
+
+                <section class="tw-card">
+                    <div class="sc-score" id="sc-score"></div>
+                    <div class="sc-filter">
+                        <div class="tw-seg" id="sc-trend" role="group" aria-label="Trend">
+                            <button type="button" data-v="" class="on">All</button><button type="button" data-v="Improving">Improving</button><button type="button" data-v="Stable">Stable</button><button type="button" data-v="Mixed">Mixed</button><button type="button" data-v="Weakening">Weakening</button>
+                        </div>
+                        <input type="search" class="form-control" id="sc-q" placeholder="Search sectors or companies" aria-label="Search sectors" />
+                        <span class="sc-count" id="sc-count"></span>
+                    </div>
+                    <p class="tw-sub" style="margin:10px 0 0">Click a sector for the latest reading, the read-through, likely winners and losers, broker views and what to watch.</p>
+                </section>
+
+                <section class="tw-card" id="sc-list">Loading…</section>
+
+                <p class="tw-muted tw-small">Summary of broker research (brokers shown as Broker A and Broker B) and public data. Company names are examples, not recommendations. For information only; not investment advice.</p>
+            </div>
+        </div>
+
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+<script src="../../static/custom/public/research.js" th:src="@{/custom/public/research.js}"></script>
+</body>
+</html>

@@ -41,6 +41,14 @@ public class StockChartApi {
         return analystViewService.getViews(ticker);
     }
 
+    /** Macro summary (Economy sheet of the research workbook; broker names anonymised). */
+    @RequestMapping(value = "/geteconomy", method = RequestMethod.GET)
+    public Map<String, Object> getEconomy() { return analystViewService.getEconomy(); }
+
+    /** Sector scoreboard and detail (Sector sheet of the research workbook; broker names anonymised). */
+    @RequestMapping(value = "/getsectors", method = RequestMethod.GET)
+    public Map<String, Object> getSectors() { return analystViewService.getSectors(); }
+
     private static final Set<String> INDICES = new HashSet<>(Arrays.asList("NIFTY", "NIFTY200", "BSEMidCap", "BSESmallCap"));
 
     /** Daily index levels from index_valuation: {ticker, d:[], v:[]}. */

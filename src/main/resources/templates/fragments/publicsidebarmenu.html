@@ -21,60 +21,53 @@
 
         <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
             <div class="menu_section">
-                <h3>Wealth Management</h3>
+                <h3>Research</h3>
                 <ul class="nav side-menu">
-                    <!-- Only Markets and Help are shown; the logo above links home. -->
-                    <!--<li><a href="/"><i class="fa fa-home"></i> Home </a></li>-->
-                    <!--<li><a><i class="fa fa-briefcase"></i> Services <span class="fa fa-chevron-down"></span></a>
+                    <!-- Home, Services, Contact Us and Blog are not shown; the logo above links home. -->
+                    <li><a><i class="fa fa-globe"></i> Markets <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="/public/economy">Economy</a></li>
+                            <li><a href="/public/sectors">Sectors</a></li>
+                            <li><a href="/public/nifty50stats">NIFTY 50 Statistics</a></li>
+                            <li><a href="/public/indexreturnstats">Index Return Statistics</a></li>
+                        </ul>
+                    </li>
+                    <li><a><i class="fa fa-line-chart"></i> Stocks <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="/public/stocklist">Stock Screener</a></li>
+                            <li><a href="/public/stockcompare">Compare Fundamentals</a></li>
+                            <li><a href="/public/stockcompareplus">Compare Valuations</a></li>
+                        </ul>
+                    </li>
+                    <li><a><i class="fa fa-pie-chart"></i> Mutual Funds <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="/public/mftypes">Mutual Fund Guide</a></li>
+                            <li><a href="/public/mflist">Mutual Fund Statistics</a></li>
+                        </ul>
+                    </li>
+                    <li><a><i class="fa fa-calculator"></i> Tools <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="/public/retirementfundcalculation">Retirement Fund Calculator</a></li>
+                        </ul>
+                    </li>
+                    <!-- Hidden for now:
+                    <li><a href="/"><i class="fa fa-home"></i> Home </a></li>
+                    <li><a><i class="fa fa-briefcase"></i> Services <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
                             <li><a href="/public/services">Overview</a></li>
                             <li><a href="/public/pmsapp">PMS App</a></li>
                             <li><a href="/public/wealthmanagementapp">Wealth Management App</a></li>
                         </ul>
-                    </li>-->
-                    <li><a><i class="fa fa-line-chart"></i> Markets <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <li><a href="/public/indexreturnstats">Return Statistics</a></li>
-                            <li><a href="/public/nifty50stats">NIFTY 50 Statistics</a></li>
-                            <li><a href="/public/mftypes">Mutual Funds Types</a></li>
-                            <li><a href="/public/mflist">Mutual Funds Stats</a></li>
-                            <li><a href="/public/stocklist">Stock Screener</a></li>
-                            <li><a href="/public/stockcompare">Compare Stocks Fundamentals</a></li>
-                            <li><a href="/public/stockcompareplus">Compare Stocks Valuations</a></li>
-                            <!--<li><a href="/public/research">Research</a></li>-->
-                        </ul>
                     </li>
-                    <!-- Blog disabled: /public/blog0001 (notes on the book "Financial Shenanigans") follows the book too closely
-                         to publish. Re-enable here and in PublicViewController.BLOG_ENABLED once rewritten as original commentary. -->
-                    <!--<li><a><i class="fa fa-pencil"></i> Blog <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <li><a href="/public/blog0001">Financial Shenanigan</a></li>
-                        </ul>
-                    </li>-->
-                    <!--<li><a><i class="fa fa-check-square-o"></i> Banking Stocks <span class="fa fa-chevron-down"></span></a>-->
-                    <!--<ul class="nav child_menu">-->
-                    <!--<li><a href="/public/bankanalysis1">Banks Large-Cap</a></li>-->
-                    <!--<li><a href="/public/bankanalysis2">Banks Mid-Cap</a></li>-->
-                    <!--<li><a href="/public/bankanalysis3">Banks Small-Cap</a></li>-->
-                    <!--</ul>-->
-                    <!--</li>-->
-                    <!--<li><a><i class="fa fa-check-square-o"></i> Economic Indicators <span class="fa fa-chevron-down"></span></a>-->
-                    <!--<ul class="nav child_menu">-->
-                    <!--<li><a href="/public/indianeconomy">India</a></li>-->
-                    <!--&lt;!&ndash;<li><a href="#">Developed Countries [Upcoming]</a></li>&ndash;&gt;-->
-                    <!--&lt;!&ndash;<li><a href="#">Other Emerging Markets [Upcoming]</a></li>&ndash;&gt;-->
-                    <!--&lt;!&ndash;<li><a href="#">Commodities [Upcoming]</a></li>&ndash;&gt;-->
-                    <!--</ul>-->
-                    <!--</li>-->
-                    <li><a><i class="fa fa-life-ring"></i> Help <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <!--<li><a href="/public/saa"><i class="fa fa-question-circle"></i>What is Asset Allocation</a></li>-->
-                            <!--<li><a href="/public/whyindependentadvice"><i class="fa fa-question-circle"></i>Why independent advice</a></li>-->
-                            <!--<li><a href="/public/ethicalstandards"><i class="fa fa-question-circle"></i>Understanding Ethical Standards</a></li>-->
-                            <li><a href="/public/retirementfundcalculation">Retirement Fund Calculation</a></li>
-                        </ul>
+                    <li><a href="/public/contactus"><i class="fa fa-envelope-o"></i> Contact Us</a></li>
+                    Blog: /public/blog0001 (notes on the book "Financial Shenanigans") follows the book too closely to publish;
+                    re-enable here and in PublicViewController.BLOG_ENABLED once rewritten as original commentary.
+                    <li><a><i class="fa fa-pencil"></i> Blog <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu"><li><a href="/public/blog0001">Financial Shenanigan</a></li></ul>
                     </li>
-                    <!--<li><a href="/public/contactus"><i class="fa fa-envelope-o"></i> Contact Us</a></li>-->
+                    Older pages: /public/bankanalysis1..3, /public/indianeconomy, /public/research, /public/saa,
+                    /public/whyindependentadvice, /public/ethicalstandards
+                    -->
                 </ul>
             </div>
         </div>
