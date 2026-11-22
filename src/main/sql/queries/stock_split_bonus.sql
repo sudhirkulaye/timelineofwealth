@@ -9,6 +9,13 @@ select a.* from stock_split_probability a, stock_universe b where a.ticker = b.t
 -- FOr 1:2 Bonus update price as 2/3 and so on (i.e. Original Stocks / (sum of newly issued stocks + original stocks)
 -- For 2:10 Stock Split update price as (New FV/Old FV) i.e. (2/10) or (1/5)
 
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 5:10' WHERE (ticker = 'PGIL') and (date = '2024-01-05');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'NA' WHERE (ticker = 'TRIVENI') and (date = '2026-07-22');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 2:10' WHERE (ticker = 'JLHL') and (date = '2026-07-24');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:2' WHERE (ticker = 'KIRLPNU') and (date = '2026-08-18');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Stock Split Ratio 1:2' WHERE (ticker = 'TDPOWERSYS') and (date = '2026-08-24');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'PGIL') and (date = '2026-09-11');
+-- UPDATE stock_split_probability SET is_processed = 'YES', note = 'NA' WHERE (ticker = 'POLICYBZR') and (date = '2026-09-24');
 -- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:5' WHERE (ticker = 'ZFCVINDIA') and (date = '2026-06-24');
 -- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 2:1' WHERE (ticker = 'TRENT') and (date = '2026-06-04');
 -- UPDATE stock_split_probability SET is_processed = 'YES', note = 'Bonus 1:1' WHERE (ticker = 'ANANDRATHI') and (date = '2026-06-03');
@@ -241,6 +248,13 @@ update portfolio_holdings set quantity = quantity * 2, rate = rate * (1/2), net_
 -- Copy this below and then replace ticker XXX to right one and replace date and most imp. replace fraction
 update nse_price_history a set close_price = close_price * ( 1 / 1	) where a.nse_ticker = 'XXX' and date < 'XXXX-XX-XX' ;
 
+update nse_price_history a set close_price = close_price * ( 5 /  10 ) where a.nse_ticker = 'PGIL' and date < '2024-01-05' ;
+update nse_price_history a set close_price = close_price * (  1 / 1 ) where a.nse_ticker = 'TRIVENI' and date < '2026-07-22' ;
+update nse_price_history a set close_price = close_price * ( 2 /  10 ) where a.nse_ticker = 'JLHL' and date < '2026-07-24' ;
+update nse_price_history a set close_price = close_price * ( 1 /  2 ) where a.nse_ticker = 'KIRLPNU' and date < '2026-08-18' ;
+update nse_price_history a set close_price = close_price * ( 1 /  2 ) where a.nse_ticker = 'TDPOWERSYS' and date < '2026-08-24' ;
+update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'PGIL' and date < '2026-09-11' ;
+update nse_price_history a set close_price = close_price * (  1 / 1 ) where a.nse_ticker = 'POLICYBZR' and date < '2026-09-24' ;
 update nse_price_history a set close_price = close_price * ( 1 / 6 ) where a.nse_ticker = 'ZFCVINDIA' and date < '2026-06-24' ;
 update nse_price_history a set close_price = close_price * ( 2 / 3 ) where a.nse_ticker = 'TRENT' and date < '2026-06-04' ;
 update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse_ticker = 'ANANDRATHI' and date < '2026-06-03' ;
@@ -463,6 +477,13 @@ update nse_price_history a set close_price = close_price * ( 1 / 2 ) where a.nse
 -- Copy this below and then replace ticker XXX to right one and replace date and most imp. replace fraction
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 1 ) where b.ticker = 'XXX' and b.ticker5 = a.name  and date < 'XXXX-XX-XX' ;
 
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 5 /  10 ) where b.ticker = 'PGIL' and b.ticker5 = a.name  and date < '2024-01-05' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * (  1 / 1 ) where b.ticker = 'TRIVENI' and b.ticker5 = a.name  and date < '2026-07-22' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 /  10 ) where b.ticker = 'JLHL' and b.ticker5 = a.name  and date < '2026-07-24' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 /  2 ) where b.ticker = 'KIRLPNU' and b.ticker5 = a.name  and date < '2026-08-18' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 /  2 ) where b.ticker = 'TDPOWERSYS' and b.ticker5 = a.name  and date < '2026-08-24' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'PGIL' and b.ticker5 = a.name  and date < '2026-09-11' ;
+update daily_data_s a, stock_universe b set a.cmp = a.cmp * (  1 / 1 ) where b.ticker = 'POLICYBZR' and b.ticker5 = a.name  and date < '2026-09-24' ;
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 6 ) where b.ticker = 'ZFCVINDIA' and b.ticker5 = a.name  and date < '2026-06-24' ;
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 2 / 3 ) where b.ticker = 'TRENT' and b.ticker5 = a.name  and date < '2026-06-04' ;
 update daily_data_s a, stock_universe b set a.cmp = a.cmp * ( 1 / 2 ) where b.ticker = 'ANANDRATHI' and b.ticker5 = a.name  and date < '2026-06-03' ;
