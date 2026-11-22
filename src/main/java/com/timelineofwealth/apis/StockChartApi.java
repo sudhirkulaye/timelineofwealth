@@ -3,6 +3,7 @@ package com.timelineofwealth.apis;
 import com.timelineofwealth.entities.YahooConsensus;
 import com.timelineofwealth.repositories.StockUniverseRepository;
 import com.timelineofwealth.repositories.YahooConsensusRepository;
+import com.timelineofwealth.service.StockFinancialsService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +21,21 @@ public class StockChartApi {
     private final StockUniverseRepository stockUniverseRepository;
     private final YahooConsensusRepository yahooConsensusRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final StockFinancialsService stockFinancialsService;
 
     public StockChartApi(StockUniverseRepository stockUniverseRepository,
-                         YahooConsensusRepository yahooConsensusRepository, JdbcTemplate jdbcTemplate) {
+                         YahooConsensusRepository yahooConsensusRepository, JdbcTemplate jdbcTemplate,
+                         StockFinancialsService stockFinancialsService) {
         this.stockUniverseRepository = stockUniverseRepository;
         this.yahooConsensusRepository = yahooConsensusRepository;
         this.jdbcTemplate = jdbcTemplate;
+        this.stockFinancialsService = stockFinancialsService;
+    }
+
+    /** Annual + quarterly revenue, EBITDA, net profit: latest result Excel, else stock_pnl / stock_quarter. */
+    @RequestMapping(value = "/getstockfinancials/{ticker}", method = RequestMethod.GET)
+    public Map<String, Object> getStockFinancials(@PathVariable String ticker) {
+        return stockFinancialsService.getFinancials(ticker);
     }
 
     /** Top-bar search. Returns up to 10 {t: ticker, n: short name}. */

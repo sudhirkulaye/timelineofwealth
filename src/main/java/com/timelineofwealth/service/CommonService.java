@@ -1253,7 +1253,7 @@ public class CommonService {
         return null;
     }
 
-    private final File getLatestExcelFileForTicker(String ticker) {
+    public File getLatestExcelFileForTicker(String ticker) {
         List<String> quarters = getAvailableQuarters(BASE_EXCEL_PATH);
         for (String quarter : quarters) {
             String filePath = BASE_EXCEL_PATH + quarter + "/" + ticker + "_FY" + quarter.substring(2) + ".xlsx";

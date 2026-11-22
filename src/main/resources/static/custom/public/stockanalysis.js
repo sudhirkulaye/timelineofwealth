@@ -335,38 +335,36 @@
     // Fundamentals
     // =====================================================================
     function fyLabel(dateStr) { var d = parseD(dateStr); var y = d.getMonth() >= 3 ? d.getFullYear() + 1 : d.getFullYear(); return 'FY' + String(y).slice(2); }
-    function qLabel(dateStr) { var d = parseD(dateStr); return MON[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2); }
-    function preferConsolidated(rows) {
-        var hasC = rows.some(function (r) { return r.key.consStandalone === 'C'; });
-        return rows.filter(function (r) { return r.key.consStandalone === (hasC ? 'C' : 'S'); })
-            .sort(function (a, b) { return a.key.date < b.key.date ? -1 : 1; });
-    }
+    // Indian fiscal quarters: Apr-Jun = Q1 ... Jan-Mar = Q4 of the FY ending that March
+    function qName(dateStr) { var m = parseD(dateStr).getMonth(); return 'Q' + (m >= 3 ? Math.floor((m - 3) / 3) + 1 : 4) + ' ' + fyLabel(dateStr); }
+    function qLabel(dateStr) { return qName(dateStr); }
     function isFinancial() {
         var D = S.details || {};
         return /financ|bank/i.test((D.sectorNameDisplay || '') + ' ' + (D.industryNameDisplay || ''));
     }
-    // share count (crore) for split-consistent EPS: today's market cap / today's price (both post any split or bonus),
-    // else the latest quarter's market cap / price, else latest annual NP / EPS
-    function sharesCr(pnl, qtr) {
+    // share count (crore) for split-consistent EPS: today's market cap / today's price (both post any split or bonus)
+    function sharesCr() {
         var dd = S.details && S.details.dailyDataS, O = S.ohlc;
         if (dd && dd.marketCap > 0 && O && O.c.length) return dd.marketCap / O.c[O.c.length - 1];
-        for (var i = qtr.length - 1; i >= 0; i--) if (qtr[i].mcap > 0 && qtr[i].price > 0) return qtr[i].mcap / qtr[i].price;
-        for (var j = pnl.length - 1; j >= 0; j--) if (pnl[j].eps > 0 && pnl[j].netProfit) return pnl[j].netProfit / pnl[j].eps;
         return null;
     }
 
     function renderFundamentals() {
-        var pnl = preferConsolidated(S.pnl || []), qtr = preferConsolidated(S.qtr || []);
-        var fin = isFinancial(), sh = sharesCr(pnl, qtr), annual = S.period === 'A';
-        var rows = annual ? pnl.slice(-10) : qtr.slice(-12);
-        var labels = rows.map(function (r) { return annual ? fyLabel(r.key.date) : qLabel(r.key.date); });
-        var rev = rows.map(function (r) { return r.sales; });
-        var ebitda = rows.map(function (r) { return r.operatingProfit; });
-        var eps = rows.map(function (r) { return sh ? r.netProfit / sh : null; });
-        var nAct = rows.length;
+        var F = S.fin || {}, annual = S.period === 'A';
+        var src = (annual ? F.annual : F.quarterly) || { d: [] };
+        var fin = isFinancial(), sh = sharesCr();
+        var take = annual ? 10 : 12, from = Math.max(0, src.d.length - take);
+        var dates = src.d.slice(from);
+        var labels = dates.map(function (d) { return annual ? fyLabel(d) : qLabel(d); });
+        var rev = src.sales.slice(from);
+        var ebitda = src.ebitda.slice(from);
+        var margin = ebitda.map(function (e, i) { return e != null && rev[i] ? e / rev[i] : null; });
+        var eps = src.np.slice(from).map(function (np) { return sh && np != null ? np / sh : null; });
+        var nAct = dates.length;
+        var rows = dates;
 
         // append consensus estimates (annual view only)
-        var C = S.cons, estRev = [], estEps = [];
+        var C = S.cons;
         if (annual && C && C.dates && C.dates.length && nAct) {
             var lastFy = +labels[nAct - 1].slice(2), k = C.dates.length - 1;
             Object.keys(C.fy).sort().forEach(function (fy) {
@@ -377,15 +375,17 @@
             });
         }
 
-        var last = rows.length ? rows[rows.length - 1] : null;
-        $('sa-fin-asof').textContent = last ? 'Data as of ' + (annual ? labels[nAct - 1] + ' (' + fmtD(last.key.date) + ')' : fmtD(last.key.date)) : 'No data';
-        $('sa-fin-sub').textContent = annual ? 'Last 10 fiscal years' + (labels.length > nAct ? ', plus consensus estimates (E)' : '') + '. Hover for YoY growth.'
+        var last = nAct ? dates[nAct - 1] : null;
+        $('sa-fin-asof').textContent = last ? 'Data as of ' + (annual ? labels[nAct - 1] + ' (' + fmtD(last) + ')' : qName(last) + ' (' + fmtD(last) + ')') : 'No data';
+        $('sa-fin-sub').textContent = annual ? 'Fiscal years (April to March)' + (labels.length > nAct ? ', plus consensus estimates (E)' : '') + '. Hover for YoY growth.'
             : 'Last 12 quarters. Hover for YoY growth.';
         var notes = [];
+        notes.push(F.source === 'excel' ? 'Source: company result workbook (' + F.file + ').'
+            : F.source === 'db' ? 'Source: stock_pnl / stock_quarter tables (result workbook not found).' : '');
         if (sh) notes.push('EPS = net profit ÷ current share count, so it is comparable across splits and bonuses.');
         if (fin) notes.push('Financial company: EBITDA is not meaningful for lenders; a dedicated banking view is planned.');
-        if (last && (Date.now() - parseD(last.key.date)) / 864e5 > (annual ? 550 : 200)) notes.push('Source financials have not been refreshed recently.');
-        $('sa-fin-note').textContent = notes.join(' ');
+        if (last && (Date.now() - parseD(last)) / 864e5 > (annual ? 550 : 200)) notes.push('These financials have not been refreshed recently.');
+        $('sa-fin-note').textContent = notes.filter(Boolean).join(' ');
 
         if (!rows.length) {
             ['sa-rev', 'sa-ebitda', 'sa-eps'].forEach(function (id) { if (charts[id]) charts[id].dispose(); empty($(id), 'No financials available.'); });
@@ -394,15 +394,28 @@
         var lag = annual ? 1 : 4;
         bars('sa-rev', labels, rev, nAct, lag, 's1');
         if (fin) { if (charts['sa-ebitda']) charts['sa-ebitda'].dispose(); empty($('sa-ebitda'), 'Not shown for financial companies.'); }
-        else bars('sa-ebitda', labels.slice(0, nAct), ebitda.slice(0, nAct), nAct, lag, 's3');
+        else bars('sa-ebitda', labels.slice(0, nAct), ebitda.slice(0, nAct), nAct, lag, 's3', 0, margin);
         if (sh) bars('sa-eps', labels, eps, nAct, lag, 's4', 1);
         else { if (charts['sa-eps']) charts['sa-eps'].dispose(); empty($('sa-eps'), 'EPS not available.'); }
     }
 
-    function bars(id, labels, vals, nAct, lag, colorVar, dp) {
+    // bar chart; optional `margin` adds a % line on a right-hand axis (EBITDA margin)
+    function bars(id, labels, vals, nAct, lag, colorVar, dp, margin) {
         var P = pal(), col = P[colorVar];
         var el = $(id);
         if (el.querySelector('.sa-empty')) { el.innerHTML = ''; if (charts[id]) charts[id].dispose(); }
+        var yAxes = [{ type: 'value', splitNumber: 3, axisLabel: Object.assign(baseText(P), { formatter: axisNum }),
+                       splitLine: { lineStyle: { color: P.grid } } }];
+        var extra = [];
+        if (margin) {
+            var ms = margin.filter(function (m) { return m != null; });
+            var lo = Math.min.apply(null, ms), hi = Math.max.apply(null, ms), pad = Math.max(0.02, (hi - lo) * 0.6);
+            yAxes.push({ type: 'value', position: 'right', splitNumber: 3, splitLine: { show: false },
+                         min: Math.floor((lo - pad) * 100) / 100, max: Math.ceil((hi + pad) * 100) / 100,
+                         axisLabel: Object.assign(baseText(P), { formatter: function (v) { return Math.round(v * 100) + '%'; } }) });
+            extra.push({ name: 'EBITDA margin', type: 'line', yAxisIndex: 1, data: margin, symbol: 'circle', symbolSize: 5,
+                         lineStyle: { width: 2, color: P.ink2 }, itemStyle: { color: P.ink2, borderColor: P.surface, borderWidth: 1 }, z: 5 });
+        }
         chart(id).setOption({
             animationDuration: 300,
             textStyle: { fontFamily: P.font },
@@ -413,14 +426,16 @@
                     var i = ps[0].dataIndex, v = vals[i], prev = i - lag >= 0 ? vals[i - lag] : null;
                     var g = (v != null && prev) ? v / prev - 1 : null;
                     return '<b>' + labels[i] + '</b>' + (i >= nAct ? ' <span style="color:' + P.muted + '">consensus</span>' : '') +
-                        '<br/>' + num(v, dp || 0) + (g != null && prev > 0 ? ' <span style="color:' + (g >= 0 ? P.pos : P.neg) + '">' + pct(g, 1) + ' YoY</span>' : '');
+                        '<br/>' + num(v, dp || 0) + (g != null && prev > 0 ? ' <span style="color:' + (g >= 0 ? P.pos : P.neg) + '">' + pct(g, 1) + ' YoY</span>' : '') +
+                        (margin && margin[i] != null ? '<br/>Margin <b>' + (margin[i] * 100).toFixed(1) + '%</b>' +
+                            (i - lag >= 0 && margin[i - lag] != null ? ' <span style="color:' + P.muted + '">(' + ((margin[i] - margin[i - lag]) * 10000 >= 0 ? '+' : '') +
+                                Math.round((margin[i] - margin[i - lag]) * 10000) + ' bps YoY)</span>' : '') : '');
                 }
             }),
             xAxis: { type: 'category', data: labels, axisTick: { show: false }, axisLine: { lineStyle: { color: P.axis } },
                      axisLabel: Object.assign(baseText(P), { hideOverlap: true, interval: 'auto' }) },
-            yAxis: { type: 'value', splitNumber: 3, axisLabel: Object.assign(baseText(P), { formatter: axisNum }),
-                     splitLine: { lineStyle: { color: P.grid } } },
-            series: [{
+            yAxis: yAxes,
+            series: extra.concat([{
                 type: 'bar', barMaxWidth: 26,
                 data: vals.map(function (v, i) {
                     var est = i >= nAct;
@@ -429,7 +444,7 @@
                         borderColor: est ? col : 'transparent', borderWidth: est ? 1 : 0, borderType: 'dashed',
                         borderRadius: v < 0 ? [0, 0, 3, 3] : [3, 3, 0, 0] } };
                 })
-            }]
+            }])
         }, true);
     }
 
@@ -525,7 +540,7 @@
     function renderAll() {
         renderHeader();
         if (S.ohlc) renderPrice();
-        if (S.pnl || S.qtr) renderFundamentals();
+        if (S.fin) renderFundamentals();
         renderConsensus();
     }
 
@@ -546,9 +561,6 @@
         .then(function () { chart('sa-price-chart').hideLoading(); renderHeader(); renderPrice(); });
     var pDet = getJSON('/public/api/getstockdetails/' + t).then(function (r) { S.details = r; renderHeader(); }).catch(function () {});
     var pCons = getJSON('/public/api/getconsensus/' + t).then(function (r) { S.cons = r; }).catch(function () { S.cons = null; });
-    var pFin = Promise.all([
-        getJSON('/public/api/getstockpnl/' + t).catch(function () { return []; }),
-        getJSON('/public/api/getstockquarter/' + t).catch(function () { return []; })
-    ]).then(function (r) { S.pnl = r[0]; S.qtr = r[1]; });
+    var pFin = getJSON('/public/api/getstockfinancials/' + t).then(function (r) { S.fin = r; }).catch(function () { S.fin = null; });
     Promise.all([pDet, pCons, pFin, pOhlc]).then(function () { renderTiles(); renderFundamentals(); renderConsensus(); });
 })();
