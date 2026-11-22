@@ -63,8 +63,144 @@ public class StockFinancialsService {
             ev.setIgnoreMissingWorkbooks(true);
             out.put("annual", readSheet(wb.getSheet("AnnualResults"), false, ev));
             out.put("quarterly", readSheet(wb.getSheet("QuarterP&L"), true, ev));
+            List<Map<String, Object>> bfsi = readBfsi(wb.getSheet("ModelBFSI"), ev);
+            if (bfsi != null) out.put("bfsi", bfsi);
             return out;
         }
+    }
+
+    // ---------- ModelBFSI (banks, NBFCs, AMCs...) ----------
+    private static final String[] BFSI_BLOCKS = {
+            "Annual Income Expense History", "Annual Banking History", "Annual Loan Distribution History",
+            "Quarterly Income Expense History", "Quarterly Banking History", "Quarterly Loan Distribution History"};
+
+    /**
+     * History blocks of the ModelBFSI sheet, actual periods only (period ended, Net Interest Income reported):
+     * [{block, period: "A"|"Q", labels: ["FY25", ...], ends: ["2025-03-31", ...], rows: [{label, values: [...]}, ...]}].
+     * Rows under "Contribution" / "Growth" sub-headers get that prefix. Returns null when the sheet holds no history
+     * (the template exists in every workbook, but only lenders and other financials fill it in).
+     */
+    private List<Map<String, Object>> readBfsi(Sheet sheet, FormulaEvaluator ev) {
+        if (sheet == null) return null;
+        // locate blocks by their title (column B)
+        Map<String, Integer> start = new LinkedHashMap<>();
+        for (int r = 0; r <= Math.min(sheet.getLastRowNum(), 400); r++) {
+            String t = text(cell(sheet, r, 1), ev);
+            if (t == null) continue;
+            for (String b : BFSI_BLOCKS) if (t.trim().startsWith(b.substring(0, Math.min(b.length(), 28))) && !start.containsKey(b)) start.put(b, r);
+        }
+        if (start.isEmpty()) return null;
+        List<Integer> starts = new ArrayList<>(start.values());
+        Collections.sort(starts);
+
+        Date today = new Date();
+        Map<String, Set<Integer>> keepByPeriod = new HashMap<>();
+        List<Map<String, Object>> blocks = new ArrayList<>();
+        for (String b : BFSI_BLOCKS) {
+            Integer r0 = start.get(b);
+            if (r0 == null) continue;
+            int next = sheet.getLastRowNum() + 1;
+            for (int s : starts) if (s > r0) { next = s; break; }
+            String period = b.startsWith("Annual") ? "A" : "Q";
+
+            // header row: "FIN Years" / "Quarters" in column C, period labels from column D onwards
+            int hdr = -1;
+            for (int r = r0; r < Math.min(next, r0 + 6); r++) {
+                String t = text(cell(sheet, r, 2), ev);
+                if (t != null && (t.startsWith("FIN Year") || t.startsWith("Quarter"))) { hdr = r; break; }
+            }
+            if (hdr < 0) continue;
+            List<Integer> cols = new ArrayList<>();
+            List<String> labels = new ArrayList<>(), ends = new ArrayList<>();
+            Row hr = sheet.getRow(hdr);
+            for (int c = 5; hr != null && c < hr.getLastCellNum(); c++) {
+                String l = text(hr.getCell(c), ev);
+                Date end = periodEnd(l);
+                if (end == null || end.after(today)) continue;
+                cols.add(c); labels.add(l); ends.add(iso(end));
+            }
+
+            List<Map<String, Object>> rows = new ArrayList<>();
+            String prefix = "";
+            for (int r = hdr + 1; r < next; r++) {
+                String label = text(cell(sheet, r, 2), ev);      // main rows in column C, sub-rows in column D
+                if (label == null || label.trim().isEmpty()) label = text(cell(sheet, r, 3), ev);
+                if (label == null || label.trim().isEmpty()) continue;
+                label = label.trim();
+                List<Double> vals = new ArrayList<>();
+                boolean any = false;
+                for (int c : cols) { Double v = num(cell(sheet, r, c), ev); vals.add(v); any |= v != null; }
+                if (!any) {   // a sub-header such as "Contribution" or "Growth"
+                    if (label.equals("Contribution") || label.equals("Growth")) prefix = label + ": ";
+                    continue;
+                }
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("label", prefix + label);
+                row.put("values", vals);
+                rows.add(row);
+            }
+
+            // actual periods = those where the income block reports Net Interest Income
+            if (b.contains("Income Expense")) {
+                Set<Integer> keep = new HashSet<>();
+                for (Map<String, Object> row : rows) {
+                    if (String.valueOf(row.get("label")).startsWith("Net Interest Income")) {
+                        @SuppressWarnings("unchecked") List<Double> v = (List<Double>) row.get("values");
+                        for (int i = 0; i < v.size(); i++) if (v.get(i) != null && v.get(i) != 0) keep.add(i);
+                    }
+                }
+                keepByPeriod.put(period, keep);
+            }
+            Map<String, Object> blk = new LinkedHashMap<>();
+            blk.put("block", b);
+            blk.put("period", period);
+            blk.put("labels", labels);
+            blk.put("ends", ends);
+            blk.put("rows", rows);
+            blocks.add(blk);
+        }
+
+        Set<Integer> annualKeep = keepByPeriod.getOrDefault("A", Collections.emptySet());
+        if (annualKeep.size() < 2) return null;
+        // trim every block to its actual periods
+        for (Map<String, Object> blk : blocks) {
+            Set<Integer> keep = keepByPeriod.getOrDefault(blk.get("period"), Collections.emptySet());
+            blk.put("labels", pick(blk.get("labels"), keep));
+            blk.put("ends", pick(blk.get("ends"), keep));
+            @SuppressWarnings("unchecked") List<Map<String, Object>> rows = (List<Map<String, Object>>) blk.get("rows");
+            for (Map<String, Object> row : rows) row.put("values", pick(row.get("values"), keep));
+        }
+        return blocks;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> List<T> pick(Object list, Set<Integer> keep) {
+        List<T> in = (List<T>) list, out = new ArrayList<>();
+        for (int i = 0; i < in.size(); i++) if (keep.contains(i)) out.add(in.get(i));
+        return out;
+    }
+
+    /** FY26 -> 31 Mar 2026; FY27Q2 -> 30 Sep 2026 (Indian fiscal year April-March). */
+    private static Date periodEnd(String label) {
+        if (label == null) return null;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("^FY(\\d{2})(?:Q([1-4]))?$").matcher(label.trim());
+        if (!m.matches()) return null;
+        int fy = 2000 + Integer.parseInt(m.group(1));
+        Calendar cal = Calendar.getInstance();
+        cal.clear();
+        if (m.group(2) == null) cal.set(fy, Calendar.MARCH, 31);
+        else {
+            int q = Integer.parseInt(m.group(2));
+            int[] month = {0, Calendar.JUNE, Calendar.SEPTEMBER, Calendar.DECEMBER, Calendar.MARCH};
+            int[] day = {0, 30, 30, 31, 31};
+            cal.set(q == 4 ? fy : fy - 1, month[q], day[q]);
+        }
+        return cal.getTime();
+    }
+
+    private static String text(Cell c, FormulaEvaluator ev) {
+        Object v = value(c, ev);
+        return v instanceof String ? (String) v : null;
     }
 
     private Map<String, List<Object>> readSheet(Sheet sheet, boolean quarterly, FormulaEvaluator ev) {

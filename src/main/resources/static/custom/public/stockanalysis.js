@@ -114,7 +114,10 @@
         var el = $('sa-price-chart');
         if (!S.ohlc || !S.ohlc.d.length) { empty(el, 'No NSE price history for ' + TICKER + '.'); $('sa-readout').innerHTML = '&#160;'; return; }
         var P = pal(), V = viewData(), n = V.d.length;
+        attachIndex(V);
         S.view = V;
+        var cmp = !!V.ix;                                   // compare mode: both lines as % return from range start
+        var yv = function (i) { return cmp ? V.c[i] / V.c[0] - 1 : V.c[i]; };
         var first = V.c[0], last = V.c[n - 1], up = last >= first;
         var lineCol = up ? P.pos : P.neg;
         var sel = S.sel;
@@ -122,8 +125,18 @@
         var selCol = selUp ? P.pos : P.neg;
 
         var volColors = V.c.map(function (c, i) { return (i === 0 ? c >= V.o[i] : c >= V.c[i - 1]) ? alpha(P.pos, .45) : alpha(P.neg, .45); });
-        var mainSeries;
-        if (S.kind === 'candle') {
+        var mainSeries, extraSeries = [];
+        if (cmp) {
+            mainSeries = {
+                name: TICKER, type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: V.c.map(function (_, i) { return yv(i); }),
+                showSymbol: false, lineStyle: { width: 2, color: lineCol }, itemStyle: { color: lineCol }, emphasis: { disabled: true }
+            };
+            extraSeries.push({
+                name: V.ixName, type: 'line', xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, emphasis: { disabled: true },
+                data: V.ix.map(function (v) { return v == null ? null : v / V.ix0 - 1; }), connectNulls: true,
+                lineStyle: { width: 1.6, color: P.ink2, type: [5, 3] }, itemStyle: { color: P.ink2 }, z: 1
+            });
+        } else if (S.kind === 'candle') {
             mainSeries = {
                 name: 'Price', type: 'candlestick', xAxisIndex: 0, yAxisIndex: 0,
                 data: V.d.map(function (_, i) { return [V.o[i], V.c[i], V.l[i], V.h[i]]; }),
@@ -154,7 +167,7 @@
             mainSeries.markPoint = {
                 silent: true, symbol: 'circle', symbolSize: 9,
                 itemStyle: { color: sel ? selCol : P.ink2, borderColor: P.surface, borderWidth: 2 }, label: { show: false },
-                data: (sel ? [a[0], a[1]] : [a[0]]).map(function (i) { return { coord: [V.d[i], V.c[i]] }; })
+                data: (sel ? [a[0], a[1]] : [a[0]]).map(function (i) { return { coord: [V.d[i], yv(i)] }; })
             };
         }
 
@@ -168,12 +181,17 @@
                 formatter: function (ps) {
                     var i = ps[0].dataIndex, chg = i > 0 ? V.c[i] / V.c[i - 1] - 1 : null;
                     var s = '<div style="font-weight:600;margin-bottom:4px">' + fmtD(V.d[i]) + '</div>';
-                    if (S.kind === 'candle') {
+                    if (S.kind === 'candle' && !cmp) {
                         s += 'O ' + px(V.o[i]) + ' &nbsp;H ' + px(V.h[i]) + '<br/>L ' + px(V.l[i]) + ' &nbsp;C <b>' + px(V.c[i]) + '</b>';
                     } else {
                         s += 'Close <b>' + px(V.c[i]) + '</b>';
                     }
                     if (chg != null) s += ' <span style="color:' + (chg >= 0 ? P.pos : P.neg) + '">' + pct(chg, 2) + '</span>';
+                    if (cmp) {
+                        var rs = V.c[i] / V.c[0] - 1, ri = V.ix[i] != null ? V.ix[i] / V.ix0 - 1 : null;
+                        s += '<br/>Since ' + fmtD(V.d[0]) + ': ' + TICKER + ' <b style="color:' + (rs >= 0 ? P.pos : P.neg) + '">' + pct(rs, 1) + '</b>' +
+                            (ri != null ? ' · ' + V.ixName + ' <b>' + pct(ri, 1) + '</b>' : '');
+                    }
                     s += '<br/><span style="color:' + P.muted + '">Volume ' + compact(V.v[i]) + '</span>';
                     return s;
                 }
@@ -188,18 +206,45 @@
                       formatter: function (s) { return n <= 40 ? fmtD(s).replace(/ \d{4}$/, '') : fmtShort(s); } }) }
             ],
             yAxis: [
-                { scale: true, position: 'right', splitNumber: 5, axisLabel: Object.assign(baseText(P), { formatter: axisNum }),
+                { scale: true, position: 'right', splitNumber: 5,
+                  axisLabel: Object.assign(baseText(P), { formatter: cmp ? function (v) { return (v > 0 ? '+' : '') + Math.round(v * 100) + '%'; } : axisNum }),
                   splitLine: { lineStyle: { color: P.grid } }, axisLine: { show: false } },
                 { gridIndex: 1, position: 'right', splitNumber: 2, axisLabel: Object.assign(baseText(P), { formatter: compact }),
                   splitLine: { show: false }, axisLine: { show: false } }
             ],
-            series: [
+            series: extraSeries.concat([
                 mainSeries,
                 { name: 'Volume', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, barCategoryGap: '20%', large: n > 600,
                   data: V.v.map(function (v, i) { return { value: v, itemStyle: { color: volColors[i] } }; }) }
-            ]
+            ])
         }, true);
         renderReadout();
+    }
+
+    // ---------- index comparison ----------
+    var INDEX_NAMES = { NIFTY: 'NIFTY 50', BSEMidCap: 'BSE Midcap', BSESmallCap: 'BSE Smallcap', NIFTY200: 'NIFTY 200' };
+    S.idx = {};
+    /** Aligns the chosen index to the visible trading days (last level on or before each day). */
+    function attachIndex(V) {
+        var I = S.cmp && S.idx[S.cmp];
+        if (!I || !I.d.length) return;
+        var out = [], j = 0, lastV = null;
+        for (var i = 0; i < V.d.length; i++) {
+            while (j < I.d.length && I.d[j] <= V.d[i]) { lastV = I.v[j]; j++; }
+            out.push(lastV);
+        }
+        var base = null;
+        for (var k = 0; k < out.length; k++) if (out[k] != null) { base = out[k]; break; }
+        if (base == null) return;
+        for (var m = 0; m < out.length && out[m] == null; m++) out[m] = base;
+        V.ix = out; V.ix0 = base; V.ixName = INDEX_NAMES[S.cmp] || S.cmp;
+    }
+    function onCompare() {
+        var k = S.cmp;
+        if (!k || S.idx[k]) { renderPrice(); return; }
+        getJSON('/public/api/getindexhistory/' + encodeURIComponent(k))
+            .then(function (r) { S.idx[k] = r; }).catch(function () { S.idx[k] = { d: [], v: [] }; })
+            .then(renderPrice);
     }
 
     function renderReadout() {
@@ -214,7 +259,14 @@
                 '<span class="big ' + cls(r) + '">' + pct(r, 2) + '</span>' +
                 '<span class="' + cls(abs) + '">' + (abs >= 0 ? '+' : '−') + px(Math.abs(abs)) + '</span>' +
                 '<span><b>' + fmtD(V.d[i]) + '</b> ' + px(V.c[i]) + ' → <b>' + fmtD(V.d[j]) + '</b> ' + px(V.c[j]) + '</span>' +
-                '<span>' + num(days) + ' days' + (cagr != null ? ' · CAGR <b class="' + cls(cagr) + '">' + pct(cagr, 1) + '</b>' : '') + '</span>';
+                '<span>' + num(days) + ' days' + (cagr != null ? ' · CAGR <b class="' + cls(cagr) + '">' + pct(cagr, 1) + '</b>' : '') + '</span>' +
+                benchmark(i, j, r);
+        }
+        function benchmark(i, j, r) {
+            if (!V.ix || V.ix[i] == null || V.ix[j] == null) return '';
+            var ri = V.ix[j] / V.ix[i] - 1, diff = r - ri;
+            return '<span>' + V.ixName + ' <b class="' + cls(ri) + '">' + pct(ri, 2) + '</b> · ' +
+                (diff >= 0 ? 'outperformed' : 'underperformed') + ' by <b class="' + cls(diff) + '">' + Math.abs(diff * 100).toFixed(1) + ' pp</b></span>';
         }
         if (S.sel) {
             var i = Math.min(S.sel[0], S.sel[1]), j = Math.max(S.sel[0], S.sel[1]);
@@ -349,7 +401,94 @@
         return null;
     }
 
+    // ---------- lenders and other financials: ModelBFSI sheet ----------
+    function bfsiBlock(kind, period) {
+        var B = (S.fin && S.fin.bfsi) || [];
+        for (var i = 0; i < B.length; i++) if (B[i].period === period && B[i].block.indexOf(kind) >= 0) return B[i];
+        return null;
+    }
+    function bfsiRow(blk, re) {
+        if (!blk) return null;
+        for (var i = 0; i < blk.rows.length; i++) if (re.test(blk.rows[i].label)) return blk.rows[i].values;
+        return null;
+    }
+    function bfsiLabel(l) { var m = /^FY(\d{2})Q([1-4])$/.exec(l); return m ? 'Q' + m[2] + ' FY' + m[1] : l; }
+    function setTitles(t1, t2, t3, title) {
+        $('sa-t1').innerHTML = t1; $('sa-t2').innerHTML = t2; $('sa-t3').innerHTML = t3; $('sa-fin-title').textContent = title;
+    }
+
+    function renderBankFundamentals() {
+        var annual = S.period === 'A', per = annual ? 'A' : 'Q';
+        var inc = bfsiBlock('Income Expense', per), bank = bfsiBlock('Banking', per);
+        setTitles('Net interest income <span class="tw-muted">&#8377; Cr &#183; line = NIM</span>',
+                  'Pre-provision profit <span class="tw-muted">&#8377; Cr &#183; line = cost to income</span>',
+                  'EPS <span class="tw-muted">&#8377;</span>', 'Net interest income, operating profit and EPS');
+        var all = inc ? inc.labels : [], take = annual ? 10 : 12, from = Math.max(0, all.length - take);
+        var labels = all.slice(from).map(bfsiLabel), nAct = labels.length;
+        var sl = function (v) { return v ? v.slice(from) : labels.map(function () { return null; }); };
+        var nii = sl(bfsiRow(inc, /^Net Interest Income/)), nim = sl(bfsiRow(inc, /^Net Interest Margin/));
+        var ppop = sl(bfsiRow(inc, /^Pre Provision Profit/)), cti = sl(bfsiRow(bank, /^Cost to Core Income/));
+        var pat = bfsiRow(inc, /^Consolidated Profit/) || bfsiRow(inc, /^Standalone Profit/);
+        var sh = sharesCr(), eps = sl(pat).map(function (p) { return sh && p != null ? p / sh : null; });
+
+        var C = S.cons;
+        if (annual && C && C.dates && C.dates.length && nAct) {
+            var lastFy = +labels[nAct - 1].slice(2), k = C.dates.length - 1;
+            Object.keys(C.fy).sort().forEach(function (fy) {
+                if (!(+fy.replace(/\D/g, '') > lastFy)) return;
+                labels.push(fy + 'E'); eps.push(C.fy[fy].epsAvg[k]);
+            });
+        }
+        var lastEnd = inc && inc.ends.length ? inc.ends[inc.ends.length - 1] : null;
+        $('sa-fin-asof').textContent = lastEnd ? 'Data as of ' + labels[nAct - 1] + ' (' + fmtD(lastEnd) + ')' : 'No data';
+        $('sa-fin-sub').textContent = (annual ? 'Fiscal years (April to March)' + (labels.length > nAct ? ', plus consensus EPS (E)' : '') : 'Last 12 quarters') + '. Hover for YoY growth.';
+        $('sa-fin-note').textContent = 'Source: ModelBFSI sheet of ' + S.fin.file + '.' +
+            (sh ? ' EPS = consolidated profit ÷ current share count.' : '') + ' Asset quality, deposits and loan mix are under Business details.';
+        if (!nAct) { ['sa-rev', 'sa-ebitda', 'sa-eps'].forEach(function (id) { if (charts[id]) charts[id].dispose(); empty($(id), 'No data in ModelBFSI.'); }); return; }
+        var lag = annual ? 1 : 4;
+        bars('sa-rev', labels.slice(0, nAct), nii, nAct, lag, 's1', 0, nim.some(function (v) { return v != null; }) ? nim : null);
+        bars('sa-ebitda', labels.slice(0, nAct), ppop, nAct, lag, 's3', 0, cti.some(function (v) { return v != null; }) ? cti : null);
+        if (sh) bars('sa-eps', labels, eps, nAct, lag, 's4', 1);
+        else { if (charts['sa-eps']) charts['sa-eps'].dispose(); empty($('sa-eps'), 'EPS not available.'); }
+    }
+
+    /** Bank-specific charts for the Business details card, in the same shape as getstockdetails.excelCharts. */
+    function bfsiCharts() {
+        if (!S.fin || !S.fin.bfsi) return [];
+        var out = [];
+        ['Q', 'A'].forEach(function (per) {
+            var pre = per === 'A' ? 'Annual ' : 'Quarterly ';
+            var bank = bfsiBlock('Banking', per), loans = bfsiBlock('Loan Distribution', per);
+            function add(title, blk, specs, type, stacked) {
+                if (!blk) return;
+                var series = [];
+                specs.forEach(function (sp) { var v = bfsiRow(blk, sp[1]); if (v && v.some(function (x) { return x != null; })) series.push({ label: sp[0], values: v, chartType: type }); });
+                if (series.length) out.push({ title: pre + title, labels: blk.labels, series: series, chartType: type, stacked: !!stacked, bank: true });
+            }
+            add('Deposits and loans (Rs. Cr)', bank, [['Deposits', /^Deposits$/], ['Loans / AUM', /^Loans \/ AUM$/]], 'bar');
+            add('Deposit and loan growth (%)', bank, [['Deposits', /^Deposits Growth/], ['Loans / AUM', /^Loan\/AUM Growth/]], 'line');
+            add('Asset quality (%)', bank, [['GNPA', /^GNPA%/], ['NNPA', /^NNPA%/], ['Slippages', /^Slippages%/]], 'line');
+            add('Provision coverage and CASA (%)', bank, [['PCR', /^PCR/], ['CASA', /^CASA/]], 'line');
+            add('Return ratios (%)', bank, [['RoE', /^RoE%/], ['RoA', /^RoA%/]], 'line');
+            add('Cost to income and capital (%)', bank, [['Cost to core income', /^Cost to Core Income/], ['CAR (Tier-1)', /^CAR/]], 'line');
+            if (loans) {
+                var leaf = loans.rows.filter(function (r) { return !/^(Total|Corporate Total|Contribution:|Growth:)/.test(r.label); });
+                add('Loan book mix (Rs. Cr)', loans, leaf.map(function (r) { return [r.label, new RegExp('^' + r.label.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&') + '$')]; }), 'bar', true);
+                var contrib = loans.rows.filter(function (r) { return /^Contribution:/.test(r.label); });
+                add('Loan book share (%)', loans, contrib.map(function (r) { return [r.label.replace('Contribution: ', ''), new RegExp('^' + r.label.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&') + '$')]; }), 'line');
+                var growth = loans.rows.filter(function (r) { return /^Growth:/.test(r.label); });
+                add('Loan growth by segment (%)', loans, growth.map(function (r) { return [r.label.replace('Growth: ', ''), new RegExp('^' + r.label.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&') + '$')]; }), 'line');
+            }
+            var dist = bank ? [['Branches', /^Branches/], ['Employees', /^Employee/]] : [];
+            add('Branches and employees', bank, dist, 'line');
+        });
+        return out;
+    }
+
     function renderFundamentals() {
+        if (S.fin && S.fin.bfsi) { renderBankFundamentals(); return; }
+        setTitles('Revenue <span class="tw-muted">&#8377; Cr</span>', 'EBITDA <span class="tw-muted">&#8377; Cr &#183; line = EBITDA margin</span>',
+                  'EPS <span class="tw-muted">&#8377;</span>', 'Revenue, EBITDA and EPS');
         var F = S.fin || {}, annual = S.period === 'A';
         var src = (annual ? F.annual : F.quarterly) || { d: [] };
         var fin = isFinancial(), sh = sharesCr();
@@ -458,6 +597,7 @@
     function wbTitle(t) { return t.replace(/^annaul/i, 'Annual').replace(/^(Quarterly|Annual)\s+/i, ''); }
     function wbPct(c, series) {
         if (!/%/.test(c.title)) return false;
+        if (c.bank) return true;          // ModelBFSI ratios are always fractions
         var mx = 0;
         series.forEach(function (s) { (s.values || []).forEach(function (v) { if (v != null && isFinite(v)) mx = Math.max(mx, Math.abs(v)); }); });
         return mx <= 3;   // stored as fractions
@@ -471,12 +611,20 @@
 
     function renderWorkbook() {
         var card = $('sa-wb-card'), grid = $('sa-wb-grid');
-        var all = (S.details && S.details.excelCharts) || [];
+        // bank metrics first, then the workbook's company-specific charts (segments, geography, capacity...),
+        // then (with "Show all") the generic ones that repeat the P&L card (market cap, revenue, OPM, PAT)
+        var xl = (S.details && S.details.excelCharts) || [];
+        var bank = bfsiCharts();
+        // for lenders the ModelBFSI charts already cover the workbook's generic bank series, so those go behind "Show all"
+        var isCore = function (c) { return bank.length ? true : WB_CORE.test(c.title); };
+        var all = bank
+            .concat(xl.filter(function (c) { return !isCore(c); }))
+            .concat(xl.filter(isCore));
         Object.keys(charts).forEach(function (k) { if (k.indexOf('sa-wb-') === 0) { charts[k].dispose(); delete charts[k]; } });
         if (!all.length) { card.hidden = true; return; }
         card.hidden = false;
         var showAll = $('sa-wb-all').checked, annual = S.wbPeriod === 'A';
-        var list = all.filter(function (c) { return wbIsAnnual(c) === annual && (showAll || !WB_CORE.test(c.title)); });
+        var list = all.filter(function (c) { return wbIsAnnual(c) === annual && (c.bank || showAll || !isCore(c)); });
         if (!list.length) {
             grid.innerHTML = '<div class="sa-empty" style="grid-column:1/-1;height:80px">No ' + (annual ? 'annual' : 'quarterly') +
                 ' business charts' + (showAll ? '' : ' beyond the ones above; tick “Show all”') + '.</div>';
@@ -537,6 +685,51 @@
                 })
             }, true);
         });
+    }
+
+    // =====================================================================
+    // Critical factors (broker names are replaced with "Broker A/B" on the server)
+    // =====================================================================
+    function ratingOf(theme) {
+        var m = /^\s*(strong buy|buy|add|accumulate|outperform|hold|neutral|reduce|underperform|sell)\b/i.exec(theme || '');
+        if (!m) return null;
+        var r = m[1].toLowerCase();
+        return { text: m[1].replace(/\b\w/g, function (c) { return c.toUpperCase(); }),
+                 cls: /buy|add|accum|outperform/.test(r) ? 'buy' : (/sell|reduce|underperform/.test(r) ? 'sell' : 'hold') };
+    }
+    function factorList(text) {
+        if (!text) return '';
+        var parts = String(text).split(/\s*(?:^|;\s*|\s)(?=\d{1,2}\)\s)/).map(function (p) { return p.replace(/^\d{1,2}\)\s*/, '').trim(); })
+            .filter(Boolean);
+        if (parts.length <= 1) parts = String(text).split(/;\s+/).filter(Boolean);
+        return '<ol>' + parts.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ol>';
+    }
+    function noteHtml(n, open) {
+        var r = ratingOf(n.theme);
+        return '<div class="sa-note ' + (r ? r.cls : '') + '"><h4>' + esc(n.broker) + (r ? ' <span class="sa-rating ' + r.cls + '">' + esc(r.text) + '</span>' : '') +
+            ' <span class="tw-muted" style="font-weight:400">' + (n.date ? fmtD(n.date) : '') + '</span></h4>' +
+            (n.theme ? '<p class="theme">' + esc(n.theme) + '</p>' : '') +
+            (n.factors ? (open ? factorList(n.factors) : '<details><summary>Critical factors</summary>' + factorList(n.factors) + '</details>') : '') + '</div>';
+    }
+    function renderViews() {
+        var A = S.views, card = $('sa-views-card');
+        if (!A || (!A.consolidated.length && !A.notes.length)) { card.hidden = true; return; }
+        card.hidden = false;
+        $('sa-views-cons').innerHTML = A.consolidated.map(function (c) {
+            return '<div class="sa-view"><h4>' + esc(c.broker) + ' · consolidated view</h4><p>' + esc(c.view) + '</p></div>';
+        }).join('');
+        // newest note per broker in full, the rest under "Earlier notes"
+        var seen = {}, latest = [], earlier = [];
+        A.notes.forEach(function (n) { if (!seen[n.broker]) { seen[n.broker] = 1; latest.push(n); } else earlier.push(n); });
+        $('sa-views-notes').innerHTML = latest.map(function (n) { return noteHtml(n, true); }).join('');
+        if (earlier.length) {
+            var host = $('sa-views-earlier');
+            if (!host) { host = document.createElement('details'); host.id = 'sa-views-earlier'; host.className = 'sa-earlier'; $('sa-views-notes').after(host); }
+            host.innerHTML = '<summary>Earlier notes (' + earlier.length + ')</summary><div class="sa-views-notes">' +
+                earlier.map(function (n) { return noteHtml(n, false); }).join('') + '</div>';
+        }
+        var d = A.notes.length ? A.notes[0].date : null;
+        $('sa-views-asof').textContent = d ? 'Latest note ' + fmtD(d) : '';
     }
 
     // =====================================================================
@@ -638,6 +831,7 @@
 
     bindSeg('sa-range', 'data-r', 'range', function () { S.sel = null; S.pending = null; renderPrice(); });
     bindSeg('sa-kind', 'data-k', 'kind', renderPrice);
+    bindSeg('sa-cmp', 'data-c', 'cmp', onCompare);
     bindSeg('sa-period', 'data-p', 'period', renderFundamentals);
     bindSeg('sa-wb-period', 'data-p', 'wbPeriod', renderWorkbook);
     $('sa-wb-all').addEventListener('change', renderWorkbook);
@@ -656,5 +850,6 @@
     var pDet = getJSON('/public/api/getstockdetails/' + t).then(function (r) { S.details = r; renderHeader(); }).catch(function () {});
     var pCons = getJSON('/public/api/getconsensus/' + t).then(function (r) { S.cons = r; }).catch(function () { S.cons = null; });
     var pFin = getJSON('/public/api/getstockfinancials/' + t).then(function (r) { S.fin = r; }).catch(function () { S.fin = null; });
+    getJSON('/public/api/getanalystviews/' + t).then(function (r) { S.views = r; renderViews(); }).catch(function () {});
     Promise.all([pDet, pCons, pFin, pOhlc]).then(function () { renderTiles(); renderFundamentals(); renderWorkbook(); renderConsensus(); });
 })();

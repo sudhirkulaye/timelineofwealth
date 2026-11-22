@@ -41,3 +41,22 @@
 .sa-wb-latest b { color: var(--ink); font-weight: 600; }
 .sa-chart-wb { height: 250px; }
 @media (max-width: 900px) { .sa-wb-grid { grid-template-columns: 1fr; } }
+/* critical factors */
+.sa-views-cons { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin: 10px 0 4px; }
+.sa-view { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; background: var(--surface2); }
+.sa-view h4, .sa-note h4 { font-size: 12.5px; font-weight: 600; margin: 0 0 6px; color: var(--ink); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sa-view p { margin: 0; font-size: 13px; line-height: 1.55; color: var(--ink2); }
+.sa-views-notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-top: 12px; }
+.sa-note { border-left: 3px solid var(--axis); padding: 2px 0 2px 12px; }
+.sa-note .theme { font-size: 13px; color: var(--ink); font-weight: 500; margin: 0 0 6px; line-height: 1.45; }
+.sa-note ol { margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--ink2); line-height: 1.5; }
+.sa-note ol li { margin: 0 0 4px; }
+.sa-note details { margin-top: 6px; font-size: 12.5px; color: var(--ink2); }
+.sa-note details summary { cursor: pointer; color: var(--accent); font-size: 12px; }
+.sa-earlier { margin-top: 10px; }
+.sa-earlier > summary { cursor: pointer; color: var(--accent); font-size: 12.5px; font-weight: 500; }
+.sa-rating { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: var(--chip); color: var(--ink2); }
+.sa-rating.buy { background: color-mix(in srgb, var(--pos) 14%, transparent); color: var(--pos); }
+.sa-rating.sell { background: color-mix(in srgb, var(--neg) 14%, transparent); color: var(--neg); }
+.sa-rating.hold { background: color-mix(in srgb, var(--s4) 18%, transparent); color: var(--s4); }
+.sa-note.buy { border-left-color: var(--pos); } .sa-note.sell { border-left-color: var(--neg); } .sa-note.hold { border-left-color: var(--s4); }

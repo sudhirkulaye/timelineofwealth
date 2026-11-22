@@ -38,6 +38,9 @@
                             <div class="tw-seg" id="sa-range" role="group" aria-label="Range">
                                 <button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1Y" class="on">1Y</button><button data-r="3Y">3Y</button><button data-r="5Y">5Y</button><button data-r="MAX">Max</button>
                             </div>
+                            <div class="tw-seg" id="sa-cmp" role="group" aria-label="Compare with index" title="Compare with an index (% return from the start of the range)">
+                                <button data-c="" class="on">No index</button><button data-c="NIFTY">NIFTY 50</button><button data-c="BSEMidCap">Midcap</button><button data-c="BSESmallCap">Smallcap</button>
+                            </div>
                             <div class="tw-seg" id="sa-kind" role="group" aria-label="Chart type">
                                 <button data-k="line" class="on" title="Line"><i class="fa fa-area-chart"></i></button><button data-k="candle" title="Candles"><i class="fa fa-bar-chart"></i></button>
                             </div>
@@ -45,45 +48,6 @@
                     </div>
                     <div class="sa-readout" id="sa-readout" aria-live="polite">&#160;</div>
                     <div class="sa-chart sa-chart-price" id="sa-price-chart"></div>
-                </section>
-
-                <!-- ===== fundamentals ===== -->
-                <section class="tw-card" id="sa-fin-card">
-                    <div class="sa-bar">
-                        <div>
-                            <h2>Revenue, EBITDA and EPS</h2>
-                            <p class="tw-sub" style="margin:0" id="sa-fin-sub">&#160;</p>
-                        </div>
-                        <div class="sa-controls">
-                            <span class="tw-chip" id="sa-fin-asof"></span>
-                            <div class="tw-seg" id="sa-period" role="group" aria-label="Period">
-                                <button data-p="A" class="on">Annual</button><button data-p="Q">Quarterly</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="sa-fin-grid">
-                        <div><h3 class="sa-mini">Revenue <span class="tw-muted">&#8377; Cr</span></h3><div class="sa-chart sa-chart-bar" id="sa-rev"></div></div>
-                        <div><h3 class="sa-mini">EBITDA <span class="tw-muted">&#8377; Cr &#183; line = EBITDA margin</span></h3><div class="sa-chart sa-chart-bar" id="sa-ebitda"></div></div>
-                        <div><h3 class="sa-mini">EPS <span class="tw-muted">&#8377;</span></h3><div class="sa-chart sa-chart-bar" id="sa-eps"></div></div>
-                    </div>
-                    <p class="tw-muted tw-small" id="sa-fin-note" style="margin:8px 0 0"></p>
-                </section>
-
-                <!-- ===== extra series from the result workbook (segments, geography, $ revenue, KPIs) ===== -->
-                <section class="tw-card" id="sa-wb-card" hidden="hidden">
-                    <div class="sa-bar">
-                        <div>
-                            <h2>Business details</h2>
-                            <p class="tw-sub" style="margin:0" id="sa-wb-sub">Segments, geographies and operating metrics from the company result workbook.</p>
-                        </div>
-                        <div class="sa-controls">
-                            <label class="tw-chip" style="cursor:pointer"><input type="checkbox" id="sa-wb-all" style="margin:0 4px 0 0" /> Show all</label>
-                            <div class="tw-seg" id="sa-wb-period" role="group" aria-label="Period">
-                                <button data-p="Q" class="on">Quarterly</button><button data-p="A">Annual</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="sa-wb-grid" id="sa-wb-grid"></div>
                 </section>
 
                 <!-- ===== consensus ===== -->
@@ -108,6 +72,58 @@
                             <div class="sa-chart sa-chart-cons" id="sa-cons-eps"></div>
                         </div>
                     </div>
+                </section>
+
+                <!-- ===== broker views / critical factors (AnalystVeiwInsight.xlsx; broker names anonymised server-side) ===== -->
+                <section class="tw-card" id="sa-views-card" hidden="hidden">
+                    <div class="sa-bar">
+                        <div>
+                            <h2>Critical factors</h2>
+                            <p class="tw-sub" style="margin:0">What the brokers covering the stock are watching: consolidated view and the latest notes.</p>
+                        </div>
+                        <span class="tw-chip" id="sa-views-asof"></span>
+                    </div>
+                    <div class="sa-views-cons" id="sa-views-cons"></div>
+                    <div class="sa-views-notes" id="sa-views-notes"></div>
+                </section>
+
+                <!-- ===== fundamentals ===== -->
+                <section class="tw-card" id="sa-fin-card">
+                    <div class="sa-bar">
+                        <div>
+                            <h2 id="sa-fin-title">Revenue, EBITDA and EPS</h2>
+                            <p class="tw-sub" style="margin:0" id="sa-fin-sub">&#160;</p>
+                        </div>
+                        <div class="sa-controls">
+                            <span class="tw-chip" id="sa-fin-asof"></span>
+                            <div class="tw-seg" id="sa-period" role="group" aria-label="Period">
+                                <button data-p="A" class="on">Annual</button><button data-p="Q">Quarterly</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sa-fin-grid">
+                        <div><h3 class="sa-mini" id="sa-t1">Revenue <span class="tw-muted">&#8377; Cr</span></h3><div class="sa-chart sa-chart-bar" id="sa-rev"></div></div>
+                        <div><h3 class="sa-mini" id="sa-t2">EBITDA <span class="tw-muted">&#8377; Cr &#183; line = EBITDA margin</span></h3><div class="sa-chart sa-chart-bar" id="sa-ebitda"></div></div>
+                        <div><h3 class="sa-mini" id="sa-t3">EPS <span class="tw-muted">&#8377;</span></h3><div class="sa-chart sa-chart-bar" id="sa-eps"></div></div>
+                    </div>
+                    <p class="tw-muted tw-small" id="sa-fin-note" style="margin:8px 0 0"></p>
+                </section>
+
+                <!-- ===== extra series from the result workbook (segments, geography, $ revenue, KPIs) ===== -->
+                <section class="tw-card" id="sa-wb-card" hidden="hidden">
+                    <div class="sa-bar">
+                        <div>
+                            <h2>Business details</h2>
+                            <p class="tw-sub" style="margin:0" id="sa-wb-sub">Segments, geographies and operating metrics from the company result workbook.</p>
+                        </div>
+                        <div class="sa-controls">
+                            <label class="tw-chip" style="cursor:pointer"><input type="checkbox" id="sa-wb-all" style="margin:0 4px 0 0" /> Show all</label>
+                            <div class="tw-seg" id="sa-wb-period" role="group" aria-label="Period">
+                                <button data-p="Q" class="on">Quarterly</button><button data-p="A">Annual</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sa-wb-grid" id="sa-wb-grid"></div>
                 </section>
 
                 <p class="tw-muted tw-small">Values in &#8377; crore unless stated. Consolidated figures preferred. Prices: NSE. Consensus: Yahoo Finance.

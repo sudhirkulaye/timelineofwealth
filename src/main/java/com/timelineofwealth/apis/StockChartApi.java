@@ -3,6 +3,7 @@ package com.timelineofwealth.apis;
 import com.timelineofwealth.entities.YahooConsensus;
 import com.timelineofwealth.repositories.StockUniverseRepository;
 import com.timelineofwealth.repositories.YahooConsensusRepository;
+import com.timelineofwealth.service.AnalystViewService;
 import com.timelineofwealth.service.StockFinancialsService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,14 +23,40 @@ public class StockChartApi {
     private final YahooConsensusRepository yahooConsensusRepository;
     private final JdbcTemplate jdbcTemplate;
     private final StockFinancialsService stockFinancialsService;
+    private final AnalystViewService analystViewService;
 
     public StockChartApi(StockUniverseRepository stockUniverseRepository,
                          YahooConsensusRepository yahooConsensusRepository, JdbcTemplate jdbcTemplate,
-                         StockFinancialsService stockFinancialsService) {
+                         StockFinancialsService stockFinancialsService, AnalystViewService analystViewService) {
+        this.analystViewService = analystViewService;
         this.stockUniverseRepository = stockUniverseRepository;
         this.yahooConsensusRepository = yahooConsensusRepository;
         this.jdbcTemplate = jdbcTemplate;
         this.stockFinancialsService = stockFinancialsService;
+    }
+
+    /** Consolidated broker views and dated critical factors (broker names replaced with neutral labels). */
+    @RequestMapping(value = "/getanalystviews/{ticker}", method = RequestMethod.GET)
+    public Map<String, Object> getAnalystViews(@PathVariable String ticker) {
+        return analystViewService.getViews(ticker);
+    }
+
+    private static final Set<String> INDICES = new HashSet<>(Arrays.asList("NIFTY", "NIFTY200", "BSEMidCap", "BSESmallCap"));
+
+    /** Daily index levels from index_valuation: {ticker, d:[], v:[]}. */
+    @RequestMapping(value = "/getindexhistory/{index}", method = RequestMethod.GET)
+    public Map<String, Object> getIndexHistory(@PathVariable String index) {
+        List<String> d = new ArrayList<>();
+        List<Double> v = new ArrayList<>();
+        if (INDICES.contains(index)) {
+            jdbcTemplate.query("SELECT date, value FROM index_valuation WHERE ticker = ? AND value > 0 ORDER BY date",
+                    new Object[]{index}, rs -> { d.add(rs.getDate(1).toString()); v.add(rs.getDouble(2)); });
+        }
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("ticker", index);
+        out.put("d", d);
+        out.put("v", v);
+        return out;
     }
 
     /** Annual + quarterly revenue, EBITDA, net profit from the ticker's latest result workbook. */
