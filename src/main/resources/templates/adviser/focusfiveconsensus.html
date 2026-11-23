@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md">
+<link href="../../static/custom/public/consensus.css" th:href="@{/custom/public/consensus.css(v=20261124)}" rel="stylesheet" />
+<div class="container body">
+    <div class="main_container">
+        <div th:replace="fragments/advisersidebarmenu :: common-advisersidebarmenu" />
+        <div th:replace="fragments/usertopnavigation :: common-usertopnavigation" />
+
+        <div class="right_col" role="main">
+            <div class="tw-page" id="ff-root">
+                <header class="tw-head" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+                    <div>
+                        <h1>Focus Five Consensus</h1>
+                        <p>Private: weights, named broker views and daily performance of the Focus Five model portfolio.</p>
+                    </div>
+                    <div><span class="tw-chip" id="ff-asof"></span> <span class="tw-chip" id="ff-pricedate"></span></div>
+                </header>
+
+                <section class="tw-card">
+                    <div class="tw-tiles" id="ff-tiles"></div>
+                </section>
+
+                <section class="tw-card">
+                    <h3 class="cs-h">Focus Five vs indices (daily)</h3>
+                    <div class="cs-wrap" id="ff-returns"></div>
+                    <p class="cs-note">Returns are worked out from the daily portfolio value with cash flows taken out; 3Y and Inception are annualised. Green: beat NIFTY over that period; red: lagged it. The difference row is Focus Five minus NIFTY.</p>
+                </section>
+
+                <section class="tw-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+                        <h3 class="cs-h">Growth of 100</h3>
+                        <div class="tw-seg" id="ff-range"><button type="button" data-v="1">1M</button><button type="button" data-v="3">3M</button><button type="button" data-v="6">6M</button><button type="button" data-v="12" class="on">1Y</button><button type="button" data-v="36">3Y</button></div>
+                    </div>
+                    <div id="ff-chart"></div>
+                </section>
+
+                <section class="tw-card">
+                    <h3 class="cs-h">Holdings, consensus and broker views</h3>
+                    <div class="cs-wrap" id="ff-holdings"></div>
+                    <p class="cs-note">Consensus is the weekly Yahoo Finance snapshot; upside is against the latest price. AMBIT and MOSL are the latest rating and target from the research tracker.</p>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script src="../../static/custom/twcharts.js" th:src="@{/custom/twcharts.js}"></script>
+<script src="../../static/custom/public/cstable.js" th:src="@{/custom/public/cstable.js(v=20261124)}"></script>
+<script src="../../static/custom/adviser/focusfiveconsensus.js" th:src="@{/custom/adviser/focusfiveconsensus.js(v=20261124)}"></script>
+</body>
+</html>

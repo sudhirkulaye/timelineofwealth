@@ -108,6 +108,14 @@ public class AdviserViewController {
 
     }
 
+    /** Focus Five: weights, named broker views and daily performance vs indices (adviser login only). */
+    @RequestMapping(value = "/adviser/focusfiveconsensus", method = RequestMethod.GET)
+    public String getFocusFiveConsensus(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        model.addAttribute("title", "Focus Five Consensus");
+        model.addAttribute("welcomeMessage", commonService.getWelcomeMessage(commonService.getLoggedInUser(userDetails)));
+        return "adviser/focusfiveconsensus";
+    }
+
     @RequestMapping(value = "/adviser/generateallpdfreports", method = RequestMethod.POST)
     public String generateAllPDFReports(Model model, @AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request, HttpServletResponse response) throws IOException {
         dateToday = publicApi.getSetupDates().getDateToday();

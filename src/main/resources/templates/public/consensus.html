@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md">
+<link href="../../static/custom/public/consensus.css" th:href="@{/custom/public/consensus.css(v=20261124)}" rel="stylesheet" />
+<div class="container body">
+    <div class="main_container">
+        <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
+        <div th:replace="fragments/publictopnavigation :: common-publictopnavigation" />
+
+        <div class="right_col" role="main">
+            <div class="tw-page" id="cs-root">
+                <header class="tw-head" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+                    <div>
+                        <h1>Analyst Consensus</h1>
+                        <p>Which way analysts are revising their forecasts, and how prices are reacting, across about 500 Indian stocks.</p>
+                    </div>
+                    <div><span class="tw-chip" id="cs-asof"></span> <span class="tw-chip" id="cs-pricedate"></span></div>
+                </header>
+
+                <div class="cs-tabs">
+                    <div class="tw-seg" id="cs-tabs" role="tablist" aria-label="Sections">
+                        <button type="button" data-v="market" class="on">Market</button><button type="button" data-v="industries">Industries</button><button type="button" data-v="long">Long ideas</button><button type="button" data-v="short">Short ideas</button><button type="button" data-v="divergence">Divergence</button><button type="button" data-v="emerging">Emerging</button><button type="button" data-v="scoreboard">Scoreboard</button>
+                    </div>
+                </div>
+
+                <!-- Market -->
+                <section class="cs-pane on" id="pane-market">
+                    <div class="tw-card">
+                        <p class="cs-lede">The share of stocks whose consensus earnings forecast (nearer fiscal year) went up or down over the last four weeks. When upgrades outnumber downgrades, earnings momentum is improving across the market.</p>
+                        <div class="tw-tiles" id="mk-tiles"></div>
+                    </div>
+                    <div class="tw-card">
+                        <h3 class="cs-h">Upgrades and downgrades, week by week</h3>
+                        <div id="mk-breadth"></div>
+                    </div>
+                    <div class="tw-card">
+                        <h3 class="cs-h">Index performance over the last 12 months</h3>
+                        <p class="cs-note" id="mk-index-note"></p>
+                        <div id="mk-index-chart"></div>
+                    </div>
+                    <div class="tw-card">
+                        <h3 class="cs-h">Index returns (daily)</h3>
+                        <div class="cs-wrap" id="mk-indices"></div>
+                    </div>
+                </section>
+
+                <!-- Industries -->
+                <section class="cs-pane" id="pane-industries">
+                    <div class="tw-card">
+                        <h3 class="cs-h">Industries: estimate revisions and relative price</h3>
+                        <p class="cs-lede">Each scored stock (5+ analysts and a price) is placed in its sector and industry group. Every stock counts equally: the figures are medians, not market-cap weighted. Sectors are in the usual order; click a sector to see its groups below.</p>
+                        <details class="cs-defs"><summary>What the columns mean</summary><ul>
+                            <li><b>Net EPS upgrades</b>: share of the scored stocks whose consensus EPS rose more than 0.5% in 4 weeks, minus the share whose EPS fell more than 0.5%.</li>
+                            <li><b>EPS 4W</b>: median 4-week change in consensus average EPS (nearer fiscal year).</li>
+                            <li><b>EPS 13W</b>: median 13-week change in consensus average EPS.</li>
+                            <li><b>TP 4W</b>: median 4-week change in consensus average target price.</li>
+                            <li><b>1M vs NIFTY</b> and <b>3M vs NIFTY</b>: median of the stock's return minus NIFTY's return, as of the latest trading day.</li>
+                        </ul></details>
+                        <div class="cs-wrap" id="ind-sectors"></div>
+                    </div>
+                    <div class="tw-card" id="ind-table-card">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+                            <h3 class="cs-h">Industry groups</h3>
+                            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                                <select id="ind-sector" class="form-control input-sm" style="width:auto" aria-label="Sector"></select>
+                                <div class="tw-seg" id="ind-view"><button type="button" data-v="sector" class="on">By sector</button><button type="button" data-v="all">Ranked by net upgrades</button></div>
+                            </div>
+                        </div>
+                        <div class="cs-wrap" id="ind-table"></div>
+                    </div>
+                </section>
+
+                <!-- idea lists -->
+                <section class="cs-pane" id="pane-long">
+                    <div class="tw-card">
+                        <h3 class="cs-h">Long ideas, 1-month horizon</h3>
+                        <p class="cs-lede">Ranked every week across all <span id="long-n"></span> scored stocks (5+ analysts and a price), so the list changes as estimates and prices move. Highest scores: consensus EPS and target raised over 4 weeks while the price has not run up in the last month, in a stock that rose over the year before.</p>
+                        <div class="cs-filters"><label><input type="checkbox" id="long-table-fno" /> F&amp;O stocks only</label><span class="sub" id="long-count"></span></div>
+                        <div class="cs-wrap" id="long-table"></div>
+                    </div>
+                </section>
+                <section class="cs-pane" id="pane-short">
+                    <div class="tw-card">
+                        <h3 class="cs-h">Short ideas, 1-month horizon</h3>
+                        <p class="cs-lede">Lowest scores among the F&amp;O stocks in the same ranking (an overnight short in India needs futures or options): estimates and targets being cut, often after a price run-up, in a stock that has lagged over the year.</p>
+                        <div class="cs-wrap" id="short-table"></div>
+                    </div>
+                </section>
+                <section class="cs-pane" id="pane-divergence">
+                    <div class="tw-card">
+                        <h3 class="cs-h">Divergence: estimates and price moving apart</h3>
+                        <p class="cs-lede">Scored stocks where the 4-week change in consensus EPS and the 4-week price move disagree, ranked by the size of the gap.</p>
+                        <div class="cs-tabs"><div class="tw-seg" id="div-view"><button type="button" data-v="cut" class="on">Estimates cut, price up</button><button type="button" data-v="raised">Estimates raised, price down</button></div></div>
+                        <div id="div-cut-box">
+                            <p class="cs-note cs-note-top">Consensus EPS down more than 1% in 4 weeks while the price rose more than 3%: the rally may be running ahead of the numbers.</p>
+                            <div class="cs-filters"><label><input type="checkbox" id="div-cut-fno" /> F&amp;O stocks only</label></div>
+                            <div class="cs-wrap" id="div-cut"></div>
+                        </div>
+                        <div id="div-raised-box" hidden>
+                            <p class="cs-note cs-note-top">Consensus EPS up more than 1% in 4 weeks while the price fell more than 3%: the price may not have caught up with the numbers yet.</p>
+                            <div class="cs-filters"><label><input type="checkbox" id="div-raised-fno" /> F&amp;O stocks only</label></div>
+                            <div class="cs-wrap" id="div-raised"></div>
+                        </div>
+                    </div>
+                </section>
+                <section class="cs-pane" id="pane-emerging">
+                    <div class="tw-card">
+                        <h3 class="cs-h">Emerging</h3>
+                        <p class="cs-lede">Stocks starting to move, before they reach the long or short lists. The score is a percentile among the <span id="em-n"></span> scored stocks: 100 is the best, 80 or more is the top 20%, 20 or less the bottom 20%.</p>
+                        <div class="cs-grid2">
+                            <div><h4 class="cs-h4">Moved into the top 20%</h4><p class="cs-note cs-note-top">Score now 80+, below 80 four weeks ago. Largest gains first; stocks already in the long list are left out.</p><div class="cs-wrap" id="em-top"></div></div>
+                            <div><h4 class="cs-h4">Dropped into the bottom 20%</h4><p class="cs-note cs-note-top">Score now 20 or less, above 20 four weeks ago. Largest falls first; stocks already in the short list are left out.</p><div class="cs-wrap" id="em-bottom"></div></div>
+                            <div><h4 class="cs-h4">Analyst coverage rising</h4><p class="cs-note cs-note-top">More analysts on Yahoo than 13 weeks ago. A big jump can also be a Yahoo data refresh.</p><div class="cs-wrap" id="em-coverage"></div></div>
+                            <div><h4 class="cs-h4">Steady upgraders</h4><p class="cs-note cs-note-top">Consensus EPS raised in most of the last 13 weeks.</p><div class="cs-wrap" id="em-steady"></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Scoreboard -->
+                <section class="cs-pane" id="pane-scoreboard">
+                    <div class="tw-card">
+                        <p class="cs-lede">How the score has done. Each week's long and short lists are followed for the next four weeks against the average scored stock. <b>IC</b> is the rank correlation between the score and the next four-week return (above zero means the score ranked stocks in the right order).</p>
+                        <div class="tw-tiles" id="sb-tiles"></div>
+                    </div>
+                    <div class="tw-card">
+                        <h3 class="cs-h">Long minus short, next four weeks</h3>
+                        <div id="sb-chart"></div>
+                    </div>
+                    <div class="tw-card">
+                        <div class="cs-wrap" id="sb-table"></div>
+                    </div>
+                </section>
+
+                <p class="tw-muted tw-small">Source: Yahoo Finance analyst consensus, updated weekly; prices from NSE, updated daily. Scores are model output, not recommendations. For information only; not investment advice.</p>
+            </div>
+        </div>
+
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script src="../../static/custom/twcharts.js" th:src="@{/custom/twcharts.js}"></script>
+<script src="../../static/custom/public/cstable.js" th:src="@{/custom/public/cstable.js(v=20261124)}"></script>
+<script src="../../static/custom/public/consensus.js" th:src="@{/custom/public/consensus.js(v=20261124)}"></script>
+</body>
+</html>

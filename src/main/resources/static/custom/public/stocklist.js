@@ -6,15 +6,16 @@ module.controller('StockListController', function($scope, $http, $filter) {
     $scope.stocks = [];
     $scope.indexFilter = "SENSEX";
     $scope.watchlistFilter = "";
-    $scope.watchlistNames = [];
+    $scope.watchlists = [];
+    $scope.consensus = {};
+    $scope.consensusAsOf = "";
     $scope.flagBasicInfo = false;
     $scope.flagFundamentalInfo = true;
     $scope.flagCapitalStructureInfo = true;
     $scope.flagValuations = true;
     $scope.flagPricePerformance = true;
     $scope.flagAdditionalInfo = true;
-    $scope.flagAnalystsReco = true;
-    $scope.flagDCFValuation = true;
+    $scope.flagConsensus = true;
     $scope.reverseSort = false;
 
     showRecords();
@@ -46,24 +47,66 @@ module.controller('StockListController', function($scope, $http, $filter) {
             then(function (response) {
                 if (response != undefined) {
                     $scope.stocks = response.data;
-                    $scope.watchlistNames = [];
-                    angular.forEach($scope.stocks, function(stock) {
-                        if (stock.watchlistNames != undefined) {
-                            angular.forEach(stock.watchlistNames, function(watchlistName) {
-                                if ($scope.watchlistNames.indexOf(watchlistName) === -1) {
-                                    $scope.watchlistNames.push(watchlistName);
-                                }
-                            });
-                        }
-                    });
-                    $scope.watchlistNames.sort();
+                    attachConsensus();
                 } else {
                     $scope.stocks = [];
-                    $scope.watchlistNames = [];
                 }
             });
 
+        $http.get("/public/api/getwatchlists").then(function (response) {
+            $scope.watchlists = (response && response.data) || [];
+        });
+
+        $http.get("/public/api/getstocklistconsensus").then(function (response) {
+            $scope.consensus = (response && response.data) || {};
+            attachConsensus();
+        });
+
     }
+
+    // Consensus is weekly; upside is worked out against each stock's latest (daily) price.
+    function attachConsensus() {
+        var latest = "";
+        angular.forEach($scope.stocks, function (stock) {
+            var c = $scope.consensus[stock.ticker];
+            if (!c) { stock.cons = null; return; }
+            var price = Number(stock.latestPrice);
+            var cons = angular.extend({}, c);
+            cons.upside = (c.tpAvg && price > 0) ? c.tpAvg / price - 1 : null;
+            cons.brokerList = [];
+            angular.forEach(['1', '2', '3', '4'], function (k) {
+                var b = c.brokers && c.brokers[k];
+                if (b) cons.brokerList.push({ no: k, label: 'Broker ' + k, reco: b.reco, tp: b.tp, date: b.date,
+                                              upside: (b.tp && price > 0) ? b.tp / price - 1 : null });
+            });
+            if (c.asOf && c.asOf > latest) latest = c.asOf;
+            stock.cons = cons;
+        });
+        if (latest) $scope.consensusAsOf = latest;
+    }
+
+    // soft green / red cell background; value and cap in the same unit (percent), cap = value for the darkest shade
+    $scope.heat = function (value, cap) {
+        if (value === null || value === undefined || value === '' || isNaN(value)) return {};
+        var v = Number(value);
+        var a = Math.min(Math.abs(v) / cap, 1) * 0.42 + 0.04;
+        return { 'background-color': v >= 0 ? 'rgba(27,175,122,' + a.toFixed(2) + ')' : 'rgba(208,59,59,' + a.toFixed(2) + ')' };
+    };
+
+    $scope.recoClass = function (reco) {
+        var r = String(reco || '').toUpperCase();
+        if (r === 'BUY' || r === 'ADD' || r === 'ACCUMULATE' || r === 'STRONG BUY') return 'sl-buy';
+        if (r === 'SELL' || r === 'REDUCE') return 'sl-sell';
+        return 'sl-hold';
+    };
+
+    $scope.pct = function (x) {
+        if (x === null || x === undefined || isNaN(x)) return '';
+        var v = x * 100;
+        var s = v.toFixed(1);
+        if (Number(s) === 0) s = s.replace('-', '');
+        return (Number(s) > 0 ? '+' : '') + s + '%';
+    };
 
     $scope.searchStock = function (stock) {
         if ($scope.searchTextFilter == undefined) {
@@ -177,87 +220,11 @@ module.controller('StockListController', function($scope, $http, $filter) {
             return false;
         }
 
+    var VIEWS = { BasicInfo: 'flagBasicInfo', FundamentalInfo: 'flagFundamentalInfo',
+        CapitalStructureInfo: 'flagCapitalStructureInfo', Valuations: 'flagValuations',
+        PricePerformance: 'flagPricePerformance', AdditionalInfo: 'flagAdditionalInfo', Consensus: 'flagConsensus' };
     $scope.showColumns = function(selectedOption) {
-        if (selectedOption == "BasicInfo") {
-            $scope.flagBasicInfo = false;
-            $scope.flagFundamentalInfo = true;
-            $scope.flagCapitalStructureInfo = true;
-            $scope.flagValuations = true;
-            $scope.flagPricePerformance = true;
-            $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsReco = true;
-            $scope.flagDCFValuation = true;
-        }
-        if (selectedOption == "FundamentalInfo") {
-            $scope.flagBasicInfo = true;
-            $scope.flagFundamentalInfo = false;
-            $scope.flagCapitalStructureInfo = true;
-            $scope.flagValuations = true;
-            $scope.flagPricePerformance = true;
-            $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsReco = true;
-            $scope.flagDCFValuation = true;
-        }
-        if (selectedOption == "CapitalStructureInfo") {
-            $scope.flagBasicInfo = true;
-            $scope.flagFundamentalInfo = true;
-            $scope.flagCapitalStructureInfo = false;
-            $scope.flagValuations = true;
-            $scope.flagPricePerformance = true;
-            $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsReco = true;
-            $scope.flagDCFValuation = true;
-        }
-        if (selectedOption == "Valuations") {
-            $scope.flagBasicInfo = true;
-            $scope.flagFundamentalInfo = true;
-            $scope.flagCapitalStructureInfo = true;
-            $scope.flagValuations = false;
-            $scope.flagPricePerformance = true;
-            $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsReco = true;
-            $scope.flagDCFValuation = true;
-        }
-        if (selectedOption == "PricePerformance") {
-            $scope.flagBasicInfo = true;
-            $scope.flagFundamentalInfo = true;
-            $scope.flagCapitalStructureInfo = true;
-            $scope.flagValuations = true;
-            $scope.flagPricePerformance = false;
-            $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsReco = true;
-            $scope.flagDCFValuation = true;
-        }
-        if (selectedOption == "AdditionalInfo") {
-            $scope.flagBasicInfo = true;
-            $scope.flagFundamentalInfo = true;
-            $scope.flagCapitalStructureInfo = true;
-            $scope.flagValuations = true;
-            $scope.flagPricePerformance = true;
-            $scope.flagAdditionalInfo = false;
-            $scope.flagAnalystsReco = true;
-            $scope.flagDCFValuation = true;
-        }
-        if (selectedOption == "AnalystsReco") {
-            $scope.flagBasicInfo = true;
-            $scope.flagFundamentalInfo = true;
-            $scope.flagCapitalStructureInfo = true;
-            $scope.flagValuations = true;
-            $scope.flagPricePerformance = true;
-            $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsReco = false;
-            $scope.flagDCFValuation = true;
-        }
-        if (selectedOption == "DCFValuation") {
-            $scope.flagBasicInfo = true;
-            $scope.flagFundamentalInfo = true;
-            $scope.flagCapitalStructureInfo = true;
-            $scope.flagValuations = true;
-            $scope.flagPricePerformance = true;
-            $scope.flagAdditionalInfo = true;
-            $scope.flagAnalystsReco = true;
-            $scope.flagDCFValuation = false;
-        }
+        angular.forEach(VIEWS, function (flag, view) { $scope[flag] = (view !== selectedOption); });
     }
 
     $scope.sortData = function (column) {

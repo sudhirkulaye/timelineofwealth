@@ -116,6 +116,14 @@ public class PublicViewController {
         return "public/economy";
     }
 
+    /** Weekly analyst-consensus dashboard with daily prices (via /public/api/getconsensusdashboard). */
+    @RequestMapping(value = "/public/consensus")
+    public String consensus(HttpServletRequest request, Model model){
+        logger.debug("Visited /public/consensus - " + request.getRemoteAddr());
+        model.addAttribute("title", "Analyst Consensus");
+        return "public/consensus";
+    }
+
     /** Sector scoreboard (Sector sheet of the research workbook, via /public/api/getsectors). */
     @RequestMapping(value = "/public/sectors")
     public String sectors(HttpServletRequest request, Model model){

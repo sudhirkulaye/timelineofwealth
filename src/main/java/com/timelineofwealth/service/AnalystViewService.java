@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  *   ConsolidatedView (one row per stock, one consolidated view per broker) and the per-broker email sheets
  *   (Ticker, Date, Name, Category / Theme, Critical Factors, ...).
  *
- * Broker names are replaced with neutral labels ("Broker A", "Broker B") before anything leaves the server,
+ * Broker names are replaced with neutral labels ("Broker 1", "Broker 2", ...) before anything leaves the server,
  * because the research is shared privately. The workbook is read with the streaming API (it is several MB)
  * and cached until the file changes.
  */
@@ -38,14 +38,14 @@ public class AnalystViewService {
     static final String FILE = "C:/MyDocuments/03Business/05ResearchAndAnalysis/StockInvestments/CoworkProject/ResearchIntelligence/AnalystVeiwInsight.xlsx";
 
     /** email sheet -> neutral label; ConsolidatedView columns are matched by the same key word. */
-    private static final String[][] BROKERS = {{"Ambit Emails", "AMBIT", "Broker A"}, {"MOSL Emails", "MOSL", "Broker B"}};
+    private static final String[][] BROKERS = {{"Ambit Emails", "AMBIT", "Broker 1"}, {"MOSL Emails", "MOSL", "Broker 2"}};
     private static final Pattern[] SCRUB_B = {
             Pattern.compile("\\bMotilal(\\s+Oswal)?(\\s+Financial\\s+Services)?(\\s+(Limited|Ltd\\.?))?", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\bOswal\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\bMOFSL\\b|\\bMOSL\\b|\\bMOFS\\b", Pattern.CASE_INSENSITIVE)};
     private static final Pattern[] SCRUB_A = {
             Pattern.compile("\\bAmbit(\\s+Capital)?\\b", Pattern.CASE_INSENSITIVE)};
-    private static final Pattern DUP = Pattern.compile("(Broker [AB])\\s*\\(\\s*\\1\\s*\\)");
+    private static final Pattern DUP = Pattern.compile("(Broker [1-4])\\s*\\(\\s*\\1\\s*\\)");
     /** workbook row pointers such as "(r1206)" or "(r1081–r1383)" in the summary sheets */
     private static final Pattern ROW_REF = Pattern.compile("\\s*\\(\\s*r\\d+[^)]*\\)");
     private static final Pattern MY_VIEW = Pattern.compile("\\bMyView\\b");
@@ -54,6 +54,13 @@ public class AnalystViewService {
     private volatile Map<String, Map<String, Object>> byTicker = Collections.emptyMap();
     private volatile Map<String, Object> economy = Collections.emptyMap();
     private volatile Map<String, Object> sectors = Collections.emptyMap();
+    private volatile Map<String, Map<String, Object>> brokerTargets = Collections.emptyMap();
+
+    /**
+     * Latest rating and target per stock from the Tracker sheet, keyed by ticker, then by neutral label
+     * ("1" = Ambit, "2" = MOSL, "3" = Axis, "4" = PL): {reco, tp}, plus "date". Public pages send only the label, never the name.
+     */
+    public Map<String, Map<String, Object>> getBrokerTargets() { ensureLoaded(); return brokerTargets; }
 
     /** Macro summary from the Economy sheet: bottom line, nutshell, ranked critical points, indicator dashboard. */
     public Map<String, Object> getEconomy() { ensureLoaded(); return economy; }
@@ -75,8 +82,8 @@ public class AnalystViewService {
     static String scrub(String s) {
         if (s == null) return null;
         String out = s;
-        for (Pattern p : SCRUB_B) out = p.matcher(out).replaceAll("Broker B");
-        for (Pattern p : SCRUB_A) out = p.matcher(out).replaceAll("Broker A");
+        for (Pattern p : SCRUB_B) out = p.matcher(out).replaceAll("Broker 2");
+        for (Pattern p : SCRUB_A) out = p.matcher(out).replaceAll("Broker 1");
         return DUP.matcher(out).replaceAll("$1").trim();
     }
 
@@ -87,14 +94,68 @@ public class AnalystViewService {
         if (stamp == loadedStamp) return;
         long t0 = System.currentTimeMillis();
         try {
-            Map<String, List<List<String>>> sheets = readSheets(f, new HashSet<>(Arrays.asList("ConsolidatedView", BROKERS[0][0], BROKERS[1][0], "Economy", "Sector")));
+            Map<String, List<List<String>>> sheets = readSheets(f, new HashSet<>(Arrays.asList("ConsolidatedView", BROKERS[0][0], BROKERS[1][0], "Economy", "Sector", "Tracker")));
             byTicker = build(sheets);
             economy = buildEconomy(sheets.getOrDefault("Economy", Collections.emptyList()));
             sectors = buildSectors(sheets.getOrDefault("Sector", Collections.emptyList()));
+            brokerTargets = buildBrokerTargets(sheets.getOrDefault("Tracker", Collections.emptyList()));
             loadedStamp = stamp;
             logger.debug("Loaded broker views for {} stocks in {} ms", byTicker.size(), System.currentTimeMillis() - t0);
         } catch (Exception e) {
             logger.error("Could not read {}", FILE, e);
+        }
+    }
+
+    /** Tracker: Ticker, ..., "Ambit Reco", "AMBIT TP", ..., "MOSL Reco", "MOSL TP", ..., "Latest Date"; "AXIS Reco/TP" and "PL Reco/TP" are picked up when those columns are added. */
+    private static Map<String, Map<String, Object>> buildBrokerTargets(List<List<String>> rows) {
+        Map<String, Map<String, Object>> out = new HashMap<>();
+        if (rows.isEmpty()) return out;
+        List<String> hdr = rows.get(0);
+        String[][] keys = {{"AMBIT", "1"}, {"MOSL", "2"}, {"AXIS", "3"}, {"PL", "4"}};
+        int cT = -1, cDate = -1;
+        Map<String, int[]> cols = new LinkedHashMap<>();   // label -> {reco column, target column}
+        for (String[] k : keys) cols.put(k[1], new int[]{-1, -1});
+        for (int c = 0; c < hdr.size(); c++) {
+            String h = hdr.get(c) == null ? "" : hdr.get(c).trim().toUpperCase(Locale.ROOT);
+            if (h.equals("TICKER")) cT = c;
+            if (h.equals("LATEST DATE")) cDate = c;
+            for (String[] k : keys) {
+                if (!h.startsWith(k[0] + " ")) continue;
+                if (h.endsWith(" RECO")) cols.get(k[1])[0] = c;
+                if (h.endsWith(" TP")) cols.get(k[1])[1] = c;
+            }
+        }
+        if (cT < 0) return out;
+        for (List<String> row : rows.subList(1, rows.size())) {
+            String t = at(row, cT);
+            if (t == null || !t.matches("[A-Za-z0-9&_-]+")) continue;
+            Map<String, Object> m = new LinkedHashMap<>();
+            for (Map.Entry<String, int[]> e : cols.entrySet()) {
+                String reco = at(row, e.getValue()[0]);
+                Double tp = positive(at(row, e.getValue()[1]));
+                if (blank(reco) && tp == null) continue;
+                Map<String, Object> v = new LinkedHashMap<>();
+                v.put("reco", blank(reco) ? null : reco);
+                v.put("tp", tp);
+                m.put(e.getKey(), v);
+            }
+            if (m.isEmpty()) continue;
+            m.put("date", at(row, cDate));
+            out.put(t.toUpperCase(Locale.ROOT), m);
+        }
+        return out;
+    }
+
+    /** "₹ 2,547" or "2547" -> 2547.0; blank, "-" or 0 (not filled in) -> null. */
+    private static Double positive(String s) {
+        if (s == null) return null;
+        String d = s.replaceAll("[^0-9.]", "");
+        if (d.isEmpty() || d.equals(".")) return null;
+        try {
+            double v = Double.parseDouble(d);
+            return v > 0 ? v : null;
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 

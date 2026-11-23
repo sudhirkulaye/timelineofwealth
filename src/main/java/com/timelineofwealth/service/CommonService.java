@@ -368,16 +368,15 @@ public class CommonService {
 
             nseBse500.setDailyDataS(dailyDataSList.stream().filter(dailyDataS -> nseBse500.getTicker5().equals(dailyDataS.getKey().getName())).findAny().orElse(null));
             nseBse500.setStockPriceMovement(stockPriceMovementList.stream().filter(stockPriceMovement -> nseBse500.getTicker().equals(stockPriceMovement.getTicker())).findAny().orElse(null));
-            nseBse500.setLatestMOSLReco(getLatestFourRecommendations(stockUniverse.getTicker(), "MOSL", stockUniverse.getLatestPrice().doubleValue()));
-            nseBse500.setLatestAMBITReco(getLatestFourRecommendations(stockUniverse.getTicker(), "AMBIT", stockUniverse.getLatestPrice().doubleValue()));
-            nseBse500.setLatestAXISReco(getLatestFourRecommendations(stockUniverse.getTicker(), "AXIS", stockUniverse.getLatestPrice().doubleValue()));
-            nseBse500.setLatestICICIDIRECTReco(getLatestFourRecommendations(stockUniverse.getTicker(), "ICICIDIRECT", stockUniverse.getLatestPrice().doubleValue()));
-            nseBse500.setLatestPLReco(getLatestFourRecommendations(stockUniverse.getTicker(), "PL", stockUniverse.getLatestPrice().doubleValue()));
-            nseBse500.setLatestKOTAKReco(getLatestFourRecommendations(stockUniverse.getTicker(), "KOTAK", stockUniverse.getLatestPrice().doubleValue()));
+            // Broker-named recommendations (latestMOSLReco ...) and the DCF valuation range are no longer sent to
+            // the public stock list: it shows the Yahoo consensus with broker targets labelled A / B instead
+            // (attached per request by ConsensusService, so a new week shows without a restart).
 
-            getLatestFourValuation(stockUniverse.getTicker(),stockUniverse.getLatestPrice().doubleValue(), nseBse500);
-
-            List<String> watchlistNames = watchlistsByTicker.getOrDefault(normalizeTicker(stockUniverse.getTicker()), new ArrayList<>());
+            // only Focus Five, the long-term shortlists and the sector groups (101+) are public
+            List<String> watchlistNames = new ArrayList<>();
+            for (String section : watchlistsByTicker.getOrDefault(normalizeTicker(stockUniverse.getTicker()), new ArrayList<>())) {
+                if (WatchlistNames.isPublic(section)) watchlistNames.add(WatchlistNames.display(section));
+            }
             nseBse500.setWatchlistNames(watchlistNames);
             nseBse500.setWatchlistsDisplay(String.join(", ", watchlistNames));
 
@@ -1006,6 +1005,21 @@ public class CommonService {
             dtos.add(dto);
         }
         return dtos;
+    }
+
+    /** Public watchlists in file order (001, 003-005, then 101+): [{name, group}] for the stock list filter. */
+    public List<Map<String, String>> getPublicWatchlists() {
+        List<String> sections = new ArrayList<>(loadSectionedProperties(WATCHLIST_PROPERTIES_FILE).keySet());
+        sections.removeIf(s -> !WatchlistNames.isPublic(s));
+        sections.sort(Comparator.comparingInt(WatchlistNames::code));
+        List<Map<String, String>> out = new ArrayList<>();
+        for (String s : sections) {
+            Map<String, String> m = new LinkedHashMap<>();
+            m.put("name", WatchlistNames.display(s));
+            m.put("group", WatchlistNames.group(s));
+            out.add(m);
+        }
+        return out;
     }
 
     private Map<String, List<String>> loadWatchlistsByTicker() {

@@ -104,7 +104,7 @@
                     if (s.group !== g) { g = s.group; html += '<div class="sc-group">' + esc(g || '') + '</div>'; }
                     html += '<details class="ec-pt"><summary><span class="rk">' + s.rank + '</span><span>' +
                         '<div class="pt">' + esc(s.sector) + '</div><div class="vw">' + esc(s.view) + '</div>' +
-                        '<div class="sc-brokers"><span>Broker A: <b>' + esc(s.brokerA || '—') + '</b></span><span>Broker B: <b>' + esc(s.brokerB || '—') + '</b></span>' +
+                        '<div class="sc-brokers"><span>Broker 1: <b>' + esc(s.brokerA || '—') + '</b></span><span>Broker 2: <b>' + esc(s.brokerB || '—') + '</b></span>' +
                         (s.updated ? '<span>Last note ' + esc(day(s.updated)) + '</span>' : '') + '</div></span>' +
                         '<span class="chips">' + chip(s.trend) + '</span></summary>' + details(s.details) + '</details>';
                 });

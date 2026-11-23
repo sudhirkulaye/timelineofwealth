@@ -689,7 +689,7 @@
     }
 
     // =====================================================================
-    // Critical factors (broker names are replaced with "Broker A/B" on the server)
+    // Critical factors (broker names are replaced with "Broker 1/2" on the server)
     // =====================================================================
     function ratingOf(theme) {
         var m = /^\s*(strong buy|buy|add|accumulate|outperform|hold|neutral|reduce|underperform|sell)\b/i.exec(theme || '');
@@ -758,6 +758,11 @@
             var e = C.fy[fy].epsAvg, c13 = chg(e, 13);
             html += tile(fy + ' EPS (avg)', '₹' + num(e[k], 1), '13W revision <span class="' + cls(c13) + '">' + pct(c13, 1) + '</span>');
         });
+        fys.slice(0, 2).forEach(function (fy) {
+            var f = C.fy[fy], lo = f.epsMin[k], hi = f.epsMax[k], avg = f.epsAvg[k];
+            if (lo == null || hi == null) return;
+            html += tile(fy + ' EPS range', '₹' + num(lo, 1) + ' – ' + num(hi, 1), avg ? 'spread ' + pct((hi - lo) / Math.abs(avg), 0).replace('+', '') : '');
+        });
         $('sa-cons-tiles').innerHTML = html;
 
         // price vs target: band = tpMin + (tpMax - tpMin) stacked
@@ -792,7 +797,8 @@
         // EPS by FY: show the fiscal years that still have a current estimate (max 3)
         var cols = [P.s1, P.s2, P.s3];
         var show = fys.slice(0, 3);
-        $('sa-cons-eps-legend').innerHTML = show.map(function (fy, i) { return '<span><i style="background:' + cols[i] + '"></i>' + esc(fy) + ' EPS (avg)</span>'; }).join('');
+        $('sa-cons-eps-legend').innerHTML = show.map(function (fy, i) { return '<span><i style="background:' + cols[i] + '"></i>' + esc(fy) + ' EPS (avg)</span>'; }).join('') +
+            '<span style="opacity:.75">Shaded: analysts\' low – high estimate</span>';
         chart('sa-cons-eps').setOption({
             animationDuration: 300, textStyle: { fontFamily: P.font },
             grid: { left: 4, right: 44, top: 12, bottom: 4, containLabel: true },
@@ -811,11 +817,19 @@
             xAxis: { type: 'category', data: labels, boundaryGap: false, axisTick: { show: false }, axisLine: { lineStyle: { color: P.axis } },
                      axisLabel: Object.assign(baseText(P), { hideOverlap: true, formatter: fmtShort }) },
             yAxis: { type: 'value', scale: true, splitNumber: 4, axisLabel: Object.assign(baseText(P), { formatter: function (v) { return num(v, v < 10 ? 1 : 0); } }), splitLine: { lineStyle: { color: P.grid } } },
-            series: show.map(function (fy, i) {
+            // low-high band per fiscal year (as on the target chart), then the average line
+            series: show.slice(0, 2).reduce(function (acc, fy, i) {
+                var f = C.fy[fy];
+                acc.push({ name: fy + ' low', type: 'line', stack: 'eps' + i, data: f.epsMin, symbol: 'none', lineStyle: { opacity: 0 }, silent: true });
+                acc.push({ name: fy + ' range', type: 'line', stack: 'eps' + i, symbol: 'none', lineStyle: { opacity: 0 }, silent: true,
+                           areaStyle: { color: alpha(cols[i], .12) },
+                           data: f.epsMax.map(function (v, j) { return v != null && f.epsMin[j] != null ? v - f.epsMin[j] : null; }) });
+                return acc;
+            }, []).concat(show.map(function (fy, i) {
                 return { name: fy, type: 'line', data: C.fy[fy].epsAvg, symbol: 'none', connectNulls: false,
                          lineStyle: { width: 2, color: cols[i] }, itemStyle: { color: cols[i] },
                          endLabel: { show: true, formatter: fy, color: cols[i], fontSize: 11, fontWeight: 600 } };
-            })
+            }))
         }, true);
     }
 
