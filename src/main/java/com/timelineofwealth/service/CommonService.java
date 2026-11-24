@@ -42,7 +42,7 @@ public class CommonService {
     public final String ADVISER_ROLE = "ROLE_ADVISER";
     private final Logger logger = LoggerFactory.getLogger(CommonService.class);
     private final String BASE_EXCEL_PATH = "C:/MyDocuments/03Business/05ResearchAndAnalysis/StockInvestments/QuarterResultsScreenerExcels/";
-    /** watchlists.properties: Property\website first, else the old QuarterResultsScreenerExcels copy */
+    /** watchlists.properties in 11Property\website */
     private String watchlistFile() { return ConfigFiles.watchlists(); }
     private final UserRepository userRepository;
     private final AssetClassificationRepository assetClassificationRepository;

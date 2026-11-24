@@ -15,14 +15,11 @@ import java.io.File;
  *                     reportconfig.properties and ReportDataExtractConfig2.0.xlsx (AnalystRecoExtractor)
  *     dailydata\      downloadconfig.property (daily EOD downloads)
  *
- * While the move is being tested, a file missing from the new folder is read from its old location instead
- * (and a line is logged), so nothing breaks if the Property folder is not on a laptop yet.
+ * The old locations (QuarterResultsScreenerExcels, CompanyResearchReports, 03DailyData) are no longer used: a file
+ * missing from this folder is logged as an error and the program fails on the path shown here.
  */
 public final class ConfigFiles {
     private static final Logger logger = LoggerFactory.getLogger(ConfigFiles.class);
-    private static final String SA = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\";
-    private static final String QRS = SA + "QuarterResultsScreenerExcels\\";
-    private static final String CRR = SA + "ResearchReports\\CompanyResearchReports\\";
 
     private ConfigFiles() {}
 
@@ -34,27 +31,28 @@ public final class ConfigFiles {
     }
 
     // ---------------- website
-    public static String watchlists()            { return pick("website", "watchlists.properties", QRS + "watchlists.properties"); }
-    public static String chartForSheetAndRow()   { return pick("website", "ChartForSheet&Row.property", QRS + "ChartForSheet&Row.property"); }
-    public static String tickerChartCombination(){ return pick("website", "TickerChartCombination.property", QRS + "TickerChartCombination.property"); }
+    public static String watchlists()            { return file("website", "watchlists.properties"); }
+    public static String chartForSheetAndRow()   { return file("website", "ChartForSheet&Row.property"); }
+    public static String tickerChartCombination(){ return file("website", "TickerChartCombination.property"); }
 
     // ---------------- quarterly result Excels
-    public static String updateQuarterlyExcels() { return pick("quarterexcels", "update_quarterly_excels.properties", QRS + "Analysis\\config.properties"); }
-    public static String copyConfig()            { return pick("quarterexcels", "copy_config.properties", QRS + "copy_config.properties"); }
+    public static String updateQuarterlyExcels() { return file("quarterexcels", "update_quarterly_excels.properties"); }
+    public static String copyConfig()            { return file("quarterexcels", "copy_config.properties"); }
 
     // ---------------- broker report PDFs
-    public static String dailyReportSplitter()   { return pick("reportpdfs", "daily_report_splitter.properties", CRR + "KotakDaily\\config.properties"); }
-    public static String moslMorningIndia()      { return pick("reportpdfs", "mosl_morning_india.properties", CRR + "MOSLMorningIndia\\config.properties"); }
-    public static String reportConfig()          { return pick("reportpdfs", "reportconfig.properties", CRR + "reportconfig.properties"); }
-    /** where an uploaded reportconfig.properties is saved: the Property folder when it exists */
-    public static String reportConfigForWrite()  { return writeTarget("reportpdfs", "reportconfig.properties", CRR + "reportconfig.properties"); }
+    public static String dailyReportSplitter()   { return file("reportpdfs", "daily_report_splitter.properties"); }
+    public static String moslMorningIndia()      { return file("reportpdfs", "mosl_morning_india.properties"); }
+    public static String reportConfig()          { return file("reportpdfs", "reportconfig.properties"); }
+    /** where an uploaded reportconfig.properties is saved */
+    public static String reportConfigForWrite()  { return root() + File.separator + "reportpdfs" + File.separator + "reportconfig.properties"; }
 
     // ---------------- daily data
-    public static String downloadConfig()        { return pick("dailydata", "downloadconfig.property", "C:\\MyDocuments\\03Business\\03DailyData\\downloadconfig.property"); }
+    public static String downloadConfig()        { return file("dailydata", "downloadconfig.property"); }
 
     /**
      * A setup file named inside another config (e.g. ReportDataExtractConfigFilePath in reportconfig.properties):
-     * the copy in Property\<group> with the same file name wins, so old paths in uploaded files keep working.
+     * the copy in 11Property\<group> with the same file name is used, so an old path written in an uploaded file
+     * still works. If that copy is missing, the configured path is used as written.
      */
     public static String preferProperty(String group, String configuredPath) {
         if (configuredPath == null || configuredPath.trim().isEmpty()) return configuredPath;
@@ -63,15 +61,9 @@ public final class ConfigFiles {
         return f.isFile() ? f.getPath() : configuredPath.trim();
     }
 
-    private static String pick(String group, String name, String legacy) {
+    private static String file(String group, String name) {
         File f = new File(root() + File.separator + group + File.separator + name);
-        if (f.isFile()) return f.getPath();
-        logger.info("{} not found in {}; using the old location {}", name, f.getParent(), legacy);
-        return legacy;
-    }
-
-    private static String writeTarget(String group, String name, String legacy) {
-        File dir = new File(root() + File.separator + group);
-        return dir.isDirectory() ? new File(dir, name).getPath() : legacy;
+        if (!f.isFile()) logger.error("Setup file missing: {} (all setup files live under {})", f.getPath(), root());
+        return f.getPath();
     }
 }
