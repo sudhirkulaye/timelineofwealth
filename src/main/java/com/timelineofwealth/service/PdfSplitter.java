@@ -12,7 +12,7 @@ public class PdfSplitter {
         try {
             // Load properties file
             Properties properties = new Properties();
-            properties.load(new FileInputStream("C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\KotakDaily\\config.properties"));
+            properties.load(new FileInputStream(ConfigFiles.dailyReportSplitter()));
 
             // Get source file name
             String sourceFile = properties.getProperty("sourceFile");

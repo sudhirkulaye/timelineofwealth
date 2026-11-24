@@ -165,7 +165,7 @@ public class AnalystRecoExtractor {
         try {
             // Load config file
             Properties prop = new Properties();
-            String reportConfigFileVersion = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\reportconfig.properties";
+            String reportConfigFileVersion = ConfigFiles.reportConfig();
             // Define the output file path
             String reportExtractFile = "";
 
@@ -174,8 +174,9 @@ public class AnalystRecoExtractor {
             input.close();
 
             // Get reportDataExtractConfigFilePath
-            String reportDataExtractConfigFilePath = prop.getProperty("ReportDataExtractConfigFilePath");
-            String analystNamesFilePath = prop.getProperty("AnalystNamesFilePath");
+            // the copy in Property\reportpdfs wins over the path written in the file
+            String reportDataExtractConfigFilePath = ConfigFiles.preferProperty("reportpdfs", prop.getProperty("ReportDataExtractConfigFilePath"));
+            String analystNamesFilePath = ConfigFiles.preferProperty("reportpdfs", prop.getProperty("AnalystNamesFilePath"));
             AnalystRecoExtractor analystRecoExtractor = new AnalystRecoExtractor();
             analystRecoExtractor.loadAnalystNames(analystNamesFilePath);
 //            analystRecoExtractor.loadReportDataExtractConfig(reportDataExtractConfigFilePath);

@@ -1865,7 +1865,7 @@ public class AdminViewController {
                     updateConfigFile(ticker, industrySubindustry, yearQuarter, originalFilename);
                     // Assuming UpdateQuarterlyExcels.main() accepts no arguments
                     com.timelineofwealth.service.UpdateQuarterlyExcels.main(new String[]{});
-                    removeParametersFromConfigFile("C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis\\config.properties");
+                    removeParametersFromConfigFile(com.timelineofwealth.service.ConfigFiles.updateQuarterlyExcels());
 
                     model.addAttribute("message", "File '" + originalFilename + "' uploaded successfully.");
                 } catch (Exception e) {
@@ -1915,7 +1915,7 @@ public class AdminViewController {
     }
 
     private void updateConfigFile(String ticker, String industrySubindustry, String yearQuarter, String originalFilename) {
-        String configFile = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\Analysis\\config.properties";
+        String configFile = com.timelineofwealth.service.ConfigFiles.updateQuarterlyExcels();
 
         Properties properties = new Properties();
         try (FileInputStream fis = new FileInputStream(configFile)) {
@@ -2064,7 +2064,7 @@ public class AdminViewController {
 
         try {
             // Define the path where the property file should be saved
-            String configFilePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\reportconfig.properties";
+            String configFilePath = com.timelineofwealth.service.ConfigFiles.reportConfigForWrite();
 
             // Save the uploaded property file to the specified path
             try (FileOutputStream fos = new FileOutputStream(configFilePath)) {

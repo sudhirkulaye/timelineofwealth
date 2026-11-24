@@ -76,7 +76,7 @@ public class DownloadEODFiles {
         this.commonService = commonService;
     }
 
-    String downloadConfigFilePath = "C:\\MyDocuments\\03Business\\03DailyData\\downloadconfig.property";
+    String downloadConfigFilePath = ConfigFiles.downloadConfig();
 
     public int oneClickUpload() throws IOException {
         int returnValue = 0;

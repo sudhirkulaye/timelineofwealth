@@ -21,7 +21,7 @@ public class UpdateQuarterlyExcels {
     public static void main(String[] args) throws IOException, EncryptedDocumentException {
         UpdateQuarterlyExcels updateQuarterlyExcels = new UpdateQuarterlyExcels();
         Properties prop = new Properties();
-        FileInputStream input = new FileInputStream(updateQuarterlyExcels.BASE_PATH + "\\Analysis\\config.properties");
+        FileInputStream input = new FileInputStream(ConfigFiles.updateQuarterlyExcels());
         prop.load(input);
         input.close();
 
@@ -1721,7 +1721,7 @@ public class UpdateQuarterlyExcels {
             System.out.println("Starting data copy from " + oldFileRenamed.getName() + " to " + newFile.getName());
 
             // Load properties file ONCE
-            properties.load(new FileInputStream("C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\copy_config.properties"));
+            properties.load(new FileInputStream(ConfigFiles.copyConfig()));
 
             // OPEN workbooks ONCE
             oldFis = new FileInputStream(oldFileRenamed);
@@ -1932,7 +1932,7 @@ public class UpdateQuarterlyExcels {
         List<String> currentCellList = null;
         String currentSheet = null;
 
-        String propertiesPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\copy_config.properties";
+        String propertiesPath = ConfigFiles.copyConfig();
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(propertiesPath));
@@ -2109,7 +2109,7 @@ public class UpdateQuarterlyExcels {
         Map<String, List<CellRange>> sheetBlockCells = new HashMap<String, List<CellRange>>();
         String currentSheet = null;
 
-        String propertiesPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\copy_config.properties";
+        String propertiesPath = ConfigFiles.copyConfig();
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(propertiesPath));
@@ -2341,7 +2341,7 @@ public class UpdateQuarterlyExcels {
         SheetHeaderConfig currentConfig = null;
         String currentSheet = null;
 
-        String propertiesPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\copy_config.properties";
+        String propertiesPath = ConfigFiles.copyConfig();
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(propertiesPath));
@@ -2753,7 +2753,7 @@ public class UpdateQuarterlyExcels {
         Map<String, List<CellRange>> sheetFormattingCells = new HashMap<String, List<CellRange>>();
         String currentSheet = null;
 
-        String propertiesPath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\copy_config.properties";
+        String propertiesPath = ConfigFiles.copyConfig();
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(propertiesPath));

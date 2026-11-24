@@ -34,7 +34,7 @@ public class MOSLPDFExtractor {
     public static void main(String[] args) throws IOException {
         // Load config file
         Properties config = new Properties();
-        config.load(new FileInputStream("C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\ResearchReports\\CompanyResearchReports\\MOSLMorningIndia\\config.properties"));
+        config.load(new FileInputStream(ConfigFiles.moslMorningIndia()));
 
         // Get source file name from config
         String sourceFile = config.getProperty("sourceFile");

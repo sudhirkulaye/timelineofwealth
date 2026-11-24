@@ -42,7 +42,8 @@ public class CommonService {
     public final String ADVISER_ROLE = "ROLE_ADVISER";
     private final Logger logger = LoggerFactory.getLogger(CommonService.class);
     private final String BASE_EXCEL_PATH = "C:/MyDocuments/03Business/05ResearchAndAnalysis/StockInvestments/QuarterResultsScreenerExcels/";
-    private final String WATCHLIST_PROPERTIES_FILE = BASE_EXCEL_PATH + "watchlists.properties";
+    /** watchlists.properties: Property\website first, else the old QuarterResultsScreenerExcels copy */
+    private String watchlistFile() { return ConfigFiles.watchlists(); }
     private final UserRepository userRepository;
     private final AssetClassificationRepository assetClassificationRepository;
     private final SubindustryRepository subindustryRepository;
@@ -1009,7 +1010,7 @@ public class CommonService {
 
     /** Public watchlists in file order (001, 003-005, then 101+): [{name, group}] for the stock list filter. */
     public List<Map<String, String>> getPublicWatchlists() {
-        List<String> sections = new ArrayList<>(loadSectionedProperties(WATCHLIST_PROPERTIES_FILE).keySet());
+        List<String> sections = new ArrayList<>(loadSectionedProperties(watchlistFile()).keySet());
         sections.removeIf(s -> !WatchlistNames.isPublic(s));
         sections.sort(Comparator.comparingInt(WatchlistNames::code));
         List<Map<String, String>> out = new ArrayList<>();
@@ -1025,7 +1026,7 @@ public class CommonService {
     private Map<String, List<String>> loadWatchlistsByTicker() {
         Map<String, List<String>> watchlistsByTicker = new HashMap<>();
         try {
-            Map<String, Map<String, String>> watchlistSections = loadSectionedProperties(WATCHLIST_PROPERTIES_FILE);
+            Map<String, Map<String, String>> watchlistSections = loadSectionedProperties(watchlistFile());
 
             for (Map.Entry<String, Map<String, String>> sectionEntry : watchlistSections.entrySet()) {
                 String watchlistName = sectionEntry.getKey();
@@ -1047,7 +1048,7 @@ public class CommonService {
                 }
             }
         } catch (Exception ex) {
-            logger.error("Unable to load watchlists from {}", WATCHLIST_PROPERTIES_FILE, ex);
+            logger.error("Unable to load watchlists from {}", watchlistFile(), ex);
         }
         return watchlistsByTicker;
     }
@@ -1062,10 +1063,10 @@ public class CommonService {
     private final List<CustomChartData> loadExcelChartsForTicker(String ticker) {
         List<CustomChartData> chartDataList = new ArrayList<>();
         try {
-            Map<String, Map<String, String>> chartProperty = loadSectionedProperties(BASE_EXCEL_PATH + "ChartForSheet&Row.property");
+            Map<String, Map<String, String>> chartProperty = loadSectionedProperties(ConfigFiles.chartForSheetAndRow());
 
             Properties tickerCombination = new Properties();
-            tickerCombination.load(new FileInputStream(BASE_EXCEL_PATH + "TickerChartCombination.property"));
+            tickerCombination.load(new FileInputStream(ConfigFiles.tickerChartCombination()));
 
             File excelFile = getLatestExcelFileForTicker(ticker);
             if (excelFile == null) return chartDataList;
