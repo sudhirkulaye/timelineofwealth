@@ -8,7 +8,7 @@ import java.io.File;
 /**
  * Where the setup / property files live. Everything is under one folder, grouped by use:
  *
- *   C:\MyDocuments\03Business\Property\          (override with -Dtow.property.root=... or env TOW_PROPERTY_ROOT)
+ *   C:\MyDocuments\03Business\11Property\        (override with -Dtow.property.root=... or env TOW_PROPERTY_ROOT)
  *     website\        watchlists.properties, ChartForSheet&Row.property, TickerChartCombination.property
  *     quarterexcels\  update_quarterly_excels.properties (FilesToBeUpdated window), copy_config.properties
  *     reportpdfs\     daily_report_splitter.properties (AMBIT / Kotak daily PDF split), mosl_morning_india.properties,
@@ -29,7 +29,7 @@ public final class ConfigFiles {
     public static String root() {
         String r = System.getProperty("tow.property.root");
         if (r == null || r.trim().isEmpty()) r = System.getenv("TOW_PROPERTY_ROOT");
-        if (r == null || r.trim().isEmpty()) r = "C:\\MyDocuments\\03Business\\Property";
+        if (r == null || r.trim().isEmpty()) r = "C:\\MyDocuments\\03Business\\11Property";
         return r.endsWith("\\") || r.endsWith("/") ? r.substring(0, r.length() - 1) : r;
     }
 
