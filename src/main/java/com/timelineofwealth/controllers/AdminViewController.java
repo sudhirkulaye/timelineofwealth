@@ -2078,7 +2078,7 @@ public class AdminViewController {
             }
 
             // Check if the property file contains at least the required properties
-            if (properties.containsKey("ReportDataExtractConfigFilePath") && properties.containsKey("AnalystNamesFilePath")) {
+            if (properties.containsKey("ReportDataExtractConfigFilePath")) {
                 // Execute AnalystRecoExtractor.main
                 com.timelineofwealth.service.AnalystRecoExtractor.main(new String[]{});
 

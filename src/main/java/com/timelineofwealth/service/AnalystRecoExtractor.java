@@ -176,9 +176,8 @@ public class AnalystRecoExtractor {
             // Get reportDataExtractConfigFilePath
             // the copy in Property\reportpdfs wins over the path written in the file
             String reportDataExtractConfigFilePath = ConfigFiles.preferProperty("reportpdfs", prop.getProperty("ReportDataExtractConfigFilePath"));
-            String analystNamesFilePath = ConfigFiles.preferProperty("reportpdfs", prop.getProperty("AnalystNamesFilePath"));
+            // Analyst names are read from each report PDF; the old AnalystNamesFilePath list is no longer used.
             AnalystRecoExtractor analystRecoExtractor = new AnalystRecoExtractor();
-            analystRecoExtractor.loadAnalystNames(analystNamesFilePath);
 //            analystRecoExtractor.loadReportDataExtractConfig(reportDataExtractConfigFilePath);
 
             // Load list of reportPaths and corresponding excelPaths
