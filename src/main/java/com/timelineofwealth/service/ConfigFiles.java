@@ -49,6 +49,13 @@ public final class ConfigFiles {
     // ---------------- daily data
     public static String downloadConfig()        { return file("dailydata", "downloadconfig.property"); }
 
+    // ---------------- data folders / workbooks read by Admin > Process Yahoo Consensus (not setup files)
+    private static final String STOCK_DIR = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\";
+    /** yyyymmdd_YahooConsensus.csv files and YahooConsensusHistory.csv (1_Download_YahooConsensus.bat) */
+    public static String yahooConsensusFolder()  { return STOCK_DIR + "ResearchReports\\YahooConsensus\\WeeklyConsensus"; }
+    /** AnalystsReco sheet: verified (yellow) broker reports */
+    public static String analystViewTracker()    { return STOCK_DIR + "QuarterResultsScreenerExcels\\DBInsert\\AnalystViewTracker.xlsx"; }
+
     /**
      * A setup file named inside another config (e.g. ReportDataExtractConfigFilePath in reportconfig.properties):
      * the copy in 11Property\<group> with the same file name is used, so an old path written in an uploaded file

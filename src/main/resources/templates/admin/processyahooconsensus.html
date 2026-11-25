@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: common-header" />
+<body class="nav-md">
+<style>
+    .yc-table { width: 100%; border-collapse: collapse; margin: 6px 0 14px; font-size: 13px; }
+    .yc-table th, .yc-table td { border-bottom: 1px solid rgba(128,128,128,.25); padding: 5px 8px; text-align: left; vertical-align: top; }
+    .yc-table td.n { text-align: right; white-space: nowrap; }
+    .yc-ok { color: #0a7d33; font-weight: 600; }
+    .yc-bad { color: #d03b3b; font-weight: 600; }
+    .yc-muted { color: #888; }
+    .yc-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin: 10px 0 4px; }
+    .yc-buttons form { margin: 0; }
+    .yc-list { margin: 4px 0 12px; padding-left: 18px; font-size: 13px; }
+    .yc-ex { font-family: Consolas, monospace; font-size: 12px; white-space: pre-wrap; margin: 4px 0 0; }
+</style>
+<div class="container body">
+    <div class="main_container">
+        <div th:replace="fragments/adminsidebarmenu :: common-adminsidebarmenu" />
+        <div th:replace="fragments/usertopnavigation :: common-usertopnavigation" />
+
+        <div class="right_col" role="main">
+            <div class="row"><div class="col-md-12 col-sm-12 col-xs-12"><br />
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h1>Process Yahoo Consensus</h1>
+                        <p>Run after <b>1_Download_YahooConsensus.bat</b> (and <b>2_Ticker_Change_or_Refetch.bat</b> when a ticker changed),
+                            once the WeeklyConsensus folder is on this laptop. Computes the weekly scores, idea lists, industry groups,
+                            scoreboard and broker views, and loads them with the consensus history into the database in one step.</p>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                        <h4>Inputs</h4>
+                        <table class="yc-table">
+                            <tr th:each="r : ${inputs}"><td th:text="${r[0]}"></td><td class="yc-muted" th:text="${r[1]}"></td><td th:text="${r[2]}"></td></tr>
+                        </table>
+                        <h4>Database now</h4>
+                        <table class="yc-table">
+                            <tr th:each="r : ${dbstatus}"><td th:text="${r[0]}"></td><td th:text="${r[1]}"></td></tr>
+                        </table>
+
+                        <div class="yc-buttons">
+                            <form method="POST" action="/admin/processyahooconsensus">
+                                <input type="hidden" name="mode" value="compare" />
+                                <input class="btn btn-default" type="submit" value="Compare only (no changes)" />
+                            </form>
+                            <form method="POST" action="/admin/processyahooconsensus"
+                                  onsubmit="return confirm('Replace the Yahoo consensus tables with this run?');">
+                                <input type="hidden" name="mode" value="process" />
+                                <input class="btn btn-success" type="submit" value="Process and update database" />
+                            </form>
+                        </div>
+                        <p class="yc-muted">Takes about 20 seconds. Compare only computes everything and lists every difference with what the
+                            database holds, without changing anything.</p>
+
+                        <div th:if="${result}">
+                            <hr />
+                            <div th:if="${result.error}" class="alert alert-danger">
+                                <b>Failed - nothing was written.</b> <span th:text="${result.error}"></span>
+                            </div>
+                            <div th:if="${result.written}" class="alert alert-success">
+                                Database updated: <span th:text="${result.weeks}"></span> weeks
+                                (<span th:text="${result.firstWeek}"></span> to <span th:text="${result.lastWeek}"></span>).
+                                Reload a stock page or the Analyst Consensus page to see it.
+                            </div>
+                            <div th:if="${compareOnly and result.error == null}"
+                                 th:class="${allMatch} ? 'alert alert-success' : 'alert alert-warning'">
+                                <span th:if="${allMatch}">Compare only: every table matches the database exactly. Nothing was changed.</span>
+                                <span th:unless="${allMatch}">Compare only: differences found (see below). Nothing was changed.
+                                    After a new download this is expected for the new week; anything else needs a look.</span>
+                            </div>
+
+                            <h4>Steps</h4>
+                            <ul class="yc-list"><li th:each="s : ${result.steps}" th:text="${s}"></li></ul>
+
+                            <h4 th:text="${compareOnly} ? 'Comparison with the database' : 'Before writing: comparison with the previous database'"></h4>
+                            <table class="yc-table">
+                                <tr><th>Table</th><th>This run</th><th>Database</th><th>Identical</th><th>Only this run</th><th>Only database</th><th>Columns that differ</th><th></th></tr>
+                                <tr th:each="c : ${result.comparison}">
+                                    <td th:text="${c['table']}"></td>
+                                    <td class="n" th:text="${c['skipped']} ? 'not read' : ${c['javaRows']}"></td>
+                                    <td class="n" th:text="${c['dbRows']}"></td>
+                                    <td class="n" th:text="${c['identical']}"></td>
+                                    <td class="n" th:text="${c['onlyJava']}"></td>
+                                    <td class="n" th:text="${c['onlyDb']}"></td>
+                                    <td>
+                                        <span th:each="e : ${c['diffColumns']}" th:text="${e.key + ' (' + e.value + ') '}"></span>
+                                        <div class="yc-ex" th:if="${c['examples'] != null}"><div th:each="x : ${c['examples']}" th:text="${x}"></div></div>
+                                    </td>
+                                    <td>
+                                        <span th:if="${c['match']}" class="yc-ok">match</span>
+                                        <span th:if="${c['skipped']}" class="yc-muted">left as is</span>
+                                        <span th:if="${!c['skipped'] and !c['match']}" class="yc-bad">differs</span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <h4>Notes</h4>
+                            <ul class="yc-list"><li th:each="n : ${result.notes}" th:text="${n}"></li></ul>
+                        </div>
+                    </div>
+                </div>
+            </div></div>
+        </div>
+        <div th:replace="fragments/publicfooter :: common-publicfooter" />
+    </div>
+</div>
+<script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+<script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
+</body>
+</html>
