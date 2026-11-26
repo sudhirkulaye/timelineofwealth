@@ -83,7 +83,7 @@ public class YahooConsensusProcessService {
             Arrays.asList(d("ic_spearman", 6), d("long_fwd_ret", 6), d("short_fwd_ret", 6), d("spread_fwd_ret", 6),
                     d("hit_rate", 6), d("breadth_up", 6), d("breadth_down", 6)));
     static final Table BROKER = new Table("consensus_broker_view", Arrays.asList(s("ticker"), s("broker")),
-            Arrays.asList(s("reco"), d("target", 3), dt("report_date"), s("quarter")));
+            Arrays.asList(s("reco"), d("target", 3), dt("report_date"), s("quarter"), s("fwd_multiple")));
 
     // =====================================================================================================
     // result of one run
@@ -195,6 +195,7 @@ public class YahooConsensusProcessService {
                 Map<String, Object> m = new LinkedHashMap<>();
                 m.put("ticker", v.ticker); m.put("broker", v.broker); m.put("reco", v.reco);
                 m.put("target", v.target); m.put("report_date", v.reportDate); m.put("quarter", v.quarter);
+                m.put("fwd_multiple", v.fwdMultiple);
                 out.add(m);
             }
             res.tables.put(BROKER.name, out);
@@ -673,20 +674,25 @@ public class YahooConsensusProcessService {
     // =====================================================================================================
     // write (one transaction)
     // =====================================================================================================
+    /** ALTER TABLE ... ADD COLUMN for a column a table created by an older version does not have yet */
+    private static void addMissingColumn(Connection con, Statement st, String table, String[] col) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = ? AND column_name = ?")) {
+            ps.setString(1, table);
+            ps.setString(2, col[0]);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                if (rs.getInt(1) == 0) st.execute("ALTER TABLE " + table + " ADD COLUMN " + col[0] + " " + col[1]);
+            }
+        }
+    }
+
     void write(Result res) throws SQLException {
         try (Connection con = dataSource.getConnection()) {
             try (Statement st = con.createStatement()) {                 // DDL commits on its own in MySQL
                 for (String ddl : YcSchema.DDL) st.execute(ddl);
-                for (String[] col : YcSchema.NEW_SCORE_COLS) {
-                    try (PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
-                            + "AND table_name = 'consensus_weekly_score' AND column_name = ?")) {
-                        ps.setString(1, col[0]);
-                        try (ResultSet rs = ps.executeQuery()) {
-                            rs.next();
-                            if (rs.getInt(1) == 0) st.execute("ALTER TABLE consensus_weekly_score ADD COLUMN " + col[0] + " " + col[1]);
-                        }
-                    }
-                }
+                for (String[] col : YcSchema.NEW_SCORE_COLS) addMissingColumn(con, st, "consensus_weekly_score", col);
+                for (String[] col : YcSchema.NEW_BROKER_COLS) addMissingColumn(con, st, "consensus_broker_view", col);
             }
             boolean auto = con.getAutoCommit();
             con.setAutoCommit(false);

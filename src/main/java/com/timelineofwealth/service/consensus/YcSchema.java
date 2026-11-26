@@ -4,6 +4,11 @@ package com.timelineofwealth.service.consensus;
 final class YcSchema {
     private YcSchema() {}
 
+    /** consensus_broker_view columns added after the Python version: added to an existing table on write */
+    static final String[][] NEW_BROKER_COLS = {
+            {"fwd_multiple", "varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'valuation basis of the target (AnalystsReco Fwd Multiple)'"},
+    };
+
     static final String[][] NEW_SCORE_COLS = {
             {"eps_rev_4w", "decimal(12,6) DEFAULT NULL COMMENT 'EPS 4W revision, both FYs averaged (dashboard EPS 4W)'"},
             {"eps_rev_13w", "decimal(12,6) DEFAULT NULL COMMENT 'EPS 13W revision, both FYs averaged'"},
@@ -97,6 +102,7 @@ final class YcSchema {
                     "  target decimal(20,3) DEFAULT NULL,\n" +
                     "  report_date date DEFAULT NULL,\n" +
                     "  quarter varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,\n" +
+                    "  fwd_multiple varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'valuation basis of the target (AnalystsReco Fwd Multiple)',\n" +
                     "  PRIMARY KEY (ticker, broker)\n" +
                     ") ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci\n" +
                     "  COMMENT='Latest verified AnalystsReco report per ticker and broker'",

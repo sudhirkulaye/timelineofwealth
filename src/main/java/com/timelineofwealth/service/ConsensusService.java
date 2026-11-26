@@ -112,6 +112,7 @@ public class ConsensusService {
                 x.put("reco", v.getValue().get("reco"));
                 x.put("tp", v.getValue().get("tp"));
                 x.put("date", v.getValue().get("date"));
+                x.put("fwd", v.getValue().get("fwd"));
                 b.put(v.getKey(), x);
             }
             if (!b.isEmpty()) m.put("brokers", b);
@@ -375,6 +376,12 @@ public class ConsensusService {
         return n != null && n > 0;
     }
 
+    private boolean columnExists(String table, String column) {
+        Integer n = jdbc.queryForObject("SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = ? AND column_name = ?", Integer.class, table, column);
+        return n != null && n > 0;
+    }
+
     /**
      * ticker -> label ("1" Ambit, "2" MOSL, "3" Axis, "4" PL) -> {reco, tp, date, score}. From consensus_broker_view
      * (AnalystsReco, loaded by the weekly Python step) when it has rows; otherwise Ambit and MOSL from the research
@@ -385,7 +392,8 @@ public class ConsensusService {
         for (String[] b : BROKER_NAMES) label.put(b[1], b[0]);
         Map<String, Map<String, Map<String, Object>>> out = new HashMap<>();
         if (tableExists("consensus_broker_view")) {
-            jdbc.query("SELECT ticker, broker, reco, target, report_date FROM consensus_broker_view", (ResultSet rs) -> {
+            boolean hasFwd = columnExists("consensus_broker_view", "fwd_multiple");
+            jdbc.query("SELECT ticker, broker, reco, target, report_date" + (hasFwd ? ", fwd_multiple" : "") + " FROM consensus_broker_view", (ResultSet rs) -> {
                 String lb = label.get(String.valueOf(rs.getString("broker")).trim().toUpperCase(Locale.ROOT));
                 if (lb == null) return;
                 Map<String, Object> v = new LinkedHashMap<>();
@@ -393,6 +401,7 @@ public class ConsensusService {
                 Double tp = dbl(rs, "target");
                 v.put("tp", tp != null && tp > 0 ? tp : null);
                 v.put("date", str(rs.getDate("report_date")));
+                v.put("fwd", hasFwd ? rs.getString("fwd_multiple") : null);
                 v.put("score", recoScore(v.get("reco")));
                 out.computeIfAbsent(rs.getString("ticker").toUpperCase(Locale.ROOT), k -> new TreeMap<>()).put(lb, v);
             });

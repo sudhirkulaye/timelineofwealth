@@ -33,7 +33,7 @@ final class YcBrokerViews {
 
     /** one verified AnalystsReco row */
     static final class Reco {
-        String ticker, broker, reco, quarter;
+        String ticker, broker, reco, quarter, fwdMultiple;
         double target;
         LocalDateTime date;     // repaired report date; null when it could not be read
         int sheetRow;
@@ -41,7 +41,7 @@ final class YcBrokerViews {
 
     /** a consensus_broker_view row */
     static final class View {
-        String ticker, broker, reco, quarter;
+        String ticker, broker, reco, quarter, fwdMultiple;
         Double target;
         LocalDate reportDate;
     }
@@ -64,7 +64,8 @@ final class YcBrokerViews {
                 if (v != null && !col.containsKey(v.toString())) col.put(v.toString(), c);
             }
             int cT = col.getOrDefault("Ticker", -1), cQ = col.getOrDefault("Quarter", -1), cD = col.getOrDefault("Date", -1),
-                    cB = col.getOrDefault("Broker", -1), cR = col.getOrDefault("Reco", -1), cTg = col.getOrDefault("Target", -1);
+                    cB = col.getOrDefault("Broker", -1), cR = col.getOrDefault("Reco", -1), cTg = col.getOrDefault("Target", -1),
+                    cF = col.getOrDefault("Fwd Multiple", -1);
             int rows = 0, verified = 0, fixed = 0, unresolved = 0;
             for (int r = 1; r <= ws.getLastRowNum(); r++) {
                 Row row = ws.getRow(r);
@@ -83,6 +84,7 @@ final class YcBrokerViews {
                 String reco = title(pyStr(at(row, cR)).trim());
                 x.reco = "Nan".equals(reco) ? null : reco;
                 x.target = targetValue(at(row, cTg));
+                x.fwdMultiple = fwdMultiple(at(row, cF));
                 Object q = at(row, cQ);
                 x.quarter = q == null ? null : pyStr(q).trim();
                 Object[] fix = fixReportDate(at(row, cD), q == null ? "None" : pyStr(q), today);
@@ -124,6 +126,7 @@ final class YcBrokerViews {
             v.target = Double.isNaN(x.target) ? null : x.target;
             v.reportDate = x.date.toLocalDate();
             v.quarter = x.quarter;
+            v.fwdMultiple = x.fwdMultiple;
             out.put(v.ticker + "|" + v.broker, v);
         }
         return new ArrayList<>(out.values());
@@ -203,6 +206,14 @@ final class YcBrokerViews {
         else if (v instanceof String) d = YcInputs.num((String) v);
         else d = Double.NaN;
         return d == 0 ? Double.NaN : d;
+    }
+
+    /** the valuation basis as typed ("18x Sep'27 EPS", "DCF", "SoTP"), whitespace collapsed; null when blank */
+    static String fwdMultiple(Object v) {
+        if (v == null) return null;
+        String s = (v instanceof String ? (String) v : pyStr(v)).replaceAll("\\s+", " ").trim();
+        if (s.isEmpty()) return null;
+        return s.length() > 100 ? s.substring(0, 100) : s;
     }
 
     static Integer expectedReportYear(String quarter) {

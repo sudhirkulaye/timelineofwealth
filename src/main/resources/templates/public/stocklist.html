@@ -6,7 +6,8 @@
     /* Consensus Targets view: broker targets and forward EPS as short bulleted lists inside one cell */
     td.sl-list { white-space: nowrap; font-size: 12px; line-height: 1.35; }
     td.sl-list ul { margin: 0; padding: 0; }
-    td.sl-list li { list-style: none; padding: 1px 0; display: grid; grid-template-columns: 26px 44px 58px auto; align-items: center; column-gap: 4px; }
+    td.sl-list li { list-style: none; padding: 1px 0; display: grid; grid-template-columns: 26px 44px 58px 46px 150px; align-items: center; column-gap: 4px; }
+    td.sl-list .sl-fwd { color: #888; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     td.sl-list.eps li { grid-template-columns: 46px auto auto; }
     .sl-chip { display: inline-block; min-width: 22px; text-align: center; font-size: 10px; font-weight: 600; padding: 1px 4px;
                border-radius: 4px; background: var(--chip, rgba(128,128,128,.15)); color: var(--muted, #888); }
@@ -41,7 +42,7 @@
 <!-- ui-bootstrap-tpls.js -->
 <script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
 <!-- custom angular script -->
-<script type="text/javascript" src="../../static/custom/public/stocklist.js" th:src="@{/custom/public/stocklist.js(v=20261124)}"></script>
+<script type="text/javascript" src="../../static/custom/public/stocklist.js" th:src="@{/custom/public/stocklist.js(v=20261125)}"></script>
 <div class="container body">
     <div class="main_container">
         <!-- sidebar menu -->
@@ -190,7 +191,7 @@
                                     <th align='right' ng-click="sortData('cons.tpAvg')" ng-hide="flagConsensus">Target Low / Avg / High<i ng-class="getSortClass('cons.tpAvg')" /></th>
                                     <th align='right' ng-click="sortData('cons.upside')" ng-hide="flagConsensus">Upside<i ng-class="getSortClass('cons.upside')" /></th>
                                     <th align='right' ng-click="sortData('cons.tpRev4w')" ng-hide="flagConsensus" title="Change in the consensus target over four weeks">Target 4W<i ng-class="getSortClass('cons.tpRev4w')" /></th>
-                                    <th ng-hide="flagConsensus" style="cursor:default" title="Latest rating and target of up to four brokers (B1 to B4), with upside to the latest price">Broker Targets</th>
+                                    <th ng-hide="flagConsensus" style="cursor:default" title="Latest rating and target of up to four brokers (B1 to B4), with upside to the latest price and the valuation basis of the target (Fwd Multiple)">Broker Targets</th>
                                     <th ng-click="sortData('cons.eps1Rev4w')" ng-hide="flagConsensus" title="Consensus EPS Low / Avg / High for the next two fiscal years, with the 4-week change. Sorts by the 1-year forward change.">Fwd EPS Low / Avg / High (4W)<i ng-class="getSortClass('cons.eps1Rev4w')" /></th>
 
                                 </tr>
@@ -264,7 +265,7 @@
                                     <td align='right' ng-hide="flagConsensus" style="white-space:nowrap"><span ng-if="stock.cons.tpAvg">{{stock.cons.tpMin | number:0}} / <b>{{stock.cons.tpAvg | number:0}}</b> / {{stock.cons.tpMax | number:0}}</span></td>
                                     <td align='right' ng-hide="flagConsensus" ng-style="heat(stock.cons.upside * 100, 30)">{{pct(stock.cons.upside)}}</td>
                                     <td align='right' ng-hide="flagConsensus" ng-style="heat(stock.cons.tpRev4w * 100, 8)">{{pct(stock.cons.tpRev4w)}}</td>
-                                    <td ng-hide="flagConsensus" class="sl-list"><ul ng-if="stock.cons.brokerList.length"><li ng-repeat="b in stock.cons.brokerList" title="{{b.label}}: {{b.reco}}, target {{b.tp | number:0}}{{b.date ? ' (report ' + b.date + ')' : ''}}"><span class="sl-chip">B{{b.no}}</span><span class="sl-reco" ng-class="recoClass(b.reco)">{{b.reco || '–'}}</span><span class="sl-num">{{b.tp | number:0}}</span><span ng-if="b.upside != null" ng-class="b.upside >= 0 ? 'tw-pos' : 'tw-neg'">{{pct(b.upside)}}</span></li></ul></td>
+                                    <td ng-hide="flagConsensus" class="sl-list"><ul ng-if="stock.cons.brokerList.length"><li ng-repeat="b in stock.cons.brokerList" title="{{b.label}}: {{b.reco}}, target {{b.tp | number:0}}{{b.fwd ? ' at ' + b.fwd : ''}}{{b.date ? ' (report ' + b.date + ')' : ''}}"><span class="sl-chip">B{{b.no}}</span><span class="sl-reco" ng-class="recoClass(b.reco)">{{b.reco || '–'}}</span><span class="sl-num">{{b.tp | number:0}}</span><span ng-class="b.upside == null ? '' : (b.upside >= 0 ? 'tw-pos' : 'tw-neg')">{{b.upside != null ? pct(b.upside) : ''}}</span><span class="sl-fwd">{{b.fwd}}</span></li></ul></td>
                                     <td ng-hide="flagConsensus" class="sl-list eps"><ul ng-if="stock.cons.eps1Avg != null"><li title="{{stock.cons.fy1}} consensus EPS: low / average / high, and the 4-week change"><span class="sl-chip">1Y fwd</span><span>{{stock.cons.eps1Min | number:1}} / <b>{{stock.cons.eps1Avg | number:1}}</b> / {{stock.cons.eps1Max | number:1}}</span><span ng-if="stock.cons.eps1Rev4w != null" ng-class="stock.cons.eps1Rev4w >= 0 ? 'tw-pos' : 'tw-neg'">{{pct(stock.cons.eps1Rev4w)}}</span></li><li ng-if="stock.cons.eps2Avg != null" title="{{stock.cons.fy2}} consensus EPS: low / average / high, and the 4-week change"><span class="sl-chip">2Y fwd</span><span>{{stock.cons.eps2Min | number:1}} / <b>{{stock.cons.eps2Avg | number:1}}</b> / {{stock.cons.eps2Max | number:1}}</span><span ng-if="stock.cons.eps2Rev4w != null" ng-class="stock.cons.eps2Rev4w >= 0 ? 'tw-pos' : 'tw-neg'">{{pct(stock.cons.eps2Rev4w)}}</span></li></ul></td>
                                 </tr>
                                 </tbody>

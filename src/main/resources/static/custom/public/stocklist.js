@@ -76,7 +76,7 @@ module.controller('StockListController', function($scope, $http, $filter) {
             cons.brokerList = [];
             angular.forEach(['1', '2', '3', '4'], function (k) {
                 var b = c.brokers && c.brokers[k];
-                if (b) cons.brokerList.push({ no: k, label: 'Broker ' + k, reco: b.reco, tp: b.tp, date: b.date,
+                if (b) cons.brokerList.push({ no: k, label: 'Broker ' + k, reco: b.reco, tp: b.tp, date: b.date, fwd: b.fwd,
                                               upside: (b.tp && price > 0) ? b.tp / price - 1 : null });
             });
             if (c.asOf && c.asOf > latest) latest = c.asOf;
