@@ -1,5 +1,11 @@
 package com.timelineofwealth.service;
 
+import org.apache.poi.ss.formula.FormulaParser;
+import org.apache.poi.ss.formula.FormulaRenderer;
+import org.apache.poi.ss.formula.FormulaType;
+import org.apache.poi.ss.formula.ptg.AreaPtgBase;
+import org.apache.poi.ss.formula.ptg.Ptg;
+import org.apache.poi.ss.formula.ptg.RefPtgBase;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 
@@ -18,8 +24,11 @@ import java.util.regex.Pattern;
  *    information, bank data, model assumptions, forecasts) survive. For reported periods a template formula
  *    wins over a typed/pasted value (the history must follow the Data Sheet), except Share Price and Result
  *    Date rows.
- *  - Formula cells are copied as values only where the new cell is empty, which fills the history columns
- *    Screener no longer provides (the 11th/12th quarter or year). Formulas of the new workbook are kept.
+ *  - Typed values of Share Price, Market Cap, EPS (Diluted) and Result Date are kept for reported periods too.
+ *  - Where the new cell is empty, an old formula is copied as a formula, moved like an Excel copy (relative
+ *    references follow the shifted columns), e.g. the user's formulas on the Other Information pages. Formulas
+ *    that read the Data Sheet directly go in as values, which fills the history columns Screener no longer
+ *    provides (the 11th/12th quarter or year). Formulas of the new workbook are kept.
  *  - Formatting of empty cells is copied too, so custom pages keep their look.
  */
 public class ExcelCarryOver {
@@ -30,15 +39,17 @@ public class ExcelCarryOver {
     public static final Set<String> DROP_SHEETS = new HashSet<>(Collections.singletonList("Analysts&Consensus"));
 
     private static final Pattern PERIOD = Pattern.compile("^FY\\d{2}(Q[1-4])?$");
-    /** quarterly rows whose typed values (written at result time) beat the template formula */
-    private static final Set<String> KEEP_TYPED = new HashSet<>(Arrays.asList("Share Price", "Result Date"));
+    /** rows whose typed (non-formula) values beat the template formula, annual and quarterly */
+    private static final Set<String> KEEP_TYPED = new HashSet<>(Arrays.asList(
+            "Share Price", "Result Date", "EPS (Diluted)", "Market Cap"));
 
     private final XSSFWorkbook oldWb, newWb;
     private final FormulaEvaluator oldEv, newEv;
     private final Map<Short, XSSFCellStyle> styleCache = new HashMap<>();
     private final DataFormatter fmt = new DataFormatter();
 
-    public int values, carried, styles;
+    public int values, carried, formulas, styles;
+    private final Map<Cell, CellValue> moved = new LinkedHashMap<>();
 
     public ExcelCarryOver(XSSFWorkbook oldWb, XSSFWorkbook newWb) {
         this.oldWb = oldWb;
@@ -55,11 +66,13 @@ public class ExcelCarryOver {
             if (SKIP_SHEETS.contains(os.getSheetName())) continue;
             XSSFSheet ns = newWb.getSheet(os.getSheetName());
             if (ns == null) { log.append(os.getSheetName()).append(": not in the new workbook; "); continue; }
-            int v0 = values, c0 = carried;
+            int v0 = values, c0 = carried, f0 = formulas;
             carrySheet(os, ns);
             log.append(os.getSheetName()).append(": ").append(values - v0).append(" values, ")
-               .append(carried - c0).append(" carried; ");
+               .append(carried - c0).append(" carried, ").append(formulas - f0).append(" formulas; ");
         }
+        int fixed = fixErrors();
+        if (fixed > 0) log.append(fixed).append(" moved formulas gave errors, kept as values; ");
         for (String name : DROP_SHEETS) {
             int ix = newWb.getSheetIndex(name);
             if (ix >= 0) { newWb.removeSheetAt(ix); log.append("dropped ").append(name).append("; "); }
@@ -111,15 +124,27 @@ public class ExcelCarryOver {
         return l;
     }
 
+    /**
+     * Period label -> column of a header row, keyed "section:label": section 0 is the first run of period
+     * columns (history), 1 the run after the spacer columns (forecast). Matching on the key keeps history with
+     * history and forecast with forecast: last quarter's forecast column FY27Q2 must not land in this quarter's
+     * reported FY27Q2 column (its forecast formula would turn circular there).
+     */
     private Map<String, Integer> periodsOf(Row row, FormulaEvaluator ev) {
         Map<String, Integer> p = new LinkedHashMap<>();
         if (row == null) return p;
+        int section = 0, prev = -1;
         for (int c = 5; c < Math.min(row.getLastCellNum(), 60); c++) {
             String t = text(row, c, ev);
-            if (PERIOD.matcher(t).matches()) p.putIfAbsent(t, c);
+            if (!PERIOD.matcher(t).matches()) continue;
+            if (prev >= 0 && c > prev + 1) section++;
+            prev = c;
+            p.putIfAbsent(section + ":" + t, c);
         }
         return p;
     }
+
+    private static String label(String key) { return key.substring(key.indexOf(':') + 1); }
 
     /** old row -> new row: same block + label (n-th occurrence), else same position inside the same block */
     private Map<Integer, Integer> rowMap(Layout o, Layout n) {
@@ -190,11 +215,22 @@ public class ExcelCarryOver {
                 if (nc_ == null) nc_ = target.createCell(nc);
                 // reported periods: the template's formulas (Data Sheet links and calculations) win over values
                 // pasted in old workbooks; typed share prices / result dates are kept
-                boolean templateWins = period != null && isActual(period)
-                        && !(KEEP_TYPED.contains(lo.label.get(e.getKey())) && lo.block.get(e.getKey()).startsWith("Quarterly"));
+                boolean templateWins = period != null && isActual(label(period))
+                        && !(keepTyped(lo.label.get(e.getKey())) && !isZero(oc));
                 copy(oc, nc_, templateWins);
             }
         }
+    }
+
+    /** Share Price, Market Cap, EPS, Result Date and Total Volume (units, headcount...: the template's
+     *  formula there is only a placeholder = revenue) keep typed numbers */
+    private static boolean keepTyped(String label) {
+        return label != null && (KEEP_TYPED.contains(label) || label.startsWith("Total Volume"));
+    }
+
+    /** a typed 0 is a placeholder, not data: the template formula is kept */
+    private static boolean isZero(Cell c) {
+        return c.getCellType() == Cell.CELL_TYPE_NUMERIC && c.getNumericCellValue() == 0;
     }
 
     private static boolean isBetweenPeriods(Map<String, Integer> p, int c) {
@@ -240,6 +276,20 @@ public class ExcelCarryOver {
             values++;
             wrote = true;
         } else if (ot == Cell.CELL_TYPE_FORMULA && newEmpty && !newHasFormula) {
+            // the user's own formula (e.g. on the Other Information pages): copy it, moved like an Excel copy so
+            // relative references follow the shifted columns. Formulas reading the Data Sheet directly (and
+            // array formulas) are carried as values: the Data Sheet's columns move on their own each quarter.
+            String f = shiftedFormula(oc, nc.getRowIndex() - oc.getRowIndex(), nc.getColumnIndex() - oc.getColumnIndex());
+            if (f != null) {
+                try {
+                    nc.setCellFormula(f);
+                    formulas++;
+                    moved.put(nc, evaluate(oc));              // checked for errors once everything is copied
+                    nc.setCellStyle(style((XSSFCellStyle) oc.getCellStyle()));
+                    styles++;
+                    return;
+                } catch (Exception bad) { nc.setCellType(Cell.CELL_TYPE_BLANK); }
+            }
             CellValue v = evaluate(oc);
             if (v != null) {
                 if (v.getCellType() == Cell.CELL_TYPE_NUMERIC) { nc.setCellValue(v.getNumberValue()); carried++; wrote = true; }
@@ -250,6 +300,56 @@ public class ExcelCarryOver {
         if (wrote || (ot == Cell.CELL_TYPE_BLANK && oc.getCellStyle().getIndex() != 0 && !newHasFormula)) {
             nc.setCellStyle(style((XSSFCellStyle) oc.getCellStyle()));
             styles++;
+        }
+    }
+
+    /**
+     * A moved formula that now gives an error (#DIV/0!, #REF!..., e.g. a TTM ratio moved next to an empty
+     * column) is replaced by the old cell's value, or left empty. Unsupported functions count as fine.
+     */
+    private int fixErrors() {
+        newEv.clearAllCachedResultValues();
+        int n = 0;
+        for (Map.Entry<Cell, CellValue> e : moved.entrySet()) {
+            Cell c = e.getKey();
+            CellValue v;
+            try { v = newEv.evaluate(c); } catch (Exception ex) { continue; }
+            if (v == null || v.getCellType() != Cell.CELL_TYPE_ERROR) continue;
+            CellValue old = e.getValue();
+            c.setCellType(Cell.CELL_TYPE_BLANK);
+            if (old != null && old.getCellType() == Cell.CELL_TYPE_NUMERIC) c.setCellValue(old.getNumberValue());
+            formulas--;
+            n++;
+        }
+        return n;
+    }
+
+    /** the old cell's formula moved by (dRow, dCol) like an Excel copy/paste; null when it must go in as a value */
+    private String shiftedFormula(Cell oc, int dRow, int dCol) {
+        try {
+            if (oc.isPartOfArrayFormulaGroup()) return null;
+            String f = oc.getCellFormula();
+            if (f.contains("Data Sheet") || f.contains("Analysts&Consensus") || f.contains("[")) return null;
+            int sheetIx = oldWb.getSheetIndex(oc.getSheet());
+            Ptg[] ptgs = FormulaParser.parse(f, XSSFEvaluationWorkbook.create(oldWb), FormulaType.CELL, sheetIx);
+            for (Ptg p : ptgs) {
+                if (p instanceof RefPtgBase) {
+                    RefPtgBase r = (RefPtgBase) p;
+                    if (r.isRowRelative()) r.setRow(r.getRow() + dRow);
+                    if (r.isColRelative()) r.setColumn(r.getColumn() + dCol);
+                    if (r.getRow() < 0 || r.getColumn() < 0) return null;
+                } else if (p instanceof AreaPtgBase) {
+                    AreaPtgBase a = (AreaPtgBase) p;
+                    if (a.isFirstRowRelative()) a.setFirstRow(a.getFirstRow() + dRow);
+                    if (a.isLastRowRelative()) a.setLastRow(a.getLastRow() + dRow);
+                    if (a.isFirstColRelative()) a.setFirstColumn(a.getFirstColumn() + dCol);
+                    if (a.isLastColRelative()) a.setLastColumn(a.getLastColumn() + dCol);
+                    if (a.getFirstRow() < 0 || a.getFirstColumn() < 0) return null;
+                }
+            }
+            return FormulaRenderer.toFormulaString(XSSFEvaluationWorkbook.create(newWb), ptgs);
+        } catch (Exception e) {
+            return null;
         }
     }
 
