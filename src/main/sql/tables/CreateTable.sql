@@ -1291,3 +1291,74 @@ CREATE TABLE yahoo_consensus (
   PRIMARY KEY (ticker, date, fin_year),
   KEY index_yahoo_consensus_date (date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Weekly Yahoo Finance analyst consensus (loaded by YahooFinance/yahoo_consensus_download.py)';
+
+-- Weekly consensus analytics, computed and loaded by Admin > Stocks > Process Yahoo Consensus
+-- (YahooConsensusProcessService; same definitions as service/consensus/YcSchema.java).
+
+CREATE TABLE consensus_weekly_score (
+  week_date date NOT NULL COMMENT 'PK consensus week (Friday)',
+  ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK stock_universe ticker',
+  analyst_count int(5) DEFAULT NULL,
+  watchlist_group varchar(80) COLLATE utf8_unicode_ci NOT NULL COMMENT 'first 101+ section of watchlists.properties, else Other',
+  tp_rev_1w decimal(12,6) DEFAULT NULL COMMENT 'consensus TP change vs 1 week before (0.05 = +5%)',
+  tp_rev_4w decimal(12,6) DEFAULT NULL,
+  eps_fy1_rev_4w decimal(12,6) DEFAULT NULL COMMENT 'nearer fiscal year, same FY label on both dates',
+  eps_fy2_rev_4w decimal(12,6) DEFAULT NULL,
+  rev_fy1_rev_4w decimal(12,6) DEFAULT NULL COMMENT 'revenue estimate, nearer fiscal year',
+  persistence_13w int(4) DEFAULT NULL COMMENT 'weeks with EPS upgrade minus weeks with downgrade, last 13',
+  mom_4w decimal(12,6) DEFAULT NULL COMMENT 'price return over the 4 weeks to week_date',
+  mom_12_1 decimal(12,6) DEFAULT NULL COMMENT 'price return from 12 months to 1 month before week_date',
+  score decimal(12,6) DEFAULT NULL COMMENT 'composite score (mean rank z); NULL if not scored',
+  score_rank int(5) DEFAULT NULL COMMENT '1 = best among the week''s scored stocks',
+  is_long tinyint(1) NOT NULL DEFAULT 0,
+  is_short tinyint(1) NOT NULL DEFAULT 0,
+  is_divergence tinyint(1) NOT NULL DEFAULT 0,
+  is_emerging tinyint(1) NOT NULL DEFAULT 0,
+  price_at_score decimal(20,3) DEFAULT NULL COMMENT 'nse_price_history close on or before week_date',
+  eps_rev_4w decimal(12,6) DEFAULT NULL COMMENT 'EPS 4W revision, both FYs averaged (dashboard EPS 4W)',
+  eps_rev_13w decimal(12,6) DEFAULT NULL COMMENT 'EPS 13W revision, both FYs averaged',
+  score_pct decimal(8,4) DEFAULT NULL COMMENT 'score percentile, 100 = best',
+  z_eps decimal(10,6) DEFAULT NULL COMMENT 'score component: EPS revision rank z',
+  z_tp decimal(10,6) DEFAULT NULL COMMENT 'score component: TP revision rank z',
+  z_rev decimal(10,6) DEFAULT NULL COMMENT 'score component: minus 4W price rank z (reversal)',
+  z_mom12 decimal(10,6) DEFAULT NULL COMMENT 'score component: 12-1 momentum rank z',
+  count_chg_13w int(5) DEFAULT NULL COMMENT 'change in analyst count over 13 weeks',
+  consensus_age_weeks int(5) DEFAULT NULL COMMENT 'weeks since the Yahoo TP or EPS last changed',
+  PRIMARY KEY (week_date, ticker),
+  KEY index_consensus_weekly_score_ticker (ticker)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Weekly composite score per stock';
+
+CREATE TABLE consensus_weekly_group (
+  week_date date NOT NULL COMMENT 'PK',
+  watchlist_group varchar(80) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK',
+  stock_count int(5) NOT NULL COMMENT 'stocks with consensus that week',
+  avg_eps_rev_4w decimal(12,6) DEFAULT NULL,
+  up_count int(5) NOT NULL DEFAULT 0 COMMENT 'EPS 4W revision above +0.5%',
+  down_count int(5) NOT NULL DEFAULT 0 COMMENT 'EPS 4W revision below -0.5%',
+  avg_return_1m decimal(12,6) DEFAULT NULL COMMENT 'mean price return over the month to week_date',
+  rel_return_1m_vs_nifty decimal(12,6) DEFAULT NULL COMMENT 'avg_return_1m minus NIFTY over the same dates',
+  PRIMARY KEY (week_date, watchlist_group)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Weekly revisions by watchlist group';
+
+CREATE TABLE consensus_scoreboard (
+  week_date date NOT NULL COMMENT 'PK',
+  ic_spearman decimal(8,6) DEFAULT NULL COMMENT 'rank corr of score with next 4-week return; NULL until known',
+  long_fwd_ret decimal(12,6) DEFAULT NULL COMMENT 'long list next 4-week return minus the scored-stock average',
+  short_fwd_ret decimal(12,6) DEFAULT NULL COMMENT 'short list next 4-week return minus the scored-stock average',
+  spread_fwd_ret decimal(12,6) DEFAULT NULL COMMENT 'long_fwd_ret minus short_fwd_ret',
+  hit_rate decimal(8,6) DEFAULT NULL COMMENT 'share of long and short picks that beat / lagged the average',
+  breadth_up decimal(8,6) DEFAULT NULL COMMENT 'share of scored stocks with EPS 4W revision above +0.5%',
+  breadth_down decimal(8,6) DEFAULT NULL COMMENT 'share below -0.5%',
+  PRIMARY KEY (week_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Weekly score track record';
+
+CREATE TABLE consensus_broker_view (
+  ticker varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK stock_universe ticker',
+  broker varchar(10) COLLATE utf8_unicode_ci NOT NULL COMMENT 'PK MOSL / AMBIT / PL / AXIS',
+  reco varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  target decimal(20,3) DEFAULT NULL,
+  report_date date DEFAULT NULL,
+  quarter varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  fwd_multiple varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'valuation basis of the target (AnalystsReco Fwd Multiple)',
+  PRIMARY KEY (ticker, broker)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Latest verified AnalystsReco report per ticker and broker';
