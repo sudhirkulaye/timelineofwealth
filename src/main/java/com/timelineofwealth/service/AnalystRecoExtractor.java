@@ -232,7 +232,6 @@ public class AnalystRecoExtractor {
                     System.out.println("\n\n ********** New File ********* \n");
                     System.out.println("Begin Updating File No. " + currentFile + " --> " +quarter + "_" + ticker + "_" + brokerName);
                     ReportParameters reportParameters = extractor.getReportParameters(reportFilePath, reportDataExtractConfig, isFinancialReport);
-                    // Call saveReportParameters
                     // Define the content to append
                     String tickerValue = (ticker != null) ? ticker : "";
                     String quarterValue = (quarter != null) ? quarter : "";
@@ -291,7 +290,6 @@ public class AnalystRecoExtractor {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-//                    extractor.saveReportParameters(reportParameters, excelFilePath);
                 }
             }
         } catch (Exception e) {
@@ -362,170 +360,6 @@ public class AnalystRecoExtractor {
 
         reportParameters.setQuarter(QUARTER);
 
-    }
-
-    protected void saveReportParameters(ReportParameters reportParameters, String excelFileToBeUpdated) {
-        try {
-            FileInputStream file = new FileInputStream(new File(excelFileToBeUpdated));
-            XSSFWorkbook wb = new XSSFWorkbook(file);
-            XSSFSheet ws = wb.getSheet("AnalystReco");
-            FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
-
-            // Loop through each row in the workbook
-            for (int i = 1; i <= ws.getLastRowNum(); i++) {
-                XSSFRow row = ws.getRow(i);
-                XSSFCell firstColumnCell = row.getCell(0); // Quarter
-                XSSFCell sixthColumnCell = row.getCell(5); // Broker
-                if (firstColumnCell != null && sixthColumnCell != null) {
-                    CellValue firstColumnValue = evaluator.evaluate(firstColumnCell);
-                    CellValue sixthColumnValue = evaluator.evaluate(sixthColumnCell);
-                    // if Quarter & Broker matches then copy the result at that row
-                    if (firstColumnValue != null && sixthColumnValue != null &&
-                            firstColumnValue.getStringValue().equals(reportParameters.getQuarter()) &&
-                            sixthColumnValue.getStringValue().equals(reportParameters.getBroker()) ) {
-                        XSSFCell dateCell = row.getCell(1);
-                        dateCell.setCellValue(reportParameters.getReportDate());
-
-                        XSSFCell mcapCell = row.getCell(2);
-                        mcapCell.setCellValue(reportParameters.getMcap().doubleValue());
-
-                        XSSFCell priceCell = row.getCell(3);
-                        priceCell.setCellValue(reportParameters.getPrice().doubleValue());
-
-                        XSSFCell recoCell = row.getCell(6);
-                        recoCell.setCellValue(reportParameters.getRating());
-
-                        XSSFCell targetCell = row.getCell(7);
-                        targetCell.setCellValue(reportParameters.getTarget().doubleValue());
-
-                        XSSFCell y0RevCell = row.getCell(9);
-                        y0RevCell.setCellValue(reportParameters.getY0Revenue().doubleValue());
-
-                        XSSFCell y1RevCell = row.getCell(10);
-                        y1RevCell.setCellValue(reportParameters.getY1Revenue().doubleValue());
-
-                        XSSFCell y2RevCell = row.getCell(11);
-                        y2RevCell.setCellValue(reportParameters.getY2Revenue().doubleValue());
-
-                        XSSFCell y0EBITCell = row.getCell(13);
-                        y0EBITCell.setCellFormula(reportParameters.getY0EBIT());
-
-                        XSSFCell y1EBITCell = row.getCell(14);
-                        y1EBITCell.setCellFormula(reportParameters.getY1EBIT());
-
-                        XSSFCell y2EBITCell = row.getCell(15);
-                        y2EBITCell.setCellFormula(reportParameters.getY2EBIT());
-
-                        XSSFCell y0OPMCell = row.getCell(17);
-                        y0OPMCell.setCellValue(reportParameters.getY0OPM().doubleValue());
-
-                        XSSFCell y1OPMCell = row.getCell(18);
-                        y1OPMCell.setCellValue(reportParameters.getY1OPM().doubleValue());
-
-                        XSSFCell y2OPMCell = row.getCell(19);
-                        y2OPMCell.setCellValue(reportParameters.getY2OPM().doubleValue());
-
-                        XSSFCell y0ROCECell = row.getCell(20);
-                        y0ROCECell.setCellValue(reportParameters.getY0ROCE().doubleValue());
-
-                        XSSFCell y1ROCECell = row.getCell(21);
-                        y1ROCECell.setCellValue(reportParameters.getY1ROCE().doubleValue());
-
-                        XSSFCell y2ROCECell = row.getCell(22);
-                        y2ROCECell.setCellValue(reportParameters.getY2ROCE().doubleValue());
-
-                        XSSFCell y0EVBYEBITCell = row.getCell(23);
-                        y0EVBYEBITCell.setCellValue(reportParameters.getY0EVBYEBIT().doubleValue());
-
-                        XSSFCell y1EVBYEBITCell = row.getCell(24);
-                        y1EVBYEBITCell.setCellValue(reportParameters.getY1EVBYEBIT().doubleValue());
-
-                        XSSFCell y2EVBYEBITCell = row.getCell(25);
-                        y2EVBYEBITCell.setCellValue(reportParameters.getY2EVBYEBIT().doubleValue());
-
-                        if (reportParameters.getY0AUM() != null) {
-                            XSSFCell y0AUMCell = row.getCell(26);
-                            y0AUMCell.setCellValue(reportParameters.getY0AUM().doubleValue());
-                        }
-
-                        if (reportParameters.getY1AUM() != null) {
-                            XSSFCell y1AUMCell = row.getCell(27);
-                            y1AUMCell.setCellValue(reportParameters.getY1AUM().doubleValue());
-                        }
-
-                        if (reportParameters.getY2AUM() != null) {
-                            XSSFCell y2AUMCell = row.getCell(28);
-                            y2AUMCell.setCellValue(reportParameters.getY2AUM().doubleValue());
-                        }
-
-                        if(reportParameters.getY0CreditCost() != null) {
-                            XSSFCell y0CreditCostCell = row.getCell(30);
-                            y0CreditCostCell.setCellValue(reportParameters.getY0CreditCost().doubleValue());
-                        }
-
-                        if(reportParameters.getY1CreditCost() != null) {
-                            XSSFCell y1CreditCostCell = row.getCell(31);
-                            y1CreditCostCell.setCellValue(reportParameters.getY1CreditCost().doubleValue());
-                        }
-
-                        if(reportParameters.getY2CreditCost() != null) {
-                            XSSFCell y2CreditCostCell = row.getCell(32);
-                            y2CreditCostCell.setCellValue(reportParameters.getY2CreditCost().doubleValue());
-                        }
-
-                        if(reportParameters.getY0GNPA() != null) {
-                            XSSFCell y0GNPACell = row.getCell(33);
-                            y0GNPACell.setCellValue(reportParameters.getY0GNPA().doubleValue());
-                        }
-
-                        if(reportParameters.getY1GNPA() != null) {
-                            XSSFCell y1GNPACell = row.getCell(34);
-                            y1GNPACell.setCellValue(reportParameters.getY1GNPA().doubleValue());
-                        }
-
-                        if(reportParameters.getY2GNPA() != null) {
-                            XSSFCell y2GNPACell = row.getCell(35);
-                            y2GNPACell.setCellValue(reportParameters.getY2GNPA().doubleValue());
-                        }
-
-                        if(reportParameters.getY0NNPA() != null) {
-                            XSSFCell y0NNPACell = row.getCell(36);
-                            y0NNPACell.setCellValue(reportParameters.getY0NNPA().doubleValue());
-                        }
-
-                        if(reportParameters.getY1NNPA() != null) {
-                            XSSFCell y1NNPACell = row.getCell(37);
-                            y1NNPACell.setCellValue(reportParameters.getY1NNPA().doubleValue());
-                        }
-
-                        if(reportParameters.getY2NNPA() != null) {
-                            XSSFCell y2NNPACell = row.getCell(38);
-                            y2NNPACell.setCellValue(reportParameters.getY2NNPA().doubleValue());
-                        }
-
-                        XSSFCell analystNamesCell = row.getCell(39);
-                        if (analystNamesCell == null) {
-                            analystNamesCell = row.createCell(39);
-                        }
-                        analystNamesCell.setCellValue(reportParameters.getAnalystsNames());
-
-                        XSSFCell summaryCell = row.getCell(40);
-                        evaluator.evaluate(summaryCell);
-                    }
-
-                }
-            }
-            // Save the workbook
-            FileOutputStream fileOut = new FileOutputStream(new File(excelFileToBeUpdated));
-            wb.write(fileOut);
-            fileOut.close();
-            wb.close();
-            String fileName = new File(excelFileToBeUpdated).getAbsoluteFile().toString();
-            System.out.println("********** Copied AnalystReco Sheet for " + fileName.substring(fileName.lastIndexOf("\\")) + "*********\n\n");
-        } catch (Exception e) {
-            System.out.println("Exception in saveReportParameters " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     private void loadAnalystNames(String analystNamesFilePath){

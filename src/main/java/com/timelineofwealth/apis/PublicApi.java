@@ -100,12 +100,6 @@ public class PublicApi {
         return commonService.getStockValuationHistory(ticker);
     }
 
-    @RequestMapping(value = "/getrecentvaluations/{ticker}", method = RequestMethod.GET)
-    public List<RecentValuations> getRecentValuations(@PathVariable String ticker){
-        logger.debug((String.format("Call public/api/getrecentpe"+ticker)));
-        return commonService.getRecentValuations(ticker);
-    }
-
     @RequestMapping(value = "/getpricemovements/{ticker}", method = RequestMethod.GET)
     public List<StockPriceMovementHistory> getPriceMovements(@PathVariable String ticker){
         logger.debug((String.format("Call public/api/getpricemovements"+ticker)));

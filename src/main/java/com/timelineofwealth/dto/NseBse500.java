@@ -73,7 +73,6 @@ public class NseBse500 implements Serializable {
     private List<String> watchlistNames = new ArrayList<>();
     private String watchlistsDisplay;
     private List<CustomChartData> excelCharts;
-    private List<ReportNotes> reportNotes;
 
     public NseBse500(){}
     public NseBse500(StockUniverse stockUniverse){
@@ -533,12 +532,5 @@ public class NseBse500 implements Serializable {
     }
     public void setExcelCharts(List<CustomChartData> excelCharts) {
         this.excelCharts = excelCharts;
-    }
-
-    public List<ReportNotes> getReportNotes() {
-        return reportNotes;
-    }
-    public void setReportNotes(List<ReportNotes> reportNotes) {
-        this.reportNotes = reportNotes;
     }
 }

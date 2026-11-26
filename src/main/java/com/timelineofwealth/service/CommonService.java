@@ -639,7 +639,6 @@ public class CommonService {
 
         // === ADD THIS LINE ===
         dto.setExcelCharts(loadExcelChartsForTicker(ticker));
-        dto.setReportNotes(loadReportNotesForTicker(ticker));
         return dto;
     }
 
@@ -722,103 +721,6 @@ public class CommonService {
         return stockPriceMovementHistoryList;
     }
 
-    /**
-     *
-     * @param ticker
-     * @return
-     */
-    public List<RecentValuations> getRecentValuations(String ticker) {
-        List<RecentValuations> recentPES = new ArrayList<>();
-        LocalDate now = LocalDate.now();
-        LocalDate tenQuarterBefore = now.minusMonths(30);
-        NseBse500 stockDetails = getStockDetails(ticker);
-
-        List<java.sql.Date> resultDates = this.stockQuarterRepository.findDistinctResultDateForTicker(ticker, java.sql.Date.valueOf(tenQuarterBefore));
-        Set<java.sql.Date> resultDateSet = new HashSet<>(resultDates);
-        resultDateSet.addAll(getResultDatesFromExcel(ticker));
-
-        List<DailyDataS> dailyDataSList = this.dailyDataSRepository.findAllByKeyNameAndKeyDateGreaterThanOrderByKeyDateAsc(stockDetails.getTicker(),java.sql.Date.valueOf(tenQuarterBefore));
-        Set<java.sql.Date> markerDates = buildNearestMarketDatesForResults(resultDateSet, dailyDataSList);
-        for(DailyDataS dailyDataS: dailyDataSList){
-            RecentValuations recentPE = new RecentValuations();
-            recentPE.setTicker(ticker);
-            recentPE.setDate(dailyDataS.getKey().getDate());
-            recentPE.setPe(dailyDataS.getPeTtm().setScale(2, RoundingMode.HALF_UP));
-            recentPE.setPb(dailyDataS.getPbTtm().setScale(2, RoundingMode.HALF_UP));
-            recentPE.setEvToEbita(dailyDataS.getEvToEbit().setScale(2, RoundingMode.HALF_UP));
-            recentPE.setMarketCap(dailyDataS.getMarketCap().setScale(0, RoundingMode.HALF_UP));
-            recentPE.setMarketPrice(dailyDataS.getCmp().setScale(0, RoundingMode.HALF_UP));
-            if (markerDates.contains(dailyDataS.getKey().getDate())) {
-                recentPE.setResultDateMCap(dailyDataS.getMarketCap().setScale(0, RoundingMode.HALF_UP));
-            } else {
-                recentPE.setResultDateMCap(new BigDecimal(0));
-            }
-            recentPES.add(recentPE);
-        }
-        return recentPES;
-    }
-
-    private Set<java.sql.Date> buildNearestMarketDatesForResults(Set<java.sql.Date> resultDates, List<DailyDataS> dailyDataSList) {
-        Set<java.sql.Date> mappedDates = new HashSet<>();
-        if (resultDates == null || resultDates.isEmpty() || dailyDataSList == null || dailyDataSList.isEmpty()) {
-            return mappedDates;
-        }
-
-        List<java.sql.Date> tradingDates = dailyDataSList.stream()
-                .map(d -> d.getKey().getDate())
-                .sorted()
-                .collect(Collectors.toList());
-
-        for (java.sql.Date resultDate : resultDates) {
-            if (resultDate == null) {
-                continue;
-            }
-            java.sql.Date mapped = null;
-            for (java.sql.Date tradingDate : tradingDates) {
-                if (!tradingDate.before(resultDate)) {
-                    mapped = tradingDate;
-                    break;
-                }
-            }
-            if (mapped == null) {
-                mapped = tradingDates.get(tradingDates.size() - 1);
-            }
-            mappedDates.add(mapped);
-        }
-        return mappedDates;
-    }
-
-    private Set<java.sql.Date> getResultDatesFromExcel(String ticker) {
-        Set<java.sql.Date> excelResultDates = new HashSet<>();
-        File excelFile = getLatestExcelFileForTicker(ticker);
-        if (excelFile == null) {
-            return excelResultDates;
-        }
-
-        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(excelFile))) {
-            Sheet sheet = workbook.getSheet("QuarterP&L");
-            if (sheet == null) {
-                return excelResultDates;
-            }
-
-            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-            Row quarterDateRow = sheet.getRow(14); // Excel row 15
-            if (quarterDateRow == null) {
-                return excelResultDates;
-            }
-
-            for (int col = CellReference.convertColStringToIndex("B"); col <= CellReference.convertColStringToIndex("R"); col++) {
-                Cell cell = quarterDateRow.getCell(col);
-                java.sql.Date parsedDate = extractSqlDate(cell, evaluator);
-                if (parsedDate != null) {
-                    excelResultDates.add(parsedDate);
-                }
-            }
-        } catch (Exception ex) {
-            logger.error("Unable to read result dates from excel for ticker {}", ticker, ex);
-        }
-        return excelResultDates;
-    }
 
 
     /**
@@ -1210,6 +1112,7 @@ public class CommonService {
      *                                                    sub-header, up to the next column-C row (the subtotal
      *                                                    row repeating the header label and empty rows skipped)
      *   series_label  = optional legend name for a row_label series
+     *   transform     = optional ttm / ttm_growth / ttm_weighted / noplat / ttm_noplat (see transformed())
      * Columns are the block's period labels (FY26 / FY27Q2, header "FIN Years" / "Quarters" in column C) whose
      * period has ended; trailing periods with no value yet are dropped. Returns null when nothing is found.
      */
@@ -1284,13 +1187,16 @@ public class CommonService {
                 from = rowLabels.indexOf(p.get("row_under").trim());
                 if (from < 0) return null;
             }
-            int i = -1;
-            for (int j = from; j < rowLabels.size() && i < 0; j++) if (rowLabels.get(j).equals(label)) i = j;
-            if (i < 0) return null;
-            List<Double> v = valuesAt(sheet, rows.get(i), cols, ev);
-            if (v.stream().noneMatch(x -> x != null && x != 0)) return null;
+            final int start = from;
+            java.util.function.Function<String, List<Double>> row = l -> {
+                for (int j = start; j < rowLabels.size(); j++)
+                    if (rowLabels.get(j).equals(l.trim())) return valuesAt(sheet, rows.get(j), cols, ev);
+                return null;
+            };
+            List<Double> v = transformed(p.getOrDefault("transform", "").trim(), label, p, row);
+            if (v == null || v.stream().noneMatch(x -> x != null && x != 0)) return null;
             ChartSeriesData s = new ChartSeriesData();
-            s.setLabel(p.getOrDefault("series_label", label));
+            s.setLabel(p.getOrDefault("series_label", label.isEmpty() ? title : label));
             s.setValues(v);
             s.setChartType(chartType);
             series.add(s);
@@ -1316,6 +1222,77 @@ public class CommonService {
         chartData.setStacked(stacked);
         chartData.setShowLegend(showLegend);
         return chartData;
+    }
+
+    /**
+     * Optional "transform" of a row_label chart (quarterly blocks; quarters must be consecutive columns):
+     *   ttm          sum of the last 4 quarters of row_label
+     *   ttm_growth   ttm vs ttm 4 quarters earlier (fraction)
+     *   ttm_weighted margin over the last 4 quarters: sum(row_label x weight_label) / sum(weight_label)
+     *                (weight_label defaults to Revenue), e.g. TTM OPM from the quarterly margin row
+     *   noplat       Revenue x (Ex-Other Inc.) EBIT Margin% x (1 - Tax Rate%)   (row_label not used)
+     *   ttm_noplat   ttm of noplat
+     * A quarter whose own value is missing or 0 (not reported yet) gets no TTM value.
+     */
+    private static List<Double> transformed(String t, String label, Map<String, String> p,
+                                            java.util.function.Function<String, List<Double>> row) {
+        if (t.isEmpty()) return row.apply(label);
+        List<Double> base;
+        if (t.endsWith("noplat")) {
+            List<Double> rev = row.apply("Revenue"), m = row.apply("(Ex-Other Inc.) EBIT Margin%"), tax = row.apply("Tax Rate%");
+            if (rev == null || m == null || tax == null) return null;
+            base = new ArrayList<>();
+            for (int k = 0; k < rev.size(); k++) {
+                Double r = rev.get(k), mm = m.get(k), tx = tax.get(k);
+                base.add(r == null || r == 0 || mm == null ? null : r * mm * (1 - (tx == null ? 0 : tx)));
+            }
+            if (t.equals("noplat")) return base;
+            return ttm(base);
+        }
+        base = row.apply(label);
+        if (base == null) return null;
+        switch (t) {
+            case "ttm":
+                return ttm(base);
+            case "ttm_growth": {
+                List<Double> s = ttm(base), out = new ArrayList<>();
+                for (int k = 0; k < s.size(); k++) {
+                    Double a = s.get(k), b = k >= 4 ? s.get(k - 4) : null;
+                    out.add(a == null || b == null || b <= 0 ? null : a / b - 1);
+                }
+                return out;
+            }
+            case "ttm_weighted": {
+                List<Double> w = row.apply(p.getOrDefault("weight_label", "Revenue"));
+                if (w == null) return null;
+                List<Double> prod = new ArrayList<>();
+                for (int k = 0; k < base.size(); k++) {
+                    Double a = base.get(k), b = w.get(k);
+                    prod.add(a == null || b == null || b == 0 ? null : a * b);
+                }
+                List<Double> num = ttm(prod), den = ttm(w), out = new ArrayList<>();
+                for (int k = 0; k < num.size(); k++) {
+                    Double a = num.get(k), b = den.get(k);
+                    out.add(a == null || b == null || b == 0 ? null : a / b);
+                }
+                return out;
+            }
+            default:
+                return base;
+        }
+    }
+
+    private static List<Double> ttm(List<Double> v) {
+        List<Double> out = new ArrayList<>();
+        for (int k = 0; k < v.size(); k++) {
+            Double sum = null;
+            if (k >= 3 && v.get(k) != null && v.get(k) != 0) {
+                sum = 0.0;
+                for (int j = k - 3; j <= k && sum != null; j++) sum = v.get(j) == null ? null : sum + v.get(j);
+            }
+            out.add(sum);
+        }
+        return out;
     }
 
     private String safeText(Cell cell, FormulaEvaluator ev) {
@@ -1490,39 +1467,6 @@ public class CommonService {
             e.printStackTrace();
         }
         return sectionedProps;
-    }
-
-    public List<ReportNotes> loadReportNotesForTicker(String ticker) {
-        List<ReportNotes> notesList = new ArrayList<>();
-        try {
-            File excelFile = getLatestExcelFileForTicker(ticker);
-            if (excelFile == null) return notesList;
-
-            Workbook workbook = new XSSFWorkbook(new FileInputStream(excelFile));
-            Sheet sheet = workbook.getSheet("Reports");
-            if (sheet == null) return notesList;
-
-            DataFormatter formatter = new DataFormatter();
-            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                Row row = sheet.getRow(i);
-                if (row == null) continue;
-
-                ReportNotes note = new ReportNotes();
-                note.setTicker(formatter.formatCellValue(row.getCell(0)));
-                note.setDate(formatter.formatCellValue(row.getCell(1)));
-                note.setDocumentSource(formatter.formatCellValue(row.getCell(2)));
-                note.setDocumentSection(formatter.formatCellValue(row.getCell(3)));
-                note.setInfoCategory(formatter.formatCellValue(row.getCell(4)));
-                note.setInfoSubCategory(formatter.formatCellValue(row.getCell(5)));
-                note.setInformation(formatter.formatCellValue(row.getCell(6)));
-
-                notesList.add(note);
-            }
-            workbook.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return notesList;
     }
 
     private final String getCellString(Cell cell) {
@@ -1789,30 +1733,8 @@ public class CommonService {
 
             try (FileInputStream fis = new FileInputStream(excelFile)) {
                 Workbook workbook = WorkbookFactory.create(fis);
-                Map<java.sql.Date, Double> sharesByDate = extractSharesFromAnnualSheet(workbook);
                 List<ResultRow> quarterlyResults = extractQuarterlyResults(workbook);
-
                 quarterlyResults.sort(Comparator.comparing(ResultRow::getResultEndDate));
-                for (ResultRow row : quarterlyResults) {
-                    java.sql.Date resultDate = row.getResultEndDate();
-                    java.sql.Date latest = null;
-                    for (java.sql.Date d : sharesByDate.keySet()) {
-                        if (!d.after(resultDate)) {
-                            if (latest == null || d.after(latest)) {
-                                latest = d;
-                            }
-                        }
-                    }
-                    if (latest != null) {
-                        row.setShares(sharesByDate.get(latest));
-                    }
-                }
-
-                for (ResultRow row : quarterlyResults) {
-                    if (row.getTtmEps() == null && row.getTtmPat() != null && row.getShares() != null && row.getShares() > 0) {
-                        row.setTtmEps(row.getTtmPat() / row.getShares());
-                    }
-                }
 
                 List<ResultRow> finalRows = quarterlyResults.stream()
                         .filter(r -> r.getTtmEps() != null && r.getTtmEps() > 0 && r.getAnnouncementDate() != null)
@@ -1884,108 +1806,84 @@ public class CommonService {
         return output;
     }
 
-    private final Map<java.sql.Date, Double> extractSharesFromAnnualSheet(Workbook workbook) {
-        Map<java.sql.Date, Double> sharesByDate = new TreeMap<>();
-        Sheet sheet = workbook.getSheet("AnnualResults");
-
-        if (sheet == null) return sharesByDate;
-
-        Row dateRow = sheet.getRow(2);     // index 2 = 3rd row
-        Row epsRow = sheet.getRow(12);     // EPS
-        Row patRow = sheet.getRow(42);     // PAT
-
-        if (dateRow == null || epsRow == null || patRow == null) return sharesByDate;
-
-        for (int col = 1; col <= 14; col++) {
-            Cell dateCell = dateRow.getCell(col);
-            Cell epsCell = epsRow.getCell(col);
-            Cell patCell = patRow.getCell(col);
-
-            java.sql.Date date = getSqlDateFromCell(dateCell);
-            Double eps = getNumericFromCell(epsCell);
-            Double pat = getNumericFromCell(patCell);
-
-            if (date != null && eps != null && eps != 0 && pat != null) {
-                sharesByDate.put(date, pat / eps);
-            }
-        }
-
-        return sharesByDate;
-    }
-
-    private final java.sql.Date getSqlDateFromCell(Cell cell) {
-        if (cell == null) return null;
-        try {
-            int type = (cell.getCellType() == Cell.CELL_TYPE_FORMULA)
-                    ? cell.getCachedFormulaResultType()
-                    : cell.getCellType();
-
-            if (type == Cell.CELL_TYPE_NUMERIC && DateUtil.isCellDateFormatted(cell)) {
-                return new java.sql.Date(cell.getDateCellValue().getTime());
-            } else if (type == Cell.CELL_TYPE_STRING) {
-                return java.sql.Date.valueOf(cell.getStringCellValue().trim()); // expects yyyy-MM-dd
-            }
-        } catch (Exception e) {
-            // Optional: log error
-        }
-        return null;
-    }
-
-    private final Double getNumericFromCell(Cell cell) {
-        if (cell == null) return null;
-        try {
-            int type = (cell.getCellType() == Cell.CELL_TYPE_FORMULA)
-                    ? cell.getCachedFormulaResultType()
-                    : cell.getCellType();
-
-            switch (type) {
-                case Cell.CELL_TYPE_NUMERIC:
-                    return cell.getNumericCellValue();
-                case Cell.CELL_TYPE_STRING:
-                    String text = cell.getStringCellValue().trim();
-                    return text.isEmpty() ? null : Double.parseDouble(text);
-                default:
-                    return null;
-            }
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private final List<ResultRow> extractQuarterlyResults(Workbook workbook) {
+    /**
+     * One row per reported quarter from the HistoricalData "Quarterly Income Statement" block (rows found by
+     * label): quarter end from the period label (FY27Q2), announcement = "Result Date" (quarter end when blank),
+     * TTM EPS = the sheet's "TTM EPS" row, else sum of the last 4 quarters' "Net Income" / "Wt. Avg. Shares".
+     * Quarters not reported yet (period not ended, Revenue 0, or Result Date in the future) are skipped.
+     */
+    private List<ResultRow> extractQuarterlyResults(Workbook workbook) {
         List<ResultRow> results = new ArrayList<>();
-        Sheet sheet = workbook.getSheet("QuarterP&L");
-
+        Sheet sheet = workbook.getSheet("HistoricalData");
         if (sheet == null) return results;
+        FormulaEvaluator ev = workbook.getCreationHelper().createFormulaEvaluator();
 
-        Row quarterEndRow = sheet.getRow(2);
-        Row announcementRow = sheet.getRow(14);
-        Row ttmPatRow = sheet.getRow(34);
+        int last = sheet.getLastRowNum(), r0 = -1, hdr = -1, end = last + 1;
+        for (int r = 0; r <= last && r0 < 0; r++)
+            if (safeText(cellAt(sheet, r, 1), ev).trim().startsWith("Quarterly Income Statement")) r0 = r;
+        if (r0 < 0) return results;
+        for (int r = r0; r <= Math.min(last, r0 + 6) && hdr < 0; r++)
+            if (safeText(cellAt(sheet, r, 2), ev).trim().startsWith("Quarter")) hdr = r;
+        if (hdr < 0) return results;
+        for (int r = hdr + 1; r <= last; r++)
+            if (!safeText(cellAt(sheet, r, 1), ev).trim().isEmpty()) { end = r; break; }
 
-        if (quarterEndRow == null || announcementRow == null || ttmPatRow == null) return results;
+        Map<String, Integer> rowOf = new HashMap<>();
+        for (int r = hdr + 1; r < end; r++) {
+            String c = safeText(cellAt(sheet, r, 2), ev).trim();
+            String d = safeText(cellAt(sheet, r, 3), ev).trim();
+            String l = c.isEmpty() ? d : c;
+            if (!l.isEmpty()) rowOf.putIfAbsent(l, r);
+        }
+        Integer revRow = rowOf.get("Revenue"), npRow = rowOf.get("Net Income"), shRow = rowOf.get("Wt. Avg. Shares"),
+                ttmEpsRow = rowOf.get("TTM EPS"), dateRow = rowOf.get("Result Date");
+        if (revRow == null) return results;
 
-        for (int col = 1; col < 25; col++) {
-            Cell resultEndCell = quarterEndRow.getCell(col);
-            Cell announceCell = announcementRow.getCell(col);
-            Cell patCell = ttmPatRow.getCell(col);
+        Date today = new Date();
+        List<Integer> cols = new ArrayList<>();
+        List<Date> ends = new ArrayList<>();
+        Row hr = sheet.getRow(hdr);
+        for (int c = 3; hr != null && c < hr.getLastCellNum(); c++) {
+            Date pe = StockFinancialsService.periodEnd(safeText(hr.getCell(c), ev).trim());
+            if (pe == null || pe.after(today)) continue;
+            cols.add(c);
+            ends.add(pe);
+        }
+        List<Double> rev = valuesAt(sheet, revRow, cols, ev);
+        List<Double> np = npRow == null ? null : valuesAt(sheet, npRow, cols, ev);
+        List<Double> sh = shRow == null ? null : valuesAt(sheet, shRow, cols, ev);
+        List<Double> ttmEps = ttmEpsRow == null ? null : valuesAt(sheet, ttmEpsRow, cols, ev);
+        List<Double> ttmNp = np == null ? null : ttm(np);
 
-            java.sql.Date resultEnd = getSqlDateFromCell(resultEndCell);
-            java.sql.Date announce = getSqlDateFromCell(announceCell);
-            Double ttmPat = getNumericFromCell(patCell);
+        for (int k = 0; k < cols.size(); k++) {
+            if (rev.get(k) == null || rev.get(k) == 0) continue;
+            java.sql.Date quarterEnd = new java.sql.Date(ends.get(k).getTime());
+            java.sql.Date announce = null;
+            if (dateRow != null) {
+                try {
+                    Cell dc = cellAt(sheet, dateRow, cols.get(k));
+                    if (dc != null) {
+                        CellValue cv = ev.evaluate(dc);
+                        if (cv != null && cv.getCellType() == Cell.CELL_TYPE_NUMERIC && cv.getNumberValue() > 0)
+                            announce = new java.sql.Date(DateUtil.getJavaDate(cv.getNumberValue()).getTime());
+                    }
+                } catch (Exception ignored) { }
+            }
+            if (announce != null && announce.after(today)) continue;
+            if (announce == null) announce = quarterEnd;
 
-            if (resultEnd == null) continue;
-
-            // fallback: if announce date not available, use result end date
-            if (announce == null) announce = resultEnd;
+            Double eps = ttmEps == null ? null : ttmEps.get(k);
+            if ((eps == null || eps <= 0) && ttmNp != null && sh != null && ttmNp.get(k) != null
+                    && sh.get(k) != null && sh.get(k) > 0) eps = ttmNp.get(k) / sh.get(k);
 
             ResultRow row = new ResultRow();
-            row.setResultEndDate(resultEnd);
+            row.setResultEndDate(quarterEnd);
             row.setAnnouncementDate(announce);
-            row.setTtmPat(ttmPat);
-            // shares & ttm_eps to be filled later
+            row.setTtmPat(ttmNp == null ? null : ttmNp.get(k));
+            row.setShares(sh == null ? null : sh.get(k));
+            row.setTtmEps(eps);
             results.add(row);
         }
-
         return results;
     }
 

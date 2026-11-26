@@ -138,7 +138,6 @@ module.controller('StockCompareController', function($scope, $http, $filter, $wi
         $scope.selectedCombinations = orderedByFirstStock;
 
         renderComparisonCharts();
-//        renderComparisonNotes();
     }
 
     // === Render All Comparison Charts (themed ECharts via /custom/twcharts.js) ===
@@ -243,66 +242,6 @@ module.controller('StockCompareController', function($scope, $http, $filter, $wi
             } else {
                 return +val.toFixed(1);
             }
-        });
-    }
-
-    function renderComparisonNotes() {
-        let container = document.getElementById("reportNotesContainer");
-        container.innerHTML = "";
-
-        if (!$scope.comparisonData || $scope.comparisonData.length === 0) {
-            container.innerHTML = "<p>No notes available.</p>";
-            return;
-        }
-
-        $scope.comparisonData.forEach(stock => {
-            let notes = stock.reportNotes;
-            if (!notes || notes.length === 0) return;
-
-            // === Group notes by "ticker|date|documentSource"
-            let grouped = {};
-            notes.forEach(note => {
-                let mainKey = `${note.ticker}|${note.date}|${note.documentSource}`;
-                let subKey = `${note.documentSection}|${note.infoCategory}`;
-                if (!grouped[mainKey]) grouped[mainKey] = {};
-                if (!grouped[mainKey][subKey]) grouped[mainKey][subKey] = [];
-                grouped[mainKey][subKey].push(note);
-            });
-
-            Object.keys(grouped).forEach(mainKey => {
-                let [ticker, rawDate, documentSource] = mainKey.split("|");
-                let formattedDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : rawDate;
-
-                // === Big Bold Header ===
-                let h2 = document.createElement("h2");
-                h2.innerText = `${ticker} - ${formattedDate} - ${documentSource}`;
-                h2.style.fontWeight = "bold";
-                h2.style.marginTop = "30px";
-                container.appendChild(h2);
-
-                let subGroup = grouped[mainKey];
-                Object.keys(subGroup).forEach(subKey => {
-                    let [docSection, infoCategory] = subKey.split("|");
-
-                    // === Sub Header (smaller bold) ===
-                    let h4 = document.createElement("h4");
-                    h4.innerText = `${docSection} - ${infoCategory}`;
-                    h4.style.fontWeight = "bold";
-                    h4.style.marginTop = "15px";
-                    h4.style.fontSize = "16px";
-                    container.appendChild(h4);
-
-                    // === Bullet List ===
-                    subGroup[subKey].forEach(note => {
-                        let bullet = document.createElement("div");
-                        bullet.innerText = `${note.infoSubCategory}: ${note.information}`;
-                        bullet.style.marginLeft = "20px";
-                        bullet.style.fontSize = "14px";
-                        bullet.style.marginBottom = "4px";
-                        container.appendChild(bullet);
-                    });
-                });
-            });
         });
     }
 

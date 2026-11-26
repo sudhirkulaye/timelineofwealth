@@ -233,7 +233,6 @@ public class CreateFolderStructureForIndustry {
             System.out.println(" 5. Update ResultTracker.xlsx");
             System.out.println(" 6. Create Auto Sales Table");
             System.out.println(" 7. Update MCap and Price Data");
-            System.out.println(" 8. Consolidate Quarter Data");
             System.out.println(" 9. Update Valuation Sheet of ResultTracker");
             System.out.println("10. Upsert affected daily_data_s dates (cmp=0) from ScreenerDaily CSV");
             System.out.println("11. Exit");
@@ -268,10 +267,6 @@ public class CreateFolderStructureForIndustry {
 
                 case "7":
                     updateMCapAndPrice(new UpdateQuarterlyExcels().getLatestQuarterFolder());
-                    break;
-
-                case "8":
-                    ConsolidateQuarterData.main(argv);
                     break;
 
                 case "9":
