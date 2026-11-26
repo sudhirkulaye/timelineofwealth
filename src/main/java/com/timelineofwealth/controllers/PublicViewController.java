@@ -47,8 +47,8 @@ public class PublicViewController {
         logger.debug(String.format("Visited Homepage: IP -  - " + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Sudhir Kulaye");
-        return "public/indexreturnstats";
+        model.addAttribute("title", "Markets today");
+        return "public/home";
     }
 
     @RequestMapping(value = "/userlogin", method = RequestMethod.GET)
