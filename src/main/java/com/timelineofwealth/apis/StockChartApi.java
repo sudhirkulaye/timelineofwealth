@@ -4,6 +4,7 @@ import com.timelineofwealth.entities.YahooConsensus;
 import com.timelineofwealth.repositories.StockUniverseRepository;
 import com.timelineofwealth.repositories.YahooConsensusRepository;
 import com.timelineofwealth.service.AnalystViewService;
+import com.timelineofwealth.service.LiveQuoteService;
 import com.timelineofwealth.service.StockFinancialsService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,10 +25,13 @@ public class StockChartApi {
     private final JdbcTemplate jdbcTemplate;
     private final StockFinancialsService stockFinancialsService;
     private final AnalystViewService analystViewService;
+    private final LiveQuoteService liveQuoteService;
 
     public StockChartApi(StockUniverseRepository stockUniverseRepository,
                          YahooConsensusRepository yahooConsensusRepository, JdbcTemplate jdbcTemplate,
-                         StockFinancialsService stockFinancialsService, AnalystViewService analystViewService) {
+                         StockFinancialsService stockFinancialsService, AnalystViewService analystViewService,
+                         LiveQuoteService liveQuoteService) {
+        this.liveQuoteService = liveQuoteService;
         this.analystViewService = analystViewService;
         this.stockUniverseRepository = stockUniverseRepository;
         this.yahooConsensusRepository = yahooConsensusRepository;
@@ -39,6 +43,15 @@ public class StockChartApi {
     @RequestMapping(value = "/getanalystviews/{ticker}", method = RequestMethod.GET)
     public Map<String, Object> getAnalystViews(@PathVariable String ticker) {
         return analystViewService.getViews(ticker);
+    }
+
+    /**
+     * Delayed current price and today's change for display (Yahoo Finance, cached a couple of minutes):
+     * ?t=TCS,INFY -> {TCS: {p, pc, ch, r, t}, ...}. Stocks without a quote are left out.
+     */
+    @RequestMapping(value = "/getlivequotes", method = RequestMethod.GET)
+    public Map<String, Object> getLiveQuotes(@RequestParam("t") String tickers) {
+        return liveQuoteService.getQuotes(Arrays.asList(tickers.split(",")));
     }
 
     /** Macro summary (Economy sheet of the research workbook; broker names anonymised). */

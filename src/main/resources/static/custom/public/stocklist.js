@@ -1,6 +1,6 @@
 var module = angular.module('StockListManagement', []);
 
-module.controller('StockListController', function($scope, $http, $filter) {
+module.controller('StockListController', function($scope, $http, $filter, $timeout, $interval) {
     $scope.assetClasses = [];
     $scope.industries = [];
     $scope.stocks = [];
@@ -84,6 +84,37 @@ module.controller('StockListController', function($scope, $http, $filter) {
         });
         if (latest) $scope.consensusAsOf = latest;
     }
+
+    // CMP (delayed, display only) for the rows on screen: /public/api/getlivequotes, 100 tickers per call.
+    // Loaded after the table, so a slow quote source never holds the page up; refreshed every 2 minutes.
+    var LIVE_TTL = 120000, liveTimer = null, liveBusy = false;
+    function loadLive(force) {
+        if (liveBusy || document.hidden || !$scope.shownStocks || !$scope.shownStocks.length) return;
+        var now = Date.now(), need = [], byTicker = {};
+        angular.forEach($scope.shownStocks, function (stock) {
+            if (!stock.ticker || byTicker[stock.ticker]) return;
+            if (force || !stock.liveAt || now - stock.liveAt > LIVE_TTL) { need.push(stock.ticker); byTicker[stock.ticker] = stock; }
+        });
+        if (!need.length) return;
+        liveBusy = true;
+        angular.forEach(need, function (t) { byTicker[t].liveAt = now; });
+        // one batch at a time, so a long list never floods the server (or Yahoo) with parallel calls
+        (function next(i) {
+            if (i >= need.length) { liveBusy = false; return; }
+            $http.get("/public/api/getlivequotes", { params: { t: need.slice(i, i + 100).join(",") } })
+                .then(function (response) {
+                    angular.forEach(response.data || {}, function (q, ticker) {
+                        if (byTicker[ticker] && q && q.p > 0) byTicker[ticker].live = q;
+                    });
+                }, function () {})
+                .then(function () { next(i + 100); });
+        })(0);
+    }
+    $scope.$watchCollection('shownStocks', function () {
+        if (liveTimer) $timeout.cancel(liveTimer);
+        liveTimer = $timeout(function () { loadLive(false); }, 400, false);
+    });
+    $interval(function () { loadLive(false); }, LIVE_TTL, 0, false);
 
     // soft green / red cell background; value and cap in the same unit (percent), cap = value for the darkest shade
     $scope.heat = function (value, cap) {

@@ -344,7 +344,8 @@
             if (idx) { $('sa-index').hidden = false; $('sa-index').textContent = idx; }
             document.title = (D.shortName || D.name || TICKER) + ' · Stock analysis';
         }
-        if (O && O.d.length) {
+        if (S.live) renderLive();
+        else if (O && O.d.length) {
             var n = O.d.length, last = O.c[n - 1], prev = n > 1 ? O.c[n - 2] : null;
             $('sa-price').textContent = px(last);
             if (prev) {
@@ -355,6 +356,29 @@
             $('sa-asof').textContent = 'NSE close · ' + fmtD(O.d[n - 1]);
         }
         renderTiles();
+    }
+
+    // ---------- current market price (delayed, display only): /public/api/getlivequotes ----------
+    function renderLive() {
+        var q = S.live, up = q.ch > 0, down = q.ch < 0;
+        $('sa-price').textContent = px(q.p);
+        $('sa-chg').className = 'sa-chg sa-chg-live ' + (up ? 'up' : (down ? 'down' : ''));
+        $('sa-chg').textContent = (up ? '▲ +' : (down ? '▼ −' : '')) + px(Math.abs(q.ch)) + '  (' + pct(q.r, 2) + ')';
+        var t = q.t ? new Date(q.t * 1000) : null, when = '';
+        if (t) {
+            try {
+                when = t.toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
+            } catch (e) { when = t.getDate() + ' ' + MON[t.getMonth()]; }
+        }
+        $('sa-asof').innerHTML = '<span class="sa-live-dot"></span>CMP (delayed)' + (when ? ' · ' + esc(when) : '') +
+            ' · prev close ' + esc(px(q.pc));
+    }
+    function loadLive() {
+        if (document.hidden) return;
+        getJSON('/public/api/getlivequotes?t=' + encodeURIComponent(TICKER)).then(function (r) {
+            var q = r && r[TICKER];
+            if (q && q.p > 0) { S.live = q; renderLive(); }
+        }).catch(function () {});
     }
 
     function renderTiles() {
@@ -900,6 +924,8 @@
     var pDet = getJSON('/public/api/getstockdetails/' + t).then(function (r) { S.details = r; renderHeader(); }).catch(function () {});
     var pCons = getJSON('/public/api/getconsensus/' + t).then(function (r) { S.cons = r; }).catch(function () { S.cons = null; });
     var pFin = getJSON('/public/api/getstockfinancials/' + t).then(function (r) { S.fin = r; }).catch(function () { S.fin = null; });
+    loadLive();
+    setInterval(loadLive, 120000);   // the server caches quotes for 2 minutes
     getJSON('/public/api/getanalystviews/' + t).then(function (r) { S.views = r; renderViews(); }).catch(function () {});
     Promise.all([pDet, pCons, pFin, pOhlc]).then(function () { renderTiles(); renderFundamentals(); renderWorkbook(); renderConsensus(); });
 })();

@@ -2,7 +2,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: common-header" />
 <body class="nav-md">
-<link href="../../static/custom/public/stockanalysis.css" th:href="@{/custom/public/stockanalysis.css(v=20261124)}" rel="stylesheet" />
+<link href="../../static/custom/public/stockanalysis.css" th:href="@{/custom/public/stockanalysis.css(v=20261126)}" rel="stylesheet" />
 <div class="container body">
     <div class="main_container">
         <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
@@ -126,7 +126,7 @@
                     <div class="sa-wb-grid" id="sa-wb-grid"></div>
                 </section>
 
-                <p class="tw-muted tw-small">Values in &#8377; crore unless stated. Consolidated figures preferred. Prices: NSE. Consensus: Yahoo Finance.
+                <p class="tw-muted tw-small">Values in &#8377; crore unless stated. Consolidated figures preferred. Prices: NSE; current price (CMP) from Yahoo Finance, delayed. Consensus: Yahoo Finance.
                     Sources also include BSE India, Screener.in and broker research. For information only; not investment advice.</p>
             </div>
         </div>
@@ -138,6 +138,6 @@
 <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
 <script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-<script src="../../static/custom/public/stockanalysis.js" th:src="@{/custom/public/stockanalysis.js(v=20261124)}"></script>
+<script src="../../static/custom/public/stockanalysis.js" th:src="@{/custom/public/stockanalysis.js(v=20261126)}"></script>
 </body>
 </html>

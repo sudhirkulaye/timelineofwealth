@@ -16,6 +16,10 @@
     .sl-sell { color: var(--neg, #d03b3b); }
     .sl-hold { color: var(--muted, #888); }
     .sl-num { text-align: right; }
+    td.sl-cmp { white-space: nowrap; font-weight: 600; font-variant-numeric: tabular-nums; }
+    td.sl-cmp small { font-size: 11px; font-weight: 600; }
+    td.sl-up { color: var(--pos, #0a7d33); background: rgba(27,175,122,.08); }
+    td.sl-down { color: var(--neg, #d03b3b); background: rgba(208,59,59,.08); }
 </style>
 <!-- iCheck -->
 <link href="../../static/vendors/iCheck/skins/flat/green.css" th:href="@{/vendors/iCheck/skins/flat/green.css}"  rel="stylesheet" />
@@ -42,7 +46,7 @@
 <!-- ui-bootstrap-tpls.js -->
 <script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
 <!-- custom angular script -->
-<script type="text/javascript" src="../../static/custom/public/stocklist.js" th:src="@{/custom/public/stocklist.js(v=20261125)}"></script>
+<script type="text/javascript" src="../../static/custom/public/stocklist.js" th:src="@{/custom/public/stocklist.js(v=20261126)}"></script>
 <div class="container body">
     <div class="main_container">
         <!-- sidebar menu -->
@@ -133,7 +137,8 @@
                                     <th ng-click="sortData('industryNameDisplay')" ng-hide="flagBasicInfo">Industry<i ng-class="getSortClass('industryNameDisplay')" /></th>
                                     <th ng-click="sortData('subIndustryNameDisplay')" ng-hide="flagBasicInfo">Sub-Industry<i ng-class="getSortClass('subIndustryNameDisplay')" /></th>
                                     <th align='right' ng-click="sortData('dailyDataS.marketCap')" >MCap<i ng-class="getSortClass('dailyDataS.marketCap')" /></th>
-                                    <th align='right'>Price</th>
+                                    <th align='right' title="Previous trading day's close">Yesterday's Close</th>
+                                    <th align='right' ng-click="sortData('live.r')" title="Current market price (Yahoo Finance, delayed) and change from yesterday's close">CMP (%)<i ng-class="getSortClass('live.r')" /></th>
                                     <th align='right' ng-click="sortData('dailyDataS.rank')" ng-hide="flagBasicInfo">MCap Rank<i ng-class="getSortClass('dailyDataS.rank')" /></th>
                                     <th ng-click="sortData('dailyDataS.lastResultDate')" ng-hide="flagFundamentalInfo">Last Result<i ng-class="getSortClass('dailyDataS.lastResultDate')" /></th>
                                     <th ng-click="sortData('dailyDataS.sales')" ng-hide="flagFundamentalInfo">TTM Sales<i ng-class="getSortClass('dailyDataS.sales')" /></th>
@@ -196,7 +201,7 @@
 
                                 </tr>
                                 <tbody>
-                            <tr ng-repeat="stock in stocks  | filter:filterByIndex | filter:filterByFno | filter:filterBySector | filter:filterByIndustry | filter:filterByWatchlist | filter:searchStock | orderBy:sortColumn:reverseSort">
+                            <tr ng-repeat="stock in stocks  | filter:filterByIndex | filter:filterByFno | filter:filterBySector | filter:filterByIndustry | filter:filterByWatchlist | filter:searchStock | orderBy:sortColumn:reverseSort as shownStocks">
                                     <!--<td>{{ (assetClasses | filter : { 'classid' : stock.assetClassid})[0].subclassName }}</td>-->
                                     <!--<td>{{stock.ticker}}</td>-->
                                     <td ng-hide="flagBasicInfo">{{stock.includedIndexName}}</td>
@@ -207,7 +212,8 @@
                                     <td ng-hide="flagBasicInfo">{{stock.subIndustryNameDisplay}}</td>
                                     <!--<td >{{(stock.dailyDataS.marketCap/1000) | currency:"&#8377;":0}}</td>-->
                                     <td align='right'>{{(stock.dailyDataS.marketCap) | currency:"&#8377;":0}}</td>
-                                    <td align='right'>{{stock.latestPrice | currency:"&#8377;":0}}</td>
+                                    <td align='right'>{{(stock.live ? stock.live.pc : stock.latestPrice) | currency:"&#8377;":0}}</td>
+                                    <td align='right' class="sl-cmp" ng-class="{'sl-up': stock.live.ch > 0, 'sl-down': stock.live.ch < 0}"><span ng-if="stock.live">{{stock.live.p | currency:"&#8377;":(stock.live.p < 100 ? 2 : 0)}} <small>({{pct(stock.live.r, 2)}})</small></span><span ng-if="!stock.live" class="sl-hold">&#8211;</span></td>
                                     <td align='right' ng-hide="flagBasicInfo">{{stock.dailyDataS.rank}}</td>
                                     <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.lastResultDate}}</td>
                                     <td align='right' ng-hide="flagFundamentalInfo">{{stock.dailyDataS.sales | currency:"&#8377;":0}}</td>

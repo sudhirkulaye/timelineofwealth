@@ -6,6 +6,11 @@
 .sa-quote { text-align: right; }
 .sa-price { font-size: 32px; font-weight: 650; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--ink); line-height: 1.1; }
 .sa-chg { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sa-chg-live { display: inline-block; margin: 4px 0 2px; padding: 3px 10px; border-radius: 999px; font-size: 15px; font-weight: 700; color: var(--ink2); background: rgba(128,128,128,.14); }
+.sa-chg-live.up { color: var(--pos); background: rgba(27,175,122,.14); }
+.sa-chg-live.down { color: var(--neg); background: rgba(208,59,59,.13); }
+.sa-live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--pos); margin-right: 5px; vertical-align: 1px; animation: sa-pulse 2s ease-in-out infinite; }
+@keyframes sa-pulse { 50% { opacity: .35; } }
 .sa-tiles { margin-bottom: 18px; grid-template-columns: repeat(auto-fit, minmax(138px, 1fr)); }
 #sa-tiles .tv, #sa-cons-tiles .tv { font-size: 18px; white-space: nowrap; }
 #sa-cons-tiles { grid-template-columns: repeat(auto-fit, minmax(138px, 1fr)); }
