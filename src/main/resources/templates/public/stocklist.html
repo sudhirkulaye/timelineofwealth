@@ -45,6 +45,9 @@
 <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
 <!-- ui-bootstrap-tpls.js -->
 <script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
+<!-- wide-table scrolling -->
+<link href="../../static/custom/public/tablescroll.css" th:href="@{/custom/public/tablescroll.css(v=20261126)}" rel="stylesheet" />
+<script type="text/javascript" src="../../static/custom/public/tablescroll.js" th:src="@{/custom/public/tablescroll.js(v=20261126)}"></script>
 <!-- custom angular script -->
 <script type="text/javascript" src="../../static/custom/public/stocklist.js" th:src="@{/custom/public/stocklist.js(v=20261126)}"></script>
 <div class="container body">
@@ -66,7 +69,7 @@
                             <font color="green"><strong><h1>Stocks Statistics.. [Wait for few seconds to load all data]</h1></strong></font>
                             <div class="clearfix"></div>
                         </div>
-                        <div class="x_content">
+                        <div class="x_content ts-filters">
                             <!--<font color="red"> <strong>Note: </strong> Keep watching this page which is going to evolve. We will make sure investors will get bigger picture while investing in individual security. Also, pPlease update us if you find any discrepancy to sudhir.kulaye@gmail.com. <p />We believe, Investing in individual security requires understanding company's core business and having unique insight where consensus might be wrong. <p /> Especially in three areas: better ability to forecast financial results, better ability to predict valuation levels and  better ability of judging sentiments.     </font> <p />-->
                             <div class="clearfix"></div>
                             <label class="pull-left" >Included in Index : &nbsp;&nbsp;&nbsp;</label>
@@ -127,15 +130,18 @@
                                 <lable style="float: right;">Last updated : </lable>
                                 <lable style="float: left;">Returns for more than one year are annualized. Stocks ended with <i class="fa fa-star"></i> are available for FnO trading on NSE</lable>
                             </p>
+                            <div class="clearfix"></div>
+                            <div class="ts-host">
+                            <div class="ts-scroll">
                             <table class="table table-hover">
                                 <thead>
                                 <tr>
                                     <!--<th>Asset Class</th>-->
-                                    <th ng-hide="flagBasicInfo">Included Index</th>
-                                    <th>Name</th>
-                                    <th ng-click="sortData('sectorNameDisplay')" ng-hide="flagBasicInfo">Sector<i ng-class="getSortClass('sectorNameDisplay')" /></th>
-                                    <th ng-click="sortData('industryNameDisplay')" ng-hide="flagBasicInfo">Industry<i ng-class="getSortClass('industryNameDisplay')" /></th>
-                                    <th ng-click="sortData('subIndustryNameDisplay')" ng-hide="flagBasicInfo">Sub-Industry<i ng-class="getSortClass('subIndustryNameDisplay')" /></th>
+                                    <th class="ts-wrap" ng-hide="flagBasicInfo">Included Index</th>
+                                    <th class="ts-pin">Name</th>
+                                    <th class="ts-wrap" ng-click="sortData('sectorNameDisplay')" ng-hide="flagBasicInfo">Sector<i ng-class="getSortClass('sectorNameDisplay')" /></th>
+                                    <th class="ts-wrap" ng-click="sortData('industryNameDisplay')" ng-hide="flagBasicInfo">Industry<i ng-class="getSortClass('industryNameDisplay')" /></th>
+                                    <th class="ts-wrap" ng-click="sortData('subIndustryNameDisplay')" ng-hide="flagBasicInfo">Sub-Industry<i ng-class="getSortClass('subIndustryNameDisplay')" /></th>
                                     <th align='right' ng-click="sortData('dailyDataS.marketCap')" >MCap<i ng-class="getSortClass('dailyDataS.marketCap')" /></th>
                                     <th align='right' title="Previous trading day's close">Yesterday's Close</th>
                                     <th align='right' ng-click="sortData('live.r')" title="Current market price (Yahoo Finance, delayed) and change from yesterday's close">CMP (%)<i ng-class="getSortClass('live.r')" /></th>
@@ -204,12 +210,12 @@
                             <tr ng-repeat="stock in stocks  | filter:filterByIndex | filter:filterByFno | filter:filterBySector | filter:filterByIndustry | filter:filterByWatchlist | filter:searchStock | orderBy:sortColumn:reverseSort as shownStocks">
                                     <!--<td>{{ (assetClasses | filter : { 'classid' : stock.assetClassid})[0].subclassName }}</td>-->
                                     <!--<td>{{stock.ticker}}</td>-->
-                                    <td ng-hide="flagBasicInfo">{{stock.includedIndexName}}</td>
-                                    <td><a href="/public/stockanalysis/{{stock.ticker}}" target="_blank">{{stock.shortName}} <i class="fa fa-star" ng-if="stock.isFno == '1'"></i></a></td>
+                                    <td class="ts-wrap" ng-hide="flagBasicInfo">{{stock.includedIndexName}}</td>
+                                    <td class="ts-pin"><a href="/public/stockanalysis/{{stock.ticker}}" target="_blank">{{stock.shortName}} <i class="fa fa-star" ng-if="stock.isFno == '1'"></i></a></td>
                                     <!--<td>{{(industries | filter : { 'subindustryid' : stock.subindustryid})[0].sectorNameDisplay}}-{{(industries | filter : { 'subindustryid' : stock.subindustryid})[0].industryNameDisplay}}</td>-->
-                                    <td ng-hide="flagBasicInfo">{{stock.sectorNameDisplay}}</td>
-                                    <td ng-hide="flagBasicInfo">{{stock.industryNameDisplay}}</td>
-                                    <td ng-hide="flagBasicInfo">{{stock.subIndustryNameDisplay}}</td>
+                                    <td class="ts-wrap" ng-hide="flagBasicInfo">{{stock.sectorNameDisplay}}</td>
+                                    <td class="ts-wrap" ng-hide="flagBasicInfo">{{stock.industryNameDisplay}}</td>
+                                    <td class="ts-wrap" ng-hide="flagBasicInfo">{{stock.subIndustryNameDisplay}}</td>
                                     <!--<td >{{(stock.dailyDataS.marketCap/1000) | currency:"&#8377;":0}}</td>-->
                                     <td align='right'>{{(stock.dailyDataS.marketCap) | currency:"&#8377;":0}}</td>
                                     <td align='right'>{{(stock.live ? stock.live.pc : stock.latestPrice) | currency:"&#8377;":0}}</td>
@@ -277,6 +283,9 @@
                                 </tbody>
                                 </thead>
                             </table>
+                            </div>
+                            <div class="ts-fbar ts-off" aria-hidden="true"><div></div></div>
+                            </div>
                             <br />
                             <strong>Note: </strong> Values are in Cr. INR. First preference is given to consolidated data and ratios. Consensus Targets: Yahoo Finance analyst consensus (updated weekly, as of {{consensusAsOf}}) against the latest price; 4W is the change in the consensus over four weeks; 1Y fwd and 2Y fwd are the next two fiscal years with a consensus EPS estimate (hover for the year); B1 to B4 are the latest ratings and targets of four individual brokers (the same broker always has the same number), with upside to the latest price. Data sources: publicly available information on NSE India, BSE India, Screener.in, Yahoo Finance, broker research and internal data processing. For information only; not investment advice.
                         </div>

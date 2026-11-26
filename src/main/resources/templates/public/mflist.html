@@ -26,6 +26,9 @@
 <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
 <!-- ui-bootstrap-tpls.js -->
 <script type="text/javascript" src="../../static/custom/ui-bootstrap-tpls.min.js" th:src="@{/custom/ui-bootstrap-tpls.min.js}"></script>
+<!-- wide-table scrolling -->
+<link href="../../static/custom/public/tablescroll.css" th:href="@{/custom/public/tablescroll.css(v=20261126)}" rel="stylesheet" />
+<script type="text/javascript" src="../../static/custom/public/tablescroll.js" th:src="@{/custom/public/tablescroll.js(v=20261126)}"></script>
 <!-- custom angular script -->
 <script type="text/javascript" src="../../static/custom/public/mflist.js" th:src="@{/custom/public/mflist.js}"></script>
 <div class="container body">
@@ -47,7 +50,7 @@
                             <font color="green"><strong><h1>List of Selected Mutual Funds (Growth Option)</h1></strong></font>
                             <div class="clearfix"></div>
                         </div>
-                        <div class="x_content">
+                        <div class="x_content ts-filters">
                             <!--<label class="pull-left" >Fund House : &nbsp;&nbsp;&nbsp;</label>-->
                             <!--<select class="pull-left" ng-change="getSchemeDetails()" ng-model="fundHouse" >-->
                                 <!--<option ng-repeat="fundHouse in fundHouses" value="{{fundHouse}}">{{fundHouse}}</option>-->
@@ -76,10 +79,13 @@
                                 <lable style="float: right;">* Returns 1-Jan-2019 till Date  </lable>
                                 <label style="float: left;"><font color="red"> Return columns are sortable. Click on header to sort.</font></label>
                             </p>
+                            <div class="clearfix"></div>
+                            <div class="ts-host">
+                            <div class="ts-scroll">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th colspan="2"></th>
+                                        <th></th><th class="ts-pin"></th>
                                         <th colspan="10" ng-hide="flagYearlyReurns">Year wise Returns</th>
                                         <th colspan="4" ng-hide="flagTrailingReturns">Trailing Absolute Returns</th>
                                         <th colspan="7" ng-hide="flagSectorAllocation">Sector Allocation</th>
@@ -87,7 +93,7 @@
                                     </tr>
                                     <tr>
                                         <th ng-click="sortData('schemeType')" >Category<i ng-class="getSortClass('schemeType')" /></th>
-                                        <th ng-click="sortData('schemeNamePart')" >Name<i ng-class="getSortClass('schemeNamePart')" /></th>
+                                        <th class="ts-pin" ng-click="sortData('schemeNamePart')" >Name<i ng-class="getSortClass('schemeNamePart')" /></th>
                                         <th ng-click="sortData('totalReturnsY0')" ng-hide="flagYearlyReurns">{{extractYear()}}*<i ng-class="getSortClass('totalReturnsY0')" /></th>
                                         <th ng-click="sortData('totalReturnsY1')" ng-hide="flagYearlyReurns">{{extractYear()-1}}<i ng-class="getSortClass('totalReturnsY1')" /></th>
                                         <th ng-click="sortData('totalReturnsY2')" ng-hide="flagYearlyReurns">{{extractYear()-2}}<i ng-class="getSortClass('totalReturnsY2')" /></th>
@@ -118,7 +124,7 @@
                                     <tbody>
                                         <tr ng-repeat="fund in fundsDTO | filter:searchFund | filter:filterByCategory | orderBy:sortColumn:reverseSort">
                                             <td>{{fund.schemeType}}</td>
-                                            <td>{{fund.schemeNamePart}}</td>
+                                            <td class="ts-pin">{{fund.schemeNamePart}}</td>
                                             <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY0}}%</td>
                                             <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY1}}%</td>
                                             <td ng-hide="flagYearlyReurns">{{fund.totalReturnsY2}}%</td>
@@ -149,6 +155,9 @@
                                     </tbody>
                                 </thead>
                             </table>
+                            </div>
+                            <div class="ts-fbar ts-off" aria-hidden="true"><div></div></div>
+                            </div>
                         </div>
                     </div>
                 </div>

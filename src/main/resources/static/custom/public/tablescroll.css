@@ -1,0 +1,28 @@
+/* Wide tables: keep them inside the panel on phones and narrow screens.
+   Markup:  <div class="ts-host"><div class="ts-scroll"><table>...</table></div><div class="ts-fbar ts-off"><div></div></div></div>
+   - .ts-scroll scrolls sideways in its own box
+   - .ts-pin on a th/td (or .ts-pin-first on .ts-scroll for the first column) keeps that column on screen
+   - .ts-wrap lets a text column wrap instead of stretching the table
+   - .ts-fbar is a copy of the horizontal scrollbar that sticks to the bottom of the screen (tablescroll.js) */
+.ts-host { position: relative; }
+.ts-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.ts-scroll > table { margin-bottom: 0; }
+.ts-scroll th, .ts-scroll td { white-space: nowrap; }
+.ts-scroll th.ts-wrap, .ts-scroll td.ts-wrap { white-space: normal; min-width: 110px; max-width: 170px; }
+.ts-scroll .ts-pin, .ts-scroll.ts-pin-first tr > :first-child {
+    position: sticky; left: 0; z-index: 1; background: #fff; box-shadow: 1px 0 0 #e5e5e5; }
+.ts-scroll tr:hover .ts-pin { background: #f5f5f5; }
+.ts-fbar { position: sticky; bottom: 0; z-index: 3; overflow-x: auto; overflow-y: hidden; height: 17px;
+           background: rgba(255,255,255,.92); border-top: 1px solid #e5e5e5; scrollbar-color: #b5b5b5 transparent; }
+.ts-fbar > div { height: 1px; }
+.ts-fbar.ts-off { display: none; }
+/* phones hide scrollbars until you swipe; give the floating one a visible thumb */
+.ts-fbar::-webkit-scrollbar { height: 12px; -webkit-appearance: none; }
+.ts-fbar::-webkit-scrollbar-thumb { background: #b5b5b5; border-radius: 6px; border: 2px solid transparent; background-clip: padding-box; }
+.ts-fbar::-webkit-scrollbar-track { background: #f0f0f0; }
+.ts-filters select, .ts-filters input[type=text] { max-width: 100%; margin-bottom: 4px; }
+@media (max-width: 767px) {
+    .ts-scroll th, .ts-scroll td { padding: 6px 5px; font-size: 12px; }
+    .ts-scroll th.ts-wrap, .ts-scroll td.ts-wrap { min-width: 90px; max-width: 130px; }
+    .ts-scroll .ts-pin, .ts-scroll.ts-pin-first tr > :first-child { min-width: 80px; max-width: 120px; white-space: normal; }
+}
