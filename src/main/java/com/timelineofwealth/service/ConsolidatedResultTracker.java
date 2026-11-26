@@ -24,7 +24,7 @@ import java.util.*;
  *                                                 subsidiary rows, Consolidated Profit (financials)
  *   ModelBFSI > Quarterly Banking History         Loans / AUM, Loan/AUM Growth, GNPA, NNPA, GNPA%, NNPA%, Slippages
  *   Data Sheet                                    Current Price (result price while Share Price is still a formula)
- *   Analysts&Consensus > Analysts Expectations    reco + target per broker (Firm) for the last four quarters
+ *   DBInsert\AnalystViewTracker.xlsx > AnalystsRecoNew   reco + target per broker (Firm) for the last four quarters
  * Derived: NOPLAT = Revenue x (Ex-Other Inc.) EBIT Margin x (1 - Tax Rate); after-tax other income = Other Income x
  * (1 - Tax Rate); subsidiaries = consolidated - standalone profit; TTM = sum of four quarters; growth = YoY.
  * MinPrice / MaxPrice are not filled (no valuation range in the new sheets yet).
@@ -66,7 +66,7 @@ public class ConsolidatedResultTracker {
     static Integer NNPA_RATIO_TREND_LOCATION = 56;
     static Integer SLIPPAGES_TREND_LOCATION = 57;
 
-    /** broker report-status column, reco column and the Firm code(s) in Analysts&Consensus */
+    /** broker report-status column, reco column and the Firm code(s) in AnalystViewTracker */
     private static final Object[][] BROKERS = {
             {MOSL_REPORT_STATUS_LOCATION, MOSL_RECO_LOCATION, new String[]{"MOSL"}},
             {AMBIT_REPORT_STATUS_LOCATION, AMBIT_RECO_LOCATION, new String[]{"AMBIT"}},
@@ -113,6 +113,7 @@ public class ConsolidatedResultTracker {
             }
             FormulaEvaluator trackerFileEvaluator = trackerWorkbook.getCreationHelper().createFormulaEvaluator();
             List<String> lastFour = Arrays.asList(fyQuarter, previousQuarter(fyQuarter, 1), previousQuarter(fyQuarter, 2), previousQuarter(fyQuarter, 3));
+            Map<String, Map<String, Map<String, String[]>>> allRecos = readAnalystViewTracker(ConfigFiles.analystViewTracker());
 
             int done = 0;
             for (int rowIndex = 2; rowIndex < fySheet.getLastRowNum() + 1; rowIndex++) {
@@ -154,7 +155,7 @@ public class ConsolidatedResultTracker {
                     // no valuation range yet (Model's intrinsic / relative target price equal the price until modelled)
 
                     // broker recos (last four quarters, latest first)
-                    Map<String, Map<String, String[]>> recos = readRecos(tickerWorkbook.getSheet("Analysts&Consensus"), ev);
+                    Map<String, Map<String, String[]>> recos = allRecos.getOrDefault(ticker.toUpperCase(), Collections.emptyMap());
                     for (Object[] b : BROKERS) {
                         Cell status = row.getCell((Integer) b[0]);
                         if (status == null || status.getCellTypeEnum() != CellType.STRING || status.getStringCellValue().isEmpty()) continue;
@@ -323,39 +324,54 @@ public class ConsolidatedResultTracker {
         }
     }
 
-    /** latest reco + target per Firm and quarter from Analysts&Consensus > "Analysts Expectations" */
-    static Map<String, Map<String, String[]>> readRecos(Sheet sheet, FormulaEvaluator ev) {
-        Map<String, Map<String, String[]>> out = new HashMap<>();
+    /** ticker -> Firm -> quarter -> {reco, target} from AnalystViewTracker.xlsx (sheet AnalystsRecoNew) */
+    static Map<String, Map<String, Map<String, String[]>>> readAnalystViewTracker(String path) {
+        try (FileInputStream in = new FileInputStream(path); Workbook wb = new XSSFWorkbook(in)) {
+            Sheet sheet = wb.getSheet("AnalystsRecoNew");
+            if (sheet == null) { System.out.println(path + ": sheet AnalystsRecoNew not found, no broker recos"); return new HashMap<>(); }
+            return readRecos(sheet, wb.getCreationHelper().createFormulaEvaluator());
+        } catch (Exception e) {
+            System.out.println("Could not read broker recos from " + path + ": " + e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
+    /** latest reco + target per Ticker, Firm and quarter; header row with Ticker / Quarter / Date / Firm / Reco / TP */
+    static Map<String, Map<String, Map<String, String[]>>> readRecos(Sheet sheet, FormulaEvaluator ev) {
+        Map<String, Map<String, Map<String, String[]>>> out = new HashMap<>();
         if (sheet == null) return out;
         int last = sheet.getLastRowNum(), hdr = -1;
-        int cQuarter = -1, cDate = -1, cFirm = -1, cReco = -1, cTp = -1;
+        int cTicker = -1, cQuarter = -1, cDate = -1, cFirm = -1, cReco = -1, cTp = -1;
         for (int r = 0; r <= last && hdr < 0; r++) {
             Row row = sheet.getRow(r);
             if (row == null) continue;
             for (int c = 0; c < Math.min(row.getLastCellNum(), 40); c++) {
                 String t = text(row.getCell(c), ev);
-                if (t.equals("Firm")) cFirm = c;
+                if (t.equals("Ticker")) cTicker = c;
+                else if (t.equals("Firm")) cFirm = c;
                 else if (t.equals("Quarter")) cQuarter = c;
                 else if (t.equals("Date")) cDate = c;
                 else if (t.equals("Reco")) cReco = c;
                 else if (t.equals("TP")) cTp = c;
             }
-            if (cFirm >= 0 && cQuarter >= 0 && cReco >= 0) hdr = r;
-            else { cQuarter = cDate = cFirm = cReco = cTp = -1; }
+            if (cTicker >= 0 && cFirm >= 0 && cQuarter >= 0 && cReco >= 0) hdr = r;
+            else { cTicker = cQuarter = cDate = cFirm = cReco = cTp = -1; }
         }
         if (hdr < 0) return out;
         Map<String, Double> latest = new HashMap<>();
         for (int r = hdr + 1; r <= last; r++) {
+            String tk = text(cellAt(sheet, r, cTicker), ev).toUpperCase();
             String firm = text(cellAt(sheet, r, cFirm), ev).toUpperCase(), q = text(cellAt(sheet, r, cQuarter), ev);
             String reco = text(cellAt(sheet, r, cReco), ev);
-            if (firm.isEmpty() || q.isEmpty() || reco.isEmpty()) continue;
+            if (tk.isEmpty() || firm.isEmpty() || q.isEmpty() || reco.isEmpty()) continue;
             Double tp = cTp < 0 ? null : number(cellAt(sheet, r, cTp), ev);
             Double date = cDate < 0 ? null : number(cellAt(sheet, r, cDate), ev);
-            String key = firm + "|" + q;
+            String key = tk + "|" + firm + "|" + q;
             double d = date == null ? 0 : date;
             if (latest.containsKey(key) && latest.get(key) > d) continue;      // keep the latest report of the quarter
             latest.put(key, d);
-            out.computeIfAbsent(firm, f -> new HashMap<>()).put(q, new String[]{reco, tp == null ? "" : String.valueOf(Math.round(tp))});
+            out.computeIfAbsent(tk, t -> new HashMap<>()).computeIfAbsent(firm, f -> new HashMap<>())
+               .put(q, new String[]{reco, tp == null ? "" : String.valueOf(Math.round(tp))});
         }
         return out;
     }
