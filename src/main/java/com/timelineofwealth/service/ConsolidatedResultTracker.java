@@ -2,24 +2,38 @@ package com.timelineofwealth.service;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.Year;
-import java.util.Arrays;
+import java.util.*;
 
+/**
+ * Fills QuarterResultsScreenerExcels\DBInsert\ResultTracker.xlsx, sheet FY{yy}Q{n}: one row per ticker with the
+ * result-day price, valuation range, broker recos and the last five quarters' trends, to see how the quarter's results
+ * trend and how the price moves after the result.
+ *
+ * Every value comes from the NEW sheets of the ticker's result workbook ({TICKER}_FY{yy}Q{n}.xlsx), found by label:
+ *   HistoricalData > Quarterly Income Statement   Share Price (result-day price, frozen by updateMCapAndPrice),
+ *                                                 Revenue, Other Income, (Ex-Other Inc.) Op. Profit Margin%,
+ *                                                 (Ex-Other Inc.) EBIT Margin%, Tax Rate%
+ *   ModelBFSI > Quarterly Income Expense History  Net Interest Income, Net Interest Margin, Standalone Profit,
+ *                                                 subsidiary rows, Consolidated Profit (financials)
+ *   ModelBFSI > Quarterly Banking History         Loans / AUM, Loan/AUM Growth, GNPA, NNPA, GNPA%, NNPA%, Slippages
+ *   Data Sheet                                    Current Price (result price while Share Price is still a formula)
+ *   Analysts&Consensus > Analysts Expectations    reco + target per broker (Firm) for the last four quarters
+ * Derived: NOPLAT = Revenue x (Ex-Other Inc.) EBIT Margin x (1 - Tax Rate); after-tax other income = Other Income x
+ * (1 - Tax Rate); subsidiaries = consolidated - standalone profit; TTM = sum of four quarters; growth = YoY.
+ * MinPrice / MaxPrice are not filled (no valuation range in the new sheets yet).
+ * The old sheets (QuarterP&L, AnalystReco, ValuationHistory) are no longer read.
+ */
 public class ConsolidatedResultTracker {
-
-    static String QUARTER = "Q3"; // Update this for each new quarter
-    static String YEAR = "26"; // Update this for each new year
-
     static Boolean IS_OVERRIDE_PRICE_DATA = true;
     static Boolean IS_OVERRIDE_RECO_DATA = true;
     static Boolean IS_OVERRIDE_OTHER_DATA = true;
-
     // Tracker workbook cell locations
     static Integer TICKER_LOCATION = 1;
     static Integer FOLDER_LOCATION = 2;
@@ -29,30 +43,15 @@ public class ConsolidatedResultTracker {
     static Integer ICICIDIRECT_REPORT_STATUS_LOCATION = 10;
     static Integer PL_REPORT_STATUS_LOCATION = 11;
     static Integer KOTAK_REPORT_STATUS_LOCATION = 12;
-
     static Integer RESULT_PRICE_LOCATION = 15;
-
     static Integer MIN_VAKYATUIB_PRICE_LOCATION = 19;
     static Integer MAX_VAKYATUIB_PRICE_LOCATION = 21;
-
     static Integer TTM_REV_TREND_LOCATION = 23;
     static Integer TTM_NOPLAT_TREND_LOCATION = 24;
     static Integer TTM_SUBSIDIARY_TREND_LOCATION = 25;
     static Integer REV_G_Q0_RATIO_LOCATION = 26;
-    static Integer REV_G_Q1_RATIO_LOCATION = 27;
-    static Integer REV_G_Q2_RATIO_LOCATION = 28;
-    static Integer REV_G_Q3_RATIO_LOCATION = 29;
-    static Integer REV_G_Q4_RATIO_LOCATION = 30;
     static Integer NOPLAT_G_Q0_RATIO_LOCATION = 31;
-    static Integer NOPLAT_G_Q1_RATIO_LOCATION = 32;
-    static Integer NOPLAT_G_Q2_RATIO_LOCATION = 33;
-    static Integer NOPLAT_G_Q3_RATIO_LOCATION = 34;
-    static Integer NOPLAT_G_Q4_RATIO_LOCATION = 35;
     static Integer OPM_Q0_RATIO_LOCATION = 36;
-    static Integer OPM_Q1_RATIO_LOCATION = 37;
-    static Integer OPM_Q2_RATIO_LOCATION = 38;
-    static Integer OPM_Q3_RATIO_LOCATION = 39;
-    static Integer OPM_Q4_RATIO_LOCATION = 40;
     static Integer MOSL_RECO_LOCATION = 41;
     static Integer AMBIT_RECO_LOCATION = 42;
     static Integer AXIS_RECO_LOCATION = 43;
@@ -61,53 +60,21 @@ public class ConsolidatedResultTracker {
     static Integer KOTAK_RECO_LOCATION = 46;
     static Integer AUM0_LOCATION = 47;
     static Integer AUM_G_Q0_RATIO_LOCATION = 48;
-    static Integer AUM_G_Q1_RATIO_LOCATION = 49;
-    static Integer AUM_G_Q2_RATIO_LOCATION = 50;
-    static Integer AUM_G_Q3_RATIO_LOCATION = 51;
-    static Integer AUM_G_Q4_RATIO_LOCATION = 52;
     static Integer GNPA_TREND_LOCATION = 53;
     static Integer NNPA_TREND_LOCATION = 54;
     static Integer GNPA_RATIO_TREND_LOCATION = 55;
     static Integer NNPA_RATIO_TREND_LOCATION = 56;
     static Integer SLIPPAGES_TREND_LOCATION = 57;
 
-    //Ticker workbook QuarterP&L sheet cell locations
-    static Integer LATEST_QUARTER_RESULT_PRICE_ROW = 13;
-    static Integer LATEST_QUARTER_RESULT_PRICE_COLUMN = 17;
-
-    //Ticker workbook ValuationHistory sheet cell locations
-    static Integer LATEST_NONFIN_VALUATIO_ROW = 1;
-    static Integer LATEST_FIN_VALUATIO_ROW = 31;
-    static Integer LATEST_MIN_VALUATIO_COLUMN = 25;
-    static Integer LATEST_MAX_VALUATIO_COLUMN = 26;
-
-    //Ticker workbook AnalystReco sheet cell locations
-    static Integer RECO_COLUMN = 6;
-    static Integer TARGET_PRICE_COLUMN = 7;
-    static Integer LATEST_QUARTER_COLUMN = 17;
-
-    static Integer NET_PROFIT_ROW = 11;
-    static Integer OPM_ROW = 15;
-    static Integer QUARTER_SALES_GROWTH_ROW = 18;
-    static Integer TTM_SALES_ROW = 19;
-    static Integer NOPLAT_ROW = 22;
-    static Integer TTM_NOPLAT_ROW = 23;
-    static Integer TTM_AFTER_TAX_OTHER_INC_ROW = 33;
-    static Integer TTM_PAT_ROW = 34;
-    static Integer SLIPPAGES_ROW = 238;
-    static Integer AUM_ROW = 240;
-    static Integer GNPA_ROW = 243;
-    static Integer NNPA_ROW = 244;
-    static Integer GNPA_RATIO_ROW = 245;
-    static Integer NNPA_RATIO_ROW = 246;
-    static Integer NIM_ROW = 248;
-    static Integer TTM_NII_ROW = 265;
-    static Integer TTM_ST_PAT_ROW = 270;
-    static Integer TTM_SUBSIDIARY_PAT_ROW = 272;
-    static Integer QUARTER_NII_GROWTH_ROW = 280;
-    static Integer ST_PAT_GROWTH_ROW = 285;
-    static Integer AUM_GROWTH_ROW = 309;
-
+    /** broker report-status column, reco column and the Firm code(s) in Analysts&Consensus */
+    private static final Object[][] BROKERS = {
+            {MOSL_REPORT_STATUS_LOCATION, MOSL_RECO_LOCATION, new String[]{"MOSL"}},
+            {AMBIT_REPORT_STATUS_LOCATION, AMBIT_RECO_LOCATION, new String[]{"AMBIT"}},
+            {AXIS_REPORT_STATUS_LOCATION, AXIS_RECO_LOCATION, new String[]{"AXIS"}},
+            {ICICIDIRECT_REPORT_STATUS_LOCATION, ICICIDIRECT_RECO_LOCATION, new String[]{"ICICIDIRECT", "ICICI"}},
+            {PL_REPORT_STATUS_LOCATION, PL_RECO_LOCATION, new String[]{"PL"}},
+            {KOTAK_REPORT_STATUS_LOCATION, KOTAK_RECO_LOCATION, new String[]{"KOTAK"}},
+    };
 
     public void updateResultTrackerExcel() {
         String basePath = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels";
@@ -126,600 +93,407 @@ public class ConsolidatedResultTracker {
     }
 
     public void updateResultTrackerExcel(String latestFolder) {
+        updateResultTrackerExcel(latestFolder,
+                "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert\\ResultTracker.xlsx",
+                "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\" + latestFolder);
+    }
 
-        String YEAR = latestFolder.substring(2, 4);
-        String QUARTER = latestFolder.substring(5);
-        String TRACKER_FILE_PATH = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\DBInsert\\ResultTracker.xlsx";
-        String QUARTER_EXCEL_FOLDER = "C:\\MyDocuments\\03Business\\05ResearchAndAnalysis\\StockInvestments\\QuarterResultsScreenerExcels\\" + latestFolder;
+    /** trackerPath / quarterFolder are parameters so the update can be tried on copies */
+    public void updateResultTrackerExcel(String latestFolder, String trackerPath, String quarterFolder) {
+        String year = latestFolder.substring(2, 4);
+        String quarter = latestFolder.substring(5);
+        String fyQuarter = "FY" + year + "Q" + quarter;
 
-        try (FileInputStream trackerFileInputStream = new FileInputStream(new File(TRACKER_FILE_PATH));
+        try (FileInputStream trackerFileInputStream = new FileInputStream(new File(trackerPath));
              Workbook trackerWorkbook = new XSSFWorkbook(trackerFileInputStream)) {
 
-            Sheet fySheet = trackerWorkbook.getSheet("FY" + YEAR + "Q" + QUARTER);
+            Sheet fySheet = trackerWorkbook.getSheet(fyQuarter);
             if (fySheet == null) {
-                throw new RuntimeException("Sheet FY" + YEAR + QUARTER + " not found in tracker file.");
+                throw new RuntimeException("Sheet " + fyQuarter + " not found in tracker file.");
             }
+            FormulaEvaluator trackerFileEvaluator = trackerWorkbook.getCreationHelper().createFormulaEvaluator();
+            List<String> lastFour = Arrays.asList(fyQuarter, previousQuarter(fyQuarter, 1), previousQuarter(fyQuarter, 2), previousQuarter(fyQuarter, 3));
 
-            //processing rows in FY sheet
+            int done = 0;
             for (int rowIndex = 2; rowIndex < fySheet.getLastRowNum() + 1; rowIndex++) {
-                // get ticker Row
                 Row row = fySheet.getRow(rowIndex);
-
-                // get corresponding Cells
+                if (row == null) continue;
                 Cell tickerCell = row.getCell(TICKER_LOCATION);
-                Cell folderCell = row.getCell(FOLDER_LOCATION);
-                Cell moslReportStatusCell = row.getCell(MOSL_REPORT_STATUS_LOCATION);
-                Cell ambitReportStatusCell = row.getCell(AMBIT_REPORT_STATUS_LOCATION);
-                Cell axisReportStatusCell = row.getCell(AXIS_REPORT_STATUS_LOCATION);
-                Cell icicidirectReportStatusCell = row.getCell(ICICIDIRECT_REPORT_STATUS_LOCATION);
-                Cell plReportStatusCell = row.getCell(PL_REPORT_STATUS_LOCATION);
-                Cell kotakReportStatusCell = row.getCell(KOTAK_REPORT_STATUS_LOCATION);
-                Cell priceCell = row.getCell(RESULT_PRICE_LOCATION);
-                Cell minValuationPriceCell = row.getCell(MIN_VAKYATUIB_PRICE_LOCATION);
-                Cell maxValuationPriceCell = row.getCell(MAX_VAKYATUIB_PRICE_LOCATION);
-                Cell ttmRevTrendCell = row.getCell(TTM_REV_TREND_LOCATION);
-                Cell ttmNoplatTrendCell = row.getCell(TTM_NOPLAT_TREND_LOCATION);
-                Cell revGQ0RatioCell = row.getCell(REV_G_Q0_RATIO_LOCATION);
-                Cell revGQ1RatioCell = row.getCell(REV_G_Q1_RATIO_LOCATION);
-                Cell revGQ2RatioCell = row.getCell(REV_G_Q2_RATIO_LOCATION);
-                Cell revGQ3RatioCell = row.getCell(REV_G_Q3_RATIO_LOCATION);
-                Cell revGQ4RatioCell = row.getCell(REV_G_Q4_RATIO_LOCATION);
-                Cell noplatGQ0RatioCell = row.getCell(NOPLAT_G_Q0_RATIO_LOCATION);
-                Cell noplatGQ1RatioCell = row.getCell(NOPLAT_G_Q1_RATIO_LOCATION);
-                Cell noplatGQ2RatioCell = row.getCell(NOPLAT_G_Q2_RATIO_LOCATION);
-                Cell noplatGQ3RatioCell = row.getCell(NOPLAT_G_Q3_RATIO_LOCATION);
-                Cell noplatGQ4RatioCell = row.getCell(NOPLAT_G_Q4_RATIO_LOCATION);
-                Cell opmQ0RatioCell = row.getCell(OPM_Q0_RATIO_LOCATION);
-                Cell opmQ1RatioCell = row.getCell(OPM_Q1_RATIO_LOCATION);
-                Cell opmQ2RatioCell = row.getCell(OPM_Q2_RATIO_LOCATION);
-                Cell opmQ3RatioCell = row.getCell(OPM_Q3_RATIO_LOCATION);
-                Cell opmQ4RatioCell = row.getCell(OPM_Q4_RATIO_LOCATION);
-                Cell moslRecoCell = row.getCell(MOSL_RECO_LOCATION);
-                Cell ambitRecoCell = row.getCell(AMBIT_RECO_LOCATION);
-                Cell axisRecoCell = row.getCell(AXIS_RECO_LOCATION);
-                Cell icicidirectRecoCell = row.getCell(ICICIDIRECT_RECO_LOCATION);
-                Cell plRecoCell = row.getCell(PL_RECO_LOCATION);
-                Cell kotakRecoCell = row.getCell(KOTAK_RECO_LOCATION);
-                Cell aum0Cell = row.getCell(AUM0_LOCATION);
-                Cell aumGQ0RatioCell = row.getCell(AUM_G_Q0_RATIO_LOCATION);
-                Cell aumGQ1RatioCell = row.getCell(AUM_G_Q1_RATIO_LOCATION);
-                Cell aumGQ2RatioCell = row.getCell(AUM_G_Q2_RATIO_LOCATION);
-                Cell aumGQ3RatioCell = row.getCell(AUM_G_Q3_RATIO_LOCATION);
-                Cell aumGQ4RatioCell = row.getCell(AUM_G_Q4_RATIO_LOCATION);
-                Cell gnpaTrendCell = row.getCell(GNPA_TREND_LOCATION);
-                Cell nnpaTrendCell = row.getCell(NNPA_TREND_LOCATION);
-                Cell gnpaRatioTrendCell = row.getCell(GNPA_RATIO_TREND_LOCATION);
-                Cell nnpaRatioTrendCell = row.getCell(NNPA_RATIO_TREND_LOCATION);
-                Cell slippagesTrendCell = row.getCell(SLIPPAGES_TREND_LOCATION);
+                if (tickerCell == null || tickerCell.getCellTypeEnum() != CellType.STRING || tickerCell.getStringCellValue().trim().isEmpty()) continue;
+                String ticker = tickerCell.getStringCellValue().trim();
 
+                File tickerFile = new File(quarterFolder, ticker + "_" + fyQuarter + ".xlsx");
+                if (!tickerFile.isFile()) {
+                    System.out.println("Could not find file for " + ticker + ": " + tickerFile.getName());
+                    continue;
+                }
+                try (FileInputStream in = new FileInputStream(tickerFile); Workbook tickerWorkbook = new XSSFWorkbook(in)) {
+                    FormulaEvaluator ev = tickerWorkbook.getCreationHelper().createFormulaEvaluator();
+                    ev.setIgnoreMissingWorkbooks(true);
 
-                if (tickerCell != null && tickerCell.getCellTypeEnum() == CellType.STRING && tickerCell.getCellTypeEnum() != CellType.BLANK) {
-
-                    String ticker = tickerCell.getStringCellValue();
+                    boolean isFinancialTicker = false;
                     try {
-                        //opern ticker quarter result file
-                        String tickerFilePath = QUARTER_EXCEL_FOLDER + "\\" + ticker + "_FY" + YEAR + "Q" + QUARTER + ".xlsx";
-                        File tickerFile = null;
-                        FileInputStream tickerFileInputStream = null;
-                        Workbook tickerWorkbook = null;
-                        FormulaEvaluator trackerFileEvaluator;
-                        FormulaEvaluator tickerFileEvaluator;
+                        CellValue cv = trackerFileEvaluator.evaluate(row.getCell(FOLDER_LOCATION));
+                        isFinancialTicker = cv != null && cv.getStringValue() != null && cv.getStringValue().startsWith("Financials");
+                    } catch (Exception ignored) { /* no folder / sector text */ }
 
-
-                        try {
-                            tickerFile = new File(tickerFilePath);
-                            tickerFileInputStream = new FileInputStream(tickerFile);
-                            tickerWorkbook = new XSSFWorkbook(tickerFileInputStream);
-                        } catch (Exception e) {
-                            System.out.println("Could not find file for " + ticker + " Exception - " + e.getMessage());
-                            continue;
-                        }
-
-                        if (tickerWorkbook == null) {
-                            throw new Exception("tickerWorbook is null for " + ticker);
-                        }
-
-                        Sheet quarterPnLSheet = tickerWorkbook.getSheet("QuarterP&L");
-                        if (quarterPnLSheet == null) {
-                            throw new Exception("QuarterP&L not found for " + ticker);
-                        }
-
-                        Sheet analystRecoSheet = tickerWorkbook.getSheet("AnalystReco");
-                        if (analystRecoSheet == null) {
-                            throw new Exception("AnalystReco not found for " + ticker);
-                        }
-
-                        Sheet valuationHistorySheet = tickerWorkbook.getSheet("ValuationHistory");
-                        if (valuationHistorySheet == null) {
-                            throw new Exception("ValuationHistory not found for " + ticker);
-                        }
-
-                        trackerFileEvaluator = trackerWorkbook.getCreationHelper().createFormulaEvaluator();
-                        tickerFileEvaluator = tickerWorkbook.getCreationHelper().createFormulaEvaluator();
-
-                        // update Revenue Trend, NOPLAT and OPM and Revenue growth
-                        CellValue cellValue = trackerFileEvaluator.evaluate(folderCell);
-                        String folder = null;
-                        boolean isFinancialTicker = false;
-
-                        try {
-                            folder = cellValue.getStringValue();
-                            if (folder.startsWith("Financials"))
-                                isFinancialTicker = true;
-                        } catch (Exception e) {
-                            folder = null;
-                        }
-
-                        // update price data
-                        if (priceCell == null ||
-                                (priceCell != null && (priceCell.getCellTypeEnum() == CellType.BLANK || priceCell.getNumericCellValue() == 0)) ||
-                                IS_OVERRIDE_PRICE_DATA == true) {
-
-                            if (priceCell == null) {
-                                priceCell = row.createCell(RESULT_PRICE_LOCATION, CellType.NUMERIC);
-                            }
-                            Cell priceDataCell = null;
-
-                            try {
-                                priceDataCell = quarterPnLSheet.getRow(LATEST_QUARTER_RESULT_PRICE_ROW).getCell(LATEST_QUARTER_RESULT_PRICE_COLUMN);
-                            } catch (Exception e) {
-                                System.out.println("Exception in getting the latest quarter result price CELL for " + ticker);
-                            }
-                            if (priceDataCell != null) {
-                                double price = getNumberValueFromCell(priceDataCell, tickerFileEvaluator);
-                                if (price > 0)
-                                    priceCell.setCellValue(price);
-                            } else {
-                                System.out.println("priceDataCell null for " + ticker);
-                            }
-                        }
-
-                        // update MIN Valuation Price data
-                        if (minValuationPriceCell == null ||
-                                (minValuationPriceCell != null && (minValuationPriceCell.getCellTypeEnum() == CellType.BLANK || minValuationPriceCell.getNumericCellValue() == 0)) ||
-                                IS_OVERRIDE_PRICE_DATA == true) {
-
-                            if (minValuationPriceCell == null) {
-                                minValuationPriceCell = row.createCell(MIN_VAKYATUIB_PRICE_LOCATION, CellType.NUMERIC);
-                            }
-                            Cell minValuationPriceDataCell = null;
-
-                            try {
-                                if(!isFinancialTicker)
-                                    minValuationPriceDataCell = valuationHistorySheet.getRow(LATEST_NONFIN_VALUATIO_ROW).getCell(LATEST_MIN_VALUATIO_COLUMN);
-                                else
-                                    minValuationPriceDataCell = valuationHistorySheet.getRow(LATEST_FIN_VALUATIO_ROW).getCell(LATEST_MIN_VALUATIO_COLUMN);
-                            } catch (Exception e) {
-                                System.out.println("Exception in getting the latest Min Valuation Price CELL for " + ticker);
-                            }
-                            if (minValuationPriceDataCell != null) {
-                                double minValuationprice = getNumberValueFromCell(minValuationPriceDataCell, tickerFileEvaluator);
-                                if (minValuationprice > 0)
-                                    minValuationPriceCell.setCellValue(minValuationprice);
-                            } else {
-                                System.out.println("minValuationPriceDataCell null for " + ticker);
-                            }
-                        }
-
-                        // update MAX Valuation Price data
-                        if (maxValuationPriceCell == null ||
-                                (maxValuationPriceCell != null && (maxValuationPriceCell.getCellTypeEnum() == CellType.BLANK || maxValuationPriceCell.getNumericCellValue() == 0)) ||
-                                IS_OVERRIDE_PRICE_DATA == true) {
-
-                            if (maxValuationPriceCell == null) {
-                                maxValuationPriceCell = row.createCell(MAX_VAKYATUIB_PRICE_LOCATION, CellType.NUMERIC);
-                            }
-                            Cell maxValuationPriceDataCell = null;
-
-                            try {
-                                if(!isFinancialTicker)
-                                    maxValuationPriceDataCell = valuationHistorySheet.getRow(LATEST_NONFIN_VALUATIO_ROW).getCell(LATEST_MAX_VALUATIO_COLUMN);
-                                else
-                                    maxValuationPriceDataCell = valuationHistorySheet.getRow(LATEST_FIN_VALUATIO_ROW).getCell(LATEST_MAX_VALUATIO_COLUMN);
-                            } catch (Exception e) {
-                                System.out.println("Exception in getting the latest Max Valuation Price CELL for " + ticker);
-                            }
-                            if (maxValuationPriceDataCell != null) {
-                                double maxValuationprice = getNumberValueFromCell(maxValuationPriceDataCell, tickerFileEvaluator);
-                                if (maxValuationprice > 0)
-                                    maxValuationPriceCell.setCellValue(maxValuationprice);
-                            } else {
-                                System.out.println("maxValuationPriceDataCell null for " + ticker);
-                            }
-                        }
-
-                        // update MOSL reco
-                        if (moslReportStatusCell != null && !moslReportStatusCell.getStringCellValue().isEmpty()) {
-                            if (moslRecoCell == null || moslRecoCell.getStringCellValue().isEmpty()) {
-                                row.createCell(MOSL_RECO_LOCATION, CellType.STRING);
-                                setReco(ticker, trackerWorkbook, analystRecoSheet, moslRecoCell, 0);
-                            } else if (IS_OVERRIDE_RECO_DATA) {
-                                setReco(ticker, trackerWorkbook, analystRecoSheet, moslRecoCell, 0);
-                            }
-                        }
-
-                        // update AMBIT reco
-                        if (ambitReportStatusCell != null && !ambitReportStatusCell.getStringCellValue().isEmpty()) {
-                            if (ambitRecoCell == null || ambitRecoCell.getStringCellValue().isEmpty()) {
-                                row.createCell(AMBIT_RECO_LOCATION, CellType.STRING);
-                                setReco(ticker, trackerWorkbook, analystRecoSheet, ambitRecoCell, 20);
-                            } else if (IS_OVERRIDE_RECO_DATA) {
-                                setReco(ticker, trackerWorkbook, analystRecoSheet, ambitRecoCell, 20);
-                            }
-                        }
-
-                        // update AXIS reco
-                        if (axisReportStatusCell != null && !axisReportStatusCell.getStringCellValue().isEmpty()) {
-                            if (axisRecoCell == null || axisRecoCell.getStringCellValue().isEmpty()) {
-                                row.createCell(AXIS_RECO_LOCATION, CellType.STRING);
-                                setReco(ticker, trackerWorkbook, analystRecoSheet, axisRecoCell, 40);
-                            } else if (IS_OVERRIDE_RECO_DATA) {
-                                setReco(ticker, trackerWorkbook, analystRecoSheet, axisRecoCell, 40);
-                            }
-                        }
-
-                        // update ICICIDIRECT reco
-                        if (icicidirectReportStatusCell != null && !icicidirectReportStatusCell.getStringCellValue().isEmpty()) {
-                            if (icicidirectRecoCell == null || icicidirectRecoCell.getStringCellValue().isEmpty()) {
-                                row.createCell(ICICIDIRECT_RECO_LOCATION, CellType.STRING);
-                                setReco(ticker, trackerWorkbook, analystRecoSheet, icicidirectRecoCell, 60);
-                            } else if (IS_OVERRIDE_RECO_DATA) {
-                                setReco(ticker, trackerWorkbook, analystRecoSheet, icicidirectRecoCell, 60);
-                            }
-                        }
-
-                        // update PL reco
-                        if (plReportStatusCell != null && !plReportStatusCell.getStringCellValue().isEmpty()) {
-                            if (plRecoCell == null || plRecoCell.getStringCellValue().isEmpty()) {
-                                row.createCell(PL_RECO_LOCATION, CellType.STRING);
-                                setReco(ticker, trackerWorkbook, analystRecoSheet, plRecoCell, 80);
-                            } else if (IS_OVERRIDE_RECO_DATA) {
-                                setReco(ticker, trackerWorkbook, analystRecoSheet, plRecoCell, 80);
-                            }
-                        }
-
-                        // update KOTAK reco
-                        if (kotakReportStatusCell != null && !kotakReportStatusCell.getStringCellValue().isEmpty()) {
-                            if (kotakRecoCell == null || kotakRecoCell.getStringCellValue().isEmpty()) {
-                                row.createCell(KOTAK_RECO_LOCATION, CellType.STRING);
-                                setReco(ticker, trackerWorkbook, analystRecoSheet, kotakRecoCell, 100);
-                            } else if (IS_OVERRIDE_RECO_DATA) {
-                                setReco(ticker, trackerWorkbook, analystRecoSheet, kotakRecoCell, 100);
-                            }
-                        }
-
-                        if (!isFinancialTicker) {
-                            // set TTM Sales Trend
-                            setTrend(row, quarterPnLSheet, tickerFileEvaluator, TTM_SALES_ROW, LATEST_QUARTER_COLUMN, TTM_REV_TREND_LOCATION);
-                            // set TTM NOPLAT Trend
-                            setTrend(row, quarterPnLSheet, tickerFileEvaluator, TTM_NOPLAT_ROW, LATEST_QUARTER_COLUMN, TTM_NOPLAT_TREND_LOCATION);
-                            // set TTM After Tax Non. Op. Inc. Trend
-                            setTrend(row, quarterPnLSheet, tickerFileEvaluator, TTM_AFTER_TAX_OTHER_INC_ROW, LATEST_QUARTER_COLUMN, TTM_SUBSIDIARY_TREND_LOCATION);
-                            // set Quarterly Sales Growth
-                            setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q0_RATIO_LOCATION, QUARTER_SALES_GROWTH_ROW, LATEST_QUARTER_COLUMN);
-                            setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q1_RATIO_LOCATION, QUARTER_SALES_GROWTH_ROW, LATEST_QUARTER_COLUMN - 1);
-                            setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q2_RATIO_LOCATION, QUARTER_SALES_GROWTH_ROW, LATEST_QUARTER_COLUMN - 2);
-                            setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q3_RATIO_LOCATION, QUARTER_SALES_GROWTH_ROW, LATEST_QUARTER_COLUMN - 3);
-                            setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q4_RATIO_LOCATION, QUARTER_SALES_GROWTH_ROW, LATEST_QUARTER_COLUMN - 4);
-                            // set Quarter NOPLAT growth rate
-                            computeAndSetGrowth(row, quarterPnLSheet, tickerFileEvaluator, NOPLAT_ROW, NOPLAT_G_Q0_RATIO_LOCATION);
-                            // set QPM
-                            setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q0_RATIO_LOCATION, OPM_ROW, LATEST_QUARTER_COLUMN);
-                            setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q1_RATIO_LOCATION, OPM_ROW, LATEST_QUARTER_COLUMN - 1);
-                            setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q2_RATIO_LOCATION, OPM_ROW, LATEST_QUARTER_COLUMN - 2);
-                            setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q3_RATIO_LOCATION, OPM_ROW, LATEST_QUARTER_COLUMN - 3);
-                            setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q4_RATIO_LOCATION, OPM_ROW, LATEST_QUARTER_COLUMN - 4);
-                        } else {
-                            // set TTM NII as TTM Sales for Financials if not exists then set TTM Sales
-                            if (quarterPnLSheet.getRow(TTM_NII_ROW) != null && quarterPnLSheet.getRow(TTM_NII_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("TTM NII")) {
-                                setTrend(row, quarterPnLSheet, tickerFileEvaluator, TTM_NII_ROW, LATEST_QUARTER_COLUMN, TTM_REV_TREND_LOCATION);
-                            } else {
-                                setTrend(row, quarterPnLSheet, tickerFileEvaluator, TTM_SALES_ROW, LATEST_QUARTER_COLUMN, TTM_REV_TREND_LOCATION);
-                            }
-                            // set TTM Standalone PAT TREND as NOPLAT trend
-                            if (quarterPnLSheet.getRow(TTM_ST_PAT_ROW) != null && quarterPnLSheet.getRow(TTM_ST_PAT_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("TTM St. PAT")) {
-                                setTrend(row, quarterPnLSheet, tickerFileEvaluator, TTM_ST_PAT_ROW, LATEST_QUARTER_COLUMN, TTM_NOPLAT_TREND_LOCATION);
-                            } else {
-                                setTrend(row, quarterPnLSheet, tickerFileEvaluator, TTM_PAT_ROW, LATEST_QUARTER_COLUMN, TTM_NOPLAT_TREND_LOCATION);
-                            }
-                            // set subsiiary PAT trend
-                            if (quarterPnLSheet.getRow(TTM_SUBSIDIARY_PAT_ROW) != null && quarterPnLSheet.getRow(TTM_SUBSIDIARY_PAT_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("TTM Subsidiaries")) {
-                                setTrend(row, quarterPnLSheet, tickerFileEvaluator, TTM_SUBSIDIARY_PAT_ROW, LATEST_QUARTER_COLUMN, TTM_SUBSIDIARY_TREND_LOCATION);
-                            }
-                            // set NII growth
-                            if (quarterPnLSheet.getRow(QUARTER_NII_GROWTH_ROW) != null && quarterPnLSheet.getRow(QUARTER_NII_GROWTH_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("NII g%")) {
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q0_RATIO_LOCATION, QUARTER_NII_GROWTH_ROW, LATEST_QUARTER_COLUMN);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q1_RATIO_LOCATION, QUARTER_NII_GROWTH_ROW, LATEST_QUARTER_COLUMN - 1);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q2_RATIO_LOCATION, QUARTER_NII_GROWTH_ROW, LATEST_QUARTER_COLUMN - 2);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q3_RATIO_LOCATION, QUARTER_NII_GROWTH_ROW, LATEST_QUARTER_COLUMN - 3);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q4_RATIO_LOCATION, QUARTER_NII_GROWTH_ROW, LATEST_QUARTER_COLUMN - 4);
-                            } else {
-                                // else set sales growth
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q0_RATIO_LOCATION, QUARTER_SALES_GROWTH_ROW, LATEST_QUARTER_COLUMN);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q1_RATIO_LOCATION, QUARTER_SALES_GROWTH_ROW, LATEST_QUARTER_COLUMN - 1);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q2_RATIO_LOCATION, QUARTER_SALES_GROWTH_ROW, LATEST_QUARTER_COLUMN - 2);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q3_RATIO_LOCATION, QUARTER_SALES_GROWTH_ROW, LATEST_QUARTER_COLUMN - 3);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, REV_G_Q4_RATIO_LOCATION, QUARTER_SALES_GROWTH_ROW, LATEST_QUARTER_COLUMN - 4);
-                            }
-                            // set Standalone PAT growth
-                            if (quarterPnLSheet.getRow(ST_PAT_GROWTH_ROW) != null && quarterPnLSheet.getRow(ST_PAT_GROWTH_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("St. PAT g%")) {
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, NOPLAT_G_Q0_RATIO_LOCATION, ST_PAT_GROWTH_ROW, LATEST_QUARTER_COLUMN);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, NOPLAT_G_Q1_RATIO_LOCATION, ST_PAT_GROWTH_ROW, LATEST_QUARTER_COLUMN - 1);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, NOPLAT_G_Q2_RATIO_LOCATION, ST_PAT_GROWTH_ROW, LATEST_QUARTER_COLUMN - 2);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, NOPLAT_G_Q3_RATIO_LOCATION, ST_PAT_GROWTH_ROW, LATEST_QUARTER_COLUMN - 3);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, NOPLAT_G_Q4_RATIO_LOCATION, ST_PAT_GROWTH_ROW, LATEST_QUARTER_COLUMN - 4);
-                            } else {
-                                // else set consolidated PAT growth
-                                computeAndSetGrowth(row, quarterPnLSheet, tickerFileEvaluator, NET_PROFIT_ROW, NOPLAT_G_Q0_RATIO_LOCATION);
-                            }
-                            // set NIM
-                            if (quarterPnLSheet.getRow(NIM_ROW) != null && quarterPnLSheet.getRow(NIM_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("NIM%")) {
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q0_RATIO_LOCATION, NIM_ROW, LATEST_QUARTER_COLUMN);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q1_RATIO_LOCATION, NIM_ROW, LATEST_QUARTER_COLUMN - 1);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q2_RATIO_LOCATION, NIM_ROW, LATEST_QUARTER_COLUMN - 2);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q3_RATIO_LOCATION, NIM_ROW, LATEST_QUARTER_COLUMN - 3);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q4_RATIO_LOCATION, NIM_ROW, LATEST_QUARTER_COLUMN - 4);
-                            } else {
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q0_RATIO_LOCATION, OPM_ROW, LATEST_QUARTER_COLUMN);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q1_RATIO_LOCATION, OPM_ROW, LATEST_QUARTER_COLUMN - 1);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q2_RATIO_LOCATION, OPM_ROW, LATEST_QUARTER_COLUMN - 2);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q3_RATIO_LOCATION, OPM_ROW, LATEST_QUARTER_COLUMN - 3);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, OPM_Q4_RATIO_LOCATION, OPM_ROW, LATEST_QUARTER_COLUMN - 4);
-                            }
-                            // set AUM
-                            if (quarterPnLSheet.getRow(AUM_ROW) != null && quarterPnLSheet.getRow(AUM_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("Loans / AUM")) {
-                                setTrend(row, quarterPnLSheet, tickerFileEvaluator, AUM_ROW, LATEST_QUARTER_COLUMN, AUM0_LOCATION, 100000, false);
-                            }
-                            // set AUM growth
-                            if (quarterPnLSheet.getRow(AUM_GROWTH_ROW) != null && quarterPnLSheet.getRow(AUM_GROWTH_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("Loans / AUM g%")) {
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, AUM_G_Q0_RATIO_LOCATION, AUM_GROWTH_ROW, LATEST_QUARTER_COLUMN);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, AUM_G_Q1_RATIO_LOCATION, AUM_GROWTH_ROW, LATEST_QUARTER_COLUMN - 1);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, AUM_G_Q2_RATIO_LOCATION, AUM_GROWTH_ROW, LATEST_QUARTER_COLUMN - 2);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, AUM_G_Q3_RATIO_LOCATION, AUM_GROWTH_ROW, LATEST_QUARTER_COLUMN - 3);
-                                setNumericValue(row, quarterPnLSheet, tickerFileEvaluator, AUM_G_Q4_RATIO_LOCATION, AUM_GROWTH_ROW, LATEST_QUARTER_COLUMN - 4);
-                            }
-                            // set GNPA Trend
-                            if (quarterPnLSheet.getRow(GNPA_ROW) != null && quarterPnLSheet.getRow(GNPA_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("GNPA")) {
-                                setTrend(row, quarterPnLSheet, tickerFileEvaluator, GNPA_ROW, LATEST_QUARTER_COLUMN, GNPA_TREND_LOCATION);
-                            }
-                            // set NNPA Trend
-                            if (quarterPnLSheet.getRow(NNPA_ROW) != null && quarterPnLSheet.getRow(NNPA_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("NNPA")) {
-                                setTrend(row, quarterPnLSheet, tickerFileEvaluator, NNPA_ROW, LATEST_QUARTER_COLUMN, NNPA_TREND_LOCATION);
-                            }
-                            // set GNPA% Trend
-                            if (quarterPnLSheet.getRow(GNPA_RATIO_ROW) != null && quarterPnLSheet.getRow(GNPA_RATIO_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("GNPA%")) {
-                                setTrend(row, quarterPnLSheet, tickerFileEvaluator, GNPA_RATIO_ROW, LATEST_QUARTER_COLUMN, GNPA_RATIO_TREND_LOCATION, 1000, true);
-                            }
-                            // set NNPA% Trend
-                            try {
-                                if (quarterPnLSheet.getRow(NNPA_RATIO_ROW) != null && quarterPnLSheet.getRow(NNPA_RATIO_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("NNPA%")) {
-                                    setTrend(row, quarterPnLSheet, tickerFileEvaluator, NNPA_RATIO_ROW, LATEST_QUARTER_COLUMN, NNPA_RATIO_TREND_LOCATION, 100, true);
-                                }
-                                // set Slippages Trend
-                                if (quarterPnLSheet.getRow(SLIPPAGES_ROW) != null && quarterPnLSheet.getRow(SLIPPAGES_ROW).getCell(0).getStringCellValue().trim().equalsIgnoreCase("Slippages")) {
-                                    setTrend(row, quarterPnLSheet, tickerFileEvaluator, SLIPPAGES_ROW, LATEST_QUARTER_COLUMN, SLIPPAGES_TREND_LOCATION);
-                                }
-                            } catch (Exception e) {
-                                System.out.println("Exception in setting NNPA% Trend for ticker " + ticker);
-//                                e.printStackTrace();
-                            }
-                        }
-                        tickerFileInputStream.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        System.out.println("Exception in processing ticker " + ticker);
+                    Block inc = Block.read(tickerWorkbook.getSheet("HistoricalData"), "Quarterly Income Statement", fyQuarter, ev);
+                    Block bfsi = Block.read(tickerWorkbook.getSheet("ModelBFSI"), "Quarterly Income Expense History", fyQuarter, ev);
+                    Block bank = Block.read(tickerWorkbook.getSheet("ModelBFSI"), "Quarterly Banking History", fyQuarter, ev);
+                    if (inc == null) {
+                        System.out.println(ticker + ": HistoricalData 'Quarterly Income Statement' / column " + fyQuarter + " not found");
+                        continue;
                     }
+
+                    // result-day price: HistoricalData Share Price of the quarter once updateMCapAndPrice has frozen it;
+                    // while that cell is still the template formula (annual price), the Data Sheet's Current Price
+                    Double price = inc.currentIsFormula("Share Price") ? labelledValue(tickerWorkbook.getSheet("Data Sheet"), "Current Price", ev)
+                            : inc.val("Share Price", 0);
+                    setNumber(row, RESULT_PRICE_LOCATION, price, IS_OVERRIDE_PRICE_DATA, true);
+                    // MinPrice / MaxPrice (old ValuationHistory, already empty) are left as they are: the new sheets have
+                    // no valuation range yet (Model's intrinsic / relative target price equal the price until modelled)
+
+                    // broker recos (last four quarters, latest first)
+                    Map<String, Map<String, String[]>> recos = readRecos(tickerWorkbook.getSheet("Analysts&Consensus"), ev);
+                    for (Object[] b : BROKERS) {
+                        Cell status = row.getCell((Integer) b[0]);
+                        if (status == null || status.getCellTypeEnum() != CellType.STRING || status.getStringCellValue().isEmpty()) continue;
+                        Cell recoCell = row.getCell((Integer) b[1]);
+                        boolean empty = recoCell == null || recoCell.getCellTypeEnum() != CellType.STRING || recoCell.getStringCellValue().isEmpty();
+                        if (!empty && !IS_OVERRIDE_RECO_DATA) continue;
+                        Map<String, String[]> byQuarter = null;
+                        for (String firm : (String[]) b[2]) if (byQuarter == null) byQuarter = recos.get(firm.toUpperCase());
+                        List<String[]> list = new ArrayList<>();
+                        for (String q : lastFour) list.add(byQuarter == null ? null : byQuarter.get(q));
+                        if (recoCell == null) recoCell = row.createCell((Integer) b[1], CellType.STRING);
+                        setReco(ticker, trackerWorkbook, recoCell, list);
+                    }
+
+                    // quarterly P&L series (k = 0 is the result quarter, 1 the quarter before ...)
+                    Series revenue = inc.series("Revenue");
+                    Series opm = inc.series("(Ex-Other Inc.) Op. Profit Margin%");
+                    Series ebitMargin = inc.series("(Ex-Other Inc.) EBIT Margin%");
+                    Series taxRate = inc.series("Tax Rate%");
+                    Series otherIncome = inc.series("Other Income");
+                    Series noplat = k -> {
+                        Double r = revenue.at(k), m = ebitMargin.at(k), t = taxRate.at(k);
+                        return r == null || m == null ? null : r * m * (1 - (t == null ? 0 : t));
+                    };
+                    Series otherIncAfterTax = k -> {
+                        Double o = otherIncome.at(k), t = taxRate.at(k);
+                        return o == null ? null : o * (1 - (t == null ? 0 : t));
+                    };
+
+                    if (!isFinancialTicker) {
+                        setTrend(row, TTM_REV_TREND_LOCATION, ttm(revenue), 1000, false);
+                        setTrend(row, TTM_NOPLAT_TREND_LOCATION, ttm(noplat), 1000, false);
+                        setTrend(row, TTM_SUBSIDIARY_TREND_LOCATION, ttm(otherIncAfterTax), 1000, false);
+                        setFive(row, REV_G_Q0_RATIO_LOCATION, yoy(revenue, false));
+                        setFive(row, NOPLAT_G_Q0_RATIO_LOCATION, yoy(noplat, true));
+                        setFive(row, OPM_Q0_RATIO_LOCATION, opm);
+                    } else {
+                        Series nii = bfsi == null ? null : bfsi.seriesIfReported("Net Interest Income");
+                        Series stPat = bfsi == null ? null : bfsi.seriesIfReported("Standalone Profit");
+                        Series conPat = bfsi == null ? null : bfsi.seriesIfReported("Consolidated Profit");
+                        Series nim = bfsi == null ? null : bfsi.seriesIfReported("Net Interest Margin");
+                        // subsidiaries' contribution = consolidated - standalone profit (as before); else the subsidiary rows
+                        Series subs = bfsi == null ? null : bfsi.sumUnder("Subsidiary Profit");
+                        if (stPat != null && conPat != null) {
+                            Series st = stPat, con = conPat;
+                            subs = k -> st.at(k) == null || con.at(k) == null ? null : con.at(k) - st.at(k);
+                        }
+                        // TTM NII (else TTM revenue), TTM standalone PAT (else consolidated), TTM subsidiaries
+                        setTrend(row, TTM_REV_TREND_LOCATION, ttm(nii != null ? nii : revenue), 1000, false);
+                        Series pat = stPat != null ? stPat : (conPat != null ? conPat : inc.series("Net Income"));
+                        setTrend(row, TTM_NOPLAT_TREND_LOCATION, ttm(pat), 1000, false);
+                        if (subs != null) setTrend(row, TTM_SUBSIDIARY_TREND_LOCATION, ttm(subs), 1000, false);
+                        setFive(row, REV_G_Q0_RATIO_LOCATION, yoy(nii != null ? nii : revenue, false));
+                        setFive(row, NOPLAT_G_Q0_RATIO_LOCATION, yoy(pat, true));
+                        setFive(row, OPM_Q0_RATIO_LOCATION, nim != null ? nim : opm);
+                        if (bank != null) {
+                            Series aum = bank.seriesIfReported("Loans / AUM");
+                            if (aum != null) setTrend(row, AUM0_LOCATION, aum, 100000, false);
+                            if (aum != null) setFive(row, AUM_G_Q0_RATIO_LOCATION, yoy(aum, false));   // YoY (ModelBFSI's growth row is QoQ)
+                            Series s;
+                            if ((s = bank.seriesIfReported("GNPA")) != null) setTrend(row, GNPA_TREND_LOCATION, s, 1000, false);
+                            if ((s = bank.seriesIfReported("NNPA")) != null) setTrend(row, NNPA_TREND_LOCATION, s, 1000, false);
+                            if ((s = bank.seriesIfReported("GNPA%")) != null) setTrend(row, GNPA_RATIO_TREND_LOCATION, s, 1, true);
+                            if ((s = bank.seriesIfReported("NNPA%")) != null) setTrend(row, NNPA_RATIO_TREND_LOCATION, s, 1, true);
+                            if ((s = bank.seriesIfReported("Slippages")) != null) setTrend(row, SLIPPAGES_TREND_LOCATION, s, 1000, false);
+                        }
+                    }
+                    done++;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Exception in processing ticker " + ticker);
                 }
             }
 
-//            trackerFileInputStream.close();
-//            // Save the updated tracker file
-//            saveWorkbook(trackerWorkbook, TRACKER_FILE_PATH);
-
-            try (FileOutputStream fos = new FileOutputStream(new File(TRACKER_FILE_PATH))) {
+            try (FileOutputStream fos = new FileOutputStream(new File(trackerPath))) {
                 trackerWorkbook.write(fos);
             }
-
+            System.out.println("ResultTracker " + fyQuarter + ": " + done + " tickers updated from the new sheets");
         } catch (IOException e) {
             throw new RuntimeException("Error updating result tracker: " + e.getMessage(), e);
         }
     }
 
-    private void saveWorkbook(Workbook workbook, String filePath) {
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
-            workbook.write(fileOutputStream);
-            fileOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+    // ------------------------------------------------------------------ workbook readers
+
+    /** a value per quarter, k quarters before the result quarter (null when missing) */
+    interface Series { Double at(int k); }
+
+    /** One history block (title in column B, "Quarters" header in column C, row labels in column C or D). */
+    static class Block {
+        final Map<String, List<Double>> rows = new LinkedHashMap<>();
+        final List<String> order = new ArrayList<>();
+        final List<List<Double>> values = new ArrayList<>();
+        final List<Boolean> mainRow = new ArrayList<>();
+        final Set<String> formulaAtCurrent = new HashSet<>();
+        int current;     // index of the result quarter among the block's columns
+
+        static Block read(Sheet sheet, String title, String fyQuarter, FormulaEvaluator ev) {
+            if (sheet == null) return null;
+            int last = sheet.getLastRowNum(), r0 = -1, hdr = -1, end = last + 1;
+            for (int r = 0; r <= last && r0 < 0; r++) if (text(cellAt(sheet, r, 1), ev).startsWith(title)) r0 = r;
+            if (r0 < 0) return null;
+            for (int r = r0; r <= Math.min(last, r0 + 6) && hdr < 0; r++) if (text(cellAt(sheet, r, 2), ev).startsWith("Quarter")) hdr = r;
+            if (hdr < 0) return null;
+            for (int r = hdr + 1; r <= last; r++) if (!text(cellAt(sheet, r, 1), ev).isEmpty()) { end = r; break; }
+            List<Integer> cols = new ArrayList<>();
+            Row hr = sheet.getRow(hdr);
+            int current = -1;
+            for (int c = 3; hr != null && c < hr.getLastCellNum(); c++) {
+                String l = text(hr.getCell(c), ev);
+                if (!l.matches("FY\\d{2}Q[1-4]")) continue;
+                cols.add(c);
+                if (l.equals(fyQuarter)) { current = cols.size() - 1; break; }     // nothing after the result quarter
+            }
+            if (current < 0) return null;
+            Block b = new Block();
+            b.current = current;
+            for (int r = hdr + 1; r < end; r++) {
+                String c = text(cellAt(sheet, r, 2), ev), d = text(cellAt(sheet, r, 3), ev);
+                if (c.isEmpty() && d.isEmpty()) continue;
+                List<Double> v = new ArrayList<>();
+                for (int col : cols) v.add(number(cellAt(sheet, r, col), ev));
+                String label = c.isEmpty() ? d : c;
+                b.order.add(label);
+                b.values.add(v);
+                b.mainRow.add(!c.isEmpty());
+                if (!b.rows.containsKey(label)) {
+                    Cell cc = cellAt(sheet, r, cols.get(current));
+                    if (cc != null && cc.getCellTypeEnum() == CellType.FORMULA) b.formulaAtCurrent.add(label);
+                }
+                b.rows.putIfAbsent(label, v);
+            }
+            return b;
+        }
+
+        Double val(String label, int k) { return series(label).at(k); }
+
+        boolean currentIsFormula(String label) { return formulaAtCurrent.contains(label); }
+
+        Series series(String label) {
+            List<Double> v = rows.get(label);
+            return k -> v == null || current - k < 0 ? null : v.get(current - k);
+        }
+
+        /** the row's series, or null when it reports nothing (template row left at 0 / blank) */
+        Series seriesIfReported(String label) {
+            List<Double> v = rows.get(label);
+            if (v == null || v.stream().noneMatch(x -> x != null && x != 0)) return null;
+            return series(label);
+        }
+
+        /** sum of the sub-rows below a column-C header (e.g. the subsidiaries under "Subsidiary Profit") */
+        Series sumUnder(String header) {
+            int i = order.indexOf(header);
+            if (i < 0) return null;
+            List<List<Double>> subs = new ArrayList<>();
+            for (int j = i + 1; j < order.size() && !mainRow.get(j); j++) subs.add(values.get(j));
+            if (subs.stream().noneMatch(v -> v.stream().anyMatch(x -> x != null && x != 0))) return null;
+            return k -> {
+                if (current - k < 0) return null;
+                double s = 0;
+                boolean any = false;
+                for (List<Double> v : subs) { Double x = v.get(current - k); if (x != null) { s += x; any = true; } }
+                return any ? s : null;
+            };
         }
     }
 
-    private void setReco(String ticker, Workbook trackerWorkbook, Sheet analystRecoSheet, Cell trackerCell, int startPosition){
+    /** latest reco + target per Firm and quarter from Analysts&Consensus > "Analysts Expectations" */
+    static Map<String, Map<String, String[]>> readRecos(Sheet sheet, FormulaEvaluator ev) {
+        Map<String, Map<String, String[]>> out = new HashMap<>();
+        if (sheet == null) return out;
+        int last = sheet.getLastRowNum(), hdr = -1;
+        int cQuarter = -1, cDate = -1, cFirm = -1, cReco = -1, cTp = -1;
+        for (int r = 0; r <= last && hdr < 0; r++) {
+            Row row = sheet.getRow(r);
+            if (row == null) continue;
+            for (int c = 0; c < Math.min(row.getLastCellNum(), 40); c++) {
+                String t = text(row.getCell(c), ev);
+                if (t.equals("Firm")) cFirm = c;
+                else if (t.equals("Quarter")) cQuarter = c;
+                else if (t.equals("Date")) cDate = c;
+                else if (t.equals("Reco")) cReco = c;
+                else if (t.equals("TP")) cTp = c;
+            }
+            if (cFirm >= 0 && cQuarter >= 0 && cReco >= 0) hdr = r;
+            else { cQuarter = cDate = cFirm = cReco = cTp = -1; }
+        }
+        if (hdr < 0) return out;
+        Map<String, Double> latest = new HashMap<>();
+        for (int r = hdr + 1; r <= last; r++) {
+            String firm = text(cellAt(sheet, r, cFirm), ev).toUpperCase(), q = text(cellAt(sheet, r, cQuarter), ev);
+            String reco = text(cellAt(sheet, r, cReco), ev);
+            if (firm.isEmpty() || q.isEmpty() || reco.isEmpty()) continue;
+            Double tp = cTp < 0 ? null : number(cellAt(sheet, r, cTp), ev);
+            Double date = cDate < 0 ? null : number(cellAt(sheet, r, cDate), ev);
+            String key = firm + "|" + q;
+            double d = date == null ? 0 : date;
+            if (latest.containsKey(key) && latest.get(key) > d) continue;      // keep the latest report of the quarter
+            latest.put(key, d);
+            out.computeIfAbsent(firm, f -> new HashMap<>()).put(q, new String[]{reco, tp == null ? "" : String.valueOf(Math.round(tp))});
+        }
+        return out;
+    }
 
+    /** first number to the right of a label in columns A-E, e.g. "Current Price" in the Data Sheet */
+    static Double labelledValue(Sheet sheet, String label, FormulaEvaluator ev) {
+        if (sheet == null) return null;
+        for (int r = 0; r <= sheet.getLastRowNum(); r++) {
+            Row row = sheet.getRow(r);
+            if (row == null) continue;
+            for (int c = 0; c <= 4; c++) {
+                if (!text(row.getCell(c), ev).equals(label)) continue;
+                for (int x = c + 1; x <= c + 12; x++) {
+                    Double v = number(row.getCell(x), ev);
+                    if (v != null) return v;
+                }
+                return null;
+            }
+        }
+        return null;
+    }
+
+    // ------------------------------------------------------------------ derived series
+
+    static Series ttm(Series s) {
+        return k -> {
+            double sum = 0;
+            for (int i = k; i < k + 4; i++) { Double v = s.at(i); if (v == null) return null; sum += v; }
+            return sum;
+        };
+    }
+
+    /** YoY growth; for profits (positiveOnly) 0 unless both quarters are positive, as before */
+    static Series yoy(Series s, boolean positiveOnly) {
+        return k -> {
+            Double cur = s.at(k), prev = s.at(k + 4);
+            if (cur == null || prev == null || prev == 0) return positiveOnly ? 0d : null;
+            if (positiveOnly && (cur <= 0 || prev <= 0)) return 0d;
+            return Math.round((cur / prev - 1) * 10000) / 10000.0;
+        };
+    }
+
+    // ------------------------------------------------------------------ tracker writers
+
+    private static void setNumber(Row row, int col, Double value, boolean override, boolean positiveOnly) {
+        if (value == null || (positiveOnly && value <= 0)) return;
+        Cell c = row.getCell(col);
+        boolean blank = c == null || c.getCellTypeEnum() == CellType.BLANK
+                || (c.getCellTypeEnum() == CellType.NUMERIC && c.getNumericCellValue() == 0);
+        if (!blank && !override) return;
+        if (c == null) c = row.createCell(col, CellType.NUMERIC);
+        c.setCellValue(value);
+    }
+
+    /** five numbers Q0..Q4 into five consecutive cells starting at col */
+    private static void setFive(Row row, int col, Series s) {
+        for (int k = 0; k < 5; k++) {
+            Double v = s.at(k);
+            Cell c = row.getCell(col + k);
+            boolean blank = c == null || c.getCellTypeEnum() == CellType.BLANK;
+            if (!blank && !IS_OVERRIDE_OTHER_DATA) continue;
+            if (c == null) c = row.createCell(col + k, CellType.NUMERIC);
+            if (v == null) c.setCellType(CellType.BLANK); else c.setCellValue(v);
+        }
+    }
+
+    /** "q0 / q1 / q2 / q3 / q4" (latest first), values / unit with 2 decimals, or x100 with "%" */
+    private static void setTrend(Row row, int col, Series s, double unit, boolean isPercent) {
+        StringBuilder sb = new StringBuilder();
+        for (int k = 0; k < 5; k++) {
+            Double v = s.at(k);
+            if (v != null) {
+                double x = isPercent ? v * 100 : v / unit;
+                sb.append(Math.round(x * 100) / 100.0);
+                if (isPercent) sb.append('%');
+            }
+            if (k < 4) sb.append(" / ");
+        }
+        Cell c = row.getCell(col);
+        if (c == null) c = row.createCell(col, CellType.STRING);
+        c.setCellValue(sb.toString());
+    }
+
+    /**
+     * "reco tp / reco tp / ..." for the last four quarters (latest first, blank when the broker has no report);
+     * a reco or target is green when better than the broker's previous quarter, red when worse.
+     */
+    private void setReco(String ticker, Workbook trackerWorkbook, Cell trackerCell, List<String[]> lastFour) {
         XSSFWorkbook workbook = (XSSFWorkbook) trackerWorkbook;
-
-        // Create a cell style with the desired font color
         XSSFFont greenFont = workbook.createFont();
-        greenFont.setColor(IndexedColors.GREEN.getIndex()); // Green color
-
+        greenFont.setColor(IndexedColors.GREEN.getIndex());
         XSSFFont redFont = workbook.createFont();
-        redFont.setColor(IndexedColors.RED.getIndex()); // Red color
+        redFont.setColor(IndexedColors.RED.getIndex());
 
-        // Create a font for black color
-        XSSFFont blackFont = workbook.createFont();
-        blackFont.setColor(IndexedColors.BLACK.getIndex());
-
-        String recommendation = "";
-        String[] recoArray = new String[4]; // Array to store recommendations
-        String[] targetArray = new String[4]; // Array to store target prices
-
-        //fill values in the array
-        for (int i = 1; i < 5; i ++) {
-            Cell recoCell = analystRecoSheet.getRow(i + startPosition).getCell(RECO_COLUMN);
-            Cell targetCell = analystRecoSheet.getRow(i + startPosition).getCell(TARGET_PRICE_COLUMN);
-
-            if (recoCell != null && recoCell.getCellTypeEnum() == CellType.STRING
-                    && targetCell != null && targetCell.getCellTypeEnum() == CellType.NUMERIC) {
-                String moslReco = recoCell.getStringCellValue();
-                try {
-                    int moslTarget = (int) targetCell.getNumericCellValue();
-                    recoArray[i - 1] = moslReco;
-                    targetArray[i - 1] = "" + moslTarget;
-                } catch (Exception e) {
-                    recoArray[i - 1] = moslReco;
-                    targetArray[i - 1] = "" + 0;
-                }
-            } else {
-                recoArray[i - 1] = "";
-                targetArray[i - 1] = "";
-            }
+        StringBuilder sb = new StringBuilder();
+        List<int[]> spans = new ArrayList<>();          // {start, end, 1=green / -1=red}
+        for (int i = 0; i < lastFour.size(); i++) {
+            String[] cur = lastFour.get(i);
+            if (i > 0) sb.append(" / ");
+            if (cur == null) continue;
+            String[] prev = null;
+            for (int j = i + 1; j < lastFour.size() && prev == null; j++) prev = lastFour.get(j);
+            int recoStart = sb.length();
+            sb.append(cur[0]);
+            int recoEnd = sb.length();
+            sb.append(' ');
+            int tpStart = sb.length();
+            sb.append(cur[1]);
+            int tpEnd = sb.length();
+            if (prev == null) continue;
+            if (isUpgrade(prev[0], cur[0])) spans.add(new int[]{recoStart, recoEnd, 1});
+            if (isDowngrade(prev[0], cur[0])) spans.add(new int[]{recoStart, recoEnd, -1});
+            try {
+                int t = Integer.parseInt(cur[1]), p = Integer.parseInt(prev[1]);
+                if (t > p) spans.add(new int[]{tpStart, tpEnd, 1});
+                if (t < p) spans.add(new int[]{tpStart, tpEnd, -1});
+            } catch (NumberFormatException ignored) { /* no target */ }
         }
-
-        int firstTargetStart = 0, firstTargetEnd = 0, secondTargetStart = 0, secondTargetEnd = 0, thirdTargetStart = 0, thirdTargetEnd = 0;
-        XSSFFont firstTargetColor = blackFont, secondTargetColor = blackFont, thirdTargetColor = blackFont;
-        int firstRecoStart = 0, firstRecoEnd = 0, secondRecoStart = 0, secondRecoEnd = 0, thirdRecoStart = 0, thirdRecoEnd = 0;
-        XSSFFont firstRecoColor = blackFont, secondRecoColor = blackFont, thirdRecoColor = blackFont;
-
-        for (int i=0; i<4; i++){
-            if(!recoArray[i].equals("")) {
-                if(recommendation.equals("")) {
-                    // first item
-                    if(!targetArray[i + 1].equals("")){
-                        int nextTargetNo = Integer.parseInt(targetArray[i + 1]);
-                        int targetNo = Integer.parseInt(targetArray[i]);
-                        String nextReco = recoArray[i + 1];
-                        String reco = recoArray[i];
-                        if(targetNo > nextTargetNo) {
-                            firstTargetColor = greenFont;
-                        }
-                        if(targetNo < nextTargetNo){
-                            firstTargetColor = redFont;
-                        }
-                        if(isUpgrade(nextReco, reco)){
-                            firstRecoColor = greenFont;
-                            System.out.println("1st Upgrade for ticker - " + ticker + " " + reco + " / " + nextReco);
-                        }
-                        if(isDowngrade(nextReco, reco)){
-                            firstRecoColor = redFont;
-                            System.out.println("1st Downgrade for ticker - " + ticker + " " + reco + " / " + nextReco);
-                        }
-                    }
-                    firstRecoStart = 0;
-                    firstRecoEnd = recoArray[i].length();
-                    firstTargetStart = recoArray[i].length() + 1;
-                    firstTargetEnd = firstTargetStart + targetArray[i].length() + 1;
-                    recommendation = recoArray[i] + " " + targetArray[i];
-                }
-                else {
-                    if(i==1){
-                        if(!targetArray[i + 1].equals("")) {
-                            int nextTargetNo = Integer.parseInt(targetArray[i + 1]);
-                            int targetNo = Integer.parseInt(targetArray[i]);
-                            String nextReco = recoArray[i + 1];
-                            String reco = recoArray[i];
-                            if (targetNo > nextTargetNo) {
-                                secondTargetColor = greenFont;
-                            }
-                            if (targetNo < nextTargetNo) {
-                                secondTargetColor = redFont;
-                            }
-                            if(isUpgrade(nextReco, reco)){
-                                secondRecoColor = greenFont;
-//                                System.out.println("2nd Upgrade for ticker - " + ticker + " " + reco + " / " + nextReco);
-                            }
-                            if(isDowngrade(nextReco, reco)){
-                                secondRecoColor = redFont;
-//                                System.out.println("2nd Downgrade for ticker - " + ticker + " " + reco + " / " + nextReco);
-                            }
-                        }
-                        secondRecoStart = recommendation.length() + 2;
-                        secondRecoEnd = recommendation.length() + recoArray[i].length() + 3;
-                        secondTargetStart = recommendation.length() + recoArray[i].length() + 4;
-                        secondTargetEnd = secondTargetStart + targetArray[i].length() + 1;
-                    }
-                    if(i==2){
-                        if(!targetArray[i + 1].equals("")) {
-                            int nextTargetNo = Integer.parseInt(targetArray[i + 1]);
-                            int targetNo = Integer.parseInt(targetArray[i]);
-                            String nextReco = recoArray[i + 1];
-                            String reco = recoArray[i];
-                            if (targetNo > nextTargetNo) {
-                                thirdTargetColor = greenFont;
-                            }
-                            if (targetNo < nextTargetNo) {
-                                thirdTargetColor = redFont;
-                            }
-                            if(isUpgrade(nextReco, reco)){
-                                thirdRecoColor = greenFont;
-//                                System.out.println("3rd Upgrade for ticker - " + ticker + " " + reco + " / " + nextReco);
-                            }
-                            if(isDowngrade(nextReco, reco)){
-                                thirdRecoColor = redFont;
-//                                System.out.println("3rd Downgrade for ticker - " + ticker + " " + reco + " / " + nextReco);
-                            }
-                        }
-                        thirdRecoStart = recommendation.length() + 2;
-                        thirdRecoEnd = recommendation.length() + recoArray[i].length() + 3;
-                        thirdTargetStart = recommendation.length() + recoArray[i].length() + 4;
-                        thirdTargetEnd = thirdTargetStart + targetArray[i].length() + 1;
-                    }
-                    recommendation = recommendation + " / " + recoArray[i] + " " + targetArray[i];
-                }
-            }
-            else {
-                if(i < 3) {
-                    if(i==1){
-                        secondRecoStart = recommendation.length();
-                        secondRecoEnd = secondRecoStart + 2;
-                        secondTargetStart = recommendation.length();
-                        secondTargetEnd = secondTargetStart + 3;
-                    }
-                    if(i==2){
-                        thirdRecoStart = recommendation.length();
-                        thirdRecoEnd = thirdRecoStart + 2;
-                        thirdTargetStart = recommendation.length();
-                        thirdTargetEnd = thirdTargetStart + 3;
-                    }
-                    recommendation = recommendation + " / ";
-                }
-                else {
-                    recommendation = recommendation + "  ";
-                }
-            }
-        }
-        /*System.out.print(ticker + " - recommendation: " + recommendation + " length - " + recommendation.length());
-        System.out.print(" firstRecoStart - firstRecoEnd : " + firstRecoStart + "-" + firstRecoEnd);
-        System.out.print(" firstTargetStart - firstTargetEnd : " + firstTargetStart + "-" + firstTargetEnd);
-        System.out.print(" secondRecoStart - firstRecoEnd : " + secondRecoStart + "-" + secondRecoEnd);
-        System.out.print(" secondTargetStart - firstTargetEnd : " + secondTargetStart + "-" + secondTargetEnd);
-        System.out.println(" thirdRecoStart - firstRecoEnd : " + thirdRecoStart + "-" + thirdRecoEnd);
-        System.out.println(" thirdTargetStart - firstTargetEnd : " + thirdTargetStart + "-" + thirdTargetEnd);*/
-
         try {
-            trackerCell.setCellValue(recommendation);
-            trackerCell.getRichStringCellValue().applyFont(firstRecoStart, firstRecoEnd, firstRecoColor);
-            trackerCell.getRichStringCellValue().applyFont(firstTargetStart, firstTargetEnd, firstTargetColor);
-            trackerCell.getRichStringCellValue().applyFont(secondRecoStart, secondRecoEnd, secondRecoColor);
-            trackerCell.getRichStringCellValue().applyFont(secondTargetStart, secondTargetEnd, secondTargetColor);
-            trackerCell.getRichStringCellValue().applyFont(thirdRecoStart, thirdRecoEnd, thirdRecoColor);
-            trackerCell.getRichStringCellValue().applyFont(thirdTargetStart, thirdTargetEnd, thirdTargetColor);
-        } catch (Exception e){
-            e.printStackTrace();
-            System.out.println("Exception in setting Rich Text for " + ticker + ", AnalystReco start position - " + startPosition + " Exception: " + e.getMessage());
+            XSSFRichTextString rich = new XSSFRichTextString(sb.toString());
+            for (int[] s : spans) if (s[1] > s[0]) rich.applyFont(s[0], s[1], s[2] > 0 ? greenFont : redFont);
+            trackerCell.setCellValue(rich);
+        } catch (Exception e) {
+            System.out.println("Exception in setting Rich Text for " + ticker + ": " + e.getMessage());
+            trackerCell.setCellValue(sb.toString());
         }
     }
 
     public boolean isUpgrade(String lastReco, String currentReco) {
         int lastRecoRank = getRecommendationRank(lastReco);
         int currentRecoRank = getRecommendationRank(currentReco);
-        return currentRecoRank < lastRecoRank;
+        return currentRecoRank > 0 && lastRecoRank > 0 && currentRecoRank < lastRecoRank;
     }
 
     public boolean isDowngrade(String lastReco, String currentReco) {
         int lastRecoRank = getRecommendationRank(lastReco);
         int currentRecoRank = getRecommendationRank(currentReco);
-        return currentRecoRank > lastRecoRank;
+        return currentRecoRank > 0 && lastRecoRank > 0 && currentRecoRank > lastRecoRank;
     }
 
     public int getRecommendationRank(String reco) {
@@ -745,133 +519,50 @@ public class ConsolidatedResultTracker {
         }
     }
 
-    public void setTrend(Row trackerRow, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator,  int rownumber, int y0CellNo, int trackerCellNumber) {
-        setTrend(trackerRow, quarterPnLSheet, tickerFileEvaluator, rownumber, y0CellNo, trackerCellNumber, 1000, false);
-        /*Row tickerRow = quarterPnLSheet.getRow(rownumber);//19 for Revenue
-        String[] tickerRowValuesArray = new String[4];
-        if (tickerRow != null) {
-            for (int i = y0CellNo, j = 0; i >= (y0CellNo-3) || j <= 3; i--, j++) { //17 for Y0 and 14 for Y4
-                Cell ttmRevenueCell = tickerRow.getCell(i);
-                if (ttmRevenueCell != null) {
-                    CellValue cellValue = tickerFileEvaluator.evaluate(ttmRevenueCell);
-                    try {
-                        double tickerRowValue = cellValue.getNumberValue() / 1000; // in thousand cr.
-                        tickerRowValue = Math.round(tickerRowValue * 100);
-                        tickerRowValue = tickerRowValue / 100;
-                        tickerRowValuesArray[j] = "" + tickerRowValue;
-                    } catch (Exception e) {
-                        tickerRowValuesArray[j] = "";
-                    }
-                }
-            }
-        }
-        String trackerRowTrend = "";
-        for (int i = 0; i <= 3; i++) {
-            if (i < 3)
-                trackerRowTrend = trackerRowTrend + tickerRowValuesArray[i] + " / ";
-            else
-                trackerRowTrend = trackerRowTrend + tickerRowValuesArray[i];
-        }
-        Cell trackerRowTrendCell = trackerRow.getCell(trackerCellNumber);
-        if (trackerRowTrendCell == null)
-            trackerRowTrendCell = trackerRow.createCell(trackerCellNumber, CellType.STRING);
-        trackerRowTrendCell.setCellValue(trackerRowTrend);*/
+    // ------------------------------------------------------------------ cell helpers
+
+    /** FY27Q2 minus n quarters (FY27Q1, FY26Q4, ...) */
+    static String previousQuarter(String fyq, int n) {
+        int fy = Integer.parseInt(fyq.substring(2, 4)), q = Integer.parseInt(fyq.substring(5));
+        int idx = fy * 4 + (q - 1) - n;
+        return String.format("FY%02dQ%d", idx / 4, idx % 4 + 1);
     }
 
-    public void setTrend(Row trackerRow, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator, int rownumber, int y0CellNo, int trackerCellNumber, int unit, boolean isPercent) {
-
-        Row tickerRow = quarterPnLSheet.getRow(rownumber); // e.g., 19 for Revenue
-        String[] tickerRowValuesArray = new String[5]; // Increased to 5 values
-
-        if (tickerRow != null) {
-            for (int i = y0CellNo, j = 0; i >= (y0CellNo - 4) && j <= 4; i--, j++) {
-                Cell ttmRevenueCell = tickerRow.getCell(i);
-                if (ttmRevenueCell != null) {
-                    CellValue cellValue = tickerFileEvaluator.evaluate(ttmRevenueCell);
-                    try {
-                        double tickerRowValue = 0;
-                        if (!isPercent) {
-                            tickerRowValue = cellValue.getNumberValue() / unit;
-                        } else {
-                            tickerRowValue = cellValue.getNumberValue() * 100;
-                        }
-                        tickerRowValue = Math.round(tickerRowValue * 100) / 100.0;
-                        tickerRowValuesArray[j] = "" + tickerRowValue;
-                    } catch (Exception e) {
-                        tickerRowValuesArray[j] = "";
-                    }
-                }
-            }
-        }
-
-        StringBuilder trackerRowTrend = new StringBuilder();
-        for (int i = 0; i < 5; i++) {
-            if (tickerRowValuesArray[i] != null) {
-                trackerRowTrend.append(tickerRowValuesArray[i]);
-                if (isPercent) trackerRowTrend.append("%");
-                if (i < 4) trackerRowTrend.append(" / ");
-            }
-        }
-
-        Cell trackerRowTrendCell = trackerRow.getCell(trackerCellNumber);
-        if (trackerRowTrendCell == null)
-            trackerRowTrendCell = trackerRow.createCell(trackerCellNumber, CellType.STRING);
-
-        trackerRowTrendCell.setCellValue(trackerRowTrend.toString());
+    private static Cell cellAt(Sheet sheet, int row, int col) {
+        if (col < 0) return null;
+        Row r = sheet.getRow(row);
+        return r == null ? null : r.getCell(col);
     }
 
-    public void setNumericValue(Row row, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator, int trackerCellLocation, int tickerRowNumber, int tickerCellNumber){
-        if (quarterPnLSheet.getRow(tickerRowNumber) != null) {
-            if (row.getCell(trackerCellLocation) == null || row.getCell(trackerCellLocation).getCellType() == Cell.CELL_TYPE_BLANK || IS_OVERRIDE_OTHER_DATA) {
-                if (row.getCell(trackerCellLocation) == null)
-                    row.createCell(trackerCellLocation, CellType.NUMERIC);
-                row.getCell(trackerCellLocation).setCellValue(getNumberValueFromCell(quarterPnLSheet.getRow(tickerRowNumber).getCell(tickerCellNumber), tickerFileEvaluator));
+    /** trimmed string value (formulas evaluated), "" when not text */
+    static String text(Cell c, FormulaEvaluator ev) {
+        if (c == null) return "";
+        try {
+            if (c.getCellTypeEnum() == CellType.STRING) return c.getStringCellValue().trim();
+            if (c.getCellTypeEnum() == CellType.FORMULA) {
+                CellValue v = ev.evaluate(c);
+                return v != null && v.getCellTypeEnum() == CellType.STRING ? v.getStringValue().trim() : "";
             }
+        } catch (Exception e) {
+            try { return c.getCachedFormulaResultTypeEnum() == CellType.STRING ? c.getStringCellValue().trim() : ""; }
+            catch (Exception ignored) { return ""; }
         }
+        return "";
     }
 
-    private double getNumberValueFromCell(Cell dataCell, FormulaEvaluator evaluator) {
-        double value = 0;
-        if(dataCell == null) {
-            return value;
-        }
-        if (dataCell.getCellTypeEnum() == CellType.NUMERIC) {
-            value = dataCell.getNumericCellValue();
-        } else if (dataCell.getCellTypeEnum() == CellType.FORMULA) {
-            CellValue cellValue = evaluator.evaluate(dataCell);
-            try {
-                value = cellValue.getNumberValue();
-            } catch (Exception e) {
-                value = 0;
+    /** numeric value (formulas evaluated, cached result if evaluation fails), null when not a number */
+    static Double number(Cell c, FormulaEvaluator ev) {
+        if (c == null) return null;
+        try {
+            if (c.getCellTypeEnum() == CellType.NUMERIC) return c.getNumericCellValue();
+            if (c.getCellTypeEnum() == CellType.FORMULA) {
+                CellValue v = ev.evaluate(c);
+                return v != null && v.getCellTypeEnum() == CellType.NUMERIC ? v.getNumberValue() : null;
             }
+        } catch (Exception e) {
+            try { return c.getCachedFormulaResultTypeEnum() == CellType.NUMERIC ? c.getNumericCellValue() : null; }
+            catch (Exception ignored) { return null; }
         }
-        return value;
-    }
-
-    private void computeAndSetGrowth(Row row, Sheet quarterPnLSheet, FormulaEvaluator tickerFileEvaluator,  int tickerRowNumber, int trackerFirstCellLocation){
-        if (quarterPnLSheet.getRow(tickerRowNumber) != null) {
-            Cell currentProfitCell, lastYrProfitCell;
-            for (int i = LATEST_QUARTER_COLUMN; i >= LATEST_QUARTER_COLUMN - 4; i--){
-                currentProfitCell = quarterPnLSheet.getRow(tickerRowNumber).getCell(i);
-                lastYrProfitCell =  quarterPnLSheet.getRow(tickerRowNumber).getCell(i-4);
-                if(currentProfitCell!=null && lastYrProfitCell!=null){
-                    CellValue currentProfitValue = tickerFileEvaluator.evaluate(currentProfitCell);
-                    CellValue lastYrProfitValue = tickerFileEvaluator.evaluate(lastYrProfitCell);
-                    double currentProfit = currentProfitValue.getNumberValue();
-                    double lastYrProfit = lastYrProfitValue.getNumberValue();
-                    if(lastYrProfit>0 && currentProfit > 0){
-                        double profitGrowth = (currentProfit/lastYrProfit)-1;
-                        profitGrowth = Math.round(profitGrowth * 10000);
-                        profitGrowth = profitGrowth / 10000;
-                        row.getCell(trackerFirstCellLocation).setCellValue(profitGrowth);
-                    } else {
-                        row.getCell(trackerFirstCellLocation).setCellValue(0);
-                    }
-                } else {
-                    row.getCell(trackerFirstCellLocation).setCellValue(0);
-                }
-                trackerFirstCellLocation++;
-            }
-        }
+        return null;
     }
 }
