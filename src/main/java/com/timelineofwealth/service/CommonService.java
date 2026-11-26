@@ -1087,8 +1087,8 @@ public class CommonService {
                 part = part.trim();
                 if (part.startsWith("[") && part.endsWith("]")) {
                     String[] range = part.substring(1, part.length() - 1).split("-");
-                    int start = Integer.parseInt(range[0]);
-                    int end = Integer.parseInt(range[1]);
+                    int start = Integer.parseInt(range[0].trim());
+                    int end = Integer.parseInt(range[range.length > 1 ? 1 : 0].trim());   // "[3]" = just 3
                     for (int i = start; i <= end; i++) {
                         activeCombinations.add(i);
                     }
@@ -1105,10 +1105,11 @@ public class CommonService {
                 Map<String, String> sectionProps = chartProperty.get(section);
 
                 String sheetName = sectionProps.get("sheet_name");
-                int dateRow = Integer.parseInt(sectionProps.get("date_row"));
-                int paramRow = Integer.parseInt(sectionProps.get("parameter_row"));
-                String startCol = sectionProps.get("date_column_start");
-                String endCol = sectionProps.get("date_column_end");
+                // row-number definitions; label-based ones (block / row_label) leave these out
+                int dateRow = Integer.parseInt(sectionProps.getOrDefault("date_row", "0"));
+                int paramRow = Integer.parseInt(sectionProps.getOrDefault("parameter_row", "0"));
+                String startCol = sectionProps.getOrDefault("date_column_start", "A");
+                String endCol = sectionProps.getOrDefault("date_column_end", "A");
                 String title = sectionProps.get("name");
                 String chartType = sectionProps.getOrDefault("chart_type", "line");
                 String fieldNameColumn = sectionProps.getOrDefault("name_column", "A");
@@ -1117,6 +1118,12 @@ public class CommonService {
 
                 Sheet sheet = workbook.getSheet(sheetName);
                 if (sheet == null) continue;
+
+                if (sectionProps.containsKey("block")) {          // label-based definition (HistoricalData / ModelBFSI)
+                    CustomChartData c = labelChart(sheet, evaluator, sectionProps, comboId, title, chartType, stacked, showLegend);
+                    if (c != null) chartDataList.add(c);
+                    continue;
+                }
 
                 Row dateRowObj = sheet.getRow(dateRow - 1);
                 Row paramRowObj = sheet.getRow(paramRow - 1);
@@ -1191,6 +1198,165 @@ public class CommonService {
             ex.printStackTrace();
         }
         return chartDataList;
+    }
+
+    /**
+     * Label-based chart definition, so charts survive row moves in the new sheets:
+     *   sheet_name    = HistoricalData (or ModelBFSI)
+     *   block         = Quarterly Income Statement      title of the block in column B (prefix match)
+     *   row_label     = Revenue                          one series: the row with this label (column C or D)
+     *   row_under     = BORROWING & INTEREST EXPENSES    optional: look for row_label only below this label
+     *   series_under  = Segmental Revenue                instead of row_label: one series per row below this
+     *                                                    sub-header, up to the next column-C row (the subtotal
+     *                                                    row repeating the header label and empty rows skipped)
+     *   series_label  = optional legend name for a row_label series
+     * Columns are the block's period labels (FY26 / FY27Q2, header "FIN Years" / "Quarters" in column C) whose
+     * period has ended; trailing periods with no value yet are dropped. Returns null when nothing is found.
+     */
+    private CustomChartData labelChart(Sheet sheet, FormulaEvaluator ev, Map<String, String> p, int comboId,
+                                       String title, String chartType, boolean stacked, boolean showLegend) {
+        String block = p.get("block").trim();
+        int last = sheet.getLastRowNum();
+        int r0 = -1;
+        for (int r = 0; r <= last && r0 < 0; r++) {
+            String t = safeText(cellAt(sheet, r, 1), ev);
+            if (t != null && t.trim().startsWith(block)) r0 = r;
+        }
+        if (r0 < 0) return null;
+        int hdr = -1;
+        for (int r = r0; r <= Math.min(last, r0 + 6) && hdr < 0; r++) {
+            String t = safeText(cellAt(sheet, r, 2), ev).trim();
+            if (t.startsWith("FIN Year") || t.startsWith("Quarter")) hdr = r;
+        }
+        if (hdr < 0) return null;
+        int end = last + 1;                       // block ends at the next text in column B
+        for (int r = hdr + 1; r <= last; r++) {
+            if (!safeText(cellAt(sheet, r, 1), ev).trim().isEmpty()) { end = r; break; }
+        }
+
+        // actual periods only
+        Date today = new Date();
+        List<Integer> cols = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
+        Row hr = sheet.getRow(hdr);
+        for (int c = 3; hr != null && c < hr.getLastCellNum(); c++) {
+            String l = safeText(hr.getCell(c), ev).trim();
+            Date pe = StockFinancialsService.periodEnd(l);
+            if (pe == null || pe.after(today)) continue;
+            cols.add(c);
+            labels.add(l);
+        }
+        if (cols.isEmpty()) return null;
+
+        // rows: label in column C (main rows) or D (sub-rows); remember which column held it
+        List<Integer> rows = new ArrayList<>();
+        List<String> rowLabels = new ArrayList<>();
+        List<Boolean> mainRow = new ArrayList<>();
+        for (int r = hdr + 1; r < end; r++) {
+            String c = safeText(cellAt(sheet, r, 2), ev).trim();
+            String d = safeText(cellAt(sheet, r, 3), ev).trim();
+            if (c.isEmpty() && d.isEmpty()) continue;
+            rows.add(r);
+            rowLabels.add(c.isEmpty() ? d : c);
+            mainRow.add(!c.isEmpty());
+        }
+
+        List<ChartSeriesData> series = new ArrayList<>();
+        String seriesType = p.getOrDefault("series_chart_type", chartType);
+        String under = p.get("series_under");
+        if (under != null) {
+            int i = rowLabels.indexOf(under.trim());
+            if (i < 0) return null;
+            for (int j = i + 1; j < rows.size() && !mainRow.get(j); j++) {
+                if (rowLabels.get(j).equals(under.trim())) continue;          // subtotal row
+                List<Double> v = valuesAt(sheet, rows.get(j), cols, ev);
+                if (v.stream().noneMatch(x -> x != null && x != 0)) continue;
+                ChartSeriesData s = new ChartSeriesData();
+                s.setLabel(rowLabels.get(j));
+                s.setValues(v);
+                s.setChartType(seriesType);
+                series.add(s);
+            }
+        } else {
+            String label = p.getOrDefault("row_label", "").trim();
+            int from = 0;
+            if (p.containsKey("row_under")) {
+                from = rowLabels.indexOf(p.get("row_under").trim());
+                if (from < 0) return null;
+            }
+            int i = -1;
+            for (int j = from; j < rowLabels.size() && i < 0; j++) if (rowLabels.get(j).equals(label)) i = j;
+            if (i < 0) return null;
+            List<Double> v = valuesAt(sheet, rows.get(i), cols, ev);
+            if (v.stream().noneMatch(x -> x != null && x != 0)) return null;
+            ChartSeriesData s = new ChartSeriesData();
+            s.setLabel(p.getOrDefault("series_label", label));
+            s.setValues(v);
+            s.setChartType(chartType);
+            series.add(s);
+        }
+        if (series.isEmpty()) return null;
+
+        // drop leading and trailing periods with no value in any series (years before the history starts,
+        // the latest quarter not filled in yet)
+        int n = labels.size(), first = 0;
+        while (n > 0 && !hasValue(series, n - 1)) n--;
+        while (first < n && !hasValue(series, first)) first++;
+        if (first >= n) return null;
+        for (ChartSeriesData s : series) s.setValues(new ArrayList<>(s.getValues().subList(first, n)));
+
+        CustomChartData chartData = new CustomChartData();
+        chartData.setCombinationId(comboId);
+        chartData.setTitle(title);
+        chartData.setLabels(new ArrayList<>(labels.subList(first, n)));
+        chartData.setValues(series.get(0).getValues());
+        chartData.setFieldName(series.size() == 1 ? series.get(0).getLabel() : title);
+        chartData.setSeries(series);
+        chartData.setChartType(chartType);
+        chartData.setStacked(stacked);
+        chartData.setShowLegend(showLegend);
+        return chartData;
+    }
+
+    private String safeText(Cell cell, FormulaEvaluator ev) {
+        try {
+            return getCellAsString(cell, ev);
+        } catch (Exception e) {
+            try { return cell != null && cell.getCachedFormulaResultType() == Cell.CELL_TYPE_STRING ? cell.getStringCellValue() : ""; }
+            catch (Exception ignored) { return ""; }
+        }
+    }
+
+    private static boolean hasValue(List<ChartSeriesData> series, int k) {
+        for (ChartSeriesData s : series) {
+            Double v = s.getValues().get(k);
+            if (v != null && v != 0) return true;
+        }
+        return false;
+    }
+
+    private static Cell cellAt(Sheet sheet, int row, int col) {
+        Row r = sheet.getRow(row);
+        return r == null ? null : r.getCell(col);
+    }
+
+    private List<Double> valuesAt(Sheet sheet, int row, List<Integer> cols, FormulaEvaluator ev) {
+        List<Double> out = new ArrayList<>();
+        Row r = sheet.getRow(row);
+        for (int c : cols) {
+            Double v = null;
+            Cell cell = r == null ? null : r.getCell(c);
+            if (cell != null) {
+                try {
+                    CellValue cv = ev.evaluate(cell);
+                    if (cv != null && cv.getCellType() == Cell.CELL_TYPE_NUMERIC) v = cv.getNumberValue();
+                } catch (Exception e) {
+                    if (cell.getCellType() == Cell.CELL_TYPE_FORMULA && cell.getCachedFormulaResultType() == Cell.CELL_TYPE_NUMERIC) v = cell.getNumericCellValue();
+                }
+            }
+            out.add(v);
+        }
+        return out;
     }
 
     private List<Double> extractValues(Row valueRow, int startIdx, int endIdx, FormulaEvaluator evaluator) {

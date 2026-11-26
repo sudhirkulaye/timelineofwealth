@@ -590,117 +590,120 @@ public class CreateFolderStructureForIndustry {
         }
     }
 
+    /**
+     * Result-day price and result date for the workbook's own quarter (TICKER_FY27Q2.xlsx -> column "FY27Q2"),
+     * in HistoricalData > "Quarterly Income Statement" (rows found by label; today rows 394 / 397):
+     *   Share Price  - set to the Data Sheet's "Current Price" unless a typed (non-zero) price is already there; the
+     *                  template's HLOOKUP formula in that one cell is replaced by the value, so the price at result
+     *                  time is kept. Market Cap (row 395) stays a formula (price x shares).
+     *   Result Date  - set to yesterday when blank.
+     */
     private static void updateExcel(File file) throws IOException {
-        try (FileInputStream fis = new FileInputStream(file);
-             Workbook workbook = new XSSFWorkbook(fis)) {
+        java.util.regex.Matcher m = Pattern.compile("_(FY\\d{2}Q[1-4])\\.xlsx$").matcher(file.getName());
+        if (!m.find()) return;
+        String quarter = m.group(1);
+        try (FileInputStream fis = new FileInputStream(file); XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
+            Sheet hd = workbook.getSheet("HistoricalData");
+            if (hd == null) {
+                System.out.println(file.getName() + ": no HistoricalData sheet, MCap/price not updated");
+                return;
+            }
+            FormulaEvaluator ev = workbook.getCreationHelper().createFormulaEvaluator();
+            int last = hd.getLastRowNum();
+            int r0 = -1, hdr = -1, end = last + 1;
+            for (int r = 0; r <= last && r0 < 0; r++) if (text(cellAt(hd, r, 1), ev).startsWith("Quarterly Income Statement")) r0 = r;
+            if (r0 < 0) { System.out.println(file.getName() + ": 'Quarterly Income Statement' block not found"); return; }
+            for (int r = r0; r <= Math.min(last, r0 + 6) && hdr < 0; r++) if (text(cellAt(hd, r, 2), ev).startsWith("Quarters")) hdr = r;
+            if (hdr < 0) { System.out.println(file.getName() + ": no 'Quarters' header row"); return; }
+            for (int r = hdr + 1; r <= last; r++) if (!text(cellAt(hd, r, 1), ev).isEmpty()) { end = r; break; }
 
-            // Access the "QuarterP&L" sheet
-            Sheet quarterPLSheet = workbook.getSheet("QuarterP&L");
-            if (quarterPLSheet != null) {
-                Row row13 = quarterPLSheet.getRow(12); // R13 corresponds to index 12
-                Row row14 = quarterPLSheet.getRow(13); // R14 corresponds to index 13
-                Row row15 = quarterPLSheet.getRow(14); // R15 corresponds to index 14
-
-                // Check if R15 is blank, and update with yesterday's date if true
-                String yesterdayDate = getYesterdayDate();
-                if (isNullOrEmpty(row15.getCell(17))) {
-                    updateCellValue(row15, 17, yesterdayDate);
-                }
-
-                // Check if R13 is blank, empty, null, or contains value 0
-                if (isNullOrEmptyOrZero(row13.getCell(17))) {
-                    // Access the "AnnualResults" sheet
-                    Sheet annualResultsSheet = workbook.getSheet("AnnualResults");
-                    if (annualResultsSheet != null) {
-                        // Access cell P45 (assuming this is a valid cell index)
-                        Cell cellP45 = annualResultsSheet.getRow(44).getCell(15);
-
-                        // Evaluate the formula in cell P45 to get the actual value
-                        evaluateFormulaCell(cellP45, workbook);
-
-                        // Get the numeric value from the formula cell
-                        double valueP45 = cellP45.getNumericCellValue();
-
-                        // Update cell R13 in "QuarterP&L" with the value from "AnnualResults"
-                        updateCellValue(row13, 17, valueP45);
-                    }
-                }
-
-                // Check if R14 is blank, empty, null, or contains value 0
-                if (isNullOrEmptyOrZero(row14.getCell(17))) {
-                    // Access the "AnnualResults" sheet
-                    Sheet annualResultsSheet = workbook.getSheet("AnnualResults");
-                    if (annualResultsSheet != null) {
-                        // Access cell P46 (assuming this is a valid cell index)
-                        Cell cellP46 = annualResultsSheet.getRow(45).getCell(15);
-
-                        // Evaluate the formula in cell P46 to get the actual value
-                        evaluateFormulaCell(cellP46, workbook);
-
-                        // Get the numeric value from the formula cell
-                        double valueP46 = cellP46.getNumericCellValue();
-
-                        // Update cell R14 in "QuarterP&L" with the value from "AnnualResults"
-                        updateCellValue(row14, 17, valueP46);
-                    }
-                }
+            int col = -1;
+            Row hr = hd.getRow(hdr);
+            for (int c = 3; hr != null && c < hr.getLastCellNum() && col < 0; c++) if (quarter.equals(text(hr.getCell(c), ev))) col = c;
+            int priceRow = -1, dateRow = -1;
+            for (int r = hdr + 1; r < end; r++) {
+                String l = text(cellAt(hd, r, 2), ev);
+                if (l.isEmpty()) l = text(cellAt(hd, r, 3), ev);
+                if (l.equals("Share Price") && priceRow < 0) priceRow = r;
+                if (l.equals("Result Date") && dateRow < 0) dateRow = r;
+            }
+            if (col < 0 || priceRow < 0 || dateRow < 0) {
+                System.out.println(file.getName() + ": column " + quarter + " / Share Price / Result Date not found");
+                return;
             }
 
-            // Save the changes
+            boolean changed = false;
+            // result date: yesterday when blank, styled like the previous quarter's date
+            Cell rd = cellOrCreate(hd, dateRow, col);
+            if (rd.getCellType() == Cell.CELL_TYPE_BLANK) {
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DATE, -1);
+                cal.set(Calendar.HOUR_OF_DAY, 0); cal.set(Calendar.MINUTE, 0); cal.set(Calendar.SECOND, 0); cal.set(Calendar.MILLISECOND, 0);
+                rd.setCellValue(cal.getTime());
+                Cell prev = cellAt(hd, dateRow, col - 1);
+                if (prev != null) rd.setCellStyle(prev.getCellStyle());
+                changed = true;
+            }
+            // share price: Data Sheet "Current Price" unless a typed price is already there
+            Cell pc = cellOrCreate(hd, priceRow, col);
+            boolean typed = pc.getCellType() == Cell.CELL_TYPE_NUMERIC && pc.getNumericCellValue() != 0;
+            Double price = currentPrice(workbook.getSheet("Data Sheet"), ev);
+            if (!typed && price != null && price > 0) {
+                if (pc.getCellType() == Cell.CELL_TYPE_FORMULA) pc.setCellType(Cell.CELL_TYPE_BLANK);   // drop the formula
+                pc.setCellValue(price);
+                changed = true;
+            }
+            if (!changed) return;
+            workbook.setForceFormulaRecalculation(true);     // Market Cap etc. recalculate when Excel opens the file
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 workbook.write(fos);
             }
+            System.out.println(file.getName() + ": " + quarter + " price " + price + " / result date updated in HistoricalData");
         }
     }
 
-    private static boolean isNullOrEmptyOrZero(Cell cell) {
-        return cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK ||
-                (cell.getCellType() == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() == 0);
-    }
-
-    private static boolean isNullOrEmpty(Cell cell) {
-        return cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK;
-    }
-
-    private static void updateCellValue(Row row, int columnIndex, Object value) {
-        Cell cell = row.getCell(columnIndex);
-        if (cell != null) {
-            if (value instanceof Number) {
-                cell.setCellValue(((Number) value).doubleValue());
-            } else if (value instanceof String) {
-                String stringValue = (String) value;
-                if (isDateInFormat(stringValue, "yyyy-MM-dd")) {
-                    cell.setCellValue(stringValue);
-                } else {
-                    cell.setCellValue(Double.parseDouble(stringValue));
-                }
+    /** "Current Price" in column B of the Screener Data Sheet (label in column A). */
+    private static Double currentPrice(Sheet ds, FormulaEvaluator ev) {
+        if (ds == null) return null;
+        for (int r = 0; r <= Math.min(ds.getLastRowNum(), 20); r++) {
+            if (!text(cellAt(ds, r, 0), ev).equals("Current Price")) continue;
+            Cell c = cellAt(ds, r, 1);
+            if (c == null) return null;
+            try {
+                CellValue v = ev.evaluate(c);
+                return v != null && v.getCellType() == Cell.CELL_TYPE_NUMERIC ? v.getNumberValue() : null;
+            } catch (Exception e) {
+                return null;
             }
         }
+        return null;
     }
 
-    private static boolean isDateInFormat(String date, String format) {
-        SimpleDateFormat sdf = new SimpleDateFormat(format);
-        sdf.setLenient(false);
+    private static Cell cellAt(Sheet sheet, int row, int col) {
+        Row r = sheet.getRow(row);
+        return r == null ? null : r.getCell(col);
+    }
+
+    private static Cell cellOrCreate(Sheet sheet, int row, int col) {
+        Row r = sheet.getRow(row);
+        if (r == null) r = sheet.createRow(row);
+        Cell c = r.getCell(col);
+        return c == null ? r.createCell(col) : c;
+    }
+
+    /** trimmed string value of a cell (formulas evaluated), "" when not text */
+    private static String text(Cell c, FormulaEvaluator ev) {
+        if (c == null) return "";
         try {
-            sdf.parse(date);
-            return true;
-        } catch (ParseException e) {
-            return false;
+            if (c.getCellType() == Cell.CELL_TYPE_STRING) return c.getStringCellValue().trim();
+            if (c.getCellType() == Cell.CELL_TYPE_FORMULA) {
+                CellValue v = ev.evaluate(c);
+                return v != null && v.getCellType() == Cell.CELL_TYPE_STRING ? v.getStringValue().trim() : "";
+            }
+        } catch (Exception e) {
+            try { return c.getCachedFormulaResultType() == Cell.CELL_TYPE_STRING ? c.getStringCellValue().trim() : ""; }
+            catch (Exception ignored) { return ""; }
         }
-    }
-
-    private static String getYesterdayDate() {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        java.util.Date yesterday = cal.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        return sdf.format(yesterday);
-    }
-
-    private static void evaluateFormulaCell(Cell cell, Workbook workbook) {
-        if (cell != null && cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
-            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-            evaluator.evaluateFormulaCell(cell);
-        }
+        return "";
     }
 }

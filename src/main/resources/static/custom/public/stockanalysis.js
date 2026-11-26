@@ -402,6 +402,9 @@
     }
 
     // ---------- lenders and other financials: ModelBFSI sheet ----------
+    // ModelBFSI's profit / EPS rows are filled for every company, so it is used for financials (by sector) and for
+    // any company whose ModelBFSI reports net interest income; everyone else gets the HistoricalData P&L
+    function useBfsi() { return !!(S.fin && S.fin.bfsi && (S.fin.bfsiHasNii || isFinancial())); }
     function bfsiBlock(kind, period) {
         var B = (S.fin && S.fin.bfsi) || [];
         for (var i = 0; i < B.length; i++) if (B[i].period === period && B[i].block.indexOf(kind) >= 0) return B[i];
@@ -420,15 +423,29 @@
     function renderBankFundamentals() {
         var annual = S.period === 'A', per = annual ? 'A' : 'Q';
         var inc = bfsiBlock('Income Expense', per), bank = bfsiBlock('Banking', per);
-        setTitles('Net interest income <span class="tw-muted">&#8377; Cr &#183; line = NIM</span>',
-                  'Pre-provision profit <span class="tw-muted">&#8377; Cr &#183; line = cost to income</span>',
-                  'EPS <span class="tw-muted">&#8377;</span>', 'Net interest income, operating profit and EPS');
         var all = inc ? inc.labels : [], take = annual ? 10 : 12, from = Math.max(0, all.length - take);
         var labels = all.slice(from).map(bfsiLabel), nAct = labels.length;
         var sl = function (v) { return v ? v.slice(from) : labels.map(function () { return null; }); };
-        var nii = sl(bfsiRow(inc, /^Net Interest Income/)), nim = sl(bfsiRow(inc, /^Net Interest Margin/));
-        var ppop = sl(bfsiRow(inc, /^Pre Provision Profit/)), cti = sl(bfsiRow(bank, /^Cost to Core Income/));
+        var has = function (v) { return v && v.some(function (x) { return x != null && x !== 0; }); };
         var pat = bfsiRow(inc, /^Consolidated Profit/) || bfsiRow(inc, /^Standalone Profit/);
+        // chart 1: net interest income (lenders); else total income; else revenue from HistoricalData (insurers, AMCs)
+        var nii = bfsiRow(inc, /^Net Interest Income/), t1 = 'Net interest income <span class="tw-muted">&#8377; Cr &#183; line = NIM</span>', l1 = null;
+        if (has(nii)) l1 = sl(bfsiRow(inc, /^Net Interest Margin/));
+        else if (has(bfsiRow(inc, /^Total Income/))) { nii = bfsiRow(inc, /^Total Income/); t1 = 'Total income <span class="tw-muted">&#8377; Cr</span>'; }
+        else {
+            var H = (annual ? (S.fin.annual || {}) : (S.fin.quarterly || {})), hl = H.label || [];
+            nii = all.map(function (l) { var i = hl.indexOf(l); return i >= 0 ? H.sales[i] : null; });
+            t1 = 'Revenue <span class="tw-muted">&#8377; Cr</span>';
+        }
+        nii = sl(nii);
+        // chart 2: pre-provision profit with cost to income (lenders); else net profit
+        var ppop = bfsiRow(inc, /^Pre Provision Profit/), t2 = 'Pre-provision profit <span class="tw-muted">&#8377; Cr &#183; line = cost to income</span>', l2 = null;
+        if (has(ppop)) l2 = sl(bfsiRow(bank, /^Cost to Core Income/));
+        else { ppop = pat; t2 = 'Net profit <span class="tw-muted">&#8377; Cr</span>'; }
+        ppop = sl(ppop);
+        setTitles(t1, t2, 'EPS <span class="tw-muted">&#8377;</span>',
+                  has(bfsiRow(inc, /^Net Interest Income/)) ? 'Net interest income, operating profit and EPS' : 'Income, profit and EPS');
+        var nim = l1, cti = l2;
         var sh = sharesCr(), eps = sl(pat).map(function (p) { return sh && p != null ? p / sh : null; });
 
         var C = S.cons;
@@ -443,18 +460,19 @@
         $('sa-fin-asof').textContent = lastEnd ? 'Data as of ' + labels[nAct - 1] + ' (' + fmtD(lastEnd) + ')' : 'No data';
         $('sa-fin-sub').textContent = (annual ? 'Fiscal years (April to March)' + (labels.length > nAct ? ', plus consensus EPS (E)' : '') : 'Last 12 quarters') + '. Hover for YoY growth.';
         $('sa-fin-note').textContent = 'Source: ModelBFSI sheet of ' + S.fin.file + '.' +
-            (sh ? ' EPS = consolidated profit ÷ current share count.' : '') + ' Asset quality, deposits and loan mix are under Business details.';
+            (sh ? ' EPS = consolidated profit ÷ current share count.' : '') +
+            (bank && bank.rows.length ? ' Asset quality, deposits and loan mix are under Business details.' : '');
         if (!nAct) { ['sa-rev', 'sa-ebitda', 'sa-eps'].forEach(function (id) { if (charts[id]) charts[id].dispose(); empty($(id), 'No data in ModelBFSI.'); }); return; }
         var lag = annual ? 1 : 4;
-        bars('sa-rev', labels.slice(0, nAct), nii, nAct, lag, 's1', 0, nim.some(function (v) { return v != null; }) ? nim : null);
-        bars('sa-ebitda', labels.slice(0, nAct), ppop, nAct, lag, 's3', 0, cti.some(function (v) { return v != null; }) ? cti : null);
+        bars('sa-rev', labels.slice(0, nAct), nii, nAct, lag, 's1', 0, has(nim) ? nim : null);
+        bars('sa-ebitda', labels.slice(0, nAct), ppop, nAct, lag, 's3', 0, has(cti) ? cti : null);
         if (sh) bars('sa-eps', labels, eps, nAct, lag, 's4', 1);
         else { if (charts['sa-eps']) charts['sa-eps'].dispose(); empty($('sa-eps'), 'EPS not available.'); }
     }
 
     /** Bank-specific charts for the Business details card, in the same shape as getstockdetails.excelCharts. */
     function bfsiCharts() {
-        if (!S.fin || !S.fin.bfsi) return [];
+        if (!useBfsi()) return [];
         var out = [];
         ['Q', 'A'].forEach(function (per) {
             var pre = per === 'A' ? 'Annual ' : 'Quarterly ';
@@ -486,7 +504,7 @@
     }
 
     function renderFundamentals() {
-        if (S.fin && S.fin.bfsi) { renderBankFundamentals(); return; }
+        if (useBfsi()) { renderBankFundamentals(); return; }
         setTitles('Revenue <span class="tw-muted">&#8377; Cr</span>', 'EBITDA <span class="tw-muted">&#8377; Cr &#183; line = EBITDA margin</span>',
                   'EPS <span class="tw-muted">&#8377;</span>', 'Revenue, EBITDA and EPS');
         var F = S.fin || {}, annual = S.period === 'A';
@@ -497,8 +515,22 @@
         var labels = dates.map(function (d) { return annual ? fyLabel(d) : qLabel(d); });
         var rev = src.sales.slice(from);
         var ebitda = src.ebitda.slice(from);
-        var margin = ebitda.map(function (e, i) { return e != null && rev[i] ? e / rev[i] : null; });
-        var eps = src.np.slice(from).map(function (np) { return sh && np != null ? np / sh : null; });
+        // EBITDA margin and EPS come from the HistoricalData sheet; fall back to computing them
+        var sheetMargin = (src.ebitdaMargin || []).slice(from);
+        var margin = ebitda.map(function (e, i) {
+            var m = sheetMargin[i];
+            return m != null && isFinite(m) ? m : (e != null && rev[i] ? e / rev[i] : null);
+        });
+        var np = src.np.slice(from), patM = (src.patMargin || []).slice(from), repEps = (src.eps || []).slice(from);
+        // charted EPS = net profit / current share count (comparable across splits and bonuses);
+        // without a share count, the workbook's reported diluted EPS
+        var eps = np.map(function (v, i) { return sh && v != null ? v / sh : (repEps[i] != null ? repEps[i] : null); });
+        var epsTip = np.map(function (v, i) {
+            var t = [];
+            if (sh && repEps[i] != null) t.push('Reported diluted EPS <b>' + num(repEps[i], 1) + '</b>');
+            if (v != null) t.push('Net profit <b>' + num(v, 0) + '</b> Cr' + (patM[i] != null && isFinite(patM[i]) ? ' · PAT margin <b>' + (patM[i] * 100).toFixed(1) + '%</b>' : ''));
+            return t.join('<br/>');
+        });
         var nAct = dates.length;
         var rows = dates;
 
@@ -519,8 +551,8 @@
         $('sa-fin-sub').textContent = annual ? 'Fiscal years (April to March)' + (labels.length > nAct ? ', plus consensus estimates (E)' : '') + '. Hover for YoY growth.'
             : 'Last 12 quarters. Hover for YoY growth.';
         var notes = [];
-        notes.push(F.source === 'excel' ? 'Source: company result workbook (' + F.file + ').' : '');
-        if (sh) notes.push('EPS = net profit ÷ current share count, so it is comparable across splits and bonuses.');
+        notes.push(F.source === 'excel' ? 'Source: HistoricalData sheet of the company result workbook (' + F.file + ').' : '');
+        if (sh) notes.push('EPS = net profit ÷ current share count, so it is comparable across splits and bonuses; hover for the reported diluted EPS.');
         if (fin) notes.push('Financial company: EBITDA is not meaningful for lenders; a dedicated banking view is planned.');
         if (last && (Date.now() - parseD(last)) / 864e5 > (annual ? 550 : 200)) notes.push('These financials have not been refreshed recently.');
         $('sa-fin-note').textContent = notes.filter(Boolean).join(' ');
@@ -533,12 +565,13 @@
         bars('sa-rev', labels, rev, nAct, lag, 's1');
         if (fin) { if (charts['sa-ebitda']) charts['sa-ebitda'].dispose(); empty($('sa-ebitda'), 'Not shown for financial companies.'); }
         else bars('sa-ebitda', labels.slice(0, nAct), ebitda.slice(0, nAct), nAct, lag, 's3', 0, margin);
-        if (sh) bars('sa-eps', labels, eps, nAct, lag, 's4', 1);
+        if (eps.some(function (v) { return v != null; })) bars('sa-eps', labels, eps, nAct, lag, 's4', 1, null, epsTip);
         else { if (charts['sa-eps']) charts['sa-eps'].dispose(); empty($('sa-eps'), 'EPS not available.'); }
     }
 
-    // bar chart; optional `margin` adds a % line on a right-hand axis (EBITDA margin)
-    function bars(id, labels, vals, nAct, lag, colorVar, dp, margin) {
+    // bar chart; optional `margin` adds a % line on a right-hand axis (EBITDA margin);
+    // optional `tip` adds an HTML line per bar to the tooltip
+    function bars(id, labels, vals, nAct, lag, colorVar, dp, margin, tip) {
         var P = pal(), col = P[colorVar];
         var el = $(id);
         if (el.querySelector('.sa-empty')) { el.innerHTML = ''; if (charts[id]) charts[id].dispose(); }
@@ -567,7 +600,8 @@
                         '<br/>' + num(v, dp || 0) + (g != null && prev > 0 ? ' <span style="color:' + (g >= 0 ? P.pos : P.neg) + '">' + pct(g, 1) + ' YoY</span>' : '') +
                         (margin && margin[i] != null ? '<br/>Margin <b>' + (margin[i] * 100).toFixed(1) + '%</b>' +
                             (i - lag >= 0 && margin[i - lag] != null ? ' <span style="color:' + P.muted + '">(' + ((margin[i] - margin[i - lag]) * 10000 >= 0 ? '+' : '') +
-                                Math.round((margin[i] - margin[i - lag]) * 10000) + ' bps YoY)</span>' : '') : '');
+                                Math.round((margin[i] - margin[i - lag]) * 10000) + ' bps YoY)</span>' : '') : '') +
+                        (tip && tip[i] ? '<br/>' + tip[i] : '');
                 }
             }),
             xAxis: { type: 'category', data: labels, axisTick: { show: false }, axisLine: { lineStyle: { color: P.axis } },
@@ -592,7 +626,8 @@
     // =====================================================================
     // generic series (mostly repeat the Revenue / EBITDA / EPS card): shown only with "Show all".
     // Market cap is deliberately not here: it stays with the company-specific charts.
-    var WB_CORE = /(noplat|revenue \(rs|ttm revenue|revenue growth|total revenue|\bopm\b|\bpat\b|net profit margin)/i;
+    // The generic balance-sheet / return / valuation charts of the default set (HistoricalData) are here too.
+    var WB_CORE = /(noplat|revenue \(rs|ttm revenue|revenue growth|total revenue|\bopm\b|\bpat\b|net profit margin|roic|ev \/ ebit|invested capital|avg\. borrowings|total equity and liabilities|borrowings \(rs|property, plant|inventories \(rs|cash and cash|trade receivables)/i;
 
     function wbIsAnnual(c) { return /^(annual|annaul)\b/i.test(c.title); }
     function wbTitle(t) { return t.replace(/^annaul/i, 'Annual').replace(/^(Quarterly|Annual)\s+/i, ''); }

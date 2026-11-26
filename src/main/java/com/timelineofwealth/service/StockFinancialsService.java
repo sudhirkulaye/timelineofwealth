@@ -12,17 +12,27 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Annual and quarterly revenue / EBITDA / net profit for the stock page.
+ * Annual and quarterly revenue / EBITDA / net profit / EPS for the stock page.
  *
- * Source 1 (preferred): the ticker's latest result workbook
- *   QuarterResultsScreenerExcels/{yyyyQn}/{TICKER}_FY{yyQn}.xlsx, sheets "AnnualResults" and "QuarterP&L"
- *   (Screener.in layout: row 3 dates, 4 sales, 6 operating profit, 12 net profit; quarter row 15 result date).
+ * Source: the ticker's latest result workbook QuarterResultsScreenerExcels/{yyyyQn}/{TICKER}_FY{yyQn}.xlsx,
+ * sheet "HistoricalData", blocks "Annual Income Statement" and "Quarterly Income Statement". Blocks are found by
+ * their title in column B, the period header by "FIN Years" / "Quarters" in column C (labels FY15.. / FY24Q3..),
+ * and rows by their label in column C (or D for the margin sub-rows), so the layout may move.
+ * Only actual periods are returned: the period has ended, Revenue is non-zero and the result date (if any) is not
+ * in the future; projected columns (FY27, FY27Q3...) are dropped.
  * The workbooks are the only source: the stock_pnl / stock_quarter tables are no longer maintained.
  */
 @Service
 public class StockFinancialsService {
     private static final Logger logger = LoggerFactory.getLogger(StockFinancialsService.class);
-    private static final int ROW_DATE = 2, ROW_SALES = 3, ROW_EBITDA = 5, ROW_NET_PROFIT = 11, ROW_RESULT_DATE = 14;
+    private static final String SHEET = "HistoricalData";
+    private static final String ANNUAL_BLOCK = "Annual Income Statement", QUARTER_BLOCK = "Quarterly Income Statement";
+    /** JSON key -> row label in the income statement blocks */
+    private static final String[][] ROWS = {
+            {"ebitda", "EBITDA"}, {"ebitdaMargin", "Operating Profit Margin%"},
+            {"np", "Net Income"}, {"patMargin", "PAT Margin%"}, {"shares", "Wt. Avg. Shares"},
+            {"eps", "EPS (Diluted)"}};
+    private static final String[] KEYS = {"d", "label", "sales", "ebitda", "ebitdaMargin", "np", "patMargin", "eps", "resultDate"};
 
     private final CommonService commonService;
     private final Map<String, Map<String, Object>> cache = new ConcurrentHashMap<>();
@@ -32,8 +42,11 @@ public class StockFinancialsService {
     }
 
     /**
-     * {source: "excel"|"none", file, annual: {d:[], sales:[], ebitda:[], np:[]}, quarterly: {d:[], sales:[], ebitda:[], np:[], resultDate:[]}}
-     * Dates are period ends (yyyy-MM-dd); values in Rs crore.
+     * {source: "excel"|"none", file, annual: {d, label, sales, ebitda, ebitdaMargin, np, patMargin, eps, resultDate},
+     *  quarterly: {same keys}, bfsi?: [...], bfsiHasNii?: true|false}
+     * d = period end (yyyy-MM-dd), label = FY26 / FY27Q1; values in Rs crore, margins as fractions, EPS in Rs.
+     * eps is the workbook's "EPS (Diluted)", or null where it is 0 or differs from Net Income / Wt. Avg. Shares
+     * by more than 25% (the template's annual EPS row divides the wrong Data Sheet row in some workbooks).
      */
     public Map<String, Object> getFinancials(String ticker) {
         File file = commonService.getLatestExcelFileForTicker(ticker);
@@ -58,15 +71,99 @@ public class StockFinancialsService {
             out.put("source", "excel");
             out.put("file", file.getName());
             // Evaluate formulas here: workbooks refreshed by pasting a new Screener "Data Sheet" are often saved
-            // without recalculated values, so the cached results in AnnualResults / QuarterP&L can be stale or empty.
+            // without recalculated values, so the cached results in HistoricalData can be stale or empty.
             FormulaEvaluator ev = wb.getCreationHelper().createFormulaEvaluator();
             ev.setIgnoreMissingWorkbooks(true);
-            out.put("annual", readSheet(wb.getSheet("AnnualResults"), false, ev));
-            out.put("quarterly", readSheet(wb.getSheet("QuarterP&L"), true, ev));
+            Sheet hd = wb.getSheet(SHEET);
+            if (hd == null) logger.warn("{} has no {} sheet", file.getName(), SHEET);
+            out.put("annual", readIncomeBlock(hd, ANNUAL_BLOCK, ev));
+            out.put("quarterly", readIncomeBlock(hd, QUARTER_BLOCK, ev));
             List<Map<String, Object>> bfsi = readBfsi(wb.getSheet("ModelBFSI"), ev);
-            if (bfsi != null) out.put("bfsi", bfsi);
+            if (bfsi != null) {
+                out.put("bfsi", bfsi);
+                out.put("bfsiHasNii", hasNii(bfsi));
+            }
             return out;
         }
+    }
+
+    // ---------- HistoricalData income statement blocks ----------
+    private static Map<String, List<Object>> emptySeries() {
+        Map<String, List<Object>> s = new LinkedHashMap<>();
+        for (String k : KEYS) s.put(k, new ArrayList<>());
+        return s;
+    }
+
+    private Map<String, List<Object>> readIncomeBlock(Sheet sheet, String title, FormulaEvaluator ev) {
+        Map<String, List<Object>> s = emptySeries();
+        if (sheet == null) return s;
+        int last = sheet.getLastRowNum();
+        // block title in column B
+        int r0 = -1;
+        for (int r = 0; r <= last && r0 < 0; r++) {
+            String t = text(cell(sheet, r, 1), ev);
+            if (t != null && t.trim().startsWith(title)) r0 = r;
+        }
+        if (r0 < 0) { logger.warn("{}: block '{}' not found", SHEET, title); return s; }
+        int hdr = -1;
+        for (int r = r0; r <= Math.min(last, r0 + 6) && hdr < 0; r++) {
+            String t = text(cell(sheet, r, 2), ev);
+            if (t != null && (t.trim().startsWith("FIN Year") || t.trim().startsWith("Quarter"))) hdr = r;
+        }
+        if (hdr < 0) { logger.warn("{}: no period header under '{}'", SHEET, title); return s; }
+        // the block ends at the next text in column B (the company-name row above the next block)
+        int end = last + 1;
+        for (int r = hdr + 1; r <= last; r++) {
+            String t = text(cell(sheet, r, 1), ev);
+            if (t != null && !t.trim().isEmpty()) { end = r; break; }
+        }
+        // row label -> row index (first match; main rows in column C, margin sub-rows in column D)
+        Map<String, Integer> rowOf = new HashMap<>();
+        for (int r = hdr + 1; r < end; r++) {
+            for (int c = 2; c <= 3; c++) {
+                String t = text(cell(sheet, r, c), ev);
+                if (t != null && !t.trim().isEmpty()) { rowOf.putIfAbsent(t.trim(), r); break; }
+            }
+        }
+        Integer revRow = rowOf.get("Revenue"), dateRow = rowOf.get("Result Date");
+        if (revRow == null) { logger.warn("{}: no Revenue row under '{}'", SHEET, title); return s; }
+
+        Date today = new Date();
+        Row hr = sheet.getRow(hdr);
+        for (int col = 3; hr != null && col < hr.getLastCellNum(); col++) {
+            String label = text(hr.getCell(col), ev);
+            Date pe = periodEnd(label);
+            if (pe == null || pe.after(today)) continue;                    // blank, "TTM" or projected column
+            Double sales = num(cell(sheet, revRow, col), ev);
+            if (sales == null || sales == 0) continue;                       // period without data
+            Date rd = dateRow == null ? null : date(cell(sheet, dateRow, col), ev);
+            if (rd != null && rd.after(today)) continue;                     // results not declared yet
+            Map<String, Double> v = new HashMap<>();
+            for (String[] kr : ROWS) {
+                Integer r = rowOf.get(kr[1]);
+                v.put(kr[0], r == null ? null : num(cell(sheet, r, col), ev));
+            }
+            s.get("d").add(iso(pe));
+            s.get("label").add(label.trim());
+            s.get("sales").add(sales);
+            s.get("ebitda").add(v.get("ebitda"));
+            s.get("ebitdaMargin").add(v.get("ebitdaMargin"));
+            s.get("np").add(v.get("np"));
+            s.get("patMargin").add(v.get("patMargin"));
+            s.get("eps").add(saneEps(v.get("eps"), v.get("np"), v.get("shares")));
+            s.get("resultDate").add(rd == null ? null : iso(rd));
+        }
+        return s;
+    }
+
+    /** Reported EPS, or null when it is missing / 0 or far from Net Income / Wt. Avg. Shares. */
+    private static Double saneEps(Double eps, Double np, Double shares) {
+        if (eps == null || eps == 0 || Double.isNaN(eps) || Double.isInfinite(eps)) return null;
+        if (np != null && shares != null && shares > 0 && np != 0) {
+            double calc = np / shares;
+            if (Math.abs(eps - calc) > 0.25 * Math.abs(calc)) return null;
+        }
+        return eps;
     }
 
     // ---------- ModelBFSI (banks, NBFCs, AMCs...) ----------
@@ -75,10 +172,12 @@ public class StockFinancialsService {
             "Quarterly Income Expense History", "Quarterly Banking History", "Quarterly Loan Distribution History"};
 
     /**
-     * History blocks of the ModelBFSI sheet, actual periods only (period ended, Net Interest Income reported):
+     * History blocks of the ModelBFSI sheet, actual periods only (period ended, Net Interest Income reported, or for
+     * financials without NII a reported consolidated profit); rows with nothing reported are dropped:
      * [{block, period: "A"|"Q", labels: ["FY25", ...], ends: ["2025-03-31", ...], rows: [{label, values: [...]}, ...]}].
      * Rows under "Contribution" / "Growth" sub-headers get that prefix. Returns null when the sheet holds no history
-     * (the template exists in every workbook, but only lenders and other financials fill it in).
+     * The profit / EPS / price rows are formulas filled for every company, so the page decides by sector
+     * (financials) or bfsiHasNii whether to use this view; non-financials keep the HistoricalData P&L.
      */
     private List<Map<String, Object>> readBfsi(Sheet sheet, FormulaEvaluator ev) {
         if (sheet == null) return null;
@@ -110,6 +209,12 @@ public class StockFinancialsService {
                 if (t != null && (t.startsWith("FIN Year") || t.startsWith("Quarter"))) { hdr = r; break; }
             }
             if (hdr < 0) continue;
+            // the block also ends at the next text in column B (company-name row above the next block), so the
+            // last history block does not run into the projection blocks further down the sheet
+            for (int r = hdr + 1; r < next; r++) {
+                String t = text(cell(sheet, r, 1), ev);
+                if (t != null && !t.trim().isEmpty()) { next = r; break; }
+            }
             List<Integer> cols = new ArrayList<>();
             List<String> labels = new ArrayList<>(), ends = new ArrayList<>();
             Row hr = sheet.getRow(hdr);
@@ -140,15 +245,12 @@ public class StockFinancialsService {
                 rows.add(row);
             }
 
-            // actual periods = those where the income block reports Net Interest Income
+            // actual periods = those where the income block reports Net Interest Income; financials without NII
+            // (insurers, AMCs, brokers) fall back to the periods with a reported consolidated / standalone profit
             if (b.contains("Income Expense")) {
-                Set<Integer> keep = new HashSet<>();
-                for (Map<String, Object> row : rows) {
-                    if (String.valueOf(row.get("label")).startsWith("Net Interest Income")) {
-                        @SuppressWarnings("unchecked") List<Double> v = (List<Double>) row.get("values");
-                        for (int i = 0; i < v.size(); i++) if (v.get(i) != null && v.get(i) != 0) keep.add(i);
-                    }
-                }
+                Set<Integer> keep = nonZero(rows, "Net Interest Income");
+                if (keep.isEmpty()) keep = nonZero(rows, "Consolidated Profit");
+                if (keep.isEmpty()) keep = nonZero(rows, "Standalone Profit");
                 keepByPeriod.put(period, keep);
             }
             Map<String, Object> blk = new LinkedHashMap<>();
@@ -169,8 +271,37 @@ public class StockFinancialsService {
             blk.put("ends", pick(blk.get("ends"), keep));
             @SuppressWarnings("unchecked") List<Map<String, Object>> rows = (List<Map<String, Object>>) blk.get("rows");
             for (Map<String, Object> row : rows) row.put("values", pick(row.get("values"), keep));
+            // drop rows with nothing reported (template rows left at 0 / blank)
+            rows.removeIf(row -> {
+                @SuppressWarnings("unchecked") List<Double> v = (List<Double>) row.get("values");
+                return v.stream().noneMatch(x -> x != null && x != 0);
+            });
         }
         return blocks;
+    }
+
+    /** indices of the periods where the first row whose label starts with {@code label} is non-zero */
+    @SuppressWarnings("unchecked")
+    private static Set<Integer> nonZero(List<Map<String, Object>> rows, String label) {
+        Set<Integer> keep = new HashSet<>();
+        for (Map<String, Object> row : rows) {
+            if (!String.valueOf(row.get("label")).startsWith(label)) continue;
+            List<Double> v = (List<Double>) row.get("values");
+            for (int i = 0; i < v.size(); i++) if (v.get(i) != null && v.get(i) != 0) keep.add(i);
+            break;
+        }
+        return keep;
+    }
+
+    /** true when the annual income block of ModelBFSI reports Net Interest Income (lenders) */
+    @SuppressWarnings("unchecked")
+    private static boolean hasNii(List<Map<String, Object>> bfsi) {
+        for (Map<String, Object> blk : bfsi) {
+            if (!"A".equals(blk.get("period")) || !String.valueOf(blk.get("block")).contains("Income Expense")) continue;
+            for (Map<String, Object> row : (List<Map<String, Object>>) blk.get("rows"))
+                if (String.valueOf(row.get("label")).startsWith("Net Interest Income")) return true;
+        }
+        return false;
     }
 
     @SuppressWarnings("unchecked")
@@ -181,7 +312,7 @@ public class StockFinancialsService {
     }
 
     /** FY26 -> 31 Mar 2026; FY27Q2 -> 30 Sep 2026 (Indian fiscal year April-March). */
-    private static Date periodEnd(String label) {
+    static Date periodEnd(String label) {
         if (label == null) return null;
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("^FY(\\d{2})(?:Q([1-4]))?$").matcher(label.trim());
         if (!m.matches()) return null;
@@ -203,39 +334,11 @@ public class StockFinancialsService {
         return v instanceof String ? (String) v : null;
     }
 
-    private Map<String, List<Object>> readSheet(Sheet sheet, boolean quarterly, FormulaEvaluator ev) {
-        Map<String, List<Object>> s = new LinkedHashMap<>();
-        for (String k : quarterly ? new String[]{"d", "sales", "ebitda", "np", "resultDate"} : new String[]{"d", "sales", "ebitda", "np"}) {
-            s.put(k, new ArrayList<>());
-        }
-        if (sheet == null) return s;
-        Row dates = sheet.getRow(ROW_DATE);
-        if (dates == null) return s;
-        Date today = new Date();
-        for (int col = 1; col <= dates.getLastCellNum(); col++) {
-            Date d = date(dates.getCell(col), ev);
-            if (d == null || d.after(today)) continue;     // skips "TTM", blank and projected columns
-            Double sales = num(cell(sheet, ROW_SALES, col), ev);
-            if (sales == null || sales == 0) continue;     // year/quarter without data
-            Date r = quarterly ? date(cell(sheet, ROW_RESULT_DATE, col), ev) : null;
-            if (quarterly && r != null && r.after(today)) continue;   // quarter ended but results not declared yet
-            s.get("d").add(iso(d));
-            s.get("sales").add(sales);
-            s.get("ebitda").add(num(cell(sheet, ROW_EBITDA, col), ev));
-            s.get("np").add(num(cell(sheet, ROW_NET_PROFIT, col), ev));
-            if (quarterly) s.get("resultDate").add(r == null ? null : iso(r));
-        }
-        return s;
-    }
-
     private static Map<String, Object> none() {
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("source", "none");
-        Map<String, List<Object>> a = new LinkedHashMap<>(), q = new LinkedHashMap<>();
-        for (String k : new String[]{"d", "sales", "ebitda", "np"}) { a.put(k, new ArrayList<>()); q.put(k, new ArrayList<>()); }
-        q.put("resultDate", new ArrayList<>());
-        out.put("annual", a);
-        out.put("quarterly", q);
+        out.put("annual", emptySeries());
+        out.put("quarterly", emptySeries());
         return out;
     }
 
