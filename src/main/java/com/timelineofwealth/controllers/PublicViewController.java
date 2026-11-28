@@ -47,7 +47,9 @@ public class PublicViewController {
         logger.debug(String.format("Visited Homepage: IP -  - " + ipAddress + ", browser - " + browser + ", OS - " + os));
         dateToday = publicApi.getSetupDates().getDateToday();
         model.addAttribute("dateToday", dateToday);
-        model.addAttribute("title", "Markets today");
+        model.addAttribute("title", "Markets today: India and world markets, sectors and research");
+        model.addAttribute("description", "Indian and world markets with 1-month to 1-year returns, sector performance, "
+                + "the NIFTY 50 valuation, headlines from the financial press, and weekly research on the economy, sectors and stocks.");
         return "public/home";
     }
 

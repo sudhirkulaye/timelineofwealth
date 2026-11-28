@@ -2,64 +2,70 @@
    sudhirkulaye.com theme layer
    Loaded after custom.min.css (Gentelella) from fragments/header.html.
    Overrides colours, typography and chrome only; page markup is unchanged.
-   Palette follows the Weekly Dashboard (warm neutrals, one blue accent).
+   Palette follows the financial press: salmon newsprint, near-black ink,
+   a deep blue for links, a claret accent for section labels, and serif
+   headlines (Source Serif 4) over a sans-serif body and figures (Inter).
    Dark mode: <html data-theme="dark|light">, or the OS setting when unset.
    ========================================================================== */
 
 :root {
     color-scheme: light;
     --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --page: #f6f6f3;
-    --surface: #ffffff;
-    --surface2: #fbfbf9;
-    --ink: #0b0b0b;
-    --ink2: #52514e;
-    --muted: #898781;
-    --grid: #e7e6e0;
-    --axis: #c3c2b7;
-    --border: rgba(11, 11, 11, .09);
-    --chip: rgba(11, 11, 11, .045);
-    --hover: rgba(11, 11, 11, .035);
-    --accent: #2a78d6;
-    --accent-ink: #1d5fb0;
-    --accent-soft: rgba(42, 120, 214, .10);
-    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
-    --pos: #0a7d33; --neg: #d03b3b;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 4px 16px rgba(0, 0, 0, .04);
+    --serif: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+    --page: #fbefe3;        /* newsprint */
+    --surface: #fff8f1;     /* cards: a lighter sheet on the same paper */
+    --surface2: #fdf3e9;
+    --ink: #211d1a;
+    --ink2: #57504a;
+    --muted: #70655d;
+    --grid: #eddccd;
+    --axis: #cdb8a6;
+    --border: rgba(84, 52, 28, .15);
+    --chip: rgba(84, 52, 28, .07);
+    --hover: rgba(84, 52, 28, .05);
+    --accent: #12579b;
+    --accent-ink: #0b3f73;
+    --accent-soft: rgba(18, 87, 155, .10);
+    --claret: #9b1c3a;
+    --s1: #2a6fc2; --s2: #e0632e; --s3: #16a070; --s4: #d99400;
+    --pos: #0b7a3e; --neg: #c0262d;
+    --shadow: 0 1px 2px rgba(84, 52, 28, .06);
     /* sidebar stays dark in both modes so the logo always sits on the same ground */
-    --side: #121212;
-    --side-ink: #e9e8e4;
-    --side-ink2: #a3a29c;
-    --side-hover: rgba(255, 255, 255, .06);
-    --side-active: rgba(255, 255, 255, .10);
-    --side-border: rgba(255, 255, 255, .07);
-    --radius: 12px;
+    --side: #1c1916;
+    --side-ink: #f1e8df;
+    --side-ink2: #b3a79b;
+    --side-hover: rgba(255, 240, 225, .07);
+    --side-active: rgba(255, 240, 225, .11);
+    --side-border: rgba(255, 240, 225, .08);
+    --radius: 10px;
 }
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
         color-scheme: dark;
-        --page: #0d0d0d; --surface: #181817; --surface2: #1d1d1c;
-        --ink: #f0efec; --ink2: #c3c2b7; --muted: #8f8d86;
-        --grid: #2c2c2a; --axis: #3d3d3a; --border: rgba(255, 255, 255, .09);
-        --chip: rgba(255, 255, 255, .07); --hover: rgba(255, 255, 255, .05);
-        --accent: #4a95ec; --accent-ink: #7ab2f2; --accent-soft: rgba(74, 149, 236, .16);
+        --page: #13110f; --surface: #1c1916; --surface2: #221e1b;
+        --ink: #f3ece4; --ink2: #cbbfb3; --muted: #9a8e83;
+        --grid: #2e2924; --axis: #463e37; --border: rgba(255, 236, 220, .10);
+        --chip: rgba(255, 236, 220, .07); --hover: rgba(255, 236, 220, .05);
+        --accent: #79aee8; --accent-ink: #a6c9f0; --accent-soft: rgba(121, 174, 232, .16);
+        --claret: #e58fa4;
         --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
-        --pos: #2fbf5b; --neg: #e66767;
+        --pos: #43c472; --neg: #f07a7a;
         --shadow: 0 1px 2px rgba(0, 0, 0, .4);
-        --side: #0a0a0a;
+        --side: #0e0c0b;
     }
 }
 :root[data-theme="dark"] {
     color-scheme: dark;
-    --page: #0d0d0d; --surface: #181817; --surface2: #1d1d1c;
-    --ink: #f0efec; --ink2: #c3c2b7; --muted: #8f8d86;
-    --grid: #2c2c2a; --axis: #3d3d3a; --border: rgba(255, 255, 255, .09);
-    --chip: rgba(255, 255, 255, .07); --hover: rgba(255, 255, 255, .05);
-    --accent: #4a95ec; --accent-ink: #7ab2f2; --accent-soft: rgba(74, 149, 236, .16);
+    --page: #13110f; --surface: #1c1916; --surface2: #221e1b;
+    --ink: #f3ece4; --ink2: #cbbfb3; --muted: #9a8e83;
+    --grid: #2e2924; --axis: #463e37; --border: rgba(255, 236, 220, .10);
+    --chip: rgba(255, 236, 220, .07); --hover: rgba(255, 236, 220, .05);
+    --accent: #79aee8; --accent-ink: #a6c9f0; --accent-soft: rgba(121, 174, 232, .16);
+    --claret: #e58fa4;
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
-    --pos: #2fbf5b; --neg: #e66767;
+    --pos: #43c472; --neg: #f07a7a;
     --shadow: 0 1px 2px rgba(0, 0, 0, .4);
-    --side: #0a0a0a;
+    --side: #0e0c0b;
 }
 
 /* ---------- base ---------- */
@@ -74,8 +80,10 @@ body {
 body .container.body .right_col,
 .nav-md .container.body .right_col { background: var(--page); }
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3 { font-family: var(--font); color: var(--ink); letter-spacing: -.01em; }
-h1, .h1 { font-size: 26px; font-weight: 650; }
-h2, .h2 { font-size: 19px; font-weight: 600; }
+/* headlines in serif, as in a newspaper; labels (h3 and below) stay sans-serif */
+h1, .h1, h2, .h2 { font-family: var(--serif); letter-spacing: -.005em; }
+h1, .h1 { font-size: 28px; font-weight: 700; }
+h2, .h2 { font-size: 20px; font-weight: 600; }
 h3, .h3 { font-size: 16px; font-weight: 600; }
 a { color: var(--accent); }
 a:hover, a:focus { color: var(--accent-ink); }
@@ -98,10 +106,10 @@ hr { border-color: var(--border); }
 .nav_title { height: 64px; border-bottom: 1px solid var(--side-border) !important; }
 .site_title {
     color: var(--side-ink) !important;
-    font-family: var(--font);
-    font-size: 19px;
+    font-family: var(--serif);
+    font-size: 20px;
     font-weight: 600;
-    letter-spacing: -.01em;
+    letter-spacing: 0;
     line-height: 64px;
     height: 64px;
     padding-left: 18px;
@@ -315,7 +323,7 @@ footer a { color: var(--ink2); }
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
     box-shadow: var(--shadow); padding: 18px 20px; margin-bottom: 18px;
 }
-.tw-card h2 { font-size: 16px; margin: 0 0 2px; }
+.tw-card h2 { font-size: 18px; margin: 0 0 2px; }
 .tw-sub { color: var(--ink2); font-size: 13px; margin: 0 0 12px; }
 .tw-muted { color: var(--muted); }
 .tw-small { font-size: 12px; }
@@ -358,7 +366,7 @@ footer a { color: var(--ink2); }
 
 /* ---------- TwChart blocks (comparison and statistics pages) ---------- */
 .tw-head { margin: 4px 0 16px; }
-.tw-head h1 { margin: 0 0 4px; font-size: 26px; font-weight: 650; letter-spacing: -.02em; }
+.tw-head h1 { margin: 0 0 4px; font-size: 30px; font-weight: 700; letter-spacing: -.01em; }
 .tw-head p { margin: 0; color: var(--ink2); font-size: 13.5px; }
 .tw-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; }
 .tw-grid2 > .tw-wide { grid-column: 1 / -1; }

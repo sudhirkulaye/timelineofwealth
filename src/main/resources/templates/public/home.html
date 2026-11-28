@@ -2,7 +2,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: common-header" />
 <body class="nav-md">
-<link href="../../static/custom/public/home.css" th:href="@{/custom/public/home.css(v=20261126)}" rel="stylesheet" />
+<link href="../../static/custom/public/home.css" th:href="@{/custom/public/home.css(v=20261128)}" rel="stylesheet" />
 <div class="container body">
     <div class="main_container">
         <div th:replace="fragments/publicsidebarmenu :: common-publicsidebarmenu" />
@@ -10,97 +10,150 @@
 
         <div class="right_col" role="main">
             <div class="tw-page hm" id="hm-root">
-                <header class="hm-head">
-                    <div>
-                        <h1>Markets today</h1>
-                        <p id="hm-date">Indian and global markets, commodities, currencies and the day's headlines in one place.</p>
+                <!-- masthead: date, market status and a one-paragraph summary written from the live data -->
+                <header class="hm-mast">
+                    <div class="hm-mast-top">
+                        <span class="hm-dateline" id="hm-dateline"></span>
+                        <div class="hm-status">
+                            <span class="hm-dot" id="hm-dot"></span>
+                            <span id="hm-status">Loading…</span>
+                            <button type="button" class="hm-refresh" id="hm-refresh" title="Refresh now" aria-label="Refresh now"><i class="fa fa-refresh"></i></button>
+                        </div>
                     </div>
-                    <div class="hm-status">
-                        <span class="hm-dot" id="hm-dot"></span>
-                        <span id="hm-status">Loading…</span>
-                        <button type="button" class="hm-refresh" id="hm-refresh" title="Refresh now" aria-label="Refresh now"><i class="fa fa-refresh"></i></button>
-                    </div>
+                    <h1>Markets today</h1>
+                    <p class="hm-pulse" id="hm-pulse">Indian and world markets, sectors, commodities, currencies and the day's headlines from the financial press.</p>
                 </header>
 
-                <!-- India: headline tiles -->
-                <section class="hm-tiles" id="hm-india" aria-label="Indian indices"></section>
+                <!-- India -->
+                <section class="hm-block" aria-labelledby="hm-india-h">
+                    <div class="hm-block-head">
+                        <h2 id="hm-india-h">Indian indices</h2>
+                        <div class="hm-range-wrap"><span class="hm-note">Returns and charts</span><div class="tw-seg hm-range" role="group" aria-label="Period"></div></div>
+                    </div>
+                    <div class="hm-tiles" id="hm-india"></div>
+                </section>
+
+                <!-- the site's own research, kept near the top -->
+                <section class="hm-block" aria-labelledby="hm-research-h">
+                    <div class="hm-block-head">
+                        <h2 id="hm-research-h">From the research desk</h2>
+                        <span class="hm-note">Weekly summaries of broker research, and tools to dig deeper</span>
+                    </div>
+                    <div class="hm-features">
+                        <a class="hm-feature" href="/public/economy" id="hm-f-econ">
+                            <span class="hm-kicker">Economy</span>
+                            <h3>India's economy, and what it means for stocks</h3>
+                            <ol class="hm-brief" data-f="list"></ol>
+                            <p class="hm-dek" data-f="dek">Growth, inflation, interest rates and the rupee, ranked by how much each can move the market.</p>
+                            <p class="hm-facts" data-f="facts"></p>
+                            <span class="hm-cta">Read the briefing <i class="fa fa-angle-right" aria-hidden="true"></i></span>
+                        </a>
+                        <a class="hm-feature" href="/public/sectors" id="hm-f-sec">
+                            <span class="hm-kicker">Sectors</span>
+                            <h3>Which sectors are gaining momentum, and which are losing it</h3>
+                            <div data-f="trend"></div>
+                            <p class="hm-dek" data-f="dek">A scoreboard of Indian sectors: the latest reading, the outlook, likely winners and losers, and what to watch.</p>
+                            <span class="hm-cta" data-f="cta">See the scoreboard <i class="fa fa-angle-right" aria-hidden="true"></i></span>
+                        </a>
+                        <a class="hm-feature" href="/public/stocklist">
+                            <span class="hm-kicker">Stock screener</span>
+                            <h3>Screen India's 500 largest companies in one table</h3>
+                            <p class="hm-dek">Valuations, growth, returns and broker targets side by side. Filter by index, sector or industry, and keep a watchlist.</p>
+                            <p class="hm-facts">NIFTY 50 · Next 50 · NSE / BSE 100, 200 and 500 · F&amp;O stocks</p>
+                            <span class="hm-cta">Open the screener <i class="fa fa-angle-right" aria-hidden="true"></i></span>
+                        </a>
+                        <a class="hm-feature" href="/public/nifty50stats" id="hm-f-val">
+                            <span class="hm-kicker">Valuation</span>
+                            <h3>How expensive is the NIFTY 50?</h3>
+                            <div data-f="val"></div>
+                            <p class="hm-dek" data-f="dek">The index P/E, P/B and dividend yield against their own history.</p>
+                            <span class="hm-cta">See the valuation history <i class="fa fa-angle-right" aria-hidden="true"></i></span>
+                        </a>
+                    </div>
+                </section>
 
                 <div class="hm-grid">
-                    <!-- left: markets -->
-                    <div class="hm-col">
-                        <section class="tw-card hm-card">
-                            <div class="hm-card-head"><h2>Global markets</h2><span class="hm-note">Local currency</span></div>
-                            <div class="hm-rows" id="hm-global"></div>
+                    <div class="hm-main">
+                        <section class="tw-card hm-card" aria-labelledby="hm-world-h">
+                            <div class="hm-card-head">
+                                <h2 id="hm-world-h">World markets</h2>
+                                <div class="tw-seg hm-range" role="group" aria-label="Period"></div>
+                            </div>
+                            <div class="hm-tbl-wrap">
+                                <table class="hm-tbl" id="hm-world">
+                                    <thead><tr>
+                                        <th class="nm" scope="col">Name</th><th scope="col">Last</th>
+                                        <th scope="col" data-r="1d" title="Chart today">1D</th><th scope="col" data-r="1m" title="Chart one month">1M</th>
+                                        <th scope="col" data-r="3m" title="Chart three months">3M</th><th scope="col" data-r="6m" title="Chart six months">6M</th>
+                                        <th scope="col" data-r="1y" title="Chart one year">1Y</th>
+                                        <th scope="col" class="hm-c-chart" id="hm-chart-h">Chart</th><th scope="col" class="hm-c-52" title="Where the price sits between its 52-week low and high">52-wk range</th>
+                                    </tr></thead>
+                                    <tbody data-g="global"></tbody>
+                                    <tbody data-g="commodities"></tbody>
+                                    <tbody data-g="currencies"></tbody>
+                                </table>
+                            </div>
+                            <p class="hm-foot">Returns in local currency; changes in the US 10-year yield are in basis points. Click a period to chart it. A green dot marks a market that is trading now.</p>
                         </section>
-                        <section class="tw-card hm-card">
-                            <div class="hm-card-head"><h2>Commodities</h2><span class="hm-note">Futures, US$</span></div>
-                            <div class="hm-rows" id="hm-commodities"></div>
+
+                        <section class="tw-card hm-card" aria-labelledby="hm-sec-h">
+                            <div class="hm-card-head">
+                                <h2 id="hm-sec-h">Sector performance</h2>
+                                <div class="tw-seg hm-range" role="group" aria-label="Period"></div>
+                            </div>
+                            <div class="hm-heat" id="hm-sectors"></div>
+                            <p class="hm-foot"><span id="hm-sec-note">NSE sector indices, best to worst.</span> <a href="/public/sectors">Read the sector outlook &rsaquo;</a></p>
                         </section>
-                        <section class="tw-card hm-card">
-                            <div class="hm-card-head"><h2>Currencies &amp; rates</h2></div>
-                            <div class="hm-rows" id="hm-currencies"></div>
+
+                        <section class="tw-card hm-card" aria-labelledby="hm-ret-h">
+                            <div class="hm-card-head"><h2 id="hm-ret-h">Long-term returns</h2><a class="hm-more" href="/public/indexreturnstats">Full statistics &rsaquo;</a></div>
+                            <div class="tw-scroll">
+                                <table class="hm-ret" id="hm-ret">
+                                    <thead><tr><th>Index</th><th>1Y</th><th title="Annualised">3Y</th><th title="Annualised">5Y</th><th title="Annualised">10Y</th><th title="Annualised">20Y</th></tr></thead>
+                                    <tbody><tr><td colspan="6" class="hm-empty">Loading…</td></tr></tbody>
+                                </table>
+                            </div>
+                            <p class="hm-foot" id="hm-ret-foot">Price returns from end-of-day closes in this site's database; 3Y and longer are annualised.</p>
                         </section>
                     </div>
 
-                    <!-- middle: movers + returns -->
-                    <div class="hm-col">
-                        <section class="tw-card hm-card">
-                            <div class="hm-card-head"><h2>NIFTY 50 today</h2><a class="hm-more" href="/public/nifty50stats">NIFTY 50 stats &rsaquo;</a></div>
+                    <aside class="hm-side">
+                        <section class="tw-card hm-card" aria-labelledby="hm-movers-h">
+                            <div class="hm-card-head"><h2 id="hm-movers-h">NIFTY 50 today</h2><a class="hm-more" href="/public/nifty50stats">NIFTY 50 statistics &rsaquo;</a></div>
                             <div class="hm-breadth" id="hm-breadth"></div>
                             <div class="hm-movers">
                                 <div><h3>Top gainers</h3><div id="hm-gainers"></div></div>
                                 <div><h3>Top losers</h3><div id="hm-losers"></div></div>
                             </div>
                         </section>
-                        <section class="tw-card hm-card">
-                            <div class="hm-card-head"><h2>Index returns</h2><a class="hm-more" href="/public/indexreturnstats">Full statistics &rsaquo;</a></div>
-                            <div class="tw-scroll">
-                                <table class="hm-ret" id="hm-ret">
-                                    <thead><tr><th>Index</th><th>1M</th><th>3M</th><th>1Y</th><th title="Annualised">3Y</th><th title="Annualised">5Y</th></tr></thead>
-                                    <tbody><tr><td colspan="6" class="hm-empty">Loading…</td></tr></tbody>
-                                </table>
-                            </div>
-                            <p class="hm-foot">End-of-day closes from this site's database; 3Y and 5Y are annualised.</p>
-                        </section>
-                        <section class="tw-card hm-card">
-                            <div class="hm-card-head"><h2>Economy: bottom line</h2><a class="hm-more" href="/public/economy">Economy &rsaquo;</a></div>
-                            <p class="hm-bottom" id="hm-bottom">Loading…</p>
-                            <ol class="hm-nut" id="hm-nut"></ol>
-                        </section>
-                    </div>
-
-                    <!-- right: news -->
-                    <div class="hm-col">
-                        <section class="tw-card hm-card hm-news-card">
+                        <section class="tw-card hm-card hm-news-card" aria-labelledby="hm-news-h">
                             <div class="hm-card-head">
-                                <h2>Headlines</h2>
+                                <h2 id="hm-news-h">Headlines</h2>
                                 <div class="tw-seg" id="hm-news-tab" role="group" aria-label="Region">
                                     <button type="button" data-v="india" class="on">India</button><button type="button" data-v="global">Global</button>
                                 </div>
                             </div>
-                            <ul class="hm-news" id="hm-news"><li class="hm-empty">Loading…</li></ul>
-                            <p class="hm-foot">Headlines link to the publishers' sites: Economic Times, Mint, Business Standard, BusinessLine, CNBC, Financial Times and Investing.com.</p>
+                            <div id="hm-news"><p class="hm-empty">Loading…</p></div>
+                            <p class="hm-foot">Print-edition headlines where the paper publishes them (Business Standard, The Economist), otherwise its latest online stories. E-papers may need the paper's own subscription. Stock tips are left out.</p>
                         </section>
-                    </div>
+                    </aside>
                 </div>
 
-                <!-- own pages -->
-                <section class="hm-links-wrap">
-                    <h2>Research on this site</h2>
+                <section class="hm-block hm-more-block" aria-labelledby="hm-more-h">
+                    <div class="hm-block-head"><h2 id="hm-more-h">More research and tools</h2></div>
                     <div class="hm-links">
-                        <a class="hm-link" href="/public/stocklist"><i class="fa fa-table"></i><b>Stock screener</b><span>NSE / BSE 500 with valuations, returns, watchlists and broker targets</span></a>
-                        <a class="hm-link" href="/public/consensus"><i class="fa fa-users"></i><b>Analyst consensus</b><span>Weekly estimate revisions, scores and idea lists</span></a>
-                        <a class="hm-link" href="/public/sectors"><i class="fa fa-th-large"></i><b>Sectors</b><span>Sector scoreboard and outlook</span></a>
-                        <a class="hm-link" href="/public/economy"><i class="fa fa-globe"></i><b>Economy</b><span>India's macro picture and what it means for stocks</span></a>
-                        <a class="hm-link" href="/public/indexreturnstats"><i class="fa fa-line-chart"></i><b>Index returns</b><span>Rolling returns and drawdowns of the main indices</span></a>
-                        <a class="hm-link" href="/public/nifty50stats"><i class="fa fa-bar-chart"></i><b>NIFTY 50 statistics</b><span>Valuation history: PE, PB and dividend yield</span></a>
-                        <a class="hm-link" href="/public/stockcompare"><i class="fa fa-columns"></i><b>Compare fundamentals</b><span>Side-by-side business charts of up to four stocks</span></a>
-                        <a class="hm-link" href="/public/stockcompareplus"><i class="fa fa-balance-scale"></i><b>Compare valuations</b><span>TTM PE and returns against an index</span></a>
-                        <a class="hm-link" href="/public/mflist"><i class="fa fa-pie-chart"></i><b>Mutual fund statistics</b><span>Returns and risk of selected funds</span></a>
+                        <a class="hm-link" href="/public/consensus"><i class="fa fa-users" aria-hidden="true"></i><b>Analyst consensus</b><span>Which way analysts are revising forecasts across about 500 stocks</span></a>
+                        <a class="hm-link" href="/public/stockcompare"><i class="fa fa-columns" aria-hidden="true"></i><b>Compare fundamentals</b><span>Business charts of up to five stocks, side by side</span></a>
+                        <a class="hm-link" href="/public/stockcompareplus"><i class="fa fa-balance-scale" aria-hidden="true"></i><b>Compare valuations</b><span>P/E, P/B, EV/EBITA and returns against the NIFTY 50</span></a>
+                        <a class="hm-link" href="/public/indexreturnstats"><i class="fa fa-line-chart" aria-hidden="true"></i><b>Index return statistics</b><span>Rolling returns and drawdowns of the main indices</span></a>
+                        <a class="hm-link" href="/public/nifty50stats"><i class="fa fa-bar-chart" aria-hidden="true"></i><b>NIFTY 50 statistics</b><span>Valuation history: P/E, P/B and dividend yield</span></a>
+                        <a class="hm-link" href="/public/mflist"><i class="fa fa-pie-chart" aria-hidden="true"></i><b>Mutual fund statistics</b><span>Returns and risk of selected funds</span></a>
+                        <a class="hm-link" href="/public/mftypes"><i class="fa fa-book" aria-hidden="true"></i><b>Mutual fund guide</b><span>What each type of fund does, and what to check before choosing</span></a>
+                        <a class="hm-link" href="/public/retirementfundcalculation"><i class="fa fa-calculator" aria-hidden="true"></i><b>Retirement calculator</b><span>How much capital you need to retire</span></a>
                     </div>
                 </section>
 
-                <p class="tw-muted tw-small hm-disclaimer">Live prices are from Yahoo Finance and may be delayed by 15 minutes or more. For information only; not investment advice.</p>
+                <p class="tw-muted tw-small hm-disclaimer">Prices are from Yahoo Finance and may be delayed by 15 minutes or more. Valuations and long-term returns come from this site's database. For information only; not investment advice.</p>
             </div>
         </div>
 
@@ -110,6 +163,6 @@
 <script src="../../static/vendors/jquery/dist/jquery.min.js" th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
 <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js" th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
 <script src="../../static/custom/custom.min.js" th:src="@{/custom/custom.min.js}"></script>
-<script src="../../static/custom/public/home.js" th:src="@{/custom/public/home.js(v=20261126)}"></script>
+<script src="../../static/custom/public/home.js" th:src="@{/custom/public/home.js(v=20261128)}"></script>
 </body>
 </html>

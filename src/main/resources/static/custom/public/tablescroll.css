@@ -10,16 +10,16 @@
 .ts-scroll th, .ts-scroll td { white-space: nowrap; }
 .ts-scroll th.ts-wrap, .ts-scroll td.ts-wrap { white-space: normal; min-width: 110px; max-width: 170px; }
 .ts-scroll .ts-pin, .ts-scroll.ts-pin-first tr > :first-child {
-    position: sticky; left: 0; z-index: 1; background: #fff; box-shadow: 1px 0 0 #e5e5e5; }
-.ts-scroll tr:hover .ts-pin { background: #f5f5f5; }
+    position: sticky; left: 0; z-index: 1; background: var(--surface, #fff); box-shadow: 1px 0 0 var(--grid, #e5e5e5); }
+.ts-scroll tr:hover .ts-pin { background: var(--surface2, #f5f5f5); }
 .ts-fbar { position: sticky; bottom: 0; z-index: 3; overflow-x: auto; overflow-y: hidden; height: 17px;
-           background: rgba(255,255,255,.92); border-top: 1px solid #e5e5e5; scrollbar-color: #b5b5b5 transparent; }
+           background: color-mix(in srgb, var(--surface, #fff) 92%, transparent); border-top: 1px solid var(--grid, #e5e5e5); scrollbar-color: var(--axis, #b5b5b5) transparent; }
 .ts-fbar > div { height: 1px; }
 .ts-fbar.ts-off { display: none; }
 /* phones hide scrollbars until you swipe; give the floating one a visible thumb */
 .ts-fbar::-webkit-scrollbar { height: 12px; -webkit-appearance: none; }
-.ts-fbar::-webkit-scrollbar-thumb { background: #b5b5b5; border-radius: 6px; border: 2px solid transparent; background-clip: padding-box; }
-.ts-fbar::-webkit-scrollbar-track { background: #f0f0f0; }
+.ts-fbar::-webkit-scrollbar-thumb { background: var(--axis, #b5b5b5); border-radius: 6px; border: 2px solid transparent; background-clip: padding-box; }
+.ts-fbar::-webkit-scrollbar-track { background: var(--chip, #f0f0f0); }
 .ts-filters select, .ts-filters input[type=text] { max-width: 100%; margin-bottom: 4px; }
 @media (max-width: 767px) {
     .ts-scroll th, .ts-scroll td { padding: 6px 5px; font-size: 12px; }

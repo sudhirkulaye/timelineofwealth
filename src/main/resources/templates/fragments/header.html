@@ -16,7 +16,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="MobileOptimized" content="width" />
-    <meta name="description" content="sudhirkulaye.com is a professional wealth management solution for individual clients. " />
+    <meta name="description" content="sudhirkulaye.com is a professional wealth management solution for individual clients. "
+          th:content="${description != null ? description : 'sudhirkulaye.com is a professional wealth management solution for individual clients.'}" />
+    <!-- link previews (WhatsApp, LinkedIn, X): a controller can set a "description"; the title is the page title -->
+    <meta property="og:site_name" content="Sudhir Kulaye" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" th:content="${title}" />
+    <meta property="og:description" th:content="${description != null ? description : 'Research on Indian markets, the economy, sectors and stocks.'}" />
+    <meta name="twitter:card" content="summary" />
     <meta name="HandheldFriendly" content="true" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="generator" content="Bootstrap Admin Theme (https://startbootstrap.com), Gentelella bootstrap-admin-template, Spring Boot (http://start.spring.io/), Angular JS (https://angularjs.org/), MySQL (https://www.mysql.com/)" />
@@ -37,12 +44,12 @@
     <!-- Site theme (typography, palette, dark mode) layered over Gentelella -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
-    <link href="../../static/custom/theme.css" th:href="@{/custom/theme.css}" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,500..700&amp;display=swap" rel="stylesheet" />
+    <link href="../../static/custom/theme.css" th:href="@{/custom/theme.css(v=20261128)}" rel="stylesheet" />
     <script>
       (function () { try { var t = localStorage.getItem('tw-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
     </script>
-    <script defer="defer" src="../../static/custom/theme.js" th:src="@{/custom/theme.js}"></script>
+    <script defer="defer" src="../../static/custom/theme.js" th:src="@{/custom/theme.js(v=20261128)}"></script>
 
     <!--&lt;!&ndash; googleAnalytics &ndash;&gt;-->
     <!--&lt;!&ndash;<script src="../../static/vendors/google-analytics/analytics.min.js" th:src="@{/js/googleAnalytics.js}"></script>&ndash;&gt;-->
